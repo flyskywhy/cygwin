@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-accessing-values-exported-from-dlls.html" />
+<link rel="prev" href="ctypes-incomplete-types.html" />
+<link rel="parent" href="ctypes-ctypes-tutorial.html" />
+<link rel="next" href="ctypes-accessing-values-exported-from-dlls.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.1.17 Callback functions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.16 incomplete Types"
+  href="ctypes-incomplete-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.18 accessing values exported"
+  href="ctypes-accessing-values-exported-from-dlls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-incomplete-types.html">14.14.1.16 Incomplete Types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-accessing-values-exported-from-dlls.html">14.14.1.18 Accessing values exported</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION001614117000000000000000"></a><a name="ctypes-callback-functions"></a>
+<br>
+14.14.1.17 Callback functions
+</h3>
+
+<p>
+<code>ctypes</code> allows to create C callable function pointers from Python
+callables. These are sometimes called <em>callback functions</em>.
+
+<p>
+First, you must create a class for the callback function, the class
+knows the calling convention, the return type, and the number and
+types of arguments this function will receive.
+
+<p>
+The CFUNCTYPE factory function creates types for callback functions
+using the normal cdecl calling convention, and, on Windows, the
+WINFUNCTYPE factory function creates types for callback functions
+using the stdcall calling convention.
+
+<p>
+Both of these factory functions are called with the result type as
+first argument, and the callback functions expected argument types as
+the remaining arguments.
+
+<p>
+I will present an example here which uses the standard C library's
+<tt class="function">qsort</tt> function, this is used to sort items with the help of a
+callback function. <tt class="function">qsort</tt> will be used to sort an array of
+integers:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; IntArray5 = c_int * 5
+&gt;&gt;&gt; ia = IntArray5(5, 1, 7, 33, 99)
+&gt;&gt;&gt; qsort = libc.qsort
+&gt;&gt;&gt; qsort.restype = None
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+<tt class="function">qsort</tt> must be called with a pointer to the data to sort, the
+number of items in the data array, the size of one item, and a pointer
+to the comparison function, the callback. The callback will then be
+called with two pointers to items, and it must return a negative
+integer if the first item is smaller than the second, a zero if they
+are equal, and a positive integer else.
+
+<p>
+So our callback function receives pointers to integers, and must
+return an integer. First we create the <code>type</code> for the callback
+function:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; CMPFUNC = CFUNCTYPE(c_int, POINTER(c_int), POINTER(c_int))
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+For the first implementation of the callback function, we simply print
+the arguments we get, and return 0 (incremental development ;-):
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def py_cmp_func(a, b):
+...     print "py_cmp_func", a, b
+...     return 0
+...
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Create the C callable callback:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; cmp_func = CMPFUNC(py_cmp_func)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+And we're ready to go:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), cmp_func) # doctest: +WINDOWS
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+We know how to access the contents of a pointer, so lets redefine our callback:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def py_cmp_func(a, b):
+...     print "py_cmp_func", a[0], b[0]
+...     return 0
+...
+&gt;&gt;&gt; cmp_func = CMPFUNC(py_cmp_func)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Here is what we get on Windows:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), cmp_func) # doctest: +WINDOWS
+py_cmp_func 7 1
+py_cmp_func 33 1
+py_cmp_func 99 1
+py_cmp_func 5 1
+py_cmp_func 7 5
+py_cmp_func 33 5
+py_cmp_func 99 5
+py_cmp_func 7 99
+py_cmp_func 33 99
+py_cmp_func 7 33
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+It is funny to see that on linux the sort function seems to work much
+more efficient, it is doing less comparisons:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), cmp_func) # doctest: +LINUX
+py_cmp_func 5 1
+py_cmp_func 33 99
+py_cmp_func 7 33
+py_cmp_func 5 7
+py_cmp_func 1 7
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Ah, we're nearly done! The last step is to actually compare the two
+items and return a useful result:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def py_cmp_func(a, b):
+...     print "py_cmp_func", a[0], b[0]
+...     return a[0] - b[0]
+...
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Final run on Windows:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), CMPFUNC(py_cmp_func)) # doctest: +WINDOWS
+py_cmp_func 33 7
+py_cmp_func 99 33
+py_cmp_func 5 99
+py_cmp_func 1 99
+py_cmp_func 33 7
+py_cmp_func 1 33
+py_cmp_func 5 33
+py_cmp_func 5 7
+py_cmp_func 1 7
+py_cmp_func 5 1
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+and on Linux:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), CMPFUNC(py_cmp_func)) # doctest: +LINUX
+py_cmp_func 5 1
+py_cmp_func 33 99
+py_cmp_func 7 33
+py_cmp_func 1 7
+py_cmp_func 5 7
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+It is quite interesting to see that the Windows <tt class="function">qsort</tt> function
+needs more comparisons than the linux version!
+
+<p>
+As we can easily check, our array is sorted now:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; for i in ia: print i,
+...
+1 5 7 33 99
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+<b>Important note for callback functions:</b>
+
+<p>
+Make sure you keep references to CFUNCTYPE objects as long as they are
+used from C code. <code>ctypes</code> doesn't, and if you don't, they may be
+garbage collected, crashing your program when a callback is made.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.16 incomplete Types"
+  href="ctypes-incomplete-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.18 accessing values exported"
+  href="ctypes-accessing-values-exported-from-dlls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-incomplete-types.html">14.14.1.16 Incomplete Types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-accessing-values-exported-from-dlls.html">14.14.1.18 Accessing values exported</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

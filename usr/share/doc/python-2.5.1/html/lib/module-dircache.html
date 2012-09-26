@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-shutil.html" />
+<link rel="parent" href="filesys.html" />
+<link rel="next" href="archiving.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.11 dircache -- Cached directory listings</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.10.1 Example"
+  href="shutil-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12. data Compression and"
+  href="archiving.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="shutil-example.html">11.10.1 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="archiving.html">12. Data Compression and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00131100000000000000000">
+11.11 <tt class="module">dircache</tt> --
+         Cached directory listings</a>
+</h1>
+
+<p>
+<a name="module-dircache"></a>
+
+<p>
+The <tt class="module">dircache</tt> module defines a function for reading directory listing
+using a cache, and cache invalidation using the <var>mtime</var> of the directory.
+Additionally, it defines a function to annotate directories by appending
+a slash.
+
+<p>
+The <tt class="module">dircache</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2313' xml:id='l2h-2313' class="function">reset</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Resets the directory cache.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2314' xml:id='l2h-2314' class="function">listdir</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Return a directory listing of <var>path</var>, as gotten from
+<tt class="function">os.listdir()</tt>. Note that unless <var>path</var> changes, further call
+to <tt class="function">listdir()</tt> will not re-read the directory structure.
+
+<p>
+Note that the list returned should be regarded as read-only. (Perhaps
+a future version should change it to return a tuple?)
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2315' xml:id='l2h-2315' class="function">opendir</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Same as <tt class="function">listdir()</tt>. Defined for backwards compatibility.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2316' xml:id='l2h-2316' class="function">annotate</tt></b>(</nobr></td>
+  <td><var>head, list</var>)</td></tr></table></dt>
+<dd>
+Assume <var>list</var> is a list of paths relative to <var>head</var>, and append,
+in place, a "<tt class="character">/</tt>" to each path which points to a directory.
+</dl>
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import dircache
+&gt;&gt;&gt; a = dircache.listdir('/')
+&gt;&gt;&gt; a = a[:] # Copy the return value so we can change 'a'
+&gt;&gt;&gt; a
+['bin', 'boot', 'cdrom', 'dev', 'etc', 'floppy', 'home', 'initrd', 'lib', 'lost+
+found', 'mnt', 'proc', 'root', 'sbin', 'tmp', 'usr', 'var', 'vmlinuz']
+&gt;&gt;&gt; dircache.annotate('/', a)
+&gt;&gt;&gt; a
+['bin/', 'boot/', 'cdrom/', 'dev/', 'etc/', 'floppy/', 'home/', 'initrd/', 'lib/
+', 'lost+found/', 'mnt/', 'proc/', 'root/', 'sbin/', 'tmp/', 'usr/', 'var/', 'vm
+linuz']
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.10.1 Example"
+  href="shutil-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12. data Compression and"
+  href="archiving.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="shutil-example.html">11.10.1 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="archiving.html">12. Data Compression and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

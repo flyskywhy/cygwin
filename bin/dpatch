@@ -1,0 +1,1385 @@
+#! /bin/bash
+## dpatch.shpp					-*- shell-script -*-
+##
+## Main dpatch control code.
+## 'dpatch.shpp' generates 'dpatch'.
+
+set -e
+set -o pipefail
+
+DPATCH_OPTION_FORCE=0
+DPATCH_OPTION_STRICT=0
+DPATCH_OPTION_CPP=0
+DPATCH_OPTION_CHDIR=0
+DPATCH_WORKDIR=./
+
+SYSCONFDIR='/etc'
+
+if [ -e ${SYSCONFDIR}/dpatch.conf ]; then
+	. ${SYSCONFDIR}/dpatch.conf
+fi
+
+if [ -e ${HOME}/.dpatch.conf ]; then
+	. ${HOME}/.dpatch.conf
+fi
+
+# (---- beginning of dpatch_help.shpp ----)
+## dpatch_help.shpp				-*- shell-script -*-
+##
+## Help messages for dpatch.
+
+dpatch_help_apply="dpatch apply -- apply the given patches
+
+Usage: dpatch apply [<options>] <patches>
+       dpatch apply-all [<options>]
+       dpatch apply-until [<options>] <patch>
+
+Aliases: apply, patch
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Put stamps into <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+  --verbose, -v		Disables hiding of the scriptlet output.
+
+Applies one or more \`dpatches' to the working tree (the current
+directory, if not told otherwise). By default the specified patches
+will be applied in the exact same order they were specified.
+
+Calling \`apply-all' applies all available \`dpatches'.
+
+Using \`apply-until' makes it possible to apply all patches up to, and
+including the specified one."
+
+dpatch_help_deapply="dpatch deapply -- deapply the given patches
+
+Usage: dpatch deapply [<options>] <patches>
+       dpatch deapply-all [<options>]
+       dpatch deapply-until [<options>] <patch>
+
+Aliases: deapply, unpatch
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Use the stamps in <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+  --verbose, -v		Disables hiding of the scriptlet output.
+
+Deapplies one or more \`dpatches' to the working tree (the current
+directory, if not told otherwise). By default the specified patches
+will be deapplied in the exact same order they were specified. Pay
+attention to this order: you generally should deapply in reverse order
+(compared to the apply order, that is)!
+
+Calling \`deapply-all' deapplies all available \`dpatches'.
+
+Using \`deapply-until' makes it possible to deapply all patches up to,
+and including the specified one. Note that this works on a patch list
+whose order is reversed, take that into account when using this
+command."
+
+dpatch_help_custom="dpatch call -- call dpatches with a given argument
+
+Usage: dpatch call --argument=<arg> <patches>
+       dpatch call-all --argument=<arg>
+       dpatch call-until --argument=<arg> <patch>
+
+Options:
+  --argument=<arg>,
+          -a=<arg>	Call patches with <arg> as argument.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+
+Call a \`dpatch' with a user-specified argument. All arguments with a
+\`pkg-' prefix is guaranteed to be unused by dpatch itself, and are
+reserved for use with this very command.
+
+The \`call-all' command will run each and every available \`dpatch'
+with the specified argument. Using \`call-until' will do the same, but
+only up to, and including the specified patch."
+
+dpatch_help_status="dpatch status -- print the status of the given patches
+
+Usage: dpatch status [<options>] <patches>
+       dpatch status-all [<options>]
+       dpatch status-until [<options>] <patch>
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Use the stamps in <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+
+The \`status' command prints the status of the given patches - whether
+they are applied to the working tree or not.
+
+Use the \`status-all' command to get the status of all available
+patches, and \`status-until' to get the status of all patches up to
+and including the specified one."
+
+dpatch_help_log="dpatch log -- print the log of a given patching attempt
+
+Usage: dpatch log [<options>] <patches>
+       dpatch log-all [<options>]
+       dpatch log-until [<options>] <patch>
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Use the stamps in <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything, only the logs themselves.
+  --help, -h		This help message.
+
+The \`log' command displays the output of a patching attempt (that is, the
+result of a dpatch apply). It is almost similar to \`cat debian/patched/foo'.
+
+Use the \`log-all' command to view the output of all patching attempts, and
+\`log-until' to view the output of attempts up to and including the specified
+one."
+
+dpatch_help_list="dpatch list -- list patches
+
+Usage: dpatch list <patches>
+       dpatch list-all
+       dpatch list-until <patch>
+
+This command does not take any options (except --help, of course).
+
+List the name of the given patches. These commands are not really
+useful, except \`list-all', which lists all available patches."
+
+dpatch_help_cat="dpatch cat -- get patch meta-information
+
+Usage: dpatch cat [<options>] <patches>
+       dpatch cat-all [<options>]
+       dpatch cat-until [<options>] <patches>
+
+Options:
+  --no-meta, -nm,
+  --desc, -d		Only print the patch description.
+  --author-only, -a	Only print the author of the patch.
+  --no-desc, -nd	Do not print the patch description.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+
+Print meta-information about a \`dpatch', such as its name, author and
+description (any of which can be disabled with the appropriate
+option).
+
+The \`cat-all' command prints the meta-information for all available
+patches, while \`cat-until' prints them only up to and including the
+specified patch."
+
+dpatch_help_patch_template="dpatch patch-template -- generate a template dpatch
+
+Usage: dpatch patch-template [<options>] [<patchname>] [<description>]
+
+Options:
+  --prepend, -p		Prepend the template to STDIN.
+  --help, -h		This help message.
+
+Print a quasi-standard \`dpatch\ script template, based on the
+information give on the command-line.
+
+When prepending the template to STDIN, the contents of the standard input
+will be printed right after the template."
+
+dpatch_help_help="dpatch help -- offer some help
+
+Usage: dpatch help [<command>]
+
+Attempt to give a little more detailed help about dpatch itself, or
+about a given dpatch command."
+
+dpatch_help_version="dpatch version -- print dpatch version number.
+
+Usage: dpatch version
+
+Prints the dpatch version number and exits."
+
+dpatch_help_UNKNOWN="Unknown command: \`$2'
+
+If this command is documented somewhere, please file a bug. Otherwise
+check if you made a typo, or something. :)"
+
+dpatch_help ()
+{
+	cat <<EOF
+dpatch -- Debian Patching Thingy
+
+Usage: dpatch [<global options>] <command> [<options>] [<patchset>]
+
+Global Options:
+  --workdir, -d <dir>	Do everything in the given directory.
+  --strict, -S		Work in strict mode, exiting on warnings too.
+  --force, -F		Force applying or deapplying a patch.
+
+Commands:
+  apply (apply-all, apply-until)
+    Apply the given set of patches, all of them, or up to, and including
+    the specified one.
+
+  deapply (deapply-all, deapply-until)
+    Deapply a given set of patches, all of them, or up to, and including
+    the specified one.
+
+  call (call-all, call-until)
+    Call a given set of patches with a custom argument, all of them, or
+    up to, and including the specified one.
+
+  cat (cat-all, cat-until)
+    Show the meta-information of a given set of patches, all of them, or
+    up to, and including the specified one.
+
+  list (list-all, list-until)
+    List the name of a given set of patches, all of them, or up to and
+    including the specified one.
+
+  status (status-all, status-up-to)
+    Show the status (applied or not) of a given set of patches, all of them,
+    or up to and including the specified one.
+
+  log (log-all, log-up-to)
+    Display the log of the patch attempt, all attempts, or up to and including
+    the specified one.
+
+  patch-template
+    Generate a quasi-standard dpatch template.
+
+  help
+    This help screen.
+
+  version
+    Print version number and exit.
+
+You can get more information about the various commands by issuing one of the
+	dpatch <command> --help   OR   dpatch help <command>
+commands.
+
+NOTES
+
+- all patches must reside in debian/patches/
+- all patches must be in "patch -p1" form
+- all patches must have extension *.dpatch
+- the patches used are listed in order in debian/patches/00list
+EOF
+}
+
+# dpatch_help_cmd <command>
+dpatch_help_cmd ()
+{
+	local cmd
+
+	cmd=$(dpatch_command_map $1)
+
+	if eval [ ! -z \"\$dpatch_help_${cmd}\" ]; then
+		eval echo \"\$dpatch_help_${cmd}\"
+		if [ "${cmd}" = "UNKNOWN" ]; then
+			return 1
+		fi
+		return 0
+	else
+		echo "dpatch: There is no help for \`${cmd}' yet."
+		return 1
+	fi
+}
+
+# dpatch_help_do [<command>]
+dpatch_help_do ()
+{
+	if [ ! -z "$1" ]; then
+		dpatch_help_cmd $1
+		return $?
+	else
+		dpatch_help
+		return 0
+	fi
+}
+
+dpatch_version()
+{
+	local \
+DPATCH_REVISION=''
+
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				dpatch_help_do version
+				return $?
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_version: $1"
+				return 1
+				;;
+		esac
+		shift || true
+	done
+
+	cat <<EOF
+dpatch ${DPATCH_REVISION}
+EOF
+
+	return 0
+}
+
+dpatch_license ()
+{
+	dpatch_version
+	cat <<EOF
+Copyright (C) 2002, 2003, 2004
+	Gergely Nagy, Joerg Jaspert, David B Harris and others.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+EOF
+}
+
+# (---- end of dpatch_help.shpp ----)
+# (---- beginning of dpatch_lowlevel.shpp ----)
+## dpatch_lowlevel.shpp				-*- shell-script -*-
+##
+## Low level patch handling interface for dpatch.
+##
+
+# dpatch_patch_apply <args> <dpatchfile>
+dpatch_patch_apply ()
+{
+	local patch patchdir stamp ext args o_q pwd patchname stampdir wd
+	local redir o_v o_ns
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+	if [ ${DPATCH_WORKDIR} != "./" ]; then
+		wd=${DPATCH_WORKDIR}
+	fi
+	redir=">"
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			--no-stamp)
+				o_ns=1
+				;;
+			--verbose|-v)
+				redir="| tee"
+				o_v=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_apply: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	patchdir=${patchname%/*}
+	test -d ${stampdir} || install -d ${stampdir}
+	test "x${patchdir}" = "x${patchname}" || \
+		install -d ${stampdir}/${patchdir}
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	test -x ${patch} || chmod +x ${patch}
+	if test -f ${stamp} && [ ${DPATCH_OPTION_FORCE} -eq 0 ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} already applied to ${DPATCH_WORKDIR} ."
+		fi
+		if [ ${DPATCH_OPTION_STRICT} -ne 0 ]; then
+			return 1
+		fi
+	else
+		if [ -z "${o_q}" ]; then
+			echo -n "applying patch ${patchname} to ${DPATCH_WORKDIR} ..."
+			if [ ! -z "${o_v}" ]; then
+				echo
+			fi
+		fi
+		if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+			cd ${DPATCH_WORKDIR}
+		fi
+		if eval ${patch} -patch ${wd} ${redir} ${stamp}.new 2>&1; then
+			if [ -z "${o_ns}" ]; then
+				mv ${stamp}.new ${stamp}
+				touch ${stamp}
+			else
+				rm -f ${stamp}.new
+			fi
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " ok."
+				else
+					echo
+				fi
+			fi
+		else
+			if [ -z "${o_ns}" ]; then
+				mv ${stamp}.new ${stamp}.failed
+				{ printf "md5sum: "; md5sum ${patch}; } >> ${stamp}.failed
+				touch ${stamp}.failed
+			else
+				rm -f ${stamp}.new
+			fi
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " failed."
+				else
+					echo
+				fi
+			fi
+			if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+				cd ${pwd}
+			fi
+			return 1
+		fi
+	fi
+
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${pwd}
+	fi
+	return 0
+}
+
+# dpatch_patch_deapply <args> <dpatchfile>
+dpatch_patch_deapply ()
+{
+	local patch stamp ext args o_q pwd patchname stampdir wd
+	local redir o_v
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+	if [ ${DPATCH_WORKDIR} != "./" ]; then
+		wd=${DPATCH_WORKDIR}
+	fi
+	redir=">"
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			--verbose|-v)
+				redir="| tee"
+				o_v=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_deapply: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	test -x ${patch} || chmod +x ${patch}
+	if test -f ${stamp} || [ ${DPATCH_OPTION_FORCE} -ne 0 ]; then
+		if [ -z "${o_q}" ]; then
+			echo -n "reverting patch ${patchname} from ${DPATCH_WORKDIR} ..."
+			if [ ! -z "${o_v}" ]; then
+				echo
+			fi
+		fi
+		if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+			cd ${DPATCH_WORKDIR}
+		fi
+		if eval ${patch} -unpatch ${wd} ${redir} /dev/null 2>&1; then
+			rm -f ${stamp}
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " ok."
+				else
+					echo
+				fi
+			fi
+		else
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " failed."
+				else
+					echo
+				fi
+			fi
+			if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+				cd ${pwd}
+			fi
+			return 1
+		fi
+	elif test -f ${stamp}.failed; then
+		if [ -z "${o_q}" ]; then
+			echo "attempting to revert failed patch ${patchname} from ${DPATCH_WORKDIR}:"
+			if [ "$(tail -n1 ${stamp}.failed | grep ^md5sum: | cut -f2- -d" ")" \
+			     = "$(md5sum ${patch})" ]; then
+				echo -n "  md5sums match, proceeding ..."
+			else
+				echo
+				echo "  patch md5sum has changed since failed apply, aborting"
+				echo "  please clean this up manually, by reverting the changes"
+				echo "  and removing debian/patched/${patchname%%.dpatch}.dpatch.failed"
+				return 1
+			fi
+			if [ ! -z "${o_v}" ]; then
+				echo
+			fi
+		fi
+		if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+			cd ${DPATCH_WORKDIR}
+		fi
+		eval ${patch} -unpatch ${wd} ${redir} /dev/null 2>&1 || true
+		rm -f ${stamp}.failed
+		if [ -z "${o_q}" ]; then
+			if [ -z "${o_v}" ]; then
+				echo " done (neither success nor failure guaranteed)"
+			else
+				echo
+			fi
+		fi
+	else
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} not applied to ${DPATCH_WORKDIR} ."
+			if [ ${DPATCH_OPTION_STRICT} -ne 0 ]; then
+				return 1
+			fi
+		fi
+	fi
+
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${pwd}
+	fi
+	return 0
+}
+
+# dpatch_patch_status <args> <dpatchfile>
+dpatch_patch_status ()
+{
+	local patch stamp ext args o_q patchname pwd stampdir
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_status: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	if test -f ${stamp}; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} already applied to ${DPATCH_WORKDIR} ."
+		else
+			return 11
+		fi
+	else
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} not applied to ${DPATCH_WORKDIR} ."
+		fi
+	fi
+
+	return 0
+}
+
+# dpatch_patch_log <args> <dpatchfile>
+dpatch_patch_log ()
+{
+	local patch stamp ext args o_q patchname pwd stampdir
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_log: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	if test -f ${stamp}; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname}:"
+			sed -e "s,^,| ,g" < ${stamp}
+			echo
+		else
+			cat ${stamp}
+		fi
+	fi
+
+	return 0
+}
+
+# dpatch_patch_custom <args> <dpatchfile>
+dpatch_patch_custom ()
+{
+	local patch ext args o_q o_a pwd patchname wd rv
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	if [ ${DPATCH_WORKDIR} != "./" ]; then
+		wd=${DPATCH_WORKDIR}
+	fi
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--argument=*|-a=*)
+				o_a=$(echo $1 | cut -d= -f2-)
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_custom: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	if [ -z "${o_a}" ]; then
+		echo "dpatch: No argument supplied for dpatch call!" >&2
+		return 1
+	fi
+
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	test -x ${patch} || chmod +x ${patch}
+
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${DPATCH_WORKDIR}
+	fi
+	if ${patch} -${o_a} ${wd}; then
+		rv=0
+	else
+		rv=1
+	fi
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${pwd}
+	fi
+	return ${rv}
+}
+
+# dpatch_patch_cat <args> <dpatchfile>
+dpatch_patch_cat ()
+{
+	local patch ext author args o_nm o_nd o_a sp o_q
+
+	args=$1
+	patch=$2
+	sp="  "
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--no-meta|-nm|--desc-only|-d)
+				o_nm=1
+				o_a=""
+				;;
+			--author-only|-a)
+				o_a=1
+				o_nd=1
+				;;
+			--no-desc|-nd)
+				o_nd=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_cat: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	test -e debian/patches/${patch} || ext=.dpatch
+	patch=debian/patches/${patch}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patch} does not exist."
+		fi
+		return 1
+	fi
+
+	author=$(sed -n "s,^#* *.*dpatch by *,,p" ${patch})
+
+	if [ -z "${o_nm}" ] && [ -z "${o_a}" ]; then
+		echo "${patch} (${author}):"
+	else
+		if [ ! -z "${o_a}" ]; then
+			echo ${author}
+			return 0
+		fi
+		sp=""
+	fi
+	if [ -z "${o_nd}" ]; then
+		sed -n "s/^#* *DP: */${sp}/p" ${patch}
+		echo
+	fi
+
+	return 0
+}
+
+# dpatch_patch_list <args> <dpatchfile>
+dpatch_patch_list ()
+{
+	if [ ! -z "${args}" ]; then
+		echo "dpatch: dpatch_patch_list does not take any options." >&2
+		return 1
+	fi
+	echo "${2%.dpatch}"
+	return 0
+}
+
+# dpatch_command_map <command>
+dpatch_command_map ()
+{
+	local cmd_o cmd
+
+	cmd_o=$1
+
+	case ${cmd_o} in
+		call|call-until|call-up-to|call-all)
+			cmd=custom
+			;;
+		patch|apply|patch-until|apply-until|patch-up-to|apply-up-to|patch-all|apply-all)
+			cmd=apply
+			;;
+		unpatch|deapply|unpatch-until|deapply-until|unpatch-up-to|deapply-up-to|unpatch-all|deapply-all)
+			cmd=deapply
+			;;
+		list|list-all|list-up-to|list-until)
+			cmd=list
+			;;
+		cat|cat-all|cat-up-to|cat-until)
+			cmd=cat
+			;;
+		status|status-all|status-up-to|status-until)
+			cmd=status
+			;;
+		log|log-all|log-up-to|log-until)
+			cmd=log
+			;;
+		patch-template)
+			cmd=patch_template
+			;;
+		help|--help|-h)
+			cmd=help
+			;;
+		version|--version|-V)
+			cmd=version
+			;;
+		*)
+			cmd=UNKNOWN
+			;;
+	esac
+
+	echo ${cmd}
+}
+
+# (---- end of dpatch_lowlevel.shpp ----)
+# (---- beginning of dpatch_patchset.shpp ----)
+## dpatch_patchset.shpp				-*- shell-script -*-
+##
+## Patchset handling functions for dpatch.
+##
+
+# dpatch_pathset_do <command> <issingle> [<dpatchfile>]
+
+dpkg-architecture ()
+{
+    echo i386 # Cygwin fix
+}
+
+dpatch_patchset_do ()
+{
+	local patchlist patchlist_all patchlist_arch patch cpatch cmd args
+	local is_single
+	DEB_BUILD_ARCH=${DEB_BUILD_ARCH:-$(dpkg-architecture -qDEB_BUILD_ARCH)}
+
+	cmd=$1; shift || true
+	is_single=$1; shift || true
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				dpatch_help_do ${cmd}
+				return $?
+				;;
+			-*)
+				args="${args} $1"
+				;;
+			*)
+				break
+				;;
+		esac
+		shift || true
+	done
+	patch="${1%%.dpatch}";
+	if [ $# -ne 0 ]; then
+		shift || true
+	fi
+
+	if test $# -gt 0 || test $is_single -eq 1; then
+		patchlist="$patch $@"
+		patch=""
+	else
+		if [ "${DPATCH_OPTION_CPP}" = "0" ]; then
+			if test -f debian/patches/00list; then
+				patchlist_all="$(grep -v ^\# debian/patches/00list || :)"
+			fi
+			if test -f debian/patches/00list.${DEB_BUILD_ARCH}; then
+				patchlist_arch="$(grep -v ^\# debian/patches/00list.${DEB_BUILD_ARCH} || :)"
+			fi
+		else
+			if [ -f debian/patches/00list ]; then
+				patchlist_all="$(cpp -P -DDEB_BUILD_ARCH_${DEB_BUILD_ARCH}=1 \
+						        -DDEB_BUILD_ARCH=\"${DEB_BUILD_ARCH}\" \
+						        debian/patches/00list || :)"
+			fi
+			if [ -f debian/patches/00list.${DEB_BUILD_ARCH} ]; then
+				patchlist_arch="$(cpp -P -DDEB_BUILD_ARCH_${DEB_BUILD_ARCH}=1 \
+							 -DDEB_BUILD_ARCH=\"${DEB_BUILD_ARCH}\" \
+							 debian/patches/00list.${DEB_BUILD_ARCH} || :)"
+			fi
+		fi
+		patchlist="${patchlist_all} ${patchlist_arch}"
+	fi
+
+	if test "x$cmd" = "xdeapply"; then
+		patchlist=$(echo ${patchlist} | tr ' ' '\n' | tac)
+	fi
+
+	for cpatch in ${patchlist}; do
+		cpatch="${cpatch%%.dpatch}"
+		dpatch_patch_${cmd} "${args}" "${cpatch}"
+		if test $? -ne 0; then
+			return $?
+		fi
+		if test "x${cpatch}" = "x${patch}"; then
+			return 0
+		fi
+	done
+}
+
+# (---- end of dpatch_patchset.shpp ----)
+# (---- beginning of dpatch_args.shpp ----)
+## dpatch_args.shpp				-*- shell-script -*-
+##
+## Argument handling helper functions for dpatch.
+##
+
+# dpatch_args_check <cmd_help> <argc> <minimumargs> <maxargs>
+dpatch_args_check ()
+{
+	local minargs maxargs argc ch
+
+	ch=$1
+	argc=$2
+	minargs=$3
+	maxargs=$4
+
+	if [ $ch -eq 1 ]; then
+		return 0
+	fi
+	if test ${argc} -gt ${maxargs} && test ${maxargs} -ne -1; then
+		echo "dpatch: Wrong number of arguments: ${argc} (expecting at most ${maxargs})." >&2
+		exit 1
+	fi
+	if test ${argc} -lt ${minargs} && test ${minargs} -ne -1; then
+		echo "dpatch: Wrong number of arguments: ${argc} (expecting at least ${minargs})." >&2
+		exit 1
+	fi
+}
+
+# dpatch_arg_count <args>
+dpatch_arg_count ()
+{
+	local argc h
+
+	argc=0
+	while [ $# -ne 0 ]; do
+		case $1 in
+			-*)
+				;;
+			*)
+				argc=$(expr ${argc} + 1)
+				;;
+		esac
+		shift || true
+	done
+
+	echo ${argc}
+	return 0
+}
+
+# dpatch_arg_cmd_help <args>
+dpatch_arg_cmd_help ()
+{
+	local h=0
+
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				h=1
+				;;
+		esac
+		shift || true
+	done
+
+	echo ${h}
+	return 0;
+}
+
+# (---- end of dpatch_args.shpp ----)
+# (---- beginning of dpatch_requisites.shpp ----)
+## dpatch_requisites.shpp				-*- shell-script -*-
+##
+## Sanity checks for dpatch
+##
+
+# dpatch_requisites
+dpatch_requisites()
+{
+	local DPATCH_REQUISITES_FAILED
+
+	if [ "$DPATCH_OPTION_CPP" = 1 ]; then
+		if [ ! -x /usr/bin/cpp ]; then
+			echo "dpatch: /usr/bin/cpp not found, aborting!" >&2
+			echo " (consider installing the cpp package)" >&2
+			DPATCH_REQUISITES_FAILED=1
+		fi
+	fi
+
+	return $DPATCH_REQUISITES_FAILED
+}
+
+# (---- end of dpatch_requisites.shpp ----)
+# (---- beginning of dpatch_template.shpp ----)
+## dpatch_template.shpp				-*- shell-script -*-
+##
+## Template handling helper functions for dpatch
+##
+
+# dpatch_patch_template <args> <patchname> [<desc>]
+dpatch_patch_template ()
+{
+	local pname pdesc o_p
+
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				dpatch_help_do patch-template
+				return $?
+				;;
+			--prepend|-p)
+				o_p=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_template: $1" >&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift || true
+	done
+
+	pname=${1:-99-unnamed}
+	pdesc=${2:-No description.}
+
+	cat <<EOF
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## ${pname}.dpatch by ${DEBFULLNAME} <${DEBEMAIL:-${EMAIL:-$LOGNAME@`hostname -f`}}>
+##
+## All lines beginning with \`## DP:' are a description of the patch.
+EOF
+	echo "${pdesc}" | fold -s -w 72 | sed -e "s,^,## DP: ,g"
+
+	cat <<EOF
+
+@DPATCH@
+EOF
+
+	if [ ! -z "${o_p}" ]; then
+		echo
+		cat
+	fi
+
+	return 0
+}
+
+# (---- end of dpatch_template.shpp ----)
+
+if [ $# -eq 0 ]; then
+	dpatch_help
+	exit 1
+fi
+
+while [ $# -gt 0 ]; do
+	case $1 in
+		--with-cpp)
+			DPATCH_CLI_OPTION_CPP=1
+			;;
+		--force|-F)
+			DPATCH_OPTION_FORCE=1
+			;;
+		--strict|-S)
+			DPATCH_OPTION_STRICT=1
+			;;
+		--chdir|-c)
+			DPATCH_OPTION_CHDIR=1
+			;;
+		--help|-h|--version|-V|--license)
+			break
+			;;
+		--workdir|-d)
+			case $2 in
+				/*)
+					DPATCH_WORKDIR=$2
+					;;
+				*)
+					DPATCH_WORKDIR=$(pwd)/$2
+					;;
+			esac
+			shift
+			;;
+		-*)
+			echo "dpatch: Unsupported global option: $1" >&2
+			exit 1
+			;;
+		*)
+			break
+			;;
+	esac
+	shift || true
+done
+
+# Source debian/patches/00options here, as we need to know $DPATCH_WORKDIR first
+if [ -e "$DPATCH_WORKDIR/debian/patches/00options" ]; then
+    . "$DPATCH_WORKDIR/debian/patches/00options"
+fi
+
+# For each option we support both in the CLI and in 00options, the CLI should
+# set "DPATCH_CLI_OPTION_FOO", and the real option should be
+# "DPATCH_OPTION_FOO".  After sourcing 00options, one must check for each CLI
+# option for an override (we do want CLI options overriding 00options right?)
+if [ "$DPATCH_CLI_OPTION_CPP" = 1 ]; then
+    DPATCH_OPTION_CPP=1
+    unset DPATCH_CLI_OPTION_CPP
+fi
+
+# Check that we have everything we need, up until this point.
+if ! dpatch_requisites; then
+    echo "dpatch: aborting" >&2
+    exit 1
+fi
+
+command=$1; shift
+argc=$(dpatch_arg_count "$@")
+cmd_help=$(dpatch_arg_cmd_help "$@")
+cmd_mapped=$(dpatch_command_map ${command})
+
+case ${command} in
+	## Help commands
+	help|--help|-h)
+		dpatch_help_do "$@"
+		exit $?
+		;;
+	version|--version|-V)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_version "$@"
+		exit $?
+		;;
+	license|--license)
+		dpatch_license
+		exit $?
+		;;
+
+	## Template
+	patch-template)
+		dpatch_args_check ${cmd_help} ${argc} -1 2
+		dpatch_patch_template "$@"
+		exit $?
+		;;
+
+	## User-defined call to patches
+	call)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	call-until|call-up-to)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	call-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Applying of patches
+	patch|apply)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	apply-until|apply-up-to|patch-until|patch-up-to)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	apply-all|patch-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Deapplying of patches
+	unpatch|deapply)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	deapply-until|deapply-up-to|unpatch-until|unpatch-up-to)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	deapply-all|unpatch-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Listing patches
+	list)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	list-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	list-up-to|list-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Getting patch info/meta-data
+	cat)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	cat-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	cat-up-to|cat-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Getting patch status
+	status)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	status-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	status-up-top|status-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Showing patch logs
+	log)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	log-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	log-up-to|log-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Catch-all
+	*)
+		dpatch_help
+		exit 1
+		;;
+esac
+

@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-hotshot.html" />
+<link rel="prev" href="profile-calibration.html" />
+<link rel="parent" href="profile.html" />
+<link rel="next" href="module-hotshot.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>25.7 Extensions -- Deriving Better Profilers</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.6 Calibration"
+  href="profile-calibration.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.8 hotshot  "
+  href="module-hotshot.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="profile-calibration.html">25.6 Calibration</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-hotshot.html">25.8 hotshot  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0027700000000000000000">
+25.7 Extensions -- Deriving Better Profilers</a>
+</h1>
+<a name="Profiler_Extensions"></a>
+<p>
+The <tt class="class">Profile</tt> class of both modules, <tt class="module">profile</tt> and
+<tt class="module">cProfile</tt>, were written so that
+derived classes could be developed to extend the profiler.  The details
+are not described here, as doing this successfully requires an expert
+understanding of how the <tt class="class">Profile</tt> class works internally.  Study
+the source code of the module carefully if you want to
+pursue this.
+
+<p>
+If all you want to do is change how current time is determined (for
+example, to force use of wall-clock time or elapsed process time),
+pass the timing function you want to the <tt class="class">Profile</tt> class
+constructor:
+
+<p>
+<div class="verbatim"><pre>
+pr = profile.Profile(your_time_func)
+</pre></div>
+
+<p>
+The resulting profiler will then call <tt class="function">your_time_func()</tt>.
+
+<p>
+<dl>
+<dt><strong><tt class="class">profile.Profile</tt></strong></dt>
+<dd><tt class="function">your_time_func()</tt> should return a single number, or a list of
+numbers whose sum is the current time (like what <tt class="function">os.times()</tt>
+returns).  If the function returns a single time number, or the list of
+returned numbers has length 2, then you will get an especially fast
+version of the dispatch routine.
+
+<p>
+Be warned that you should calibrate the profiler class for the
+timer function that you choose.  For most machines, a timer that
+returns a lone integer value will provide the best results in terms of
+low overhead during profiling.  (<tt class="function">os.times()</tt> is
+<em>pretty</em> bad, as it returns a tuple of floating point values).  If
+you want to substitute a better timer in the cleanest fashion,
+derive a class and hardwire a replacement dispatch method that best
+handles your timer call, along with the appropriate calibration
+constant.
+
+<p>
+</dd>
+<dt><strong><tt class="class">cProfile.Profile</tt></strong></dt>
+<dd><tt class="function">your_time_func()</tt> should return a single number.  If it returns
+plain integers, you can also invoke the class constructor with a second
+argument specifying the real duration of one unit of time.  For example,
+if <tt class="function">your_integer_time_func()</tt> returns times measured in thousands
+of seconds, you would constuct the <tt class="class">Profile</tt> instance as follows:
+
+<p>
+<div class="verbatim"><pre>
+pr = profile.Profile(your_integer_time_func, 0.001)
+</pre></div>
+
+<p>
+As the <tt class="module">cProfile.Profile</tt> class cannot be calibrated, custom
+timer functions should be used with care and should be as fast as
+possible.  For the best results with a custom timer, it might be
+necessary to hard-code it in the C source of the internal
+<tt class="module">_lsprof</tt> module.
+
+<p>
+</dd>
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.6 Calibration"
+  href="profile-calibration.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.8 hotshot  "
+  href="module-hotshot.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="profile-calibration.html">25.6 Calibration</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-hotshot.html">25.8 hotshot  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

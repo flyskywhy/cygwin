@@ -1,0 +1,211 @@
+#!/usr/bin/perl -w
+# -*- cperl -*-
+#
+# gtk-doc - GTK DocBook documentation generator.
+# Copyright (C) 1998  Damon Chaplin
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+#############################################################################
+# Script      : gtkdoc-fixxref
+# Description : This fixes cross-references in the HTML documentation.
+#############################################################################
+
+use strict;
+use bytes;
+use Getopt::Long;
+
+# Options
+
+# name of documentation module
+my $MODULE;
+my $MODULE_DIR;
+my $HTML_DIR = "";
+my @EXTRA_DIRS;
+my $PRINT_VERSION;
+my $PRINT_HELP;
+
+my %optctl = (module => \$MODULE,
+	      'module-dir' => \$MODULE_DIR,
+	      'html-dir' => \$HTML_DIR,
+	      'extra-dir' => \@EXTRA_DIRS,
+	      'version' => \$PRINT_VERSION,
+	      'help' => \$PRINT_HELP);
+GetOptions(\%optctl, "module=s", "module-dir=s", "html-dir=s", "extra-dir=s@",
+	"version", "help");
+
+if ($PRINT_VERSION) {
+    print "1.5\n";
+    exit 0;
+}
+
+if ($PRINT_HELP) {
+    print "gtkdoc-fixxref version 1.5\n";
+    print "\n--module=MODULE_NAME    Name of the doc module being parsed";
+    print "\n--module-dir=MODULE_DIR The directory which contains the generated HTML";
+    print "\n--html-dir=HTML_DIR     The directory where gtk-doc generated documentation is installed";
+    print "\n--extra-dir=EXTRA_DIR   Directories to scan for indices in addition to HTML_DIR";
+    print "\n                        May be used more than once for multiple directories";
+    print "\n--version               Print the version of this program";
+    print "\n--help                  Print this help\n";
+    exit 0;
+}
+
+# This contains all the entities and their relative URLs.
+my %Links;
+
+my $dir;
+
+# We scan the directory containing GLib and any directories in GNOME2_PATH
+# first, but these will be overriden by any later scans.
+$dir = `pkg-config --variable=prefix glib-2.0`;
+$dir =~ s/\s+$//;
+$dir = $dir . "/share/gtk-doc/html";
+if (-d $dir && $dir ne $HTML_DIR) {
+#    print "Scanning GLib directory: $dir\n";
+    &ScanIndices ($dir, 1);
+}
+
+if (defined ($ENV{"GNOME2_PATH"})) {
+    foreach $dir (split (/:/, $ENV{"GNOME2_PATH"})) {
+        $dir = $dir . "/share/gtk-doc/html";
+	if (-d $dir && $dir ne $HTML_DIR) {
+#	    print "Scanning GNOME2_PATH directory: $dir\n";
+	    &ScanIndices ($dir, 1);
+	}
+    }
+}
+
+#print "Scanning HTML_DIR directory: $HTML_DIR\n";
+&ScanIndices ($HTML_DIR, 0);
+foreach my $dir (@EXTRA_DIRS) {
+#    print "Scanning EXTRA_DIR directory: $dir\n";
+    # If the --extra-dir option is an absolute directory, we use absolute
+    # directories for the links. Support Unix '/' or Win32 'C:\'.
+    if ($dir =~ m%^(/|[A-Z]:\\)%) {
+        &ScanIndices ($dir, 1);
+    } else {
+        &ScanIndices ($dir, 0);
+    }
+}
+
+&FixCrossReferences (defined $MODULE_DIR ? $MODULE_DIR : "$HTML_DIR/$MODULE");
+
+sub ScanIndices {
+    my ($scan_dir, $use_absolute_links) = @_;
+#    print "Scanning source directory: $scan_dir absolute: $use_absolute_links\n";
+
+    # This array holds any subdirectories found.
+    my (@subdirs) = ();
+
+    opendir (HTMLDIR, $scan_dir) || return;
+    my $file;
+    foreach $file (readdir (HTMLDIR)) {
+	if ($file eq '.' || $file eq '..') {
+	    next;
+	} elsif (-d "$scan_dir/$file") {
+	    push (@subdirs, $file);
+	} elsif ($file eq "index.sgml") {
+	    &ScanIndex ("$scan_dir/$file", $use_absolute_links);
+	}
+    }
+    closedir (HTMLDIR);
+
+    # Now recursively scan the subdirectories.
+    my $dir;
+    foreach $dir (@subdirs) {
+	&ScanIndices ("$scan_dir/$dir", $use_absolute_links);
+    }
+}
+
+sub ScanIndex {
+    my ($file, $use_absolute_links) = @_;
+#    print "Scanning index file: $file absolute: $use_absolute_links\n";
+
+    # Determine the absolute directory, to be added to links in index.sgml
+    # if we need to use an absolute link.
+    # $file will be something like /opt/gnome/share/gtk-doc/html/gtk/index.sgml
+    # We want the part up to 'html' since the links in index.sgml include
+    # the rest.
+    my $dir = "../";
+    if ($use_absolute_links) {
+        $file =~ /(.*\/)(.*?)\/index\.sgml/;
+        $dir = $1;
+    }
+
+    open (INDEXFILE, $file)
+	|| die "Can't open $file: $!";
+    while (<INDEXFILE>) {
+	if (m/^<ANCHOR\s+id\s*=\s*"([^"]*)"\s+href\s*=\s*"([^"]*)"\s*>/) {
+#	    print "Found id: $1 href: $2\n";
+	    $Links{$1} = "$dir$2";
+	}
+    }
+    close (INDEXFILE);
+}
+
+
+sub FixCrossReferences {
+    my ($scan_dir) = @_;
+
+    opendir (HTMLDIR, $scan_dir)
+	|| die "Can't open HTML directory $scan_dir: $!";
+    my $file;
+    foreach $file (readdir (HTMLDIR)) {
+	if ($file eq '.' || $file eq '..') {
+	    next;
+	} elsif ($file =~ m/.html?$/) {
+	    &FixHTMLFile ("$scan_dir/$file");
+	}
+    }
+    closedir (HTMLDIR);
+}
+
+
+sub FixHTMLFile {
+    my ($file) = @_;
+#    print "Fixing file: $file\n";
+
+    open (HTMLFILE, $file)
+	|| die "Can't open $file: $!";
+    undef $/;
+    my $entire_file = <HTMLFILE>;
+    close (HTMLFILE);
+
+    $entire_file =~ s%<GTKDOCLINK\s+HREF="([^"]*)"\s*>(.*?)</GTKDOCLINK\s*>% &MakeXRef($1, $2); %ge;
+
+    open (NEWFILE, ">$file.new")
+	|| die "Can't open $file: $!";
+    print NEWFILE $entire_file;
+    close (NEWFILE);
+
+    unlink ($file)
+	|| die "Can't delete $file: $!";
+    rename ("$file.new", $file)
+	|| die "Can't rename $file.new: $!";
+}
+
+
+sub MakeXRef {
+    my ($id, $text) = @_;
+
+    my $href = $Links{$id};
+    if ($href) {
+        return "<a\nhref=\"$href\"\n>$text</a>";
+    } else {
+	return $text;
+    }
+}

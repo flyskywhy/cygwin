@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="writer-impls.html" />
+<link rel="prev" href="formatter-impls.html" />
+<link rel="parent" href="module-formatter.html" />
+<link rel="next" href="writer-impls.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>33.1.3 The Writer Interface </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="33.1.2 formatter Implementations"
+  href="formatter-impls.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="33.1 formatter  "
+  href="module-formatter.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="33.1.4 writer Implementations"
+  href="writer-impls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="formatter-impls.html">33.1.2 Formatter Implementations</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-formatter.html">33.1 formatter  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="writer-impls.html">33.1.4 Writer Implementations</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0035130000000000000000"></a><a name="writer-interface"></a>
+<br>
+33.1.3 The Writer Interface 
+</h2>
+
+<p>
+Interfaces to create writers are dependent on the specific writer
+class being instantiated.  The interfaces described below are the
+required interfaces which all writers must support once initialized.
+Note that while most applications can use the
+<tt class="class">AbstractFormatter</tt> class as a formatter, the writer must
+typically be provided by the application.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5533' xml:id='l2h-5533' class="method">flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Flush any buffered output or device control events.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5534' xml:id='l2h-5534' class="method">new_alignment</tt></b>(</nobr></td>
+  <td><var>align</var>)</td></tr></table></dt>
+<dd>
+Set the alignment style.  The <var>align</var> value can be any object,
+but by convention is a string or <code>None</code>, where <code>None</code>
+indicates that the writer's ``preferred'' alignment should be used.
+Conventional <var>align</var> values are <code>'left'</code>, <code>'center'</code>,
+<code>'right'</code>, and <code>'justify'</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5535' xml:id='l2h-5535' class="method">new_font</tt></b>(</nobr></td>
+  <td><var>font</var>)</td></tr></table></dt>
+<dd>
+Set the font style.  The value of <var>font</var> will be <code>None</code>,
+indicating that the device's default font should be used, or a tuple
+of the form <code>(</code><var>size</var>, <var>italic</var>, <var>bold</var>,
+<var>teletype</var><code>)</code>.  Size will be a string indicating the size of
+font that should be used; specific strings and their interpretation
+must be defined by the application.  The <var>italic</var>, <var>bold</var>, and
+<var>teletype</var> values are Boolean values specifying which of those
+font attributes should be used.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5536' xml:id='l2h-5536' class="method">new_margin</tt></b>(</nobr></td>
+  <td><var>margin, level</var>)</td></tr></table></dt>
+<dd>
+Set the margin level to the integer <var>level</var> and the logical tag
+to <var>margin</var>.  Interpretation of the logical tag is at the
+writer's discretion; the only restriction on the value of the logical
+tag is that it not be a false value for non-zero values of
+<var>level</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5537' xml:id='l2h-5537' class="method">new_spacing</tt></b>(</nobr></td>
+  <td><var>spacing</var>)</td></tr></table></dt>
+<dd>
+Set the spacing style to <var>spacing</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5538' xml:id='l2h-5538' class="method">new_styles</tt></b>(</nobr></td>
+  <td><var>styles</var>)</td></tr></table></dt>
+<dd>
+Set additional styles.  The <var>styles</var> value is a tuple of
+arbitrary values; the value <tt class="constant">AS_IS</tt> should be ignored.  The
+<var>styles</var> tuple may be interpreted either as a set or as a stack
+depending on the requirements of the application and writer
+implementation.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5539' xml:id='l2h-5539' class="method">send_line_break</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Break the current line.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5540' xml:id='l2h-5540' class="method">send_paragraph</tt></b>(</nobr></td>
+  <td><var>blankline</var>)</td></tr></table></dt>
+<dd>
+Produce a paragraph separation of at least <var>blankline</var> blank
+lines, or the equivalent.  The <var>blankline</var> value will be an
+integer.  Note that the implementation will receive a call to
+<tt class="method">send_line_break()</tt> before this call if a line break is needed; 
+this method should not include ending the last line of the paragraph.
+It is only responsible for vertical spacing between paragraphs.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5541' xml:id='l2h-5541' class="method">send_hor_rule</tt></b>(</nobr></td>
+  <td><var>*args, **kw</var>)</td></tr></table></dt>
+<dd>
+Display a horizontal rule on the output device.  The arguments to this
+method are entirely application- and writer-specific, and should be
+interpreted with care.  The method implementation may assume that a
+line break has already been issued via <tt class="method">send_line_break()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5542' xml:id='l2h-5542' class="method">send_flowing_data</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Output character data which may be word-wrapped and re-flowed as
+needed.  Within any sequence of calls to this method, the writer may
+assume that spans of multiple whitespace characters have been
+collapsed to single space characters.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5543' xml:id='l2h-5543' class="method">send_literal_data</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Output character data which has already been formatted
+for display.  Generally, this should be interpreted to mean that line
+breaks indicated by newline characters should be preserved and no new
+line breaks should be introduced.  The data may contain embedded
+newline and tab characters, unlike data provided to the
+<tt class="method">send_formatted_data()</tt> interface.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5544' xml:id='l2h-5544' class="method">send_label_data</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Set <var>data</var> to the left of the current left margin, if possible.
+The value of <var>data</var> is not restricted; treatment of non-string
+values is entirely application- and writer-dependent.  This method
+will only be called at the beginning of a line.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="33.1.2 formatter Implementations"
+  href="formatter-impls.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="33.1 formatter  "
+  href="module-formatter.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="33.1.4 writer Implementations"
+  href="writer-impls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="formatter-impls.html">33.1.2 Formatter Implementations</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-formatter.html">33.1 formatter  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="writer-impls.html">33.1.4 Writer Implementations</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

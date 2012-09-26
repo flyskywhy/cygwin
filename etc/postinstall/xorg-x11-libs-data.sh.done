@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Set the path to programs
+export PATH=/bin
+
+Xconfig=/usr/X11R6/lib/X11 # obsolete base dir
+etcXconfig=/etc/X11	   # new base dir
+
+mkdir -p $etcXconfig # assure new base dir exists
+
+# subdirs to move
+subconfigs="app-defaults fs lbxproxy proxymngr rstart twm xdm xinit xkb xserver xsm"
+for dir in $subconfigs; do
+
+    Xdir=$Xconfig/$dir       # obsolete subdir
+    etcXdir=$etcXconfig/$dir # new subdir
+
+    mkdir -p $etcXdir # assure new subdir exists
+
+    # Move to new location if not already there
+    if test ! -L $Xdir && test -d $Xdir; then
+	tar -cf - -C $Xdir . | tar -xvpUf - -C $etcXdir && \
+	rm -rf $Xdir
+    fi
+
+    ln -sf $etcXdir $Xconfig/ # assure compatibility link exists
+
+    # Clean up bad links left from old/buggy scripts
+    if test -L $Xdir/$dir; then
+	rm -f $Xdir/$dir
+    fi
+done

@@ -1,0 +1,259 @@
+stg(1)
+======
+Yann Dirson <ydirson@altern.org>
+v0.12.1, February 2007
+
+NAME
+----
+stg - manage stacks of patches using the GIT content tracker
+
+SYNOPSIS
+--------
+[verse]
+'stg' [--version | --help]
+'stg' [--help <command> | <command> --help]
+'stg' <command> [COMMAND OPTIONS] [ARGS]
+
+DESCRIPTION
+-----------
+
+StGIT (Stacked GIT) is an application providing similar functionality
+to Quilt (i.e. pushing/popping patches to/from a stack), on top of
+GIT. These operations are performed using GIT commands and the patches
+are stored as GIT commit objects, allowing easy merging of the StGIT
+patches into other repositories using standard GIT functionality.
+
+An StGIT stack is a GIT branch with additional information to help
+making changes to individual patches you already committed, rather
+than making changes by adding new commits.  It is thus a
+non-forwarding, or rewinding branch: the old head of the branch is
+often not reachable as one of the new head's ancestors.
+
+Typical uses of StGIT include:
+
+Tracking branch::
+	Tracking changes from a remote branch, while maintaining local
+	modifications against that branch, possibly with the intent of
+	sending some patches upstream.  StGIT assists in preparing and
+	cleaning up patches until they are acceptable upstream, as
+	well as maintaining local patches not meant to be sent
+	upstream.
++
+In such a setup, typically all commits on your branch are StGIT
+patches; the stack base is the branch point where your changes "fork"
+off their parent branch.
+
+Development branch::
+	Preparing and testing your commits before publishing them,
+	separating your features from unrelated bugfixes collected
+	while developping.
++
+In such a setup, not all commits on your branch need to be StGIT
+patches; there may be regular GIT commits below your stack base.
+
+Patches
+~~~~~~~
+
+Many StGIT commands take references to StGIT patches as arguments.
+Patches in the stack are identified with short names, each of which
+must be unique in the stack.
+
+Patches in the current stack are just referred to by their name.  Some
+commands allow you to specify a patch in another stack of the repository;
+this is done by suffixing the patch name with an '@' sign followed by the
+branch name (eg. 'thispatch@otherbranch').
+
+A number of positions in the stack related to the patch are also
+accessible through '//' suffixes.  For example, 'patch//top' is
+equivalent to 'patch', and 'patch//bottom' refers to the commit below
+'patch' (i.e. the patch below, or the stack base if this is the
+bottom-most patch).  Similarly '//top.old' and '//bottom.old'
+refer to the previous version of the patch (before the last
+stglink:push[] or stglink:refresh[] operation).  When referring to the
+current patch, its name can be omitted (eg. 'currentpatch//bottom.old'
+can be abbreviated as 'bottom.old').
+
+If you need to pass a given StGIT reference to a git command,
+stglink:id[] will convert it to a git commit id.
+
+OPTIONS
+-------
+
+The following generic option flags are available.  Additional options
+are available per-command, and documented in the command-specific
+documentation.
+
+--version::
+	Prints the StGIT suite version that the 'stg' program came
+	from, as well as version of other components used, such as GIT
+	and Python.
+
+--help::
+	Prints the synopsis and a list of all commands.  If a git
+	command is given this option will display the specific help
+	for that command.
+
+STGIT COMMANDS
+--------------
+
+We divide StGIT commands in thematic groups, according to the primary
+type of object they create or change.
+
+ifdef::backend-docbook[]
+Here is a short description of each command. A more detailed
+description is available in individual command manpages.  Those
+manpages are named 'stg-<command>(1)'.
+endif::backend-docbook[]
+
+Generic commands
+~~~~~~~~~~~~~~~~
+
+User-support commands not touching the repository.
+
+stg help::
+	stgdesc:help[]
+stg version::
+	stgdesc:version[]
+stg copyright::
+	stgdesc:copyright[]
+
+Repository commands
+~~~~~~~~~~~~~~~~~~~
+
+stglink:clone[]::
+	stgdesc:clone[]
+stglink:id[]::
+	stgdesc:id[]
+
+Stack commands
+~~~~~~~~~~~~~~
+
+Stack management
+^^^^^^^^^^^^^^^^
+
+stglink:branch[]::
+	stgdesc:branch[]
+stglink:init[]::
+	stgdesc:init[]
+stglink:clean[]::
+	stgdesc:clean[]
+stglink:pull[]::
+	stgdesc:pull[]
+stglink:rebase[]::
+	stgdesc:rebase[]
+
+stglink:commit[]::
+	stgdesc:commit[]
+stglink:uncommit[]::
+	stgdesc:uncommit[]
+stglink:assimilate[]::
+	stgdesc:assimilate[]
+
+Controlling what patches are applied
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stglink:series[]::
+	stgdesc:series[]
+stglink:push[]::
+	stgdesc:push[]
+stglink:pop[]::
+	stgdesc:pop[]
+stglink:goto[]::
+	stgdesc:goto[]
+stglink:float[]::
+	stgdesc:float[]
+stglink:sink[]::
+	stgdesc:sink[]
+stglink:applied[]::
+	stgdesc:applied[]
+stglink:unapplied[]::
+	stgdesc:unapplied[]
+stglink:top[]::
+	stgdesc:top[]
+
+stglink:hide[]::
+	stgdesc:hide[]
+stglink:unhide[]::
+	stgdesc:unhide[]
+
+Miscellaneous stack commands
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stglink:patches[]::
+	stgdesc:patches[]
+
+
+Patch commands
+~~~~~~~~~~~~~~
+
+Patch management
+^^^^^^^^^^^^^^^^
+
+stglink:new[]::
+	stgdesc:new[]
+stglink:delete[]::
+	stgdesc:delete[]
+stglink:rename[]::
+	stgdesc:rename[]
+stglink:log[]::
+	stgdesc:log[]
+
+Controlling patch contents
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stglink:files[]::
+	stgdesc:files[]
+stglink:show[]::
+	stgdesc:show[]
+stglink:refresh[]::
+	stgdesc:refresh[]
+stglink:fold[]::
+	stgdesc:fold[]
+stglink:pick[]::
+	stgdesc:pick[]
+stglink:sync[]::
+	stgdesc:sync[]
+
+Interaction with the rest of the world
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+stglink:export[]::
+	stgdesc:export[]
+stglink:import[]::
+	stgdesc:import[]
+stglink:mail[]::
+	stgdesc:mail[]
+
+
+Working-copy commands
+~~~~~~~~~~~~~~~~~~~~~
+
+stglink:add[]::
+	stgdesc:add[]
+stglink:rm[]::
+	stgdesc:rm[]
+stglink:cp[]::
+	stgdesc:cp[]
+stglink:status[]::
+	stgdesc:status[]
+stglink:diff[]::
+	stgdesc:diff[]
+stglink:resolved[]::
+	stgdesc:resolved[]
+
+CONFIGURATION MECHANISM
+-----------------------
+
+Starting with 0.12, StGIT uses the same configuration mechanism as
+GIT.  See gitlink:git[7] for more details.
+
+TEMPLATES
+---------
+
+A number of StGIT commands make use of template files to provide
+useful default texts to be edited by the user.  These '<name>.tmpl'
+template files are searched in the following directories:
+
+	$GITDIR/
+	$HOME/.stgit/templates/
+	/usr/share/stgit/templates/

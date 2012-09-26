@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="mac.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="mac.html" title='Macintosh library Modules' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="window-objects.html" />
+<link rel="prev" href="module-FrameWork.html" />
+<link rel="parent" href="module-FrameWork.html" />
+<link rel="next" href="window-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.8.1 Application Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.8 framework  "
+  href="module-FrameWork.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.8 framework  "
+  href="module-FrameWork.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.8.2 window Objects"
+  href="window-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Macintosh Library Modules</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-FrameWork.html">2.8 FrameWork  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-FrameWork.html">2.8 FrameWork  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="window-objects.html">2.8.2 Window Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004810000000000000000"></a><a name="application-objects"></a>
+<br>
+2.8.1 Application Objects 
+</h2>
+
+<p>
+Application objects have the following methods, among others:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-109' xml:id='l2h-109' class="method">makeusermenus</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Override this method if you need menus in your application. Append the
+menus to the attribute <tt class="member">menubar</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-110' xml:id='l2h-110' class="method">getabouttext</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Override this method to return a text string describing your
+application.  Alternatively, override the <tt class="method">do_about()</tt> method
+for more elaborate ``about'' messages.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-111' xml:id='l2h-111' class="method">mainloop</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>mask</var><big>[</big><var>, wait</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This routine is the main event loop, call it to set your application
+rolling. <var>Mask</var> is the mask of events you want to handle,
+<var>wait</var> is the number of ticks you want to leave to other
+concurrent application (default 0, which is probably not a good
+idea). While raising <var>self</var> to exit the mainloop is still
+supported it is not recommended: call <code>self._quit()</code> instead.
+
+<p>
+The event loop is split into many small parts, each of which can be
+overridden. The default methods take care of dispatching events to
+windows and dialogs, handling drags and resizes, Apple Events, events
+for non-FrameWork windows, etc.
+
+<p>
+In general, all event handlers should return <code>1</code> if the event is fully
+handled and <code>0</code> otherwise (because the front window was not a FrameWork
+window, for instance). This is needed so that update events and such
+can be passed on to other windows like the Sioux console window.
+Calling <tt class="function">MacOS.HandleEvent()</tt> is not allowed within
+<var>our_dispatch</var> or its callees, since this may result in an
+infinite loop if the code is called through the Python inner-loop
+event handler.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-112' xml:id='l2h-112' class="method">asyncevents</tt></b>(</nobr></td>
+  <td><var>onoff</var>)</td></tr></table></dt>
+<dd>
+Call this method with a nonzero parameter to enable
+asynchronous event handling. This will tell the inner interpreter loop
+to call the application event handler <var>async_dispatch</var> whenever events
+are available. This will cause FrameWork window updates and the user
+interface to remain working during long computations, but will slow the
+interpreter down and may cause surprising results in non-reentrant code
+(such as FrameWork itself). By default <var>async_dispatch</var> will immediately
+call <var>our_dispatch</var> but you may override this to handle only certain
+events asynchronously. Events you do not handle will be passed to Sioux
+and such.
+
+<p>
+The old on/off value is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-113' xml:id='l2h-113' class="method">_quit</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Terminate the running <tt class="method">mainloop()</tt> call at the next convenient
+moment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-114' xml:id='l2h-114' class="method">do_char</tt></b>(</nobr></td>
+  <td><var>c, event</var>)</td></tr></table></dt>
+<dd>
+The user typed character <var>c</var>. The complete details of the event
+can be found in the <var>event</var> structure. This method can also be
+provided in a <code>Window</code> object, which overrides the
+application-wide handler if the window is frontmost.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-115' xml:id='l2h-115' class="method">do_dialogevent</tt></b>(</nobr></td>
+  <td><var>event</var>)</td></tr></table></dt>
+<dd>
+Called early in the event loop to handle modeless dialog events. The
+default method simply dispatches the event to the relevant dialog (not
+through the <code>DialogWindow</code> object involved). Override if you
+need special handling of dialog events (keyboard shortcuts, etc).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-116' xml:id='l2h-116' class="method">idle</tt></b>(</nobr></td>
+  <td><var>event</var>)</td></tr></table></dt>
+<dd>
+Called by the main event loop when no events are available. The
+null-event is passed (so you can look at mouse position, etc).
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.8 framework  "
+  href="module-FrameWork.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.8 framework  "
+  href="module-FrameWork.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.8.2 window Objects"
+  href="window-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Macintosh Library Modules</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-FrameWork.html">2.8 FrameWork  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-FrameWork.html">2.8 FrameWork  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="window-objects.html">2.8.2 Window Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

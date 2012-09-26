@@ -1,0 +1,142 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>The CYGWIN environment
+variable</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.61.2"><link rel="home" href="index.html" title="Cygwin User's Guide"><link rel="up" href="using.html" title="Chapter 3. Using Cygwin"><link rel="previous" href="using-specialnames.html" title="Special filenames"><link rel="next" href="using-cygserver.html" title="Cygserver"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">The CYGWIN environment
+variable</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="using-specialnames.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Using Cygwin</th><td width="20%" align="right"> <a accesskey="n" href="using-cygserver.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="using-cygwinenv"></a>The <tt class="envar">CYGWIN</tt> environment
+variable</h2></div></div><div></div></div><p>The <tt class="envar">CYGWIN</tt> environment variable is used to configure
+many global settings for the Cygwin runtime system. It contains the options
+listed below, separated by blank characters. Many options can be turned off
+by prefixing with <tt class="literal">no </tt>.</p><div class="itemizedlist"><ul type="bullet"><li style="list-style-type: disc"><p><tt class="envar">(no)binmode</tt> - if set, non-disk 
+(e.g. pipe and COM ports) file opens default to binary mode 
+(no CRLF translation) instead of text mode.  Defaults to set (binary
+mode).  By default, devices are opened in binary mode, so this option
+has little effect on normal cygwin operations.
+
+It does affect two things, however.  For non-NTFS filesystems, this
+option will control the line endings for standard output/input/error
+for redirection from the Windows command shell.  It will also affect
+the default translation mode of a pipe, although most shells set the
+pipe to binary by default.
+</p></li><li style="list-style-type: disc"><p><tt class="envar">check_case:level</tt> - THIS OPTION IS DEPRECATED.
+Don't use it unless you know what you're doing and don't see any way
+around it.  And even then, this option is error prone, slows down Cygwin
+and not well maintained.  This option controls the behavior of
+Cygwin when a user tries to open or create a file using a case different from
+the case of the path as saved on the disk.
+<tt class="literal">level</tt> is one of <tt class="literal">relaxed</tt>,
+<tt class="literal">adjust</tt> and <tt class="literal">strict</tt>.</p><div class="itemizedlist"><ul type="bullet"><li style="list-style-type: disc"><p><tt class="envar">relaxed</tt> which is the default behaviour simply
+ignores case. That's the default for native Windows applications as well.</p></li><li style="list-style-type: disc"><p><tt class="envar">adjust</tt> behaves mostly invisible. The POSIX input
+path is internally adjusted in case, so that the resulting DOS path uses the
+correct case throughout. You can see the result when changing the directory
+using a wrong case and calling <b class="command">/bin/pwd</b> afterwards.</p></li><li style="list-style-type: disc"><p><tt class="envar">strict</tt> results in a error message if the case
+isn't correct. Trying to open a file <tt class="filename">Foo</tt> while a file
+<tt class="filename">fOo</tt> exists results in a "no such file or directory"
+error. Trying to create a file <tt class="filename">BAR</tt> while a file
+<tt class="filename">Bar</tt> exists results in a "Filename exists with different
+case" error.</p></li></ul></div></li><li style="list-style-type: disc"><p><tt class="envar">codepage:[ansi|oem]</tt> - Windows console 
+applications can use different character sets (codepages) for drawing
+characters.  The first setting, called "ansi", is the default.
+This character set contains various forms of latin characters used
+in European languages.  The name originates from the ANSI Latin1
+(ISO 8859-1) standard, used in Windows 1.0, though the character
+sets have since diverged from any standard.  The second setting
+selects an older, DOS-based character set, containing various line
+drawing and special characters.  It is called "oem" since it was
+originally encoded in the firmware of IBM PCs by original
+equipment manufacturers (OEMs).  If you find that some characters 
+(especially non-US or 'graphical' ones) do not display correctly in 
+Cygwin, you can use this option to select an appropriate codepage.
+</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)dosfilewarning</tt> - If set, Cygwin will warn the
+first time a user uses an "MS-DOS" style path name rather than a POSIX-style
+path name.  Defaults to set.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)envcache</tt> - If set, environment variable
+conversions (between Win32 and POSIX) are cached.  Note that this is may
+cause problems if the mount table changes, as the cache is not invalidated
+and may contain values that depend on the previous mount table
+contents. Defaults to set.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)export</tt> - If set, the final values of these
+settings are re-exported to the environment as <tt class="envar">CYGWIN</tt> again.
+Defaults to off.</p></li><li style="list-style-type: disc"><p>
+<tt class="envar">error_start:Win32filepath</tt> - if set, runs 
+<tt class="filename">Win32filepath</tt> when cygwin encounters a fatal error,
+which is useful for debugging.  <tt class="filename">Win32filepath</tt> is
+usually set to the path to <b class="command">gdb</b> or
+<b class="command">dumper</b>, for example
+<tt class="filename">C:\cygwin\bin\gdb.exe</tt>. 
+There is no default set.
+</p></li><li style="list-style-type: disc"><p><tt class="envar">forkchunk:32768</tt> - causes the <tt class="function">fork()</tt>
+to copy memory some number of bytes at a time, in the above example 
+32768 bytes (32Kb) at a time. The default is to copy as many bytes as 
+possible, which is preferable in most cases but may slow some older systems
+down.
+</p></li><li style="list-style-type: disc"><p><tt class="envar">proc_retry:n</tt> - causes the <tt class="function">fork()</tt> and <tt class="function">exec*()</tt>
+to retry n times when a child process fails due to certain windows-specific errors.  These errors usually
+occur when processes are being started while a user is logging off.
+</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)glob[:ignorecase]</tt> - if set, command line arguments
+containing UNIX-style file wildcard characters (brackets, question mark,
+asterisk, escaped with \) are expanded into lists of files that match 
+those wildcards.
+This is applicable only to programs running from a DOS command line prompt.
+Default is set.</p><p>This option also accepts an optional <tt class="literal">[no]ignorecase</tt> modifer.
+If supplied, wildcard matching is case insensitive.  The default is <tt class="literal">noignorecase</tt></p></li><li style="list-style-type: disc"><p><tt class="envar">(no)ntea</tt> - if set, use NT Extended Attributes to
+store UNIX-like inode information.
+This option only operates under Windows NT. Defaults to not set.
+Only FAT and NTFS support Extended Attributes, not FAT32, so it's
+of no use there.  Furthermore, on NTFS partitions ntsec, which provides
+real permissions, overrides ntea, which only provides faked permissions.
+So setting ntea only makes sense if you either have FAT partitions,
+or if you switch off ntsec explicitely. </p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning!</h3><p>This may create additional
+<span class="emphasis"><em>large</em></span> files on FAT partitions.</p></div></li><li style="list-style-type: disc"><p><tt class="envar">(no)ntsec</tt> - if set, use the NT security
+model to set UNIX-like permissions on files and processes. The
+file permissions can only be set on NTFS partitions. FAT/FAT32 don't
+support the NT file security. Defaults to set. For more information, read
+the documentation in <a href="ntsec.html" title="NT security and usage of ntsec">the section called &#8220;NT security and usage of ntsec&#8221;</a>.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)smbntsec</tt> - if set, use <tt class="envar">ntsec</tt> on remote
+drives as well (default is "nosmbntesc"). When setting "smbntsec" there's
+a chance that you get problems with Samba shares so you should use this
+option with care.  One reason for a non working <tt class="envar">ntsec</tt> on
+remote drives could be insufficient permissions of the users. The requires
+user rights are somewhat dangerous (SeRestorePrivilege), so it's not always
+an option to grant that rights to users.  However, this shouldn't be a
+problem in NT domain environments.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)reset_com</tt> - if set, serial ports are reset
+to 9600-8-N-1 with no flow control when used. This is done at open
+time and when handles are inherited.  Defaults to set.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)server</tt> - if set, allows client applications
+to use the Cygserver facilities.  This option must be enabled explicitely
+on the client side, otherwise your applications won't be able to use the
+XSI IPC function calls (<tt class="function">msgget</tt>,
+<tt class="function">semget</tt>, <tt class="function">shmget</tt>, and friends)
+successfully.  These function calls will return with
+<tt class="literal">ENOSYS</tt>, "Bad system call".
+</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)strip_title</tt> - if set, strips the directory
+part off the window title, if any.  Default is not set.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)title</tt> - if set, the title bar
+reflects the name of the program currently running.  Default is not
+set.  Note that under Win9x the title bar is always enabled and it is
+stripped by default, but this is because of the way Win9x works.  In
+order not to strip, specify <tt class="literal">title</tt> or <tt class="literal">title
+nostrip_title</tt>.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)transparent_exe</tt> - EXPERIMENTAL.  Only use this
+option if you're confident to be able to live with the consequences.  If
+set, several additional functions in Cygwin will handle files with .exe
+suffix transparently.  These functions are <tt class="function">link(2)</tt>,
+<tt class="function">open(2)</tt>, <tt class="function">rename(2)</tt>,
+<tt class="function">symlink(2)</tt>, <tt class="function">unlink(2)</tt>,
+<tt class="function">pathconf(3)</tt>.  So far, these functions have been
+treated as too dangerous to act on files with .exe suffix if the .exe
+suffix wasn't given explicitely in the file name argument, and this is
+still the case if the transparent_exe option is not set.  Default is not
+set.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)traverse</tt> - This option only affects NT systems.
+If set, Cygwin handles file permissions so that the parent directories'
+permissions are checked, as it's default on POSIX systems.  If not set,
+only the file's own permissions are taken into account.  This is the
+default on Windows and called "bypass traverse checking".  Default was
+"traverse" in version 1.5.13 and 1.5.14.  Beginning with 1.5.15, traverse
+checking is disabled again since it's not correctly implemented by Microsoft
+and it's behaviour is getting worse with each new OS version.  Unprivileged
+terminal server sessions are practically impossible with traverse checking
+switched on.  So, use at your own risk.</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)tty</tt> - if set, Cygwin enables extra support
+(i.e., termios) for UNIX-like ttys in the Windows console. 
+It is not compatible with some Windows programs.
+Defaults to not set, in which case the tty is opened in text mode.
+Note that this has been changed such that ^D works as
+expected instead of ^Z, and is settable via <b class="command">stty</b>.
+This option must be specified before starting a Cygwin shell 
+and it cannot be changed in the shell.  It should not be set when using
+other terminals (i.e., rxvt or xterm). 
+</p></li><li style="list-style-type: disc"><p><tt class="envar">(no)winsymlinks</tt> - if set, Cygwin creates
+symlinks as Windows shortcuts with a special header and the R/O attribute
+set. If not set, Cygwin creates symlinks as plain files with a magic number,
+a path and the system attribute set. Defaults to set.</p></li></ul></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="using-specialnames.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="using.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="using-cygserver.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Special filenames </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Cygserver</td></tr></table></div></body></html>

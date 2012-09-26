@@ -1,0 +1,592 @@
+<html xmlns:cf="http://docbook.sourceforge.net/xmlns/chunkfast/1.0">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Inline data</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.69.0">
+<link rel="start" href="index.html" title="The gdk-pixbuf Library">
+<link rel="up" href="rn01.html" title="API Reference">
+<link rel="prev" href="gdk-pixbuf-creating.html" title="Image Data in Memory">
+<link rel="next" href="gdk-pixbuf-scaling.html" title="Scaling">
+<meta name="generator" content="GTK-Doc V1.3 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="reference" href="rn01.html" title="API Reference">
+<link rel="reference" href="rn02.html" title="Tools Reference">
+<link rel="index" href="ix01.html" title="Index">
+<link rel="index" href="ix02.html" title="Index of deprecated symbols">
+<link rel="index" href="ix03.html" title="Index of new symbols in 2.2">
+<link rel="index" href="ix04.html" title="Index of new symbols in 2.4">
+<link rel="index" href="ix05.html" title="Index of new symbols in 2.6">
+<link rel="appendix" href="apa.html" title="Appendix&#160;1.&#160;Porting applications from Imlib to gdk-pixbuf">
+<link rel="appendix" href="license.html" title="Appendix&#160;2.&#160;License">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2"><tr valign="middle">
+<td><a accesskey="p" href="gdk-pixbuf-creating.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="rn01.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">The <span class="application">gdk-pixbuf</span> Library</th>
+<td><a accesskey="n" href="gdk-pixbuf-scaling.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry" lang="en">
+<a name="gdk-pixbuf-inline"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle">Inline data</span></h2>
+<p>Inline data &#8212; Functions for inlined pixbuf handling.</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+#include &lt;gdk-pixbuf/gdk-pixbuf.h&gt;
+
+
+            <a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a>;
+enum        <a href="gdk-pixbuf-inline.html#GdkPixdataType">GdkPixdataType</a>;
+enum        <a href="gdk-pixbuf-inline.html#GdkPixdataDumpType">GdkPixdataDumpType</a>;
+#define     <a href="gdk-pixbuf-inline.html#GDK-PIXBUF-MAGIC-NUMBER:CAPS">GDK_PIXBUF_MAGIC_NUMBER</a>
+#define     <a href="gdk-pixbuf-inline.html#GDK-PIXDATA-HEADER-LENGTH:CAPS">GDK_PIXDATA_HEADER_LENGTH</a>
+gpointer    <a href="gdk-pixbuf-inline.html#gdk-pixdata-from-pixbuf">gdk_pixdata_from_pixbuf</a>         (<a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             const <a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf">GdkPixbuf</a> *pixbuf,
+                                             gboolean use_rle);
+<a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf">GdkPixbuf</a>*  <a href="gdk-pixbuf-inline.html#gdk-pixbuf-from-pixdata">gdk_pixbuf_from_pixdata</a>         (const <a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             gboolean copy_pixels,
+                                             GError **error);
+guint8*     <a href="gdk-pixbuf-inline.html#gdk-pixdata-serialize">gdk_pixdata_serialize</a>           (const <a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             guint *stream_length_p);
+gboolean    <a href="gdk-pixbuf-inline.html#gdk-pixdata-deserialize">gdk_pixdata_deserialize</a>         (<a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             guint stream_length,
+                                             const guint8 *stream,
+                                             GError **error);
+GString*    <a href="gdk-pixbuf-inline.html#gdk-pixdata-to-csource">gdk_pixdata_to_csource</a>          (<a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             const gchar *name,
+                                             <a href="gdk-pixbuf-inline.html#GdkPixdataDumpType">GdkPixdataDumpType</a> dump_type);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2763849"></a><h2>Description</h2>
+<p>
+
+  </p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id2763859"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id2763865"></a><h3>
+<a name="GdkPixdata"></a>GdkPixdata</h3>
+<a class="indexterm" name="id2763875"></a><pre class="programlisting">typedef struct {
+  guint32 magic;        /* GDK_PIXBUF_MAGIC_NUMBER */
+  gint32  length;       /* &lt;1 to disable length checks, otherwise:
+			 * GDK_PIXDATA_HEADER_LENGTH + pixel_data length
+			 */
+  guint32 pixdata_type; /* GdkPixdataType */
+  guint32 rowstride;
+  guint32 width;
+  guint32 height;
+  guint8 *pixel_data;
+} GdkPixdata;
+</pre>
+<p>
+A <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> contains pixbuf information in a form suitable for 
+serialization and streaming.</p>
+<p>
+
+  </p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term">guint32&#160;<em class="structfield"><code>magic</code></em>;</span></td>
+<td> magic number. A valid <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure must have 
+   <a href="gdk-pixbuf-inline.html#GDK-PIXBUF-MAGIC-NUMBER:CAPS"><span class="type">GDK_PIXBUF_MAGIC_NUMBER</span></a> here.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">gint32&#160;<em class="structfield"><code>length</code></em>;</span></td>
+<td> less than 1 to disable length checks, otherwise 
+   <a href="gdk-pixbuf-inline.html#GDK-PIXDATA-HEADER-LENGTH:CAPS"><span class="type">GDK_PIXDATA_HEADER_LENGTH</span></a> + length of <em class="parameter"><code>pixel_data</code></em>. 
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">guint32&#160;<em class="structfield"><code>pixdata_type</code></em>;</span></td>
+<td> information about colorspace, sample width and 
+   encoding, in a <a href="gdk-pixbuf-inline.html#GdkPixdataType"><span class="type">GdkPixdataType</span></a>. 
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">guint32&#160;<em class="structfield"><code>rowstride</code></em>;</span></td>
+<td> Distance in bytes between rows.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">guint32&#160;<em class="structfield"><code>width</code></em>;</span></td>
+<td> Width of the image in pixels.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">guint32&#160;<em class="structfield"><code>height</code></em>;</span></td>
+<td> Height of the image in pixels.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">guint8&#160;*<em class="structfield"><code>pixel_data</code></em>;</span></td>
+<td> <em class="parameter"><code>width</code></em> x <em class="parameter"><code>height</code></em> pixels, encoded according to <em class="parameter"><code>pixdata_type</code></em>
+  and <em class="parameter"><code>rowstride</code></em>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2764131"></a><h3>
+<a name="GdkPixdataType"></a>enum GdkPixdataType</h3>
+<a class="indexterm" name="id2764141"></a><pre class="programlisting">typedef enum
+{
+  /* colorspace + alpha */
+  GDK_PIXDATA_COLOR_TYPE_RGB    = 0x01,
+  GDK_PIXDATA_COLOR_TYPE_RGBA   = 0x02,
+  GDK_PIXDATA_COLOR_TYPE_MASK   = 0xff,
+  /* width, support 8bits only currently */
+  GDK_PIXDATA_SAMPLE_WIDTH_8    = 0x01 &lt;&lt; 16,
+  GDK_PIXDATA_SAMPLE_WIDTH_MASK = 0x0f &lt;&lt; 16,
+  /* encoding */
+  GDK_PIXDATA_ENCODING_RAW      = 0x01 &lt;&lt; 24,
+  GDK_PIXDATA_ENCODING_RLE      = 0x02 &lt;&lt; 24,
+  GDK_PIXDATA_ENCODING_MASK     = 0x0f &lt;&lt; 24
+} GdkPixdataType;
+</pre>
+<p>
+An enumeration containing three sets of flags for a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> struct: 
+one for the used colorspace, one for the width of the samples and one 
+for the encoding of the pixel data.</p>
+<p>
+
+  </p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_COLOR_TYPE_RGB</code></span></td>
+<td>  each pixel has red, green and blue samples.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_COLOR_TYPE_RGBA</code></span></td>
+<td> each pixel has red, green and blue samples 
+   and an alpha value.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_COLOR_TYPE_MASK</code></span></td>
+<td> mask for the colortype flags of the enum.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_SAMPLE_WIDTH_8</code></span></td>
+<td> each sample has 8 bits.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_SAMPLE_WIDTH_MASK</code></span></td>
+<td> mask for the sample width flags of the enum.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_ENCODING_RAW</code></span></td>
+<td> the pixel data is in raw form. 
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_ENCODING_RLE</code></span></td>
+<td> the pixel data is run-length encoded. Runs may 
+   be up to 127 bytes long; their length is stored in a single byte 
+   preceding the pixel data for the run. If a run is constant, its length
+   byte has the high bit set and the pixel data consists of a single pixel
+   which must be repeated. 
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_ENCODING_MASK</code></span></td>
+<td> mask for the encoding flags of the enum.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2764310"></a><h3>
+<a name="GdkPixdataDumpType"></a>enum GdkPixdataDumpType</h3>
+<a class="indexterm" name="id2764322"></a><pre class="programlisting">typedef enum
+{
+  /* type of source to save */
+  GDK_PIXDATA_DUMP_PIXDATA_STREAM	= 0,
+  GDK_PIXDATA_DUMP_PIXDATA_STRUCT	= 1,
+  GDK_PIXDATA_DUMP_MACROS		= 2,
+  /* type of variables to use */
+  GDK_PIXDATA_DUMP_GTYPES		= 0,
+  GDK_PIXDATA_DUMP_CTYPES		= 1 &lt;&lt; 8,
+  GDK_PIXDATA_DUMP_STATIC		= 1 &lt;&lt; 9,
+  GDK_PIXDATA_DUMP_CONST		= 1 &lt;&lt; 10,
+  /* save RLE decoder macro? */
+  GDK_PIXDATA_DUMP_RLE_DECODER		= 1 &lt;&lt; 16
+} GdkPixdataDumpType;
+</pre>
+<p>
+An enumeration which is used by <a href="gdk-pixbuf-inline.html#gdk-pixdata-to-csource"><code class="function">gdk_pixdata_to_csource()</code></a> to
+determine the form of C source to be generated. The three values
+<em class="parameter"><code>GDK_PIXDATA_DUMP_PIXDATA_STREAM</code></em>, <em class="parameter"><code>GDK_PIXDATA_DUMP_PIXDATA_STRUCT</code></em>
+and <em class="parameter"><code>GDK_PIXDATA_DUMP_MACROS</code></em> are mutually exclusive, as are
+<em class="parameter"><code>GDK_PIXBUF_DUMP_GTYPES</code></em> and <em class="parameter"><code>GDK_PIXBUF_DUMP_CTYPES</code></em>. The remaining
+elements are optional flags that can be freely added.</p>
+<p>
+
+  </p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_PIXDATA_STREAM</code></span></td>
+<td> Generate pixbuf data stream (a single 
+   string containing a serialized <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure in network byte 
+   order).
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_PIXDATA_STRUCT</code></span></td>
+<td> Generate <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure (needs 
+   the <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure definition from gdk-pixdata.h).
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_MACROS</code></span></td>
+<td> Generate <code class="function">*_ROWSTRIDE</code>,     
+   <code class="function">*_WIDTH</code>, <code class="function">*_HEIGHT</code>,
+   <code class="function">*_BYTES_PER_PIXEL</code> and 
+   <code class="function">*_RLE_PIXEL_DATA</code> or <code class="function">*_PIXEL_DATA</code>
+   macro definitions for the image.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_GTYPES</code></span></td>
+<td> Generate GLib data types instead of 
+   standard C data types.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_CTYPES</code></span></td>
+<td> Generate standard C data types instead of 
+   GLib data types.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_STATIC</code></span></td>
+<td> Generate static symbols.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_CONST</code></span></td>
+<td> Generate const symbols.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_PIXDATA_DUMP_RLE_DECODER</code></span></td>
+<td> Provide a <code class="function">*_RUN_LENGTH_DECODE(image_buf, rle_data, size, bpp)</code> 
+   macro definition  to  decode  run-length encoded image data.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2764590"></a><h3>
+<a name="GDK-PIXBUF-MAGIC-NUMBER:CAPS"></a>GDK_PIXBUF_MAGIC_NUMBER</h3>
+<a class="indexterm" name="id2764602"></a><pre class="programlisting">#define GDK_PIXBUF_MAGIC_NUMBER (0x47646b50)    /* 'GdkP' */
+</pre>
+<p>
+Magic number for <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structures.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2764629"></a><h3>
+<a name="GDK-PIXDATA-HEADER-LENGTH:CAPS"></a>GDK_PIXDATA_HEADER_LENGTH</h3>
+<a class="indexterm" name="id2764640"></a><pre class="programlisting">#define	GDK_PIXDATA_HEADER_LENGTH	(4 + 4 + 4 + 4 + 4 + 4)
+</pre>
+<p>
+The length of a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure without the <em class="parameter"><code>pixel_data</code></em> pointer.</p>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2764674"></a><h3>
+<a name="gdk-pixdata-from-pixbuf"></a>gdk_pixdata_from_pixbuf ()</h3>
+<a class="indexterm" name="id2764684"></a><pre class="programlisting">gpointer    gdk_pixdata_from_pixbuf         (<a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             const <a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf">GdkPixbuf</a> *pixbuf,
+                                             gboolean use_rle);</pre>
+<p>
+Converts a <a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> to a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a>. If <em class="parameter"><code>use_rle</code></em> is <code class="literal">TRUE</code>, the
+pixel data is run-length encoded into newly-allocated memory and a 
+pointer to that memory is returned.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pixdata</code></em>&#160;:</span></td>
+<td> a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> to fill.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pixbuf</code></em>&#160;:</span></td>
+<td> the data to fill <em class="parameter"><code>pixdata</code></em> with.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>use_rle</code></em>&#160;:</span></td>
+<td> whether to use run-length encoding for the pixel data.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> If <em class="parameter"><code>ure_rle</code></em> is <code class="literal">TRUE</code>, a pointer to the newly-allocated memory 
+  for the run-length encoded pixel data, otherwise <code class="literal">NULL</code>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2764851"></a><h3>
+<a name="gdk-pixbuf-from-pixdata"></a>gdk_pixbuf_from_pixdata ()</h3>
+<a class="indexterm" name="id2764862"></a><pre class="programlisting"><a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf">GdkPixbuf</a>*  gdk_pixbuf_from_pixdata         (const <a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             gboolean copy_pixels,
+                                             GError **error);</pre>
+<p>
+Converts a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> to a <a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a>. If <em class="parameter"><code>copy_pixels</code></em> is <code class="literal">TRUE</code> or
+if the pixel data is run-length-encoded, the pixel data is copied into
+newly-allocated memory; otherwise it is reused.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pixdata</code></em>&#160;:</span></td>
+<td> a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> to convert into a <a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>copy_pixels</code></em>&#160;:</span></td>
+<td> whether to copy raw pixel data; run-length encoded
+    pixel data is always copied.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>error</code></em>&#160;:</span></td>
+<td> location to store possible errors.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new <a href="gdk-pixbuf-gdk-pixbuf.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2765021"></a><h3>
+<a name="gdk-pixdata-serialize"></a>gdk_pixdata_serialize ()</h3>
+<a class="indexterm" name="id2765031"></a><pre class="programlisting">guint8*     gdk_pixdata_serialize           (const <a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             guint *stream_length_p);</pre>
+<p>
+Serializes a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure into a byte stream.
+The byte stream consists of a straightforward writeout of the
+<a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> fields in network byte order, plus the <em class="parameter"><code>pixel_data</code></em>
+bytes the structure points to.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pixdata</code></em>&#160;:</span></td>
+<td> a valid <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure to serialize.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>stream_length_p</code></em>&#160;:</span></td>
+<td> location to store the resulting stream length in.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A newly-allocated string containing the serialized
+<a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2765155"></a><h3>
+<a name="gdk-pixdata-deserialize"></a>gdk_pixdata_deserialize ()</h3>
+<a class="indexterm" name="id2765165"></a><pre class="programlisting">gboolean    gdk_pixdata_deserialize         (<a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             guint stream_length,
+                                             const guint8 *stream,
+                                             GError **error);</pre>
+<p>
+Deserializes (reconstruct) a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure from a byte stream.
+The byte stream consists of a straightforward writeout of the
+<a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> fields in network byte order, plus the <em class="parameter"><code>pixel_data</code></em>
+bytes the structure points to.
+The <em class="parameter"><code>pixdata</code></em> contents are reconstructed byte by byte and are checked
+for validity. This function may fail with <code class="literal">GDK_PIXBUF_CORRUPT_IMAGE</code>
+or <code class="literal">GDK_PIXBUF_ERROR_UNKNOWN_TYPE</code>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pixdata</code></em>&#160;:</span></td>
+<td> a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure to be filled in.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>stream_length</code></em>&#160;:</span></td>
+<td> length of the stream used for deserialization.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>stream</code></em>&#160;:</span></td>
+<td> stream of bytes containing a serialized <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> structure.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>error</code></em>&#160;:</span></td>
+<td> <span class="type">GError</span> location to indicate failures (maybe <code class="literal">NULL</code> to ignore errors).
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> Upon successful deserialization <code class="literal">TRUE</code> is returned,
+<code class="literal">FALSE</code> otherwise.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id2765380"></a><h3>
+<a name="gdk-pixdata-to-csource"></a>gdk_pixdata_to_csource ()</h3>
+<a class="indexterm" name="id2765390"></a><pre class="programlisting">GString*    gdk_pixdata_to_csource          (<a href="gdk-pixbuf-inline.html#GdkPixdata">GdkPixdata</a> *pixdata,
+                                             const gchar *name,
+                                             <a href="gdk-pixbuf-inline.html#GdkPixdataDumpType">GdkPixdataDumpType</a> dump_type);</pre>
+<p>
+Generates C source code suitable for compiling images directly 
+into programs. 
+</p>
+<p>
+GTK+ ships with a program called <span><strong class="command">gdk-pixbuf-csource</strong></span> 
+which offers a command line interface to this function.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pixdata</code></em>&#160;:</span></td>
+<td> a <a href="gdk-pixbuf-inline.html#GdkPixdata"><span class="type">GdkPixdata</span></a> to convert to C source.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>name</code></em>&#160;:</span></td>
+<td> used for naming generated data structures or macros.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dump_type</code></em>&#160;:</span></td>
+<td> a <a href="gdk-pixbuf-inline.html#GdkPixdataDumpType"><span class="type">GdkPixdataDumpType</span></a> determining the kind of C
+  source to be generated.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a newly-allocated string containing the C source form
+  of <em class="parameter"><code>pixdata</code></em>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+<table class="navigation" width="100%" summary="Navigation footer" cellpadding="2" cellspacing="0"><tr valign="middle">
+<td align="left"><a accesskey="p" href="gdk-pixbuf-creating.html"><b>&lt;&lt;&#160;Image Data in Memory</b></a></td>
+<td align="right"><a accesskey="n" href="gdk-pixbuf-scaling.html"><b>Scaling&#160;&gt;&gt;</b></a></td>
+</tr></table>
+</body>
+</html>

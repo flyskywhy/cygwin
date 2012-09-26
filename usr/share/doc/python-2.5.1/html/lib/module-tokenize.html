@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-tabnanny.html" />
+<link rel="prev" href="module-keyword.html" />
+<link rel="parent" href="language.html" />
+<link rel="next" href="module-tabnanny.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>30.5 tokenize -- Tokenizer for Python source</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="30.4 keyword  "
+  href="module-keyword.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="30. python Language Services"
+  href="language.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="30.6 tabnanny  "
+  href="module-tabnanny.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-keyword.html">30.4 keyword  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="language.html">30. Python Language Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-tabnanny.html">30.6 tabnanny  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0032500000000000000000">
+30.5 <tt class="module">tokenize</tt> --
+         Tokenizer for Python source</a>
+</h1>
+
+<p>
+<a name="module-tokenize"></a>
+
+<p>
+The <tt class="module">tokenize</tt> module provides a lexical scanner for Python
+source code, implemented in Python.  The scanner in this module
+returns comments as tokens as well, making it useful for implementing
+``pretty-printers,'' including colorizers for on-screen displays.
+
+<p>
+The primary entry point is a generator:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5439' xml:id='l2h-5439' class="function">generate_tokens</tt></b>(</nobr></td>
+  <td><var>readline</var>)</td></tr></table></dt>
+<dd>
+  The <tt class="function">generate_tokens()</tt> generator requires one argment,
+  <var>readline</var>, which must be a callable object which
+  provides the same interface as the <tt class="method">readline()</tt> method of
+  built-in file objects (see section&nbsp;<a href="bltin-file-objects.html#bltin-file-objects">3.9</a>).  Each
+  call to the function should return one line of input as a string.
+
+<p>
+The generator produces 5-tuples with these members:
+  the token type;
+  the token string;
+  a 2-tuple <code>(<var>srow</var>, <var>scol</var>)</code> of ints specifying the
+  row and column where the token begins in the source;
+  a 2-tuple <code>(<var>erow</var>, <var>ecol</var>)</code> of ints specifying the
+  row and column where the token ends in the source;
+  and the line on which the token was found.
+  The line passed is the <em>logical</em> line;
+  continuation lines are included.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dl>
+
+<p>
+An older entry point is retained for backward compatibility:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5440' xml:id='l2h-5440' class="function">tokenize</tt></b>(</nobr></td>
+  <td><var>readline</var><big>[</big><var>, tokeneater</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  The <tt class="function">tokenize()</tt> function accepts two parameters: one
+  representing the input stream, and one providing an output mechanism
+  for <tt class="function">tokenize()</tt>.
+
+<p>
+The first parameter, <var>readline</var>, must be a callable object which
+  provides the same interface as the <tt class="method">readline()</tt> method of
+  built-in file objects (see section&nbsp;<a href="bltin-file-objects.html#bltin-file-objects">3.9</a>).  Each
+  call to the function should return one line of input as a string.
+  Alternately, <var>readline</var> may be a callable object that signals
+  completion by raising <tt class="exception">StopIteration</tt>.
+  
+<span class="versionnote">Changed in version 2.5:
+Added <tt class="exception">StopIteration</tt> support.</span>
+
+<p>
+The second parameter, <var>tokeneater</var>, must also be a callable
+  object.  It is called once for each token, with five arguments,
+  corresponding to the tuples generated by <tt class="function">generate_tokens()</tt>.
+</dl>
+
+<p>
+All constants from the <tt class="module"><a href="module-token.html">token</a></tt> module are also exported from
+<tt class="module">tokenize</tt>, as are two additional token type values that might be
+passed to the <var>tokeneater</var> function by <tt class="function">tokenize()</tt>:
+
+<p>
+<dl><dt><b><tt id='l2h-5441' xml:id='l2h-5441'>COMMENT</tt></b></dt>
+<dd>
+  Token value used to indicate a comment.
+</dd></dl>
+<dl><dt><b><tt id='l2h-5442' xml:id='l2h-5442'>NL</tt></b></dt>
+<dd>
+  Token value used to indicate a non-terminating newline.  The NEWLINE
+  token indicates the end of a logical line of Python code; NL tokens
+  are generated when a logical line of code is continued over multiple
+  physical lines.
+</dd></dl>
+
+<p>
+Another function is provided to reverse the tokenization process.
+This is useful for creating tools that tokenize a script, modify
+the token stream, and write back the modified script.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5443' xml:id='l2h-5443' class="function">untokenize</tt></b>(</nobr></td>
+  <td><var>iterable</var>)</td></tr></table></dt>
+<dd>
+  Converts tokens back into Python source code.  The <var>iterable</var>
+  must return sequences with at least two elements, the token type and
+  the token string.  Any additional sequence elements are ignored.
+
+<p>
+The reconstructed script is returned as a single string.  The
+  result is guaranteed to tokenize back to match the input so that
+  the conversion is lossless and round-trips are assured.  The
+  guarantee applies only to the token type and token string as
+  the spacing between tokens (column positions) may change.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+Example of a script re-writer that transforms float literals into
+Decimal objects:
+<div class="verbatim"><pre>
+def decistmt(s):
+    """Substitute Decimals for floats in a string of statements.
+
+    &gt;&gt;&gt; from decimal import Decimal
+    &gt;&gt;&gt; s = 'print +21.3e-5*-.1234/81.7'
+    &gt;&gt;&gt; decistmt(s)
+    "print +Decimal ('21.3e-5')*-Decimal ('.1234')/Decimal ('81.7')"
+
+    &gt;&gt;&gt; exec(s)
+    -3.21716034272e-007
+    &gt;&gt;&gt; exec(decistmt(s))
+    -3.217160342717258261933904529E-7
+
+    """
+    result = []
+    g = generate_tokens(StringIO(s).readline)   # tokenize the string
+    for toknum, tokval, _, _, _  in g:
+        if toknum == NUMBER and '.' in tokval:  # replace NUMBER tokens
+            result.extend([
+                (NAME, 'Decimal'),
+                (OP, '('),
+                (STRING, repr(tokval)),
+                (OP, ')')
+            ])
+        else:
+            result.append((toknum, tokval))
+    return untokenize(result)
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="30.4 keyword  "
+  href="module-keyword.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="30. python Language Services"
+  href="language.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="30.6 tabnanny  "
+  href="module-tabnanny.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-keyword.html">30.4 keyword  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="language.html">30. Python Language Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-tabnanny.html">30.6 tabnanny  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

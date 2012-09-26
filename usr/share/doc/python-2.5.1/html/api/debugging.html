@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="embedding.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="veryhigh.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.5 Debugging Builds </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.4 embedding Python"
+  href="embedding.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. Introduction"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2. the Very High"
+  href="veryhigh.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="embedding.html">1.4 Embedding Python</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Introduction</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="veryhigh.html">2. The Very High</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION003500000000000000000"></a><a name="debugging"></a>
+<br>
+1.5 Debugging Builds 
+</h1>
+
+<p>
+Python can be built with several macros to enable extra checks of the
+interpreter and extension modules.  These checks tend to add a large
+amount of overhead to the runtime so they are not enabled by default.
+
+<p>
+A full list of the various types of debugging builds is in the file
+<span class="file">Misc/SpecialBuilds.txt</span> in the Python source distribution.
+Builds are available that support tracing of reference counts,
+debugging the memory allocator, or low-level profiling of the main
+interpreter loop.  Only the most frequently-used builds will be
+described in the remainder of this section.
+
+<p>
+Compiling the interpreter with the Py_DEBUG macro
+defined produces what is generally meant by "a debug build" of Python.
+Py_DEBUG is enabled in the <span class="Unix">Unix</span> build by adding
+<b class="programopt">--with-pydebug</b> to the <span class="file">configure</span> command.  It is also
+implied by the presence of the not-Python-specific
+_DEBUG macro.  When Py_DEBUG is enabled
+in the <span class="Unix">Unix</span> build, compiler optimization is disabled.
+
+<p>
+In addition to the reference count debugging described below, the
+following extra checks are performed:
+
+<p>
+
+<ul>
+<li>Extra checks are added to the object allocator.
+</li>
+<li>Extra checks are added to the parser and compiler.
+</li>
+<li>Downcasts from wide types to narrow types are checked for
+            loss of information.
+</li>
+<li>A number of assertions are added to the dictionary and set
+            implementations.  In addition, the set object acquires a
+            <tt class="method">test_c_api</tt> method.
+</li>
+<li>Sanity checks of the input arguments are added to frame
+            creation. 
+</li>
+<li>The storage for long ints is initialized with a known
+            invalid pattern to catch reference to uninitialized
+            digits. 
+</li>
+<li>Low-level tracing and extra exception checking are added
+            to the runtime virtual machine.
+</li>
+<li>Extra checks are added to the memory arena implementation.
+</li>
+<li>Extra debugging is added to the thread module.
+</li>
+</ul>
+
+<p>
+There may be additional checks not mentioned here.
+
+<p>
+Defining Py_TRACE_REFS enables reference tracing.  When
+defined, a circular doubly linked list of active objects is maintained
+by adding two extra fields to every <tt class="ctype">PyObject</tt>.  Total
+allocations are tracked as well.  Upon exit, all existing references
+are printed.  (In interactive mode this happens after every statement
+run by the interpreter.)  Implied by Py_DEBUG.
+
+<p>
+Please refer to <span class="file">Misc/SpecialBuilds.txt</span> in the Python source
+distribution for more detailed information.
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.4 embedding Python"
+  href="embedding.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. Introduction"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2. the Very High"
+  href="veryhigh.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="embedding.html">1.4 Embedding Python</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Introduction</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="veryhigh.html">2. The Very High</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

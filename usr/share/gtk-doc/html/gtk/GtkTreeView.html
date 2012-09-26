@@ -1,0 +1,4285 @@
+<html xmlns:cf="http://docbook.sourceforge.net/xmlns/chunkfast/1.0">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>GtkTreeView</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.69.0">
+<link rel="start" href="index.html" title="GTK+ Reference Manual">
+<link rel="up" href="TreeWidgetObjects.html" title="Tree, List and Icon Grid Widgets">
+<link rel="prev" href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">
+<link rel="next" href="gtk-GtkTreeView-drag-and-drop.html" title="GtkTreeView drag-and-drop">
+<meta name="generator" content="GTK-Doc V1.3 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="part" href="gtk.html" title="Part&#160;1.&#160;GTK+ Overview">
+<link rel="part" href="gtkbase.html" title="Part&#160;2.&#160;GTK+ Core Reference">
+<link rel="part" href="gtkobjects.html" title="Part&#160;3.&#160;GTK+ Widgets and Objects">
+<link rel="chapter" href="ch01.html" title="Object Hierarchy">
+<link rel="chapter" href="ch02.html" title="Widget Gallery">
+<link rel="chapter" href="WindowWidgets.html" title="Windows">
+<link rel="chapter" href="DisplayWidgets.html" title="Display Widgets">
+<link rel="chapter" href="ButtonWidgets.html" title="Buttons and Toggles">
+<link rel="chapter" href="NumericEntry.html" title="Numeric/Text Data Entry">
+<link rel="chapter" href="TextWidgetObjects.html" title="Multiline Text Editor">
+<link rel="chapter" href="TreeWidgetObjects.html" title="Tree, List and Icon Grid Widgets">
+<link rel="chapter" href="MenusAndCombos.html" title="Menus, Combo Box, Toolbar">
+<link rel="chapter" href="Actions.html" title="Action-based menus and toolbars">
+<link rel="chapter" href="SelectorWidgets.html" title="Selectors (File/Font/Color/Input Devices)">
+<link rel="chapter" href="LayoutContainers.html" title="Layout Containers">
+<link rel="chapter" href="Ornaments.html" title="Ornaments">
+<link rel="chapter" href="ScrollingWidgets.html" title="Scrolling">
+<link rel="chapter" href="MiscObjects.html" title="Miscellaneous">
+<link rel="chapter" href="AbstractObjects.html" title="Abstract Base Classes">
+<link rel="chapter" href="PlugSocket.html" title="Cross-process Embedding">
+<link rel="chapter" href="SpecialObjects.html" title="Special-purpose features">
+<link rel="chapter" href="DeprecatedObjects.html" title="Deprecated">
+<link rel="part" href="migrating.html" title="Part&#160;4.&#160;Migrating from Previous Versions of GTK+">
+<link rel="chapter" href="gtk-migrating-checklist.html" title="Migration Checklist">
+<link rel="chapter" href="gtk-migrating-GtkFileChooser.html" title="Migrating from GtkFileSelection to GtkFileChooser">
+<link rel="chapter" href="gtk-migrating-GtkAction.html" title="Migrating from old menu and toolbar systems to GtkAction">
+<link rel="chapter" href="gtk-migrating-GtkComboBox.html" title="Migrating from GtkOptionMenu and GtkCombo to GtkComboBox and GtkComboBoxEntry">
+<link rel="chapter" href="gtk-migrating-GtkIconView.html" title="Migrating from GnomeIconList to GtkIconView">
+<link rel="chapter" href="gtk-migrating-GtkAboutDialog.html" title="Migrating from GnomeAbout to GtkAboutDialog">
+<link rel="chapter" href="gtk-migrating-GtkColorButton.html" title="Migrating from GnomeColorPicker to GtkColorButton">
+<link rel="part" href="pt05.html" title="Part&#160;5.&#160;GTK+ Tools">
+<link rel="glossary" href="glossary.html" title="Glossary">
+<link rel="index" href="ix01.html" title="Index">
+<link rel="index" href="ix02.html" title="Index of deprecated symbols">
+<link rel="index" href="ix03.html" title="Index of new symbols in 2.2">
+<link rel="index" href="ix04.html" title="Index of new symbols in 2.4">
+<link rel="index" href="ix05.html" title="Index of new symbols in 2.6">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2"><tr valign="middle">
+<td><a accesskey="p" href="GtkTreeViewColumn.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="TreeWidgetObjects.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">GTK+ Reference Manual</th>
+<td><a accesskey="n" href="gtk-GtkTreeView-drag-and-drop.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry" lang="en">
+<a name="GtkTreeView"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle">GtkTreeView</span></h2>
+<p>GtkTreeView &#8212; A widget for displaying both trees and lists</p>
+</td>
+<td valign="top" align="right"><img src="list-and-tree.png"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+#include &lt;gtk/gtk.h&gt;
+
+
+            <a href="GtkTreeView.html#GtkTreeView-struct">GtkTreeView</a>;
+enum        <a href="GtkTreeView.html#GtkTreeViewDropPosition">GtkTreeViewDropPosition</a>;
+            <a href="GtkTreeView.html#GtkTreeViewPrivate">GtkTreeViewPrivate</a>;
+gboolean    (<a href="GtkTreeView.html#GtkTreeViewColumnDropFunc">*GtkTreeViewColumnDropFunc</a>)    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *prev_column,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *next_column,
+                                             gpointer data);
+void        (<a href="GtkTreeView.html#GtkTreeViewMappingFunc">*GtkTreeViewMappingFunc</a>)       (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             gpointer user_data);
+gboolean    (<a href="GtkTreeView.html#GtkTreeViewSearchEqualFunc">*GtkTreeViewSearchEqualFunc</a>)   (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model,
+                                             gint column,
+                                             const gchar *key,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *iter,
+                                             gpointer search_data);
+<a href="GtkWidget.html" title="GtkWidget">GtkWidget</a>*  <a href="GtkTreeView.html#gtk-tree-view-new">gtk_tree_view_new</a>               (void);
+<a href="GtkWidget.html" title="GtkWidget">GtkWidget</a>*  <a href="GtkTreeView.html#gtk-tree-view-new-with-model">gtk_tree_view_new_with_model</a>    (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model);
+<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a>* <a href="GtkTreeView.html#gtk-tree-view-get-model">gtk_tree_view_get_model</a>       (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-model">gtk_tree_view_set_model</a>         (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model);
+<a href="GtkTreeSelection.html" title="GtkTreeSelection">GtkTreeSelection</a>* <a href="GtkTreeView.html#gtk-tree-view-get-selection">gtk_tree_view_get_selection</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+<a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>* <a href="GtkTreeView.html#gtk-tree-view-get-hadjustment">gtk_tree_view_get_hadjustment</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-hadjustment">gtk_tree_view_set_hadjustment</a>   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *adjustment);
+<a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>* <a href="GtkTreeView.html#gtk-tree-view-get-vadjustment">gtk_tree_view_get_vadjustment</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-vadjustment">gtk_tree_view_set_vadjustment</a>   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *adjustment);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-headers-visible">gtk_tree_view_get_headers_visible</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-headers-visible">gtk_tree_view_set_headers_visible</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean headers_visible);
+void        <a href="GtkTreeView.html#gtk-tree-view-columns-autosize">gtk_tree_view_columns_autosize</a>  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-headers-clickable">gtk_tree_view_set_headers_clickable</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean setting);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-rules-hint">gtk_tree_view_set_rules_hint</a>    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean setting);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-rules-hint">gtk_tree_view_get_rules_hint</a>    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+gint        <a href="GtkTreeView.html#gtk-tree-view-append-column">gtk_tree_view_append_column</a>     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);
+gint        <a href="GtkTreeView.html#gtk-tree-view-remove-column">gtk_tree_view_remove_column</a>     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);
+gint        <a href="GtkTreeView.html#gtk-tree-view-insert-column">gtk_tree_view_insert_column</a>     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             gint position);
+gint        <a href="GtkTreeView.html#gtk-tree-view-insert-column-with-attributes">gtk_tree_view_insert_column_with_attributes</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint position,
+                                             const gchar *title,
+                                             <a href="GtkCellRenderer.html" title="GtkCellRenderer">GtkCellRenderer</a> *cell,
+                                             ...);
+gint        <a href="GtkTreeView.html#gtk-tree-view-insert-column-with-data-func">gtk_tree_view_insert_column_with_data_func</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint position,
+                                             const gchar *title,
+                                             <a href="GtkCellRenderer.html" title="GtkCellRenderer">GtkCellRenderer</a> *cell,
+                                             <a href="GtkTreeViewColumn.html#GtkTreeCellDataFunc">GtkTreeCellDataFunc</a> func,
+                                             gpointer data,
+                                             GDestroyNotify dnotify);
+<a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a>* <a href="GtkTreeView.html#gtk-tree-view-get-column">gtk_tree_view_get_column</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint n);
+GList*      <a href="GtkTreeView.html#gtk-tree-view-get-columns">gtk_tree_view_get_columns</a>       (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-move-column-after">gtk_tree_view_move_column_after</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *base_column);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-expander-column">gtk_tree_view_set_expander_column</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);
+<a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a>* <a href="GtkTreeView.html#gtk-tree-view-get-expander-column">gtk_tree_view_get_expander_column</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-column-drag-function">gtk_tree_view_set_column_drag_function</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewColumnDropFunc">GtkTreeViewColumnDropFunc</a> func,
+                                             gpointer user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);
+void        <a href="GtkTreeView.html#gtk-tree-view-scroll-to-point">gtk_tree_view_scroll_to_point</a>   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint tree_x,
+                                             gint tree_y);
+void        <a href="GtkTreeView.html#gtk-tree-view-scroll-to-cell">gtk_tree_view_scroll_to_cell</a>    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             gboolean use_align,
+                                             gfloat row_align,
+                                             gfloat col_align);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-cursor">gtk_tree_view_set_cursor</a>        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *focus_column,
+                                             gboolean start_editing);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-cursor-on-cell">gtk_tree_view_set_cursor_on_cell</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *focus_column,
+                                             <a href="GtkCellRenderer.html" title="GtkCellRenderer">GtkCellRenderer</a> *focus_cell,
+                                             gboolean start_editing);
+void        <a href="GtkTreeView.html#gtk-tree-view-get-cursor">gtk_tree_view_get_cursor</a>        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> **focus_column);
+void        <a href="GtkTreeView.html#gtk-tree-view-row-activated">gtk_tree_view_row_activated</a>     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);
+void        <a href="GtkTreeView.html#gtk-tree-view-expand-all">gtk_tree_view_expand_all</a>        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-collapse-all">gtk_tree_view_collapse_all</a>      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-expand-to-path">gtk_tree_view_expand_to_path</a>    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-expand-row">gtk_tree_view_expand_row</a>        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             gboolean open_all);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-collapse-row">gtk_tree_view_collapse_row</a>      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);
+void        <a href="GtkTreeView.html#gtk-tree-view-map-expanded-rows">gtk_tree_view_map_expanded_rows</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewMappingFunc">GtkTreeViewMappingFunc</a> func,
+                                             gpointer data);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-row-expanded">gtk_tree_view_row_expanded</a>      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-reorderable">gtk_tree_view_set_reorderable</a>   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean reorderable);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-reorderable">gtk_tree_view_get_reorderable</a>   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-path-at-pos">gtk_tree_view_get_path_at_pos</a>   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint x,
+                                             gint y,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> **column,
+                                             gint *cell_x,
+                                             gint *cell_y);
+void        <a href="GtkTreeView.html#gtk-tree-view-get-cell-area">gtk_tree_view_get_cell_area</a>     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a
+href="../gdk/gdk-Points-Rectangles-and-Regions.html#GdkRectangle"
+>GdkRectangle</a> *rect);
+void        <a href="GtkTreeView.html#gtk-tree-view-get-background-area">gtk_tree_view_get_background_area</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a
+href="../gdk/gdk-Points-Rectangles-and-Regions.html#GdkRectangle"
+>GdkRectangle</a> *rect);
+void        <a href="GtkTreeView.html#gtk-tree-view-get-visible-rect">gtk_tree_view_get_visible_rect</a>  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a
+href="../gdk/gdk-Points-Rectangles-and-Regions.html#GdkRectangle"
+>GdkRectangle</a> *visible_rect);
+<a
+href="../gdk/gdk-Windows.html#GdkWindow"
+>GdkWindow</a>*  <a href="GtkTreeView.html#gtk-tree-view-get-bin-window">gtk_tree_view_get_bin_window</a>    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-widget-to-tree-coords">gtk_tree_view_widget_to_tree_coords</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint wx,
+                                             gint wy,
+                                             gint *tx,
+                                             gint *ty);
+void        <a href="GtkTreeView.html#gtk-tree-view-tree-to-widget-coords">gtk_tree_view_tree_to_widget_coords</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint tx,
+                                             gint ty,
+                                             gint *wx,
+                                             gint *wy);
+void        <a href="GtkTreeView.html#gtk-tree-view-enable-model-drag-dest">gtk_tree_view_enable_model_drag_dest</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             const <a href="gtk-Selections.html#GtkTargetEntry">GtkTargetEntry</a> *targets,
+                                             gint n_targets,
+                                             <a
+href="../gdk/gdk-Drag-and-Drop.html#GdkDragAction"
+>GdkDragAction</a> actions);
+void        <a href="GtkTreeView.html#gtk-tree-view-enable-model-drag-source">gtk_tree_view_enable_model_drag_source</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a
+href="../gdk/gdk-Windows.html#GdkModifierType"
+>GdkModifierType</a> start_button_mask,
+                                             const <a href="gtk-Selections.html#GtkTargetEntry">GtkTargetEntry</a> *targets,
+                                             gint n_targets,
+                                             <a
+href="../gdk/gdk-Drag-and-Drop.html#GdkDragAction"
+>GdkDragAction</a> actions);
+void        <a href="GtkTreeView.html#gtk-tree-view-unset-rows-drag-source">gtk_tree_view_unset_rows_drag_source</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-unset-rows-drag-dest">gtk_tree_view_unset_rows_drag_dest</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-drag-dest-row">gtk_tree_view_set_drag_dest_row</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeView.html#GtkTreeViewDropPosition">GtkTreeViewDropPosition</a> pos);
+void        <a href="GtkTreeView.html#gtk-tree-view-get-drag-dest-row">gtk_tree_view_get_drag_dest_row</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeView.html#GtkTreeViewDropPosition">GtkTreeViewDropPosition</a> *pos);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-dest-row-at-pos">gtk_tree_view_get_dest_row_at_pos</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint drag_x,
+                                             gint drag_y,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeView.html#GtkTreeViewDropPosition">GtkTreeViewDropPosition</a> *pos);
+<a
+href="../gdk/gdk-Bitmaps-and-Pixmaps.html#GdkPixmap"
+>GdkPixmap</a>*  <a href="GtkTreeView.html#gtk-tree-view-create-row-drag-icon">gtk_tree_view_create_row_drag_icon</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-enable-search">gtk_tree_view_set_enable_search</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean enable_search);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-enable-search">gtk_tree_view_get_enable_search</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+gint        <a href="GtkTreeView.html#gtk-tree-view-get-search-column">gtk_tree_view_get_search_column</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-search-column">gtk_tree_view_set_search_column</a> (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint column);
+<a href="GtkTreeView.html#GtkTreeViewSearchEqualFunc">GtkTreeViewSearchEqualFunc</a> <a href="GtkTreeView.html#gtk-tree-view-get-search-equal-func">gtk_tree_view_get_search_equal_func</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-search-equal-func">gtk_tree_view_set_search_equal_func</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewSearchEqualFunc">GtkTreeViewSearchEqualFunc</a> search_equal_func,
+                                             gpointer search_user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> search_destroy);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-fixed-height-mode">gtk_tree_view_get_fixed_height_mode</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-fixed-height-mode">gtk_tree_view_set_fixed_height_mode</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean enable);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-hover-selection">gtk_tree_view_get_hover_selection</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-hover-selection">gtk_tree_view_set_hover_selection</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean hover);
+gboolean    <a href="GtkTreeView.html#gtk-tree-view-get-hover-expand">gtk_tree_view_get_hover_expand</a>  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-hover-expand">gtk_tree_view_set_hover_expand</a>  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean expand);
+void        (<a href="GtkTreeView.html#GtkTreeDestroyCountFunc">*GtkTreeDestroyCountFunc</a>)      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             gint children,
+                                             gpointer user_data);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-destroy-count-func">gtk_tree_view_set_destroy_count_func</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeDestroyCountFunc">GtkTreeDestroyCountFunc</a> func,
+                                             gpointer data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);
+gboolean    (<a href="GtkTreeView.html#GtkTreeViewRowSeparatorFunc">*GtkTreeViewRowSeparatorFunc</a>)  (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *iter,
+                                             gpointer data);
+<a href="GtkTreeView.html#GtkTreeViewRowSeparatorFunc">GtkTreeViewRowSeparatorFunc</a> <a href="GtkTreeView.html#gtk-tree-view-get-row-separator-func">gtk_tree_view_get_row_separator_func</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);
+void        <a href="GtkTreeView.html#gtk-tree-view-set-row-separator-func">gtk_tree_view_set_row_separator_func</a>
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewRowSeparatorFunc">GtkTreeViewRowSeparatorFunc</a> func,
+                                             gpointer data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);
+
+
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3480072"></a><h2>Object Hierarchy</h2>
+<pre class="synopsis">
+
+  GObject
+   +----<a href="GtkObject.html" title="GtkObject">GtkObject</a>
+         +----<a href="GtkWidget.html" title="GtkWidget">GtkWidget</a>
+               +----<a href="GtkContainer.html" title="GtkContainer">GtkContainer</a>
+                     +----GtkTreeView
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3480114"></a><h2>Implemented Interfaces</h2>
+<p>
+GtkTreeView implements
+ AtkImplementorIface.</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3480132"></a><h2>Properties</h2>
+<pre class="synopsis">
+
+  "<a href="GtkTreeView.html#GtkTreeView--enable-search">enable-search</a>"        gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--expander-column">expander-column</a>"      <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a>     : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--fixed-height-mode">fixed-height-mode</a>"    gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--hadjustment">hadjustment</a>"          <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>         : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--headers-clickable">headers-clickable</a>"    gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--headers-visible">headers-visible</a>"      gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--hover-expand">hover-expand</a>"         gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--hover-selection">hover-selection</a>"      gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--model">model</a>"                <a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a>          : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--reorderable">reorderable</a>"          gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--rules-hint">rules-hint</a>"           gboolean              : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--search-column">search-column</a>"        gint                  : Read / Write
+  "<a href="GtkTreeView.html#GtkTreeView--vadjustment">vadjustment</a>"          <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>         : Read / Write
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3480367"></a><h2>Style Properties</h2>
+<pre class="synopsis">
+
+  "<a href="GtkTreeView.html#GtkTreeView--allow-rules">allow-rules</a>"          gboolean              : Read
+  "<a href="GtkTreeView.html#GtkTreeView--even-row-color">even-row-color</a>"       <a
+href="../gdk/gdk-Colormaps-and-Colors.html#GdkColor"
+>GdkColor</a>              : Read
+  "<a href="GtkTreeView.html#GtkTreeView--expander-size">expander-size</a>"        gint                  : Read
+  "<a href="GtkTreeView.html#GtkTreeView--horizontal-separator">horizontal-separator</a>" gint                  : Read
+  "<a href="GtkTreeView.html#GtkTreeView--indent-expanders">indent-expanders</a>"     gboolean              : Read
+  "<a href="GtkTreeView.html#GtkTreeView--odd-row-color">odd-row-color</a>"        <a
+href="../gdk/gdk-Colormaps-and-Colors.html#GdkColor"
+>GdkColor</a>              : Read
+  "<a href="GtkTreeView.html#GtkTreeView--vertical-separator">vertical-separator</a>"   gint                  : Read
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3480495"></a><h2>Signal Prototypes</h2>
+<pre class="synopsis">
+
+"<a href="GtkTreeView.html#GtkTreeView-columns-changed">columns-changed</a>"
+            void        user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-cursor-changed">cursor-changed</a>"
+            void        user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-expand-collapse-cursor-row">expand-collapse-cursor-row</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gboolean arg1,
+                                            gboolean arg2,
+                                            gboolean arg3,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-move-cursor">move-cursor</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="gtk-Standard-Enumerations.html#GtkMovementStep">GtkMovementStep</a> arg1,
+                                            gint arg2,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-row-activated">row-activated</a>"
+            void        user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg1,
+                                            <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *arg2,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-row-collapsed">row-collapsed</a>"
+            void        user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-row-expanded">row-expanded</a>"
+            void        user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-select-all">select-all</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-select-cursor-parent">select-cursor-parent</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-select-cursor-row">select-cursor-row</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gboolean arg1,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-set-scroll-adjustments">set-scroll-adjustments</a>"
+            void        user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *arg1,
+                                            <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *arg2,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-start-interactive-search">start-interactive-search</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-test-collapse-row">test-collapse-row</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-test-expand-row">test-expand-row</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-toggle-cursor-row">toggle-cursor-row</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);
+"<a href="GtkTreeView.html#GtkTreeView-unselect-all">unselect-all</a>"
+            gboolean    user_function      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3481156"></a><h2>Description</h2>
+<p>
+Widget that displays any object that implements the <a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> interface.
+</p>
+<p>
+Please refer to the <a href="TreeWidget.html" title="Tree and List Widget Overview">tree widget conceptual overview</a> 
+for an overview of all the objects and data types related to the tree widget and how 
+they work together.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3481187"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id3481192"></a><h3>
+<a name="GtkTreeView-struct"></a>GtkTreeView</h3>
+<a class="indexterm" name="id3481203"></a><pre class="programlisting">typedef struct _GtkTreeView GtkTreeView;</pre>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3481217"></a><h3>
+<a name="GtkTreeViewDropPosition"></a>enum GtkTreeViewDropPosition</h3>
+<a class="indexterm" name="id3481229"></a><pre class="programlisting">typedef enum
+{
+  /* drop before/after this row */
+  GTK_TREE_VIEW_DROP_BEFORE,
+  GTK_TREE_VIEW_DROP_AFTER,
+  /* drop as a child of this row (with fallback to before or after
+   * if into is not possible)
+   */
+  GTK_TREE_VIEW_DROP_INTO_OR_BEFORE,
+  GTK_TREE_VIEW_DROP_INTO_OR_AFTER
+} GtkTreeViewDropPosition;
+</pre>
+<p>
+An enum for determining where a dropped row goes.
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3481250"></a><h3>
+<a name="GtkTreeViewPrivate"></a>GtkTreeViewPrivate</h3>
+<a class="indexterm" name="id3481260"></a><pre class="programlisting">typedef struct _GtkTreeViewPrivate GtkTreeViewPrivate;</pre>
+<p>
+A private struct for internal use only.  The definition of this
+structure is not publically available.
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3481278"></a><h3>
+<a name="GtkTreeViewColumnDropFunc"></a>GtkTreeViewColumnDropFunc ()</h3>
+<a class="indexterm" name="id3481290"></a><pre class="programlisting">gboolean    (*GtkTreeViewColumnDropFunc)    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *prev_column,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *next_column,
+                                             gpointer data);</pre>
+<p>
+Function type for determining whether <em class="parameter"><code>column</code></em> can be dropped in a
+particular spot (as determined by <em class="parameter"><code>prev_column</code></em> and <em class="parameter"><code>next_column</code></em>).  In
+left to right locales, <em class="parameter"><code>prev_column</code></em> is on the left of the potential drop
+spot, and <em class="parameter"><code>next_column</code></em> is on the right.  In right to left mode, this is
+reversed.  This function should return <code class="literal">TRUE</code> if the spot is a valid drop
+spot.  Please note that returning <code class="literal">TRUE</code> does not actually indicate that
+the column drop was made, but is meant only to indicate a possible drop
+spot to the user.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td>A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td>The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> being dragged
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>prev_column</code></em>&#160;:</span></td>
+<td>A <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> on one side of <em class="parameter"><code>column</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>next_column</code></em>&#160;:</span></td>
+<td>A <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> on the other side of <em class="parameter"><code>column</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td>user data
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">TRUE</code>, if <a href="glossary.html#column"><span class="type">column</span></a> can be dropped in this spot
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3481540"></a><h3>
+<a name="GtkTreeViewMappingFunc"></a>GtkTreeViewMappingFunc ()</h3>
+<a class="indexterm" name="id3481551"></a><pre class="programlisting">void        (*GtkTreeViewMappingFunc)       (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             gpointer user_data);</pre>
+<p>
+Function used for <a href="GtkTreeView.html#gtk-tree-view-map-expanded-rows"><span class="type">gtk_tree_view_map_expanded_rows</span></a>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td>A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td>The path that's expanded
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3481658"></a><h3>
+<a name="GtkTreeViewSearchEqualFunc"></a>GtkTreeViewSearchEqualFunc ()</h3>
+<a class="indexterm" name="id3481669"></a><pre class="programlisting">gboolean    (*GtkTreeViewSearchEqualFunc)   (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model,
+                                             gint column,
+                                             const gchar *key,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *iter,
+                                             gpointer search_data);</pre>
+<p>
+A function used for checking whether a row in <em class="parameter"><code>model</code></em> matches
+a search key string entered by the user. Note the return value
+is reversed from what you would normally expect, though it
+has some similarity to <code class="function">strcmp()</code> returning 0 for equal strings.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>model</code></em>&#160;:</span></td>
+<td>the <a href="GtkTreeModel.html" title="GtkTreeModel"><span class="type">GtkTreeModel</span></a> being searched
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td>the search column set by <a href="GtkTreeView.html#gtk-tree-view-set-search-column"><code class="function">gtk_tree_view_set_search_column()</code></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>key</code></em>&#160;:</span></td>
+<td>the key string to compare with
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>iter</code></em>&#160;:</span></td>
+<td>a <a href="GtkTreeModel.html#GtkTreeIter"><span class="type">GtkTreeIter</span></a> pointing the row of <em class="parameter"><code>model</code></em> that should be compared
+  with <em class="parameter"><code>key</code></em>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>search_data</code></em>&#160;:</span></td>
+<td>user data from <a href="GtkTreeView.html#gtk-tree-view-set-search-equal-func"><code class="function">gtk_tree_view_set_search_equal_func()</code></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">FALSE</code> if the row matches, <code class="literal">TRUE</code> otherwise.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3481896"></a><h3>
+<a name="gtk-tree-view-new"></a>gtk_tree_view_new ()</h3>
+<a class="indexterm" name="id3481907"></a><pre class="programlisting"><a href="GtkWidget.html" title="GtkWidget">GtkWidget</a>*  gtk_tree_view_new               (void);</pre>
+<p>
+Creates a new <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> widget.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A newly created <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> widget.
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3481962"></a><h3>
+<a name="gtk-tree-view-new-with-model"></a>gtk_tree_view_new_with_model ()</h3>
+<a class="indexterm" name="id3481973"></a><pre class="programlisting"><a href="GtkWidget.html" title="GtkWidget">GtkWidget</a>*  gtk_tree_view_new_with_model    (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model);</pre>
+<p>
+Creates a new <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> widget with the model initialized to <em class="parameter"><code>model</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>model</code></em>&#160;:</span></td>
+<td> the model.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A newly created <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> widget.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482056"></a><h3>
+<a name="gtk-tree-view-get-model"></a>gtk_tree_view_get_model ()</h3>
+<a class="indexterm" name="id3482067"></a><pre class="programlisting"><a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a>* gtk_tree_view_get_model       (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns the model the <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> is based on.  Returns <code class="literal">NULL</code> if the
+model is unset.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A <a href="GtkTreeModel.html" title="GtkTreeModel"><span class="type">GtkTreeModel</span></a>, or <code class="literal">NULL</code> if none is currently being used.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482164"></a><h3>
+<a name="gtk-tree-view-set-model"></a>gtk_tree_view_set_model ()</h3>
+<a class="indexterm" name="id3482175"></a><pre class="programlisting">void        gtk_tree_view_set_model         (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model);</pre>
+<p>
+Sets the model for a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.  If the <em class="parameter"><code>tree_view</code></em> already has a model
+set, it will remove it before setting the new model.  If <em class="parameter"><code>model</code></em> is <code class="literal">NULL</code>, 
+then it will unset the old model.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <span class="type">GtkTreeNode</span>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>model</code></em>&#160;:</span></td>
+<td> The model.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482283"></a><h3>
+<a name="gtk-tree-view-get-selection"></a>gtk_tree_view_get_selection ()</h3>
+<a class="indexterm" name="id3482294"></a><pre class="programlisting"><a href="GtkTreeSelection.html" title="GtkTreeSelection">GtkTreeSelection</a>* gtk_tree_view_get_selection
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Gets the <a href="GtkTreeSelection.html" title="GtkTreeSelection"><span class="type">GtkTreeSelection</span></a> associated with <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A <a href="GtkTreeSelection.html" title="GtkTreeSelection"><span class="type">GtkTreeSelection</span></a> object.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482385"></a><h3>
+<a name="gtk-tree-view-get-hadjustment"></a>gtk_tree_view_get_hadjustment ()</h3>
+<a class="indexterm" name="id3482396"></a><pre class="programlisting"><a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>* gtk_tree_view_get_hadjustment
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Gets the <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> currently being used for the horizontal aspect.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> object, or <code class="literal">NULL</code> if none is currently being
+used.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482489"></a><h3>
+<a name="gtk-tree-view-set-hadjustment"></a>gtk_tree_view_set_hadjustment ()</h3>
+<a class="indexterm" name="id3482500"></a><pre class="programlisting">void        gtk_tree_view_set_hadjustment   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *adjustment);</pre>
+<p>
+Sets the <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> for the current horizontal aspect.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>adjustment</code></em>&#160;:</span></td>
+<td> The <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> to set, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482602"></a><h3>
+<a name="gtk-tree-view-get-vadjustment"></a>gtk_tree_view_get_vadjustment ()</h3>
+<a class="indexterm" name="id3482614"></a><pre class="programlisting"><a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>* gtk_tree_view_get_vadjustment
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Gets the <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> currently being used for the vertical aspect.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> object, or <code class="literal">NULL</code> if none is currently being
+used.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482706"></a><h3>
+<a name="gtk-tree-view-set-vadjustment"></a>gtk_tree_view_set_vadjustment ()</h3>
+<a class="indexterm" name="id3482717"></a><pre class="programlisting">void        gtk_tree_view_set_vadjustment   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *adjustment);</pre>
+<p>
+Sets the <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> for the current vertical aspect.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>adjustment</code></em>&#160;:</span></td>
+<td> The <a href="GtkAdjustment.html" title="GtkAdjustment"><span class="type">GtkAdjustment</span></a> to set, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482820"></a><h3>
+<a name="gtk-tree-view-get-headers-visible"></a>gtk_tree_view_get_headers_visible ()</h3>
+<a class="indexterm" name="id3482832"></a><pre class="programlisting">gboolean    gtk_tree_view_get_headers_visible
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns <code class="literal">TRUE</code> if the headers on the <em class="parameter"><code>tree_view</code></em> are visible.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> Whether the headers are visible or not.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3482913"></a><h3>
+<a name="gtk-tree-view-set-headers-visible"></a>gtk_tree_view_set_headers_visible ()</h3>
+<a class="indexterm" name="id3482925"></a><pre class="programlisting">void        gtk_tree_view_set_headers_visible
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean headers_visible);</pre>
+<p>
+Sets the visibility state of the headers.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>headers_visible</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the headers are visible
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483010"></a><h3>
+<a name="gtk-tree-view-columns-autosize"></a>gtk_tree_view_columns_autosize ()</h3>
+<a class="indexterm" name="id3483021"></a><pre class="programlisting">void        gtk_tree_view_columns_autosize  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Resizes all columns to their optimal width. Only works after the
+treeview has been realized.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483080"></a><h3>
+<a name="gtk-tree-view-set-headers-clickable"></a>gtk_tree_view_set_headers_clickable ()</h3>
+<a class="indexterm" name="id3483093"></a><pre class="programlisting">void        gtk_tree_view_set_headers_clickable
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean setting);</pre>
+<p>
+Allow the column title buttons to be clicked.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>setting</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the columns are clickable.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483178"></a><h3>
+<a name="gtk-tree-view-set-rules-hint"></a>gtk_tree_view_set_rules_hint ()</h3>
+<a class="indexterm" name="id3483190"></a><pre class="programlisting">void        gtk_tree_view_set_rules_hint    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean setting);</pre>
+<p>
+This function tells GTK+ that the user interface for your
+application requires users to read across tree rows and associate
+cells with one another. By default, GTK+ will then render the tree
+with alternating row colors. Do <span class="emphasis"><em>not</em></span> use it
+just because you prefer the appearance of the ruled tree; that's a
+question for the theme. Some themes will draw tree rows in
+alternating colors even when rules are turned off, and users who
+prefer that appearance all the time can choose those themes. You
+should call this function only as a <span class="emphasis"><em>semantic</em></span>
+hint to the theme engine that your tree makes alternating colors
+useful from a functional standpoint (since it has lots of columns,
+generally).</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>setting</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the tree requires reading across rows
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483293"></a><h3>
+<a name="gtk-tree-view-get-rules-hint"></a>gtk_tree_view_get_rules_hint ()</h3>
+<a class="indexterm" name="id3483304"></a><pre class="programlisting">gboolean    gtk_tree_view_get_rules_hint    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Gets the setting set by <a href="GtkTreeView.html#gtk-tree-view-set-rules-hint"><code class="function">gtk_tree_view_set_rules_hint()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if rules are useful for the user of this tree
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483390"></a><h3>
+<a name="gtk-tree-view-append-column"></a>gtk_tree_view_append_column ()</h3>
+<a class="indexterm" name="id3483401"></a><pre class="programlisting">gint        gtk_tree_view_append_column     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);</pre>
+<p>
+Appends <em class="parameter"><code>column</code></em> to the list of columns. If <em class="parameter"><code>tree_view</code></em> has "fixed_height"
+mode enabled, then <em class="parameter"><code>column</code></em> must have its "sizing" property set to be
+GTK_TREE_VIEW_COLUMN_FIXED.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> to add.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> The number of columns in <em class="parameter"><code>tree_view</code></em> after appending.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483525"></a><h3>
+<a name="gtk-tree-view-remove-column"></a>gtk_tree_view_remove_column ()</h3>
+<a class="indexterm" name="id3483536"></a><pre class="programlisting">gint        gtk_tree_view_remove_column     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);</pre>
+<p>
+Removes <em class="parameter"><code>column</code></em> from <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> to remove.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> The number of columns in <em class="parameter"><code>tree_view</code></em> after removing.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483652"></a><h3>
+<a name="gtk-tree-view-insert-column"></a>gtk_tree_view_insert_column ()</h3>
+<a class="indexterm" name="id3483663"></a><pre class="programlisting">gint        gtk_tree_view_insert_column     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             gint position);</pre>
+<p>
+This inserts the <em class="parameter"><code>column</code></em> into the <em class="parameter"><code>tree_view</code></em> at <em class="parameter"><code>position</code></em>.  If <em class="parameter"><code>position</code></em> is
+-1, then the column is inserted at the end. If <em class="parameter"><code>tree_view</code></em> has
+"fixed_height" mode enabled, then <em class="parameter"><code>column</code></em> must have its "sizing" property
+set to be GTK_TREE_VIEW_COLUMN_FIXED.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> to be inserted.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>position</code></em>&#160;:</span></td>
+<td> The position to insert <em class="parameter"><code>column</code></em> in.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> The number of columns in <em class="parameter"><code>tree_view</code></em> after insertion.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3483833"></a><h3>
+<a name="gtk-tree-view-insert-column-with-attributes"></a>gtk_tree_view_insert_column_with_attributes ()</h3>
+<a class="indexterm" name="id3483846"></a><pre class="programlisting">gint        gtk_tree_view_insert_column_with_attributes
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint position,
+                                             const gchar *title,
+                                             <a href="GtkCellRenderer.html" title="GtkCellRenderer">GtkCellRenderer</a> *cell,
+                                             ...);</pre>
+<p>
+Creates a new <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> and inserts it into the <em class="parameter"><code>tree_view</code></em> at
+<em class="parameter"><code>position</code></em>.  If <em class="parameter"><code>position</code></em> is -1, then the newly created column is inserted at
+the end.  The column is initialized with the attributes given. If <em class="parameter"><code>tree_view</code></em>
+has "fixed_height" mode enabled, then <em class="parameter"><code>column</code></em> must have its sizing
+property set to be GTK_TREE_VIEW_COLUMN_FIXED.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>position</code></em>&#160;:</span></td>
+<td> The position to insert the new column in.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>title</code></em>&#160;:</span></td>
+<td> The title to set the header to.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>cell</code></em>&#160;:</span></td>
+<td> The <a href="GtkCellRenderer.html" title="GtkCellRenderer"><span class="type">GtkCellRenderer</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>...</code></em>&#160;:</span></td>
+<td> A <code class="literal">NULL</code>-terminated list of attributes.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> The number of columns in <em class="parameter"><code>tree_view</code></em> after insertion.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3484057"></a><h3>
+<a name="gtk-tree-view-insert-column-with-data-func"></a>gtk_tree_view_insert_column_with_data_func ()</h3>
+<a class="indexterm" name="id3484069"></a><pre class="programlisting">gint        gtk_tree_view_insert_column_with_data_func
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint position,
+                                             const gchar *title,
+                                             <a href="GtkCellRenderer.html" title="GtkCellRenderer">GtkCellRenderer</a> *cell,
+                                             <a href="GtkTreeViewColumn.html#GtkTreeCellDataFunc">GtkTreeCellDataFunc</a> func,
+                                             gpointer data,
+                                             GDestroyNotify dnotify);</pre>
+<p>
+Convenience function that inserts a new column into the <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+with the given cell renderer and a <span class="type">GtkCellDataFunc</span> to set cell renderer
+attributes (normally using data from the model). See also
+<a href="GtkTreeViewColumn.html#gtk-tree-view-column-set-cell-data-func"><code class="function">gtk_tree_view_column_set_cell_data_func()</code></a>, <a href="GtkTreeViewColumn.html#gtk-tree-view-column-pack-start"><code class="function">gtk_tree_view_column_pack_start()</code></a>.
+If <em class="parameter"><code>tree_view</code></em> has "fixed_height" mode enabled, then <em class="parameter"><code>column</code></em> must have its
+"sizing" property set to be GTK_TREE_VIEW_COLUMN_FIXED.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>position</code></em>&#160;:</span></td>
+<td> Position to insert, -1 for append
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>title</code></em>&#160;:</span></td>
+<td> column title
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>cell</code></em>&#160;:</span></td>
+<td> cell renderer for column
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>func</code></em>&#160;:</span></td>
+<td> function to set attributes of cell renderer
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> data for <em class="parameter"><code>func</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dnotify</code></em>&#160;:</span></td>
+<td> destroy notifier for <em class="parameter"><code>data</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> number of columns in the tree view post-insert
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3484338"></a><h3>
+<a name="gtk-tree-view-get-column"></a>gtk_tree_view_get_column ()</h3>
+<a class="indexterm" name="id3484349"></a><pre class="programlisting"><a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a>* gtk_tree_view_get_column (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint n);</pre>
+<p>
+Gets the <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> at the given position in the <span class="type">tree_view</span>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>n</code></em>&#160;:</span></td>
+<td> The position of the column, counting from 0.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a>, or <code class="literal">NULL</code> if the position is outside the
+range of columns.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3484472"></a><h3>
+<a name="gtk-tree-view-get-columns"></a>gtk_tree_view_get_columns ()</h3>
+<a class="indexterm" name="id3484484"></a><pre class="programlisting">GList*      gtk_tree_view_get_columns       (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns a <span class="type">GList</span> of all the <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> s currently in <em class="parameter"><code>tree_view</code></em>.
+The returned list must be freed with <code class="function">g_list_free()</code>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A list of <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> s
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3484593"></a><h3>
+<a name="gtk-tree-view-move-column-after"></a>gtk_tree_view_move_column_after ()</h3>
+<a class="indexterm" name="id3484604"></a><pre class="programlisting">void        gtk_tree_view_move_column_after (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *base_column);</pre>
+<p>
+Moves <em class="parameter"><code>column</code></em> to be after to <em class="parameter"><code>base_column</code></em>.  If <em class="parameter"><code>base_column</code></em> is <code class="literal">NULL</code>, then
+<em class="parameter"><code>column</code></em> is placed in the first position.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> to be moved.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>base_column</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> to be moved relative to, or <code class="literal">NULL</code>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3484759"></a><h3>
+<a name="gtk-tree-view-set-expander-column"></a>gtk_tree_view_set_expander_column ()</h3>
+<a class="indexterm" name="id3484771"></a><pre class="programlisting">void        gtk_tree_view_set_expander_column
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);</pre>
+<p>
+Sets the column to draw the expander arrow at. It must be in <em class="parameter"><code>tree_view</code></em>.  If
+<em class="parameter"><code>column</code></em> is <code class="literal">NULL</code>, then the expander arrow is always at the first visible
+column.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> <code class="literal">NULL</code>, or the column to draw the expander arrow at.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3484877"></a><h3>
+<a name="gtk-tree-view-get-expander-column"></a>gtk_tree_view_get_expander_column ()</h3>
+<a class="indexterm" name="id3484889"></a><pre class="programlisting"><a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a>* gtk_tree_view_get_expander_column
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns the column that is the current expander column.  This
+column has the expander arrow drawn next to it.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> The expander column.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3484960"></a><h3>
+<a name="gtk-tree-view-set-column-drag-function"></a>gtk_tree_view_set_column_drag_function ()</h3>
+<a class="indexterm" name="id3484971"></a><pre class="programlisting">void        gtk_tree_view_set_column_drag_function
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewColumnDropFunc">GtkTreeViewColumnDropFunc</a> func,
+                                             gpointer user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);</pre>
+<p>
+Sets a user function for determining where a column may be dropped when
+dragged.  This function is called on every column pair in turn at the
+beginning of a column drag to determine where a drop can take place.  The
+arguments passed to <em class="parameter"><code>func</code></em> are: the <em class="parameter"><code>tree_view</code></em>, the <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> being
+dragged, the two <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> s determining the drop spot, and
+<em class="parameter"><code>user_data</code></em>.  If either of the <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> arguments for the drop spot
+are <code class="literal">NULL</code>, then they indicate an edge.  If <em class="parameter"><code>func</code></em> is set to be <code class="literal">NULL</code>, then
+<em class="parameter"><code>tree_view</code></em> reverts to the default behavior of allowing all columns to be
+dropped everywhere.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>func</code></em>&#160;:</span></td>
+<td> A function to determine which columns are reorderable, or <code class="literal">NULL</code>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> User data to be passed to <em class="parameter"><code>func</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>destroy</code></em>&#160;:</span></td>
+<td> Destroy notifier for <em class="parameter"><code>user_data</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3485200"></a><h3>
+<a name="gtk-tree-view-scroll-to-point"></a>gtk_tree_view_scroll_to_point ()</h3>
+<a class="indexterm" name="id3485211"></a><pre class="programlisting">void        gtk_tree_view_scroll_to_point   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint tree_x,
+                                             gint tree_y);</pre>
+<p>
+Scrolls the tree view such that the top-left corner of the visible
+area is <em class="parameter"><code>tree_x</code></em>, <em class="parameter"><code>tree_y</code></em>, where <em class="parameter"><code>tree_x</code></em> and <em class="parameter"><code>tree_y</code></em> are specified
+in tree window coordinates.  The <em class="parameter"><code>tree_view</code></em> must be realized before
+this function is called.  If it isn't, you probably want to be
+using <a href="GtkTreeView.html#gtk-tree-view-scroll-to-cell"><code class="function">gtk_tree_view_scroll_to_cell()</code></a>.
+</p>
+<p>
+If either <em class="parameter"><code>tree_x</code></em> or <em class="parameter"><code>tree_y</code></em> are -1, then that direction isn't scrolled.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_x</code></em>&#160;:</span></td>
+<td> X coordinate of new top-left pixel of visible area, or -1
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_y</code></em>&#160;:</span></td>
+<td> Y coordinate of new top-left pixel of visible area, or -1
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3485373"></a><h3>
+<a name="gtk-tree-view-scroll-to-cell"></a>gtk_tree_view_scroll_to_cell ()</h3>
+<a class="indexterm" name="id3485384"></a><pre class="programlisting">void        gtk_tree_view_scroll_to_cell    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             gboolean use_align,
+                                             gfloat row_align,
+                                             gfloat col_align);</pre>
+<p>
+Moves the alignments of <em class="parameter"><code>tree_view</code></em> to the position specified by <em class="parameter"><code>column</code></em> and
+<em class="parameter"><code>path</code></em>.  If <em class="parameter"><code>column</code></em> is <code class="literal">NULL</code>, then no horizontal scrolling occurs.  Likewise,
+if <em class="parameter"><code>path</code></em> is <code class="literal">NULL</code> no vertical scrolling occurs.  At a minimum, one of <em class="parameter"><code>column</code></em>
+or <em class="parameter"><code>path</code></em> need to be non-<code class="literal">NULL</code>.  <em class="parameter"><code>row_align</code></em> determines where the row is
+placed, and <em class="parameter"><code>col_align</code></em> determines where <em class="parameter"><code>column</code></em> is placed.  Both are expected
+to be between 0.0 and 1.0. 0.0 means left/top alignment, 1.0 means
+right/bottom alignment, 0.5 means center.
+</p>
+<p>
+If <em class="parameter"><code>use_align</code></em> is <code class="literal">FALSE</code>, then the alignment arguments are ignored, and the
+tree does the minimum amount of work to scroll the cell onto the screen.
+This means that the cell will be scrolled to the edge closest to its current
+position.  If the cell is currently visible on the screen, nothing is done.
+</p>
+<p>
+This function only works if the model is set, and <em class="parameter"><code>path</code></em> is a valid row on the
+model.  If the model changes before the <em class="parameter"><code>tree_view</code></em> is realized, the centered
+path will be modified to reflect this change.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> The path of the row to move to, or <code class="literal">NULL</code>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> to move horizontally to, or <code class="literal">NULL</code>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>use_align</code></em>&#160;:</span></td>
+<td> whether to use alignment arguments, or <code class="literal">FALSE</code>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>row_align</code></em>&#160;:</span></td>
+<td> The vertical alignment of the row specified by <em class="parameter"><code>path</code></em>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>col_align</code></em>&#160;:</span></td>
+<td> The horizontal alignment of the column specified by <em class="parameter"><code>column</code></em>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3485711"></a><h3>
+<a name="gtk-tree-view-set-cursor"></a>gtk_tree_view_set_cursor ()</h3>
+<a class="indexterm" name="id3485721"></a><pre class="programlisting">void        gtk_tree_view_set_cursor        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *focus_column,
+                                             gboolean start_editing);</pre>
+<p>
+Sets the current keyboard focus to be at <em class="parameter"><code>path</code></em>, and selects it.  This is
+useful when you want to focus the user's attention on a particular row.  If
+<em class="parameter"><code>focus_column</code></em> is not <code class="literal">NULL</code>, then focus is given to the column specified by 
+it. Additionally, if <em class="parameter"><code>focus_column</code></em> is specified, and <em class="parameter"><code>start_editing</code></em> is 
+<code class="literal">TRUE</code>, then editing should be started in the specified cell.  
+This function is often followed by <em class="parameter"><code>gtk_widget_grab_focus</code></em> (<em class="parameter"><code>tree_view</code></em>) 
+in order to give keyboard focus to the widget.  Please note that editing 
+can only happen when the widget is realized.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>focus_column</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a>, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>start_editing</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the specified cell should start being edited.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3485926"></a><h3>
+<a name="gtk-tree-view-set-cursor-on-cell"></a>gtk_tree_view_set_cursor_on_cell ()</h3>
+<a class="indexterm" name="id3485938"></a><pre class="programlisting">void        gtk_tree_view_set_cursor_on_cell
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *focus_column,
+                                             <a href="GtkCellRenderer.html" title="GtkCellRenderer">GtkCellRenderer</a> *focus_cell,
+                                             gboolean start_editing);</pre>
+<p>
+Sets the current keyboard focus to be at <em class="parameter"><code>path</code></em>, and selects it.  This is
+useful when you want to focus the user's attention on a particular row.  If
+<em class="parameter"><code>focus_column</code></em> is not <code class="literal">NULL</code>, then focus is given to the column specified by
+it. If <em class="parameter"><code>focus_column</code></em> and <em class="parameter"><code>focus_cell</code></em> are not <code class="literal">NULL</code>, and <em class="parameter"><code>focus_column</code></em>
+contains 2 or more editable or activatable cells, then focus is given to
+the cell specified by <em class="parameter"><code>focus_cell</code></em>. Additionally, if <em class="parameter"><code>focus_column</code></em> is
+specified, and <em class="parameter"><code>start_editing</code></em> is <code class="literal">TRUE</code>, then editing should be started in
+the specified cell.  This function is often followed by
+<em class="parameter"><code>gtk_widget_grab_focus</code></em> (<em class="parameter"><code>tree_view</code></em>) in order to give keyboard focus to the
+widget.  Please note that editing can only happen when the widget is
+realized.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>focus_column</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a>, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>focus_cell</code></em>&#160;:</span></td>
+<td> A <a href="GtkCellRenderer.html" title="GtkCellRenderer"><span class="type">GtkCellRenderer</span></a>, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>start_editing</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the specified cell should start being edited.
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.2
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3486216"></a><h3>
+<a name="gtk-tree-view-get-cursor"></a>gtk_tree_view_get_cursor ()</h3>
+<a class="indexterm" name="id3486226"></a><pre class="programlisting">void        gtk_tree_view_get_cursor        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> **focus_column);</pre>
+<p>
+Fills in <em class="parameter"><code>path</code></em> and <em class="parameter"><code>focus_column</code></em> with the current path and focus column.  If
+the cursor isn't currently set, then *<em class="parameter"><code>path</code></em> will be <code class="literal">NULL</code>.  If no column
+currently has focus, then *<em class="parameter"><code>focus_column</code></em> will be <code class="literal">NULL</code>.
+</p>
+<p>
+The returned <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> must be freed with <a href="GtkTreeModel.html#gtk-tree-path-free"><code class="function">gtk_tree_path_free()</code></a> when
+you are done with it.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> A pointer to be filled with the current cursor path, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>focus_column</code></em>&#160;:</span></td>
+<td> A pointer to be filled with the current focus column, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3486401"></a><h3>
+<a name="gtk-tree-view-row-activated"></a>gtk_tree_view_row_activated ()</h3>
+<a class="indexterm" name="id3486413"></a><pre class="programlisting">void        gtk_tree_view_row_activated     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column);</pre>
+<p>
+Activates the cell determined by <em class="parameter"><code>path</code></em> and <em class="parameter"><code>column</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> to be activated.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> The <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> to be activated.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3486542"></a><h3>
+<a name="gtk-tree-view-expand-all"></a>gtk_tree_view_expand_all ()</h3>
+<a class="indexterm" name="id3486552"></a><pre class="programlisting">void        gtk_tree_view_expand_all        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Recursively expands all nodes in the <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3486616"></a><h3>
+<a name="gtk-tree-view-collapse-all"></a>gtk_tree_view_collapse_all ()</h3>
+<a class="indexterm" name="id3486627"></a><pre class="programlisting">void        gtk_tree_view_collapse_all      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Recursively collapses all visible, expanded nodes in <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3486691"></a><h3>
+<a name="gtk-tree-view-expand-to-path"></a>gtk_tree_view_expand_to_path ()</h3>
+<a class="indexterm" name="id3486702"></a><pre class="programlisting">void        gtk_tree_view_expand_to_path    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);</pre>
+<p>
+Expands the row at <em class="parameter"><code>path</code></em>. This will also expand all parent rows of
+<em class="parameter"><code>path</code></em> as necessary.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> path to a row.
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.2
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3486798"></a><h3>
+<a name="gtk-tree-view-expand-row"></a>gtk_tree_view_expand_row ()</h3>
+<a class="indexterm" name="id3486810"></a><pre class="programlisting">gboolean    gtk_tree_view_expand_row        (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             gboolean open_all);</pre>
+<p>
+Opens the row so its children are visible.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> path to a row
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>open_all</code></em>&#160;:</span></td>
+<td> whether to recursively expand, or just expand immediate children
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the row existed and had children
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3486928"></a><h3>
+<a name="gtk-tree-view-collapse-row"></a>gtk_tree_view_collapse_row ()</h3>
+<a class="indexterm" name="id3486940"></a><pre class="programlisting">gboolean    gtk_tree_view_collapse_row      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);</pre>
+<p>
+Collapses a row (hides its child rows, if they exist).</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> path to a row in the <em class="parameter"><code>tree_view</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the row was collapsed.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3487041"></a><h3>
+<a name="gtk-tree-view-map-expanded-rows"></a>gtk_tree_view_map_expanded_rows ()</h3>
+<a class="indexterm" name="id3487052"></a><pre class="programlisting">void        gtk_tree_view_map_expanded_rows (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewMappingFunc">GtkTreeViewMappingFunc</a> func,
+                                             gpointer data);</pre>
+<p>
+Calls <em class="parameter"><code>func</code></em> on all expanded rows.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>func</code></em>&#160;:</span></td>
+<td> A function to be called
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> User data to be passed to the function.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3487160"></a><h3>
+<a name="gtk-tree-view-row-expanded"></a>gtk_tree_view_row_expanded ()</h3>
+<a class="indexterm" name="id3487172"></a><pre class="programlisting">gboolean    gtk_tree_view_row_expanded      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);</pre>
+<p>
+Returns <code class="literal">TRUE</code> if the node pointed to by <em class="parameter"><code>path</code></em> is expanded in <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> to test expansion state.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if <span class="type">path</span> is expanded.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3487301"></a><h3>
+<a name="gtk-tree-view-set-reorderable"></a>gtk_tree_view_set_reorderable ()</h3>
+<a class="indexterm" name="id3487313"></a><pre class="programlisting">void        gtk_tree_view_set_reorderable   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean reorderable);</pre>
+<p>
+This function is a convenience function to allow you to reorder models that
+support the <span class="type">GtkDragSourceIface</span> and the <span class="type">GtkDragDestIface</span>.  Both
+<a href="GtkTreeStore.html" title="GtkTreeStore"><span class="type">GtkTreeStore</span></a> and <a href="GtkListStore.html" title="GtkListStore"><span class="type">GtkListStore</span></a> support these.  If <em class="parameter"><code>reorderable</code></em> is <code class="literal">TRUE</code>, then
+the user can reorder the model by dragging and dropping rows.  The
+developer can listen to these changes by connecting to the model's
+row_inserted and row_deleted signals.
+</p>
+<p>
+This function does not give you any degree of control over the order -- any
+reordering is allowed.  If more control is needed, you should probably
+handle drag and drop manually.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>reorderable</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code>, if the tree can be reordered.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3487457"></a><h3>
+<a name="gtk-tree-view-get-reorderable"></a>gtk_tree_view_get_reorderable ()</h3>
+<a class="indexterm" name="id3487468"></a><pre class="programlisting">gboolean    gtk_tree_view_get_reorderable   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Retrieves whether the user can reorder the tree via drag-and-drop. See
+<a href="GtkTreeView.html#gtk-tree-view-set-reorderable"><code class="function">gtk_tree_view_set_reorderable()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the tree can be reordered.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3487554"></a><h3>
+<a name="gtk-tree-view-get-path-at-pos"></a>gtk_tree_view_get_path_at_pos ()</h3>
+<a class="indexterm" name="id3487565"></a><pre class="programlisting">gboolean    gtk_tree_view_get_path_at_pos   (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint x,
+                                             gint y,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> **column,
+                                             gint *cell_x,
+                                             gint *cell_y);</pre>
+<p>
+Finds the path at the point (<em class="parameter"><code>x</code></em>, <em class="parameter"><code>y</code></em>), relative to widget coordinates.  That
+is, <em class="parameter"><code>x</code></em> and <em class="parameter"><code>y</code></em> are relative to an events coordinates. <em class="parameter"><code>x</code></em> and <em class="parameter"><code>y</code></em> must come
+from an event on the <em class="parameter"><code>tree_view</code></em> only where <code class="literal">event-&gt;window ==
+gtk_tree_view_get_bin ()</code>. It is primarily for things 
+like popup menus. If <em class="parameter"><code>path</code></em> is non-<code class="literal">NULL</code>, then it will be filled with the 
+<a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> at that point.  This path should be freed with <a href="GtkTreeModel.html#gtk-tree-path-free"><code class="function">gtk_tree_path_free()</code></a>.  
+If <em class="parameter"><code>column</code></em> is non-<code class="literal">NULL</code>, then it will be filled with the column at that point.
+<em class="parameter"><code>cell_x</code></em> and <em class="parameter"><code>cell_y</code></em> return the coordinates relative to the cell background
+(i.e. the <em class="parameter"><code>background_area</code></em> passed to <a href="GtkCellRenderer.html#gtk-cell-renderer-render"><code class="function">gtk_cell_renderer_render()</code></a>).  This
+function is only meaningful if <em class="parameter"><code>tree_view</code></em> is realized.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>x</code></em>&#160;:</span></td>
+<td> The x position to be identified.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>y</code></em>&#160;:</span></td>
+<td> The y position to be identified.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> A pointer to a <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> pointer to be filled in, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> A pointer to a <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> pointer to be filled in, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>cell_x</code></em>&#160;:</span></td>
+<td> A pointer where the X coordinate relative to the cell can be placed, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>cell_y</code></em>&#160;:</span></td>
+<td> A pointer where the Y coordinate relative to the cell can be placed, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if a row exists at that coordinate.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3487945"></a><h3>
+<a name="gtk-tree-view-get-cell-area"></a>gtk_tree_view_get_cell_area ()</h3>
+<a class="indexterm" name="id3487957"></a><pre class="programlisting">void        gtk_tree_view_get_cell_area     (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a
+href="../gdk/gdk-Points-Rectangles-and-Regions.html#GdkRectangle"
+>GdkRectangle</a> *rect);</pre>
+<p>
+Fills the bounding rectangle in tree window coordinates for the cell at the
+row specified by <em class="parameter"><code>path</code></em> and the column specified by <em class="parameter"><code>column</code></em>.  If <em class="parameter"><code>path</code></em> is
+<code class="literal">NULL</code>, or points to a path not currently displayed, the <em class="parameter"><code>y</code></em> and <em class="parameter"><code>height</code></em> fields
+of the rectangle will be filled with 0. If <em class="parameter"><code>column</code></em> is <code class="literal">NULL</code>, the <em class="parameter"><code>x</code></em> and <em class="parameter"><code>width</code></em>
+fields will be filled with 0.  The sum of all cell rects does not cover the
+entire tree; there are extra pixels in between rows, for example. The
+returned rectangle is equivalent to the <em class="parameter"><code>cell_area</code></em> passed to
+<a href="GtkCellRenderer.html#gtk-cell-renderer-render"><code class="function">gtk_cell_renderer_render()</code></a>.  This function is only valid if <em class="parameter"><code>tree_view</code></em> is
+realized.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> for the row, or <code class="literal">NULL</code> to get only horizontal coordinates
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> for the column, or <code class="literal">NULL</code> to get only vertical coordinates
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>rect</code></em>&#160;:</span></td>
+<td> rectangle to fill with cell rect
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3488198"></a><h3>
+<a name="gtk-tree-view-get-background-area"></a>gtk_tree_view_get_background_area ()</h3>
+<a class="indexterm" name="id3488210"></a><pre class="programlisting">void        gtk_tree_view_get_background_area
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *column,
+                                             <a
+href="../gdk/gdk-Points-Rectangles-and-Regions.html#GdkRectangle"
+>GdkRectangle</a> *rect);</pre>
+<p>
+Fills the bounding rectangle in tree window coordinates for the cell at the
+row specified by <em class="parameter"><code>path</code></em> and the column specified by <em class="parameter"><code>column</code></em>.  If <em class="parameter"><code>path</code></em> is
+<code class="literal">NULL</code>, or points to a node not found in the tree, the <em class="parameter"><code>y</code></em> and <em class="parameter"><code>height</code></em> fields of
+the rectangle will be filled with 0. If <em class="parameter"><code>column</code></em> is <code class="literal">NULL</code>, the <em class="parameter"><code>x</code></em> and <em class="parameter"><code>width</code></em>
+fields will be filled with 0.  The returned rectangle is equivalent to the
+<em class="parameter"><code>background_area</code></em> passed to <a href="GtkCellRenderer.html#gtk-cell-renderer-render"><code class="function">gtk_cell_renderer_render()</code></a>.  These background
+areas tile to cover the entire tree window (except for the area used for
+header buttons). Contrast with the <em class="parameter"><code>cell_area</code></em>, returned by
+<a href="GtkTreeView.html#gtk-tree-view-get-cell-area"><code class="function">gtk_tree_view_get_cell_area()</code></a>, which returns only the cell itself, excluding
+surrounding borders and the tree expander area.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> for the row, or <code class="literal">NULL</code> to get only horizontal coordinates
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a> for the column, or <code class="literal">NULL</code> to get only vertical coordiantes
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>rect</code></em>&#160;:</span></td>
+<td> rectangle to fill with cell background rect
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3488464"></a><h3>
+<a name="gtk-tree-view-get-visible-rect"></a>gtk_tree_view_get_visible_rect ()</h3>
+<a class="indexterm" name="id3488475"></a><pre class="programlisting">void        gtk_tree_view_get_visible_rect  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a
+href="../gdk/gdk-Points-Rectangles-and-Regions.html#GdkRectangle"
+>GdkRectangle</a> *visible_rect);</pre>
+<p>
+Fills <em class="parameter"><code>visible_rect</code></em> with the currently-visible region of the
+buffer, in tree coordinates. Convert to widget coordinates with
+<a href="GtkTreeView.html#gtk-tree-view-tree-to-widget-coords"><code class="function">gtk_tree_view_tree_to_widget_coords()</code></a>. Tree coordinates start at
+0,0 for row 0 of the tree, and cover the entire scrollable area of
+the tree.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>visible_rect</code></em>&#160;:</span></td>
+<td> rectangle to fill
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3488577"></a><h3>
+<a name="gtk-tree-view-get-bin-window"></a>gtk_tree_view_get_bin_window ()</h3>
+<a class="indexterm" name="id3488587"></a><pre class="programlisting"><a
+href="../gdk/gdk-Windows.html#GdkWindow"
+>GdkWindow</a>*  gtk_tree_view_get_bin_window    (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns the window that <em class="parameter"><code>tree_view</code></em> renders to.  This is used primarily to
+compare to <code class="literal">event-&gt;window</code> to confirm that the event on
+<em class="parameter"><code>tree_view</code></em> is on the right window.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> A <a
+href="../gdk/gdk-Windows.html#GdkWindow"
+><span class="type">GdkWindow</span></a>, or <code class="literal">NULL</code> when <em class="parameter"><code>tree_view</code></em> hasn't been realized yet
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3488695"></a><h3>
+<a name="gtk-tree-view-widget-to-tree-coords"></a>gtk_tree_view_widget_to_tree_coords ()</h3>
+<a class="indexterm" name="id3488707"></a><pre class="programlisting">void        gtk_tree_view_widget_to_tree_coords
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint wx,
+                                             gint wy,
+                                             gint *tx,
+                                             gint *ty);</pre>
+<p>
+Converts widget coordinates to coordinates for the
+tree window (the full scrollable area of the tree).</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>wx</code></em>&#160;:</span></td>
+<td> widget X coordinate
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>wy</code></em>&#160;:</span></td>
+<td> widget Y coordinate
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tx</code></em>&#160;:</span></td>
+<td> return location for tree X coordinate
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>ty</code></em>&#160;:</span></td>
+<td> return location for tree Y coordinate
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3488853"></a><h3>
+<a name="gtk-tree-view-tree-to-widget-coords"></a>gtk_tree_view_tree_to_widget_coords ()</h3>
+<a class="indexterm" name="id3488865"></a><pre class="programlisting">void        gtk_tree_view_tree_to_widget_coords
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint tx,
+                                             gint ty,
+                                             gint *wx,
+                                             gint *wy);</pre>
+<p>
+Converts tree coordinates (coordinates in full scrollable area of the tree)
+to widget coordinates.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tx</code></em>&#160;:</span></td>
+<td> tree X coordinate
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>ty</code></em>&#160;:</span></td>
+<td> tree Y coordinate
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>wx</code></em>&#160;:</span></td>
+<td> return location for widget X coordinate
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>wy</code></em>&#160;:</span></td>
+<td> return location for widget Y coordinate
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489010"></a><h3>
+<a name="gtk-tree-view-enable-model-drag-dest"></a>gtk_tree_view_enable_model_drag_dest ()</h3>
+<a class="indexterm" name="id3489021"></a><pre class="programlisting">void        gtk_tree_view_enable_model_drag_dest
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             const <a href="gtk-Selections.html#GtkTargetEntry">GtkTargetEntry</a> *targets,
+                                             gint n_targets,
+                                             <a
+href="../gdk/gdk-Drag-and-Drop.html#GdkDragAction"
+>GdkDragAction</a> actions);</pre>
+<p>
+Turns <em class="parameter"><code>tree_view</code></em> into a drop destination for automatic DND.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>targets</code></em>&#160;:</span></td>
+<td> the table of targets that the drag will support
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>n_targets</code></em>&#160;:</span></td>
+<td> the number of items in <em class="parameter"><code>targets</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>actions</code></em>&#160;:</span></td>
+<td> the bitmask of possible actions for a drag from this
+   widget
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489159"></a><h3>
+<a name="gtk-tree-view-enable-model-drag-source"></a>gtk_tree_view_enable_model_drag_source ()</h3>
+<a class="indexterm" name="id3489170"></a><pre class="programlisting">void        gtk_tree_view_enable_model_drag_source
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a
+href="../gdk/gdk-Windows.html#GdkModifierType"
+>GdkModifierType</a> start_button_mask,
+                                             const <a href="gtk-Selections.html#GtkTargetEntry">GtkTargetEntry</a> *targets,
+                                             gint n_targets,
+                                             <a
+href="../gdk/gdk-Drag-and-Drop.html#GdkDragAction"
+>GdkDragAction</a> actions);</pre>
+<p>
+Turns <em class="parameter"><code>tree_view</code></em> into a drag source for automatic DND.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>start_button_mask</code></em>&#160;:</span></td>
+<td> Mask of allowed buttons to start drag
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>targets</code></em>&#160;:</span></td>
+<td> the table of targets that the drag will support
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>n_targets</code></em>&#160;:</span></td>
+<td> the number of items in <em class="parameter"><code>targets</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>actions</code></em>&#160;:</span></td>
+<td> the bitmask of possible actions for a drag from this
+   widget
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489331"></a><h3>
+<a name="gtk-tree-view-unset-rows-drag-source"></a>gtk_tree_view_unset_rows_drag_source ()</h3>
+<a class="indexterm" name="id3489342"></a><pre class="programlisting">void        gtk_tree_view_unset_rows_drag_source
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Undoes the effect of <a href="GtkTreeView.html#gtk-tree-view-enable-model-drag-source"><code class="function">gtk_tree_view_enable_model_drag_source()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489413"></a><h3>
+<a name="gtk-tree-view-unset-rows-drag-dest"></a>gtk_tree_view_unset_rows_drag_dest ()</h3>
+<a class="indexterm" name="id3489424"></a><pre class="programlisting">void        gtk_tree_view_unset_rows_drag_dest
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Undoes the effect of <a href="GtkTreeView.html#gtk-tree-view-enable-model-drag-dest"><code class="function">gtk_tree_view_enable_model_drag_dest()</code></a>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489494"></a><h3>
+<a name="gtk-tree-view-set-drag-dest-row"></a>gtk_tree_view_set_drag_dest_row ()</h3>
+<a class="indexterm" name="id3489505"></a><pre class="programlisting">void        gtk_tree_view_set_drag_dest_row (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             <a href="GtkTreeView.html#GtkTreeViewDropPosition">GtkTreeViewDropPosition</a> pos);</pre>
+<p>
+Sets the row that is highlighted for feedback.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> The path of the row to highlight, or <code class="literal">NULL</code>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pos</code></em>&#160;:</span></td>
+<td> Specifies whether to drop before, after or into the row
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489614"></a><h3>
+<a name="gtk-tree-view-get-drag-dest-row"></a>gtk_tree_view_get_drag_dest_row ()</h3>
+<a class="indexterm" name="id3489625"></a><pre class="programlisting">void        gtk_tree_view_get_drag_dest_row (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeView.html#GtkTreeViewDropPosition">GtkTreeViewDropPosition</a> *pos);</pre>
+<p>
+Gets information about the row that is highlighted for feedback.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> Return location for the path of the highlighted row, or <code class="literal">NULL</code>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pos</code></em>&#160;:</span></td>
+<td> Return location for the drop position, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489739"></a><h3>
+<a name="gtk-tree-view-get-dest-row-at-pos"></a>gtk_tree_view_get_dest_row_at_pos ()</h3>
+<a class="indexterm" name="id3489751"></a><pre class="programlisting">gboolean    gtk_tree_view_get_dest_row_at_pos
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint drag_x,
+                                             gint drag_y,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> **path,
+                                             <a href="GtkTreeView.html#GtkTreeViewDropPosition">GtkTreeViewDropPosition</a> *pos);</pre>
+<p>
+Determines the destination row for a given position.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>drag_x</code></em>&#160;:</span></td>
+<td> the position to determine the destination row for
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>drag_y</code></em>&#160;:</span></td>
+<td> the position to determine the destination row for
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> Return location for the path of the highlighted row, or <code class="literal">NULL</code>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>pos</code></em>&#160;:</span></td>
+<td> Return location for the drop position, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> whether there is a row at the given postiion,
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3489921"></a><h3>
+<a name="gtk-tree-view-create-row-drag-icon"></a>gtk_tree_view_create_row_drag_icon ()</h3>
+<a class="indexterm" name="id3489933"></a><pre class="programlisting"><a
+href="../gdk/gdk-Bitmaps-and-Pixmaps.html#GdkPixmap"
+>GdkPixmap</a>*  gtk_tree_view_create_row_drag_icon
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path);</pre>
+<p>
+Creates a <a
+href="../gdk/gdk-Bitmaps-and-Pixmaps.html#GdkPixmap"
+><span class="type">GdkPixmap</span></a> representation of the row at <em class="parameter"><code>path</code></em>.  This image is used
+for a drag icon.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeModel.html#GtkTreePath"><span class="type">GtkTreePath</span></a> in <em class="parameter"><code>tree_view</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a newly-allocated pixmap of the drag icon.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490052"></a><h3>
+<a name="gtk-tree-view-set-enable-search"></a>gtk_tree_view_set_enable_search ()</h3>
+<a class="indexterm" name="id3490063"></a><pre class="programlisting">void        gtk_tree_view_set_enable_search (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean enable_search);</pre>
+<p>
+If <em class="parameter"><code>enable_search</code></em> is set, then the user can type in text to search through
+the tree interactively (this is sometimes called "typeahead find").
+</p>
+<p>
+Note that even if this is <code class="literal">FALSE</code>, the user can still initiate a search 
+using the "start-interactive-search" key binding.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>enable_search</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code>, if the user can search interactively
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490167"></a><h3>
+<a name="gtk-tree-view-get-enable-search"></a>gtk_tree_view_get_enable_search ()</h3>
+<a class="indexterm" name="id3490178"></a><pre class="programlisting">gboolean    gtk_tree_view_get_enable_search (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns whether or not the tree allows to start interactive searching 
+by typing in text.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> whether or not to let the user search interactively
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490248"></a><h3>
+<a name="gtk-tree-view-get-search-column"></a>gtk_tree_view_get_search_column ()</h3>
+<a class="indexterm" name="id3490260"></a><pre class="programlisting">gint        gtk_tree_view_get_search_column (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Gets the column searched on by the interactive search code.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the column the interactive search code searches in.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490329"></a><h3>
+<a name="gtk-tree-view-set-search-column"></a>gtk_tree_view_set_search_column ()</h3>
+<a class="indexterm" name="id3490341"></a><pre class="programlisting">void        gtk_tree_view_set_search_column (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gint column);</pre>
+<p>
+Sets <em class="parameter"><code>column</code></em> as the column where the interactive search code should
+search in. 
+</p>
+<p>
+If the sort column is set, users can use the "start-interactive-search"
+key binding to bring up search popup. The enable-search property controls
+wether simply typing text will also start an interactive search.
+</p>
+<p>
+Note that <em class="parameter"><code>column</code></em> refers to a column of the model.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>column</code></em>&#160;:</span></td>
+<td> the column of the model to search in, or -1 to disable searching
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490444"></a><h3>
+<a name="gtk-tree-view-get-search-equal-func"></a>gtk_tree_view_get_search_equal_func ()</h3>
+<a class="indexterm" name="id3490456"></a><pre class="programlisting"><a href="GtkTreeView.html#GtkTreeViewSearchEqualFunc">GtkTreeViewSearchEqualFunc</a> gtk_tree_view_get_search_equal_func
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns the compare function currently in use.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the currently used compare function for the search code.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490527"></a><h3>
+<a name="gtk-tree-view-set-search-equal-func"></a>gtk_tree_view_set_search_equal_func ()</h3>
+<a class="indexterm" name="id3490539"></a><pre class="programlisting">void        gtk_tree_view_set_search_equal_func
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewSearchEqualFunc">GtkTreeViewSearchEqualFunc</a> search_equal_func,
+                                             gpointer search_user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> search_destroy);</pre>
+<p>
+Sets the compare function for the interactive search capabilities; note
+that somewhat like <code class="function">strcmp()</code> returning 0 for equality
+<a href="GtkTreeView.html#GtkTreeViewSearchEqualFunc"><span class="type">GtkTreeViewSearchEqualFunc</span></a> returns <code class="literal">FALSE</code> on matches.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>search_equal_func</code></em>&#160;:</span></td>
+<td> the compare function to use during the search
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>search_user_data</code></em>&#160;:</span></td>
+<td> user data to pass to <em class="parameter"><code>search_equal_func</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>search_destroy</code></em>&#160;:</span></td>
+<td> Destroy notifier for <em class="parameter"><code>search_user_data</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490715"></a><h3>
+<a name="gtk-tree-view-get-fixed-height-mode"></a>gtk_tree_view_get_fixed_height_mode ()</h3>
+<a class="indexterm" name="id3490726"></a><pre class="programlisting">gboolean    gtk_tree_view_get_fixed_height_mode
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns whether fixed height mode is turned on for <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if <em class="parameter"><code>tree_view</code></em> is in fixed height mode
+
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490817"></a><h3>
+<a name="gtk-tree-view-set-fixed-height-mode"></a>gtk_tree_view_set_fixed_height_mode ()</h3>
+<a class="indexterm" name="id3490829"></a><pre class="programlisting">void        gtk_tree_view_set_fixed_height_mode
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean enable);</pre>
+<p>
+Enables or disables the fixed height mode of <em class="parameter"><code>tree_view</code></em>. 
+Fixed height mode speeds up <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> by assuming that all 
+rows have the same height. 
+Only enable this option if all rows are the same height and all
+columns are of type <code class="literal">GTK_TREE_VIEW_COLUMN_FIXED</code>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> 
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>enable</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> to enable fixed height mode
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6 
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3490942"></a><h3>
+<a name="gtk-tree-view-get-hover-selection"></a>gtk_tree_view_get_hover_selection ()</h3>
+<a class="indexterm" name="id3490954"></a><pre class="programlisting">gboolean    gtk_tree_view_get_hover_selection
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns whether hover selection mode is turned on for <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if <em class="parameter"><code>tree_view</code></em> is in hover selection mode
+
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6 
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491045"></a><h3>
+<a name="gtk-tree-view-set-hover-selection"></a>gtk_tree_view_set_hover_selection ()</h3>
+<a class="indexterm" name="id3491057"></a><pre class="programlisting">void        gtk_tree_view_set_hover_selection
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean hover);</pre>
+<p>
+Enables of disables the hover selection mode of <em class="parameter"><code>tree_view</code></em>.
+Hover selection makes the selected row follow the pointer.
+Currently, this works only for the selection modes 
+<code class="literal">GTK_SELECTION_SINGLE</code> and <code class="literal">GTK_SELECTION_BROWSE</code>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>hover</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> to enable hover selection mode
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491167"></a><h3>
+<a name="gtk-tree-view-get-hover-expand"></a>gtk_tree_view_get_hover_expand ()</h3>
+<a class="indexterm" name="id3491178"></a><pre class="programlisting">gboolean    gtk_tree_view_get_hover_expand  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns whether hover expansion mode is turned on for <em class="parameter"><code>tree_view</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if <em class="parameter"><code>tree_view</code></em> is in hover expansion mode
+
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6 
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491270"></a><h3>
+<a name="gtk-tree-view-set-hover-expand"></a>gtk_tree_view_set_hover_expand ()</h3>
+<a class="indexterm" name="id3491280"></a><pre class="programlisting">void        gtk_tree_view_set_hover_expand  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             gboolean expand);</pre>
+<p>
+Enables of disables the hover expansion mode of <em class="parameter"><code>tree_view</code></em>.
+Hover expansion makes rows expand or collaps if the pointer 
+moves over them.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>expand</code></em>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> to enable hover selection mode
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491378"></a><h3>
+<a name="GtkTreeDestroyCountFunc"></a>GtkTreeDestroyCountFunc ()</h3>
+<a class="indexterm" name="id3491388"></a><pre class="programlisting">void        (*GtkTreeDestroyCountFunc)      (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *path,
+                                             gint children,
+                                             gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>path</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>children</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491498"></a><h3>
+<a name="gtk-tree-view-set-destroy-count-func"></a>gtk_tree_view_set_destroy_count_func ()</h3>
+<a class="indexterm" name="id3491509"></a><pre class="programlisting">void        gtk_tree_view_set_destroy_count_func
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeDestroyCountFunc">GtkTreeDestroyCountFunc</a> func,
+                                             gpointer data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);</pre>
+<p>
+This function should almost never be used.  It is meant for private use by
+ATK for determining the number of visible children that are removed when the
+user collapses a row, or a row is deleted.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>func</code></em>&#160;:</span></td>
+<td> Function to be called when a view row is destroyed, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> User data to be passed to <em class="parameter"><code>func</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>destroy</code></em>&#160;:</span></td>
+<td> Destroy notifier for <em class="parameter"><code>data</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491667"></a><h3>
+<a name="GtkTreeViewRowSeparatorFunc"></a>GtkTreeViewRowSeparatorFunc ()</h3>
+<a class="indexterm" name="id3491678"></a><pre class="programlisting">gboolean    (*GtkTreeViewRowSeparatorFunc)  (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *iter,
+                                             gpointer data);</pre>
+<p>
+Function type for determining whether the row pointed to by <em class="parameter"><code>iter</code></em> should
+be rendered as a separator. A common way to implement this is to have a
+boolean column in the model, whose values the <a href="GtkTreeView.html#GtkTreeViewRowSeparatorFunc"><span class="type">GtkTreeViewRowSeparatorFunc</span></a>
+returns.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>model</code></em>&#160;:</span></td>
+<td>the <a href="GtkTreeModel.html" title="GtkTreeModel"><span class="type">GtkTreeModel</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>iter</code></em>&#160;:</span></td>
+<td>a <a href="GtkTreeModel.html#GtkTreeIter"><span class="type">GtkTreeIter</span></a> pointing at a row in <em class="parameter"><code>model</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td>user data
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">TRUE</code> if the row is a separator
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491823"></a><h3>
+<a name="gtk-tree-view-get-row-separator-func"></a>gtk_tree_view_get_row_separator_func ()</h3>
+<a class="indexterm" name="id3491835"></a><pre class="programlisting"><a href="GtkTreeView.html#GtkTreeViewRowSeparatorFunc">GtkTreeViewRowSeparatorFunc</a> gtk_tree_view_get_row_separator_func
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view);</pre>
+<p>
+Returns the current row separator function.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> the current row separator function.
+
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3491910"></a><h3>
+<a name="gtk-tree-view-set-row-separator-func"></a>gtk_tree_view_set_row_separator_func ()</h3>
+<a class="indexterm" name="id3491922"></a><pre class="programlisting">void        gtk_tree_view_set_row_separator_func
+                                            (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *tree_view,
+                                             <a href="GtkTreeView.html#GtkTreeViewRowSeparatorFunc">GtkTreeViewRowSeparatorFunc</a> func,
+                                             gpointer data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);</pre>
+<p>
+Sets the row separator function, which is used to determine
+whether a row should be drawn as a separator. If the row separator
+function is <code class="literal">NULL</code>, no separators are drawn. This is the default value.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>tree_view</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>func</code></em>&#160;:</span></td>
+<td> a <a href="GtkTreeView.html#GtkTreeViewRowSeparatorFunc"><span class="type">GtkTreeViewRowSeparatorFunc</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td> user data to pass to <em class="parameter"><code>func</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>destroy</code></em>&#160;:</span></td>
+<td> destroy notifier for <em class="parameter"><code>data</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since  2.6
+</p>
+</div>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3492092"></a><h2>Properties</h2>
+<div class="refsect2" lang="en">
+<a name="id3492098"></a><h3>
+<a name="GtkTreeView--enable-search"></a>The "<code class="literal">enable-search</code>" property</h3>
+<pre class="programlisting">  "enable-search"        gboolean              : Read / Write</pre>
+<p>View allows user to search through columns interactively.</p>
+<p>Default value: TRUE</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492136"></a><h3>
+<a name="GtkTreeView--expander-column"></a>The "<code class="literal">expander-column</code>" property</h3>
+<pre class="programlisting">  "expander-column"      <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a>     : Read / Write</pre>
+<p>Set the column for the expander column.</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492170"></a><h3>
+<a name="GtkTreeView--fixed-height-mode"></a>The "<code class="literal">fixed-height-mode</code>" property</h3>
+<pre class="programlisting">  "fixed-height-mode"    gboolean              : Read / Write</pre>
+<p>
+Setting the ::fixed-height-mode property to <code class="literal">TRUE</code> speeds up 
+<a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> by assuming that all rows have the same height. 
+Only enable this option if all rows are the same height.  
+Please see <a href="GtkTreeView.html#gtk-tree-view-set-fixed-height-mode"><code class="function">gtk_tree_view_set_fixed_height_mode()</code></a> for more 
+information on this option.</p>
+<p>
+
+</p>
+<p>Default value: FALSE</p>
+<p>Since  2.4
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492243"></a><h3>
+<a name="GtkTreeView--hadjustment"></a>The "<code class="literal">hadjustment</code>" property</h3>
+<pre class="programlisting">  "hadjustment"          <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>         : Read / Write</pre>
+<p>Horizontal Adjustment for the widget.</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492277"></a><h3>
+<a name="GtkTreeView--headers-clickable"></a>The "<code class="literal">headers-clickable</code>" property</h3>
+<pre class="programlisting">  "headers-clickable"    gboolean              : Read / Write</pre>
+<p>Column headers respond to click events.</p>
+<p>Default value: FALSE</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492314"></a><h3>
+<a name="GtkTreeView--headers-visible"></a>The "<code class="literal">headers-visible</code>" property</h3>
+<pre class="programlisting">  "headers-visible"      gboolean              : Read / Write</pre>
+<p>Show the column header buttons.</p>
+<p>Default value: TRUE</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492352"></a><h3>
+<a name="GtkTreeView--hover-expand"></a>The "<code class="literal">hover-expand</code>" property</h3>
+<pre class="programlisting">  "hover-expand"         gboolean              : Read / Write</pre>
+<p>
+Enables of disables the hover expansion mode of <em class="parameter"><code>tree_view</code></em>.
+Hover expansion makes rows expand or collaps if the pointer moves 
+over them.
+</p>
+<p>
+This mode is primarily indended for treeviews in popups, e.g.
+in <a href="GtkComboBox.html" title="GtkComboBox"><span class="type">GtkComboBox</span></a> or <a href="GtkEntryCompletion.html" title="GtkEntryCompletion"><span class="type">GtkEntryCompletion</span></a>.</p>
+<p>
+
+</p>
+<p>Default value: FALSE</p>
+<p>Since  2.6
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492424"></a><h3>
+<a name="GtkTreeView--hover-selection"></a>The "<code class="literal">hover-selection</code>" property</h3>
+<pre class="programlisting">  "hover-selection"      gboolean              : Read / Write</pre>
+<p>
+Enables of disables the hover selection mode of <em class="parameter"><code>tree_view</code></em>.
+Hover selection makes the selected row follow the pointer.
+Currently, this works only for the selection modes 
+<code class="literal">GTK_SELECTION_SINGLE</code> and <code class="literal">GTK_SELECTION_BROWSE</code>.
+</p>
+<p>
+This mode is primarily indended for treeviews in popups, e.g.
+in <a href="GtkComboBox.html" title="GtkComboBox"><span class="type">GtkComboBox</span></a> or <a href="GtkEntryCompletion.html" title="GtkEntryCompletion"><span class="type">GtkEntryCompletion</span></a>.</p>
+<p>
+
+</p>
+<p>Default value: FALSE</p>
+<p>Since  2.6
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492509"></a><h3>
+<a name="GtkTreeView--model"></a>The "<code class="literal">model</code>" property</h3>
+<pre class="programlisting">  "model"                <a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a>          : Read / Write</pre>
+<p>The model for the tree view.</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492542"></a><h3>
+<a name="GtkTreeView--reorderable"></a>The "<code class="literal">reorderable</code>" property</h3>
+<pre class="programlisting">  "reorderable"          gboolean              : Read / Write</pre>
+<p>View is reorderable.</p>
+<p>Default value: FALSE</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492580"></a><h3>
+<a name="GtkTreeView--rules-hint"></a>The "<code class="literal">rules-hint</code>" property</h3>
+<pre class="programlisting">  "rules-hint"           gboolean              : Read / Write</pre>
+<p>Set a hint to the theme engine to draw rows in alternating colors.</p>
+<p>Default value: FALSE</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492617"></a><h3>
+<a name="GtkTreeView--search-column"></a>The "<code class="literal">search-column</code>" property</h3>
+<pre class="programlisting">  "search-column"        gint                  : Read / Write</pre>
+<p>Model column to search through when searching through code.</p>
+<p>Allowed values: &gt;= -1</p>
+<p>Default value: -1</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492659"></a><h3>
+<a name="GtkTreeView--vadjustment"></a>The "<code class="literal">vadjustment</code>" property</h3>
+<pre class="programlisting">  "vadjustment"          <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a>         : Read / Write</pre>
+<p>Vertical Adjustment for the widget.</p>
+</div>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3492693"></a><h2>Style Properties</h2>
+<div class="refsect2" lang="en">
+<a name="id3492699"></a><h3>
+<a name="GtkTreeView--allow-rules"></a>The "<code class="literal">allow-rules</code>" style property</h3>
+<pre class="programlisting">  "allow-rules"          gboolean              : Read</pre>
+<p>Allow drawing of alternating color rows.</p>
+<p>Default value: TRUE</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492736"></a><h3>
+<a name="GtkTreeView--even-row-color"></a>The "<code class="literal">even-row-color</code>" style property</h3>
+<pre class="programlisting">  "even-row-color"       <a
+href="../gdk/gdk-Colormaps-and-Colors.html#GdkColor"
+>GdkColor</a>              : Read</pre>
+<p>Color to use for even rows.</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492769"></a><h3>
+<a name="GtkTreeView--expander-size"></a>The "<code class="literal">expander-size</code>" style property</h3>
+<pre class="programlisting">  "expander-size"        gint                  : Read</pre>
+<p>Size of the expander arrow.</p>
+<p>Allowed values: &gt;= 0</p>
+<p>Default value: 12</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492810"></a><h3>
+<a name="GtkTreeView--horizontal-separator"></a>The "<code class="literal">horizontal-separator</code>" style property</h3>
+<pre class="programlisting">  "horizontal-separator" gint                  : Read</pre>
+<p>Horizontal space between cells.  Must be an even number.</p>
+<p>Allowed values: &gt;= 0</p>
+<p>Default value: 2</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492853"></a><h3>
+<a name="GtkTreeView--indent-expanders"></a>The "<code class="literal">indent-expanders</code>" style property</h3>
+<pre class="programlisting">  "indent-expanders"     gboolean              : Read</pre>
+<p>Make the expanders indented.</p>
+<p>Default value: TRUE</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492890"></a><h3>
+<a name="GtkTreeView--odd-row-color"></a>The "<code class="literal">odd-row-color</code>" style property</h3>
+<pre class="programlisting">  "odd-row-color"        <a
+href="../gdk/gdk-Colormaps-and-Colors.html#GdkColor"
+>GdkColor</a>              : Read</pre>
+<p>Color to use for odd rows.</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3492923"></a><h3>
+<a name="GtkTreeView--vertical-separator"></a>The "<code class="literal">vertical-separator</code>" style property</h3>
+<pre class="programlisting">  "vertical-separator"   gint                  : Read</pre>
+<p>Vertical space between cells.  Must be an even number.</p>
+<p>Allowed values: &gt;= 0</p>
+<p>Default value: 2</p>
+</div>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3492966"></a><h2>Signals</h2>
+<div class="refsect2" lang="en">
+<a name="id3492972"></a><h3>
+<a name="GtkTreeView-columns-changed"></a>The "columns-changed" signal</h3>
+<pre class="programlisting">void        user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493045"></a><h3>
+<a name="GtkTreeView-cursor-changed"></a>The "cursor-changed" signal</h3>
+<pre class="programlisting">void        user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493118"></a><h3>
+<a name="GtkTreeView-expand-collapse-cursor-row"></a>The "expand-collapse-cursor-row" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gboolean arg1,
+                                            gboolean arg2,
+                                            gboolean arg3,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg3</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493264"></a><h3>
+<a name="GtkTreeView-move-cursor"></a>The "move-cursor" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="gtk-Standard-Enumerations.html#GtkMovementStep">GtkMovementStep</a> arg1,
+                                            gint arg2,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493389"></a><h3>
+<a name="GtkTreeView-row-activated"></a>The "row-activated" signal</h3>
+<pre class="programlisting">void        user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg1,
+                                            <a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn">GtkTreeViewColumn</a> *arg2,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493503"></a><h3>
+<a name="GtkTreeView-row-collapsed"></a>The "row-collapsed" signal</h3>
+<pre class="programlisting">void        user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493618"></a><h3>
+<a name="GtkTreeView-row-expanded"></a>The "row-expanded" signal</h3>
+<pre class="programlisting">void        user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493733"></a><h3>
+<a name="GtkTreeView-select-all"></a>The "select-all" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493815"></a><h3>
+<a name="GtkTreeView-select-cursor-parent"></a>The "select-cursor-parent" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3493898"></a><h3>
+<a name="GtkTreeView-select-cursor-row"></a>The "select-cursor-row" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gboolean arg1,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3494002"></a><h3>
+<a name="GtkTreeView-set-scroll-adjustments"></a>The "set-scroll-adjustments" signal</h3>
+<pre class="programlisting">void        user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *arg1,
+                                            <a href="GtkAdjustment.html" title="GtkAdjustment">GtkAdjustment</a> *arg2,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3494118"></a><h3>
+<a name="GtkTreeView-start-interactive-search"></a>The "start-interactive-search" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3494202"></a><h3>
+<a name="GtkTreeView-test-collapse-row"></a>The "test-collapse-row" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3494326"></a><h3>
+<a name="GtkTreeView-test-expand-row"></a>The "test-expand-row" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *arg1,
+                                            <a href="GtkTreeModel.html#GtkTreePath">GtkTreePath</a> *arg2,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg1</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>arg2</code></em>&#160;:</span></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3494452"></a><h3>
+<a name="GtkTreeView-toggle-cursor-row"></a>The "toggle-cursor-row" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3494534"></a><h3>
+<a name="GtkTreeView-unselect-all"></a>The "unselect-all" signal</h3>
+<pre class="programlisting">gboolean    user_function                  (<a href="GtkTreeView.html" title="GtkTreeView">GtkTreeView</a> *treeview,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treeview</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3494619"></a><h2>See Also</h2>
+<p>
+<a href="GtkTreeViewColumn.html" title="GtkTreeViewColumn"><span class="type">GtkTreeViewColumn</span></a>, <a href="GtkTreeSelection.html" title="GtkTreeSelection"><span class="type">GtkTreeSelection</span></a>, <span class="type">GtkTreeDnd</span>, <a href="GtkTreeModel.html" title="GtkTreeModel"><span class="type">GtkTreeModel</span></a>, <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a>, <a href="GtkTreeModelSort.html" title="GtkTreeModelSort"><span class="type">GtkTreeModelSort</span></a>, <a href="GtkListStore.html" title="GtkListStore"><span class="type">GtkListStore</span></a>, <a href="GtkTreeStore.html" title="GtkTreeStore"><span class="type">GtkTreeStore</span></a>, <a href="GtkCellRenderer.html" title="GtkCellRenderer"><span class="type">GtkCellRenderer</span></a>, <a href="GtkCellEditable.html" title="GtkCellEditable"><span class="type">GtkCellEditable</span></a>, <a href="GtkCellRendererPixbuf.html" title="GtkCellRendererPixbuf"><span class="type">GtkCellRendererPixbuf</span></a>, <a href="GtkCellRendererText.html" title="GtkCellRendererText"><span class="type">GtkCellRendererText</span></a>, <a href="GtkCellRendererToggle.html" title="GtkCellRendererToggle"><span class="type">GtkCellRendererToggle</span></a>
+</p>
+</div>
+</div>
+<table class="navigation" width="100%" summary="Navigation footer" cellpadding="2" cellspacing="0"><tr valign="middle">
+<td align="left"><a accesskey="p" href="GtkTreeViewColumn.html"><b>&lt;&lt;&#160;GtkTreeViewColumn</b></a></td>
+<td align="right"><a accesskey="n" href="gtk-GtkTreeView-drag-and-drop.html"><b>GtkTreeView drag-and-drop&#160;&gt;&gt;</b></a></td>
+</tr></table>
+</body>
+</html>

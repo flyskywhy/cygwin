@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="mailbox-examples.html" />
+<link rel="prev" href="node176.html" />
+<link rel="parent" href="module-mailbox.html" />
+<link rel="next" href="mailbox-examples.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3.4 Deprecated classes and methods</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.3 Exceptions"
+  href="node176.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.5 Examples"
+  href="mailbox-examples.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node176.html">7.3.3 Exceptions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-examples.html">7.3.5 Examples</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009340000000000000000"></a>
+<a name="mailbox-deprecated"></a>
+<br>
+7.3.4 Deprecated classes and methods
+</h2>
+
+<p>
+Older versions of the <tt class="module">mailbox</tt> module do not support modification of
+mailboxes, such as adding or removing message, and do not provide classes to
+represent format-specific message properties. For backward compatibility, the
+older mailbox classes are still available, but the newer classes should be used
+in preference to them.
+
+<p>
+Older mailbox objects support only iteration and provide a single public
+method:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1452' xml:id='l2h-1452' class="method">next</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the next message in the mailbox, created with the optional <var>factory</var>
+argument passed into the mailbox object's constructor. By default this is an
+<tt class="class">rfc822.Message</tt> object (see the <tt class="module"><a href="module-rfc822.html">rfc822</a></tt> module).  Depending
+on the mailbox implementation the <var>fp</var> attribute of this object may be a
+true file object or a class instance simulating a file object, taking care of
+things like message boundaries if multiple mail messages are contained in a
+single file, etc.  If no more messages are available, this method returns
+<code>None</code>.
+</dl>
+
+<p>
+Most of the older mailbox classes have names that differ from the current
+mailbox class names, except for <tt class="class">Maildir</tt>. For this reason, the new
+<tt class="class">Maildir</tt> class defines a <tt class="method">next()</tt> method and its constructor
+differs slightly from those of the other new mailbox classes.
+
+<p>
+The older mailbox classes whose names are not the same as their newer
+counterparts are as follows:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1453' xml:id='l2h-1453' class="class">UnixMailbox</tt></b>(</nobr></td>
+  <td><var>fp</var><big>[</big><var>, factory</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Access to a classic <span class="Unix">Unix</span>-style mailbox, where all messages are
+contained in a single file and separated by "<tt class="samp">From </tt>"(a.k.a. "<tt class="samp">From_</tt>") lines.  The file object <var>fp</var> points to the
+mailbox file.  The optional <var>factory</var> parameter is a callable that
+should create new message objects.  <var>factory</var> is called with one
+argument, <var>fp</var> by the <tt class="method">next()</tt> method of the mailbox
+object.  The default is the <tt class="class">rfc822.Message</tt> class (see the
+<tt class="module"><a href="module-rfc822.html">rfc822</a></tt> module - and the note below).
+
+<p>
+<div class="note"><b class="label">Note:</b>
+For reasons of this module's internal implementation, you will
+  probably want to open the <var>fp</var> object in binary mode.  This is
+  especially important on Windows.
+</div>
+
+<p>
+For maximum portability, messages in a <span class="Unix">Unix</span>-style mailbox are
+separated by any line that begins exactly with the string <code>'From
+'</code> (note the trailing space) if preceded by exactly two newlines.
+Because of the wide-range of variations in practice, nothing else on
+the From_ line should be considered.  However, the current
+implementation doesn't check for the leading two newlines.  This is
+usually fine for most applications.
+
+<p>
+The <tt class="class">UnixMailbox</tt> class implements a more strict version of
+From_ line checking, using a regular expression that usually correctly
+matched From_ delimiters.  It considers delimiter line to be separated
+by "<tt class="samp">From <var>name</var> <var>time</var></tt>" lines.  For maximum portability,
+use the <tt class="class">PortableUnixMailbox</tt> class instead.  This class is
+identical to <tt class="class">UnixMailbox</tt> except that individual messages are
+separated by only "<tt class="samp">From </tt>" lines.
+
+<p>
+For more information, see
+<em class="citetitle"><a
+ href="http://home.netscape.com/eng/mozilla/2.0/relnotes/demo/content-length.html"
+ title="Configuring
+Netscape Mail on Unix: Why the Content-Length Format is Bad"
+ >Configuring
+Netscape Mail on <span class="Unix">Unix</span>: Why the Content-Length Format is Bad</a></em>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1454' xml:id='l2h-1454' class="class">PortableUnixMailbox</tt></b>(</nobr></td>
+  <td><var>fp</var><big>[</big><var>, factory</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+A less-strict version of <tt class="class">UnixMailbox</tt>, which considers only the
+"<tt class="samp">From </tt>" at the beginning of the line separating messages.  The
+``<var>name</var> <var>time</var>'' portion of the From line is ignored, to
+protect against some variations that are observed in practice.  This
+works since lines in the message which begin with <code>'From '</code> are
+quoted by mail handling software at delivery-time.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1455' xml:id='l2h-1455' class="class">MmdfMailbox</tt></b>(</nobr></td>
+  <td><var>fp</var><big>[</big><var>, factory</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Access an MMDF-style mailbox, where all messages are contained
+in a single file and separated by lines consisting of 4 control-A
+characters.  The file object <var>fp</var> points to the mailbox file.
+Optional <var>factory</var> is as with the <tt class="class">UnixMailbox</tt> class.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1456' xml:id='l2h-1456' class="class">MHMailbox</tt></b>(</nobr></td>
+  <td><var>dirname</var><big>[</big><var>, factory</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Access an MH mailbox, a directory with each message in a separate
+file with a numeric name.
+The name of the mailbox directory is passed in <var>dirname</var>.
+<var>factory</var> is as with the <tt class="class">UnixMailbox</tt> class.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1457' xml:id='l2h-1457' class="class">BabylMailbox</tt></b>(</nobr></td>
+  <td><var>fp</var><big>[</big><var>, factory</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Access a Babyl mailbox, which is similar to an MMDF mailbox.  In
+Babyl format, each message has two sets of headers, the
+<em>original</em> headers and the <em>visible</em> headers.  The original
+headers appear before a line containing only <code>'*** EOOH ***'</code>
+(End-Of-Original-Headers) and the visible headers appear after the
+<code>EOOH</code> line.  Babyl-compliant mail readers will show you only the
+visible headers, and <tt class="class">BabylMailbox</tt> objects will return messages
+containing only the visible headers.  You'll have to do your own
+parsing of the mailbox file to get at the original headers.  Mail
+messages start with the EOOH line and end with a line containing only
+<code>'\037\014'</code>.  <var>factory</var> is as with the
+<tt class="class">UnixMailbox</tt> class.
+</dl>
+
+<p>
+If you wish to use the older mailbox classes with the <tt class="module">email</tt> module
+rather than the deprecated <tt class="module">rfc822</tt> module, you can do so as follows:
+
+<p>
+<div class="verbatim"><pre>
+import email
+import email.Errors
+import mailbox
+
+def msgfactory(fp):
+    try:
+        return email.message_from_file(fp)
+    except email.Errors.MessageParseError:
+        # Don't return None since that will
+        # stop the mailbox iterator
+        return ''
+
+mbox = mailbox.UnixMailbox(fp, msgfactory)
+</pre></div>
+
+<p>
+Alternatively, if you know your mailbox contains only well-formed MIME
+messages, you can simplify this to:
+
+<p>
+<div class="verbatim"><pre>
+import email
+import mailbox
+
+mbox = mailbox.UnixMailbox(fp, email.message_from_file)
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.3 Exceptions"
+  href="node176.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.5 Examples"
+  href="mailbox-examples.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node176.html">7.3.3 Exceptions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-examples.html">7.3.5 Examples</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node23.html" />
+<link rel="prev" href="dnt-basics.html" />
+<link rel="parent" href="dnt-basics.html" />
+<link rel="next" href="node23.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.1.1 Adding data and methods to the Basic example</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1.2 providing finer control"
+  href="node23.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node23.html">2.1.2 Providing finer control</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004110000000000000000">
+2.1.1 Adding data and methods to the Basic example</a>
+</h2>
+
+<p>
+Let's expend the basic example to add some data and methods.  Let's
+also make the type usable as a base class. We'll create
+a new module, <tt class="module">noddy2</tt> that adds these capabilities:
+
+<p>
+<div class="verbatim">
+<pre>#include &lt;Python.h&gt;
+#include "structmember.h"
+
+typedef struct {
+    PyObject_HEAD
+    PyObject *first; /* first name */
+    PyObject *last;  /* last name */
+    int number;
+} Noddy;
+
+static void
+Noddy_dealloc(Noddy* self)
+{
+    Py_XDECREF(self-&gt;first);
+    Py_XDECREF(self-&gt;last);
+    self-&gt;ob_type-&gt;tp_free((PyObject*)self);
+}
+
+static PyObject *
+Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    Noddy *self;
+
+    self = (Noddy *)type-&gt;tp_alloc(type, 0);
+    if (self != NULL) {
+        self-&gt;first = PyString_FromString("");
+        if (self-&gt;first == NULL)
+          {
+            Py_DECREF(self);
+            return NULL;
+          }
+        
+        self-&gt;last = PyString_FromString("");
+        if (self-&gt;last == NULL)
+          {
+            Py_DECREF(self);
+            return NULL;
+          }
+
+        self-&gt;number = 0;
+    }
+
+    return (PyObject *)self;
+}
+
+static int
+Noddy_init(Noddy *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *first=NULL, *last=NULL, *tmp;
+
+    static char *kwlist[] = {"first", "last", "number", NULL};
+
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OOi", kwlist, 
+                                      &amp;first, &amp;last, 
+                                      &amp;self-&gt;number))
+        return -1; 
+
+    if (first) {
+        tmp = self-&gt;first;
+        Py_INCREF(first);
+        self-&gt;first = first;
+        Py_XDECREF(tmp);
+    }
+
+    if (last) {
+        tmp = self-&gt;last;
+        Py_INCREF(last);
+        self-&gt;last = last;
+        Py_XDECREF(tmp);
+    }
+
+    return 0;
+}
+
+static PyMemberDef Noddy_members[] = {
+    {"first", T_OBJECT_EX, offsetof(Noddy, first), 0,
+     "first name"},
+    {"last", T_OBJECT_EX, offsetof(Noddy, last), 0,
+     "last name"},
+    {"number", T_INT, offsetof(Noddy, number), 0,
+     "noddy number"},
+    {NULL}  /* Sentinel */
+};
+
+static PyObject *
+Noddy_name(Noddy* self)
+{
+    static PyObject *format = NULL;
+    PyObject *args, *result;
+
+    if (format == NULL) {
+        format = PyString_FromString("%s %s");
+        if (format == NULL)
+            return NULL;
+    }
+
+    if (self-&gt;first == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "first");
+        return NULL;
+    }
+
+    if (self-&gt;last == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "last");
+        return NULL;
+    }
+
+    args = Py_BuildValue("OO", self-&gt;first, self-&gt;last);
+    if (args == NULL)
+        return NULL;
+
+    result = PyString_Format(format, args);
+    Py_DECREF(args);
+    
+    return result;
+}
+
+static PyMethodDef Noddy_methods[] = {
+    {"name", (PyCFunction)Noddy_name, METH_NOARGS,
+     "Return the name, combining the first and last name"
+    },
+    {NULL}  /* Sentinel */
+};
+
+static PyTypeObject NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(Noddy),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Noddy_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Noddy objects",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    0,		               /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    Noddy_methods,             /* tp_methods */
+    Noddy_members,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)Noddy_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Noddy_new,                 /* tp_new */
+};
+
+static PyMethodDef module_methods[] = {
+    {NULL}  /* Sentinel */
+};
+
+#ifndef PyMODINIT_FUNC	/* declarations for DLL import/export */
+#define PyMODINIT_FUNC void
+#endif
+PyMODINIT_FUNC
+initnoddy2(void) 
+{
+    PyObject* m;
+
+    if (PyType_Ready(&amp;NoddyType) &lt; 0)
+        return;
+
+    m = Py_InitModule3("noddy2", module_methods,
+                       "Example module that creates an extension type.");
+
+    if (m == NULL)
+      return;
+
+    Py_INCREF(&amp;NoddyType);
+    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;NoddyType);
+}
+</pre>
+<div class="footer">
+<a href="noddy2.txt" type="text/plain">Download as text (original file name: <span class="file">noddy2.c</span>).</a>
+</div></div>
+
+<p>
+This version of the module has a number of changes.
+
+<p>
+We've added an extra include:
+
+<p>
+<div class="verbatim"><pre>
+#include "structmember.h"
+</pre></div>
+
+<p>
+This include provides declarations that we use to handle attributes,
+as described a bit later.
+
+<p>
+The name of the <tt class="class">Noddy</tt> object structure has been shortened to
+<tt class="class">Noddy</tt>.  The type object name has been shortened to
+<tt class="class">NoddyType</tt>.
+
+<p>
+The  <tt class="class">Noddy</tt> type now has three data attributes, <var>first</var>,
+<var>last</var>, and <var>number</var>.  The <var>first</var> and <var>last</var>
+variables are Python strings containing first and last names. The
+<var>number</var> attribute is an integer.
+
+<p>
+The object structure is updated accordingly:
+
+<p>
+<div class="verbatim"><pre>
+typedef struct {
+    PyObject_HEAD
+    PyObject *first;
+    PyObject *last;
+    int number;
+} Noddy;
+</pre></div>
+
+<p>
+Because we now have data to manage, we have to be more careful about
+object allocation and deallocation.  At a minimum, we need a
+deallocation method:
+
+<p>
+<div class="verbatim"><pre>
+static void
+Noddy_dealloc(Noddy* self)
+{
+    Py_XDECREF(self-&gt;first);
+    Py_XDECREF(self-&gt;last);
+    self-&gt;ob_type-&gt;tp_free((PyObject*)self);
+}
+</pre></div>
+
+<p>
+which is assigned to the <tt class="member">tp_dealloc</tt> member:
+
+<p>
+<div class="verbatim"><pre>
+    (destructor)Noddy_dealloc, /*tp_dealloc*/
+</pre></div>
+
+<p>
+This method decrements the reference counts of the two Python
+attributes. We use <tt class="cfunction">Py_XDECREF()</tt> here because the
+<tt class="member">first</tt> and <tt class="member">last</tt> members could be <tt class="constant">NULL</tt>.  It then
+calls the <tt class="member">tp_free</tt> member of the object's type to free the
+object's memory.  Note that the object's type might not be
+<tt class="class">NoddyType</tt>, because the object may be an instance of a
+subclass.
+
+<p>
+We want to make sure that the first and last names are initialized to
+empty strings, so we provide a new method:
+
+<p>
+<div class="verbatim"><pre>
+static PyObject *
+Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    Noddy *self;
+
+    self = (Noddy *)type-&gt;tp_alloc(type, 0);
+    if (self != NULL) {
+        self-&gt;first = PyString_FromString("");
+        if (self-&gt;first == NULL)
+          {
+            Py_DECREF(self);
+            return NULL;
+          }
+
+        self-&gt;last = PyString_FromString("");
+        if (self-&gt;last == NULL)
+          {
+            Py_DECREF(self);
+            return NULL;
+          }
+
+        self-&gt;number = 0;
+    }
+
+    return (PyObject *)self;
+}
+</pre></div>
+
+<p>
+and install it in the <tt class="member">tp_new</tt> member:
+
+<p>
+<div class="verbatim"><pre>
+    Noddy_new,                 /* tp_new */
+</pre></div>
+
+<p>
+The new member is responsible for creating (as opposed to
+initializing) objects of the type.  It is exposed in Python as the
+<tt class="method">__new__()</tt> method.  See the paper titled ``Unifying types and
+classes in Python'' for a detailed discussion of the <tt class="method">__new__()</tt>
+method.  One reason to implement a new method is to assure the initial
+values of instance variables.  In this case, we use the new method to
+make sure that the initial values of the members <tt class="member">first</tt> and
+<tt class="member">last</tt> are not <tt class="constant">NULL</tt>. If we didn't care whether the initial
+values were <tt class="constant">NULL</tt>, we could have used <tt class="cfunction">PyType_GenericNew()</tt> as
+our new method, as we did before.  <tt class="cfunction">PyType_GenericNew()</tt>
+initializes all of the instance variable members to <tt class="constant">NULL</tt>.
+
+<p>
+The new method is a static method that is passed the type being
+instantiated and any arguments passed when the type was called,
+and that returns the new object created. New methods always accept
+positional and keyword arguments, but they often ignore the arguments,
+leaving the argument handling to initializer methods. Note that if the
+type supports subclassing, the type passed may not be the type being
+defined.  The new method calls the tp_alloc slot to allocate memory.
+We don't fill the <tt class="member">tp_alloc</tt> slot ourselves. Rather
+<tt class="cfunction">PyType_Ready()</tt> fills it for us by inheriting it from our
+base class, which is <tt class="class">object</tt> by default.  Most types use the
+default allocation.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+If you are creating a co-operative <tt class="member">tp_new</tt> (one that
+calls a base type's <tt class="member">tp_new</tt> or <tt class="method">__new__</tt>), you
+must <em>not</em> try to determine what method to call using
+method resolution order at runtime.  Always statically determine
+what type you are going to call, and call its <tt class="member">tp_new</tt>
+directly, or via <code>type-&gt;tp_base-&gt;tp_new</code>.  If you do
+not do this, Python subclasses of your type that also inherit
+from other Python-defined classes may not work correctly.
+(Specifically, you may not be able to create instances of
+such subclasses without getting a <tt class="exception">TypeError</tt>.)</span>
+
+<p>
+We provide an initialization function:
+
+<p>
+<div class="verbatim"><pre>
+static int
+Noddy_init(Noddy *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *first=NULL, *last=NULL, *tmp;
+
+    static char *kwlist[] = {"first", "last", "number", NULL};
+
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OOi", kwlist,
+                                      &amp;first, &amp;last,
+                                      &amp;self-&gt;number))
+        return -1;
+
+    if (first) {
+        tmp = self-&gt;first;
+        Py_INCREF(first);
+        self-&gt;first = first;
+        Py_XDECREF(tmp);
+    }
+
+    if (last) {
+        tmp = self-&gt;last;
+        Py_INCREF(last);
+        self-&gt;last = last;
+        Py_XDECREF(tmp);
+    }
+
+    return 0;
+}
+</pre></div>
+
+<p>
+by filling the <tt class="member">tp_init</tt> slot.
+
+<p>
+<div class="verbatim"><pre>
+    (initproc)Noddy_init,         /* tp_init */
+</pre></div>
+
+<p>
+The <tt class="member">tp_init</tt> slot is exposed in Python as the
+<tt class="method">__init__()</tt> method. It is used to initialize an object after
+it's created. Unlike the new method, we can't guarantee that the
+initializer is called.  The initializer isn't called when unpickling
+objects and it can be overridden.  Our initializer accepts arguments
+to provide initial values for our instance. Initializers always accept
+positional and keyword arguments.
+
+<p>
+Initializers can be called multiple times.  Anyone can call the
+<tt class="method">__init__()</tt> method on our objects.  For this reason, we have
+to be extra careful when assigning the new values.  We might be
+tempted, for example to assign the <tt class="member">first</tt> member like this:
+
+<p>
+<div class="verbatim"><pre>
+    if (first) {
+        Py_XDECREF(self-&gt;first);
+        Py_INCREF(first);
+        self-&gt;first = first;
+    }
+</pre></div>
+
+<p>
+But this would be risky.  Our type doesn't restrict the type of the
+<tt class="member">first</tt> member, so it could be any kind of object.  It could
+have a destructor that causes code to be executed that tries to
+access the <tt class="member">first</tt> member.  To be paranoid and protect
+ourselves against this possibility, we almost always reassign members
+before decrementing their reference counts.  When don't we have to do
+this?
+
+<ul>
+<li>when we absolutely know that the reference count is greater than
+  1
+</li>
+<li>when we know that deallocation of the object<a name="tex2html5"
+  href="#foot1101"><sup>2.1</sup></a> will not cause any
+  calls back into our type's code
+</li>
+<li>when decrementing a reference count in a <tt class="member">tp_dealloc</tt>
+  handler when garbage-collections is not supported<a name="tex2html6"
+  href="#foot1472"><sup>2.2</sup></a>
+</li>
+</ul>
+
+<p>
+We want to want to expose our instance variables as attributes. There
+are a number of ways to do that. The simplest way is to define member
+definitions:
+
+<p>
+<div class="verbatim"><pre>
+static PyMemberDef Noddy_members[] = {
+    {"first", T_OBJECT_EX, offsetof(Noddy, first), 0,
+     "first name"},
+    {"last", T_OBJECT_EX, offsetof(Noddy, last), 0,
+     "last name"},
+    {"number", T_INT, offsetof(Noddy, number), 0,
+     "noddy number"},
+    {NULL}  /* Sentinel */
+};
+</pre></div>
+
+<p>
+and put the definitions in the <tt class="member">tp_members</tt> slot:
+
+<p>
+<div class="verbatim"><pre>
+    Noddy_members,             /* tp_members */
+</pre></div>
+
+<p>
+Each member definition has a member name, type, offset, access flags
+and documentation string. See the ``Generic Attribute Management''
+section below for details.
+
+<p>
+A disadvantage of this approach is that it doesn't provide a way to
+restrict the types of objects that can be assigned to the Python
+attributes.  We expect the first and last names to be strings, but any
+Python objects can be assigned.  Further, the attributes can be
+deleted, setting the C pointers to <tt class="constant">NULL</tt>.  Even though we can make
+sure the members are initialized to non-<tt class="constant">NULL</tt> values, the members can
+be set to <tt class="constant">NULL</tt> if the attributes are deleted.
+
+<p>
+We define a single method, <tt class="method">name</tt>, that outputs the objects
+name as the concatenation of the first and last names.
+
+<p>
+<div class="verbatim"><pre>
+static PyObject *
+Noddy_name(Noddy* self)
+{
+    static PyObject *format = NULL;
+    PyObject *args, *result;
+
+    if (format == NULL) {
+        format = PyString_FromString("%s %s");
+        if (format == NULL)
+            return NULL;
+    }
+
+    if (self-&gt;first == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "first");
+        return NULL;
+    }
+
+    if (self-&gt;last == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "last");
+        return NULL;
+    }
+
+    args = Py_BuildValue("OO", self-&gt;first, self-&gt;last);
+    if (args == NULL)
+        return NULL;
+
+    result = PyString_Format(format, args);
+    Py_DECREF(args);
+
+    return result;
+}
+</pre></div>
+
+<p>
+The method is implemented as a C function that takes a <tt class="class">Noddy</tt> (or
+<tt class="class">Noddy</tt> subclass) instance as the first argument.  Methods
+always take an instance as the first argument. Methods often take
+positional and keyword arguments as well, but in this cased we don't
+take any and don't need to accept a positional argument tuple or
+keyword argument dictionary. This method is equivalent to the Python
+method:
+
+<p>
+<div class="verbatim"><pre>
+    def name(self):
+       return "%s %s" % (self.first, self.last)
+</pre></div>
+
+<p>
+Note that we have to check for the possibility that our <tt class="member">first</tt>
+and <tt class="member">last</tt> members are <tt class="constant">NULL</tt>.  This is because they can be
+deleted, in which case they are set to <tt class="constant">NULL</tt>.  It would be better to
+prevent deletion of these attributes and to restrict the attribute
+values to be strings.  We'll see how to do that in the next section.
+
+<p>
+Now that we've defined the method, we need to create an array of
+method definitions:
+
+<p>
+<div class="verbatim"><pre>
+static PyMethodDef Noddy_methods[] = {
+    {"name", (PyCFunction)Noddy_name, METH_NOARGS,
+     "Return the name, combining the first and last name"
+    },
+    {NULL}  /* Sentinel */
+};
+</pre></div>
+
+<p>
+and assign them to the <tt class="member">tp_methods</tt> slot:
+
+<p>
+<div class="verbatim"><pre>
+    Noddy_methods,             /* tp_methods */
+</pre></div>
+
+<p>
+Note that we used the <tt class="constant">METH_NOARGS</tt> flag to indicate that the
+method is passed no arguments.
+
+<p>
+Finally, we'll make our type usable as a base class.  We've written
+our methods carefully so far so that they don't make any assumptions
+about the type of the object being created or used, so all we need to
+do is to add the <tt class="constant">Py_TPFLAGS_BASETYPE</tt> to our class flag
+definition:
+
+<p>
+<div class="verbatim"><pre>
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+</pre></div>
+
+<p>
+We rename <tt class="cfunction">initnoddy()</tt> to <tt class="cfunction">initnoddy2()</tt>
+and update the module name passed to <tt class="cfunction">Py_InitModule3()</tt>.
+
+<p>
+Finally, we update our <span class="file">setup.py</span> file to build the new module:
+
+<p>
+<div class="verbatim"><pre>
+from distutils.core import setup, Extension
+setup(name="noddy", version="1.0",
+      ext_modules=[
+         Extension("noddy", ["noddy.c"]),
+         Extension("noddy2", ["noddy2.c"]),
+         ])
+</pre></div>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot1101">... object</a><A
+ HREF="node22.html#tex2html5"><sup>2.1</sup></a></dt>
+<dd>This is
+  true when we know that the object is a basic type, like a string or
+  a float.
+
+</dd>
+<dt><a name="foot1472">... supported</a><A
+ HREF="node22.html#tex2html6"><sup>2.2</sup></a></dt>
+<dd>We relied
+  on this in the <tt class="member">tp_dealloc</tt> handler in this example, because
+  our type doesn't support garbage collection. Even if a type supports
+  garbage collection, there are calls that can be made to ``untrack''
+  the object from garbage collection, however, these calls are
+  advanced and not covered here.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1.2 providing finer control"
+  href="node23.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node23.html">2.1.2 Providing finer control</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

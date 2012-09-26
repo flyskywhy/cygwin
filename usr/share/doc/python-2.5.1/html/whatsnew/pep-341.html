@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-342.html" />
+<link rel="prev" href="pep-338.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-342.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6 PEP 341: Unified try/except/finally</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5 pep 338: Executing"
+  href="pep-338.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7 pep 342: New"
+  href="pep-342.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-338.html">5 PEP 338: Executing</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-342.html">7 PEP 342: New</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION000700000000000000000"></a><a name="pep-341"></a>
+<br>
+6 PEP 341: Unified try/except/finally
+</h1>
+
+<p>
+Until Python 2.5, the <tt class="keyword">try</tt> statement came in two
+flavours. You could use a <tt class="keyword">finally</tt> block to ensure that code
+is always executed, or one or more <tt class="keyword">except</tt> blocks to catch 
+specific exceptions.  You couldn't combine both <tt class="keyword">except</tt> blocks and a
+<tt class="keyword">finally</tt> block, because generating the right bytecode for the
+combined version was complicated and it wasn't clear what the
+semantics of the combined statement should be.  
+
+<p>
+Guido van&nbsp;Rossum spent some time working with Java, which does support the
+equivalent of combining <tt class="keyword">except</tt> blocks and a
+<tt class="keyword">finally</tt> block, and this clarified what the statement should
+mean.  In Python 2.5, you can now write:
+
+<p>
+<div class="verbatim"><pre>
+try:
+    block-1 ...
+except Exception1:
+    handler-1 ...
+except Exception2:
+    handler-2 ...
+else:
+    else-block
+finally:
+    final-block
+</pre></div>
+
+<p>
+The code in <var>block-1</var> is executed.  If the code raises an
+exception, the various <tt class="keyword">except</tt> blocks are tested: if the
+exception is of class <tt class="class">Exception1</tt>, <var>handler-1</var> is executed;
+otherwise if it's of class <tt class="class">Exception2</tt>, <var>handler-2</var> is
+executed, and so forth.  If no exception is raised, the
+<var>else-block</var> is executed.  
+
+<p>
+No matter what happened previously, the <var>final-block</var> is executed
+once the code block is complete and any raised exceptions handled.
+Even if there's an error in an exception handler or the
+<var>else-block</var> and a new exception is raised, the
+code in the <var>final-block</var> is still run.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0341.html"
+        title="Unifying try-except and try-finally"
+        >PEP 341, <em>Unifying try-except and try-finally</em></a>
+    <dd>PEP written by Georg Brandl; 
+implementation by Thomas Lee.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5 pep 338: Executing"
+  href="pep-338.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7 pep 342: New"
+  href="pep-342.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-338.html">5 PEP 338: Executing</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-342.html">7 PEP 342: New</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# Copyright (c) Pierre Habouzit, 2007
+#
+
+USAGE="[<target_dir>]"
+. `dirname $0`/guilt
+
+if [ $# -gt 1 ]; then
+	usage
+fi
+target_dir=${1:-"patches"}
+
+if [ -e "$target_dir" ]; then
+	die "Specified directory already exists"
+fi
+
+trap "rm -rf \"$target_dir\"" 0
+mkdir -p "$target_dir"
+
+get_series | tee "$target_dir/series" | while read p; do
+	silent mkdir -p "`dirname $target_dir/$p`" || true
+	cp "$GUILT_DIR/$branch/$p" "$target_dir/$p"
+done
+
+trap - 0
+echo "Series exported to \"$target_dir\" sucessfully."

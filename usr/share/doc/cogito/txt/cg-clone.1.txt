@@ -1,0 +1,103 @@
+cg-clone(1)
+===========
+
+NAME
+----
+cg-clone - clone a remote repository
+
+SYNOPSIS
+--------
+cg-clone [-l] [-b] [-s] LOCATION [DESTDIR]
+
+DESCRIPTION
+-----------
+This clones a remote GIT repository and checks it out locally.
+
+Takes a parameter specifying the location of the source repository and an
+optional second parameter specifying the destination. If the second
+parameter is omitted, the basename of the source repository is used as the
+destination.
+
+For detailed description of the location of the source repository format
+(available protocols, specifying different remote branch, etc) please see
+the gitlink:cg-branch-add[1] documentation.
+
+OPTIONS
+-------
+
+--
+-b::
+	Create only the bare repository, without a working copy attached;
+	this is useful e.g. for public repository mirrors. gitlink:cg-clone[1]
+	is to gitlink:cg-init[1] as `cg-clone -b` is to gitlink:cg-admin-setuprepo[1].
+	(Still, if you are setting up a public or a central repository
+	other people will push into, it might be more practical to just
+	gitlink:cg-admin-setuprepo[1] it and then populate it with gitlink:cg-push[1]
+	from the other side.)
+
+-l::
+	Instead of hardlinking all the objects, set up an "alternate"
+	record pointing at the source object database; this will cause
+	any objects not found locally to be looked up remotely, which
+	effectively eliminates the need to copy/hardlink the objects
+	around. This is suitable for very fast cloning of arbitrarily
+	big repositories, but your repository will become largely useless
+	if the source repository disappears or gets damaged (note that
+	it is generally BAD IDEA to prune the original repository if any
+	repository is borrowing objects from it).  The choice is yours.
+
+--reference PATH::
+	This does the same thing as '-l' but instead of borrowing the
+	objects from the source repository, it borrows them from yet
+	another local repository. E.g. if you have Linus' kernel repository
+	cloned locally and now want to clone akpm's repository, you can
+	do something like
+
+cg-clone --reference /path/to/linus/repo git://kernel.org/akpm/repo
+
+and it will download and keep only the objects that are really
+missing. Same considerations and warnings on the third-party source
+as in the case of '-l' apply. Also, you can reference only local
+repositories.
+
+-s::
+	Clone in the current directory instead of creating a new one.
+	Specifying both -s and a destination directory makes no sense.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-clone[1].
+--
+
+
+NOTES
+-----
+If the clone has been interrupted for any reason, do not panic, calmly
+cd to the destination directory and run gitlink:cg-fetch[1], which will in this case
+restart the initial clone. Chances are that you will not actually download
+any duplicate data. (At the time of writing this, the chances aren't for
+the native git protocol and ssh, but this may change in the future).
+
+EXAMPLE USAGE
+-------------
+If you want to clone the Cogito repository, you can say:
+
+	$ cg-clone http://www.kernel.org/pub/scm/cogito/cogito.git
+
+and it will be cloned to the 'cogito' subdirectory of the current directory.
+
+To clone the 'next' branch of the Git repository, do e.g.:
+
+	$ cg-clone git://git.kernel.org/pub/scm/git/git.git#next
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-clone is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

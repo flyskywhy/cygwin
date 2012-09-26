@@ -1,0 +1,451 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="mailbox-message-objects.html" />
+<link rel="prev" href="module-mailbox.html" />
+<link rel="parent" href="module-mailbox.html" />
+<link rel="next" href="mailbox-maildir.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3.1 Mailbox objects</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.1.1 Maildir"
+  href="mailbox-maildir.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-maildir.html">7.3.1.1 Maildir</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009310000000000000000"></a>
+<a name="mailbox-objects"></a>
+<br>
+7.3.1 <tt class="class">Mailbox</tt> objects
+</h2>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1336' xml:id='l2h-1336' class="class">Mailbox</tt></b>
+<dd>
+A mailbox, which may be inspected and modified.
+</dl>
+
+<p>
+The <tt class="class">Mailbox</tt> class defines an interface and
+is not intended to be instantiated.  Instead, format-specific
+subclasses should inherit from <tt class="class">Mailbox</tt> and your code
+should instantiate a particular subclass.
+
+<p>
+The <tt class="class">Mailbox</tt> interface is dictionary-like, with small keys
+corresponding to messages. Keys are issued by the <tt class="class">Mailbox</tt>
+instance with which they will be used and are only meaningful to that
+<tt class="class">Mailbox</tt> instance. A key continues to identify a message even
+if the corresponding message is modified, such as by replacing it with
+another message.
+
+<p>
+Messages may be added to a <tt class="class">Mailbox</tt> instance using the set-like
+method <tt class="method">add()</tt> and removed using a <code>del</code> statement or the
+set-like methods <tt class="method">remove()</tt> and <tt class="method">discard()</tt>.
+
+<p>
+<tt class="class">Mailbox</tt> interface semantics differ from dictionary semantics in some
+noteworthy ways. Each time a message is requested, a new
+representation (typically a <tt class="class">Message</tt> instance) is generated
+based upon the current state of the mailbox. Similarly, when a message
+is added to a <tt class="class">Mailbox</tt> instance, the provided message
+representation's contents are copied. In neither case is a reference
+to the message representation kept by the <tt class="class">Mailbox</tt> instance.
+
+<p>
+The default <tt class="class">Mailbox</tt> iterator iterates over message representations, not
+keys as the default dictionary iterator does. Moreover, modification of a
+mailbox during iteration is safe and well-defined. Messages added to the
+mailbox after an iterator is created will not be seen by the iterator. Messages
+removed from the mailbox before the iterator yields them will be silently
+skipped, though using a key from an iterator may result in a
+<tt class="exception">KeyError</tt> exception if the corresponding message is subsequently
+removed.
+
+<p>
+<div class="warning"><b class="label">Warning:</b>
+
+Be very cautious when modifying mailboxes that might be
+simultaneously changed by some other process.  The safest mailbox
+format to use for such tasks is Maildir; try to avoid using
+single-file formats such as mbox for concurrent writing.  If you're
+modifying a mailbox, you
+<em>must</em> lock it by calling the <tt class="method">lock()</tt> and
+<tt class="method">unlock()</tt> methods <em>before</em> reading any messages in the file
+or making any changes by adding or deleting a message.  Failing to
+lock the mailbox runs the risk of losing messages or corrupting the entire
+mailbox.
+</div>
+
+<p>
+<tt class="class">Mailbox</tt> instances have the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1337' xml:id='l2h-1337' class="method">add</tt></b>(</nobr></td>
+  <td><var>message</var>)</td></tr></table></dt>
+<dd>
+Add <var>message</var> to the mailbox and return the key that has been assigned to
+it.
+
+<p>
+Parameter <var>message</var> may be a <tt class="class">Message</tt> instance, an
+<tt class="class">email.Message.Message</tt> instance, a string, or a file-like object (which
+should be open in text mode). If <var>message</var> is an instance of the
+appropriate format-specific <tt class="class">Message</tt> subclass (e.g., if it's an
+<tt class="class">mboxMessage</tt> instance and this is an <tt class="class">mbox</tt> instance), its
+format-specific information is used. Otherwise, reasonable defaults for
+format-specific information are used.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1338' xml:id='l2h-1338' class="method">remove</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1339' xml:id='l2h-1339' class="method">__delitem__</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1340' xml:id='l2h-1340' class="method">discard</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>Delete the message corresponding to <var>key</var> from the mailbox.
+
+<p>
+If no such message exists, a <tt class="exception">KeyError</tt> exception is raised if the
+method was called as <tt class="method">remove()</tt> or <tt class="method">__delitem__()</tt> but no
+exception is raised if the method was called as <tt class="method">discard()</tt>. The
+behavior of <tt class="method">discard()</tt> may be preferred if the underlying mailbox
+format supports concurrent modification by other processes.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1341' xml:id='l2h-1341' class="method">__setitem__</tt></b>(</nobr></td>
+  <td><var>key, message</var>)</td></tr></table></dt>
+<dd>
+Replace the message corresponding to <var>key</var> with <var>message</var>. Raise a
+<tt class="exception">KeyError</tt> exception if no message already corresponds to <var>key</var>.
+
+<p>
+As with <tt class="method">add()</tt>, parameter <var>message</var> may be a <tt class="class">Message</tt>
+instance, an <tt class="class">email.Message.Message</tt> instance, a string, or a file-like
+object (which should be open in text mode). If <var>message</var> is an instance of
+the appropriate format-specific <tt class="class">Message</tt> subclass (e.g., if it's an
+<tt class="class">mboxMessage</tt> instance and this is an <tt class="class">mbox</tt> instance), its
+format-specific information is used. Otherwise, the format-specific information
+of the message that currently corresponds to <var>key</var> is left unchanged. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1342' xml:id='l2h-1342' class="method">iterkeys</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1343' xml:id='l2h-1343' class="method">keys</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>Return an iterator over all keys if called as <tt class="method">iterkeys()</tt> or return a
+list of keys if called as <tt class="method">keys()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1344' xml:id='l2h-1344' class="method">itervalues</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1345' xml:id='l2h-1345' class="method">__iter__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1346' xml:id='l2h-1346' class="method">values</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>Return an iterator over representations of all messages if called as
+<tt class="method">itervalues()</tt> or <tt class="method">__iter__()</tt> or return a list of such
+representations if called as <tt class="method">values()</tt>. The messages are represented as
+instances of the appropriate format-specific <tt class="class">Message</tt> subclass unless a
+custom message factory was specified when the <tt class="class">Mailbox</tt> instance was
+initialized. <span class="note"><b class="label">Note:</b>
+The behavior of <tt class="method">__iter__()</tt> is unlike that of
+dictionaries, which iterate over keys.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1347' xml:id='l2h-1347' class="method">iteritems</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1348' xml:id='l2h-1348' class="method">items</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>Return an iterator over (<var>key</var>, <var>message</var>) pairs, where <var>key</var> is a
+key and <var>message</var> is a message representation, if called as
+<tt class="method">iteritems()</tt> or return a list of such pairs if called as
+<tt class="method">items()</tt>. The messages are represented as instances of the appropriate
+format-specific <tt class="class">Message</tt> subclass unless a custom message factory was
+specified when the <tt class="class">Mailbox</tt> instance was initialized.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1349' xml:id='l2h-1349' class="method">get</tt></b>(</nobr></td>
+  <td><var>key</var><big>[</big><var>, default=None</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1350' xml:id='l2h-1350' class="method">__getitem__</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>Return a representation of the message corresponding to <var>key</var>. If no such
+message exists, <var>default</var> is returned if the method was called as
+<tt class="method">get()</tt> and a <tt class="exception">KeyError</tt> exception is raised if the method was
+called as <tt class="method">__getitem__()</tt>. The message is represented as an instance of
+the appropriate format-specific <tt class="class">Message</tt> subclass unless a custom
+message factory was specified when the <tt class="class">Mailbox</tt> instance was
+initialized.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1351' xml:id='l2h-1351' class="method">get_message</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+Return a representation of the message corresponding to <var>key</var> as an
+instance of the appropriate format-specific <tt class="class">Message</tt> subclass, or raise
+a <tt class="exception">KeyError</tt> exception if no such message exists.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1352' xml:id='l2h-1352' class="method">get_string</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+Return a string representation of the message corresponding to <var>key</var>, or
+raise a <tt class="exception">KeyError</tt> exception if no such message exists.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1353' xml:id='l2h-1353' class="method">get_file</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+Return a file-like representation of the message corresponding to <var>key</var>,
+or raise a <tt class="exception">KeyError</tt> exception if no such message exists. The
+file-like object behaves as if open in binary mode. This file should be closed
+once it is no longer needed.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+Unlike other representations of messages, file-like representations are
+not necessarily independent of the <tt class="class">Mailbox</tt> instance that created them
+or of the underlying mailbox. More specific documentation is provided by each
+subclass.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1354' xml:id='l2h-1354' class="method">has_key</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1355' xml:id='l2h-1355' class="method">__contains__</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>Return <code>True</code> if <var>key</var> corresponds to a message, <code>False</code>
+otherwise.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1356' xml:id='l2h-1356' class="method">__len__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a count of messages in the mailbox.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1357' xml:id='l2h-1357' class="method">clear</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Delete all messages from the mailbox.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1358' xml:id='l2h-1358' class="method">pop</tt></b>(</nobr></td>
+  <td><var>key</var><big>[</big><var>, default</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a representation of the message corresponding to <var>key</var> and delete
+the message. If no such message exists, return <var>default</var> if it was supplied
+or else raise a <tt class="exception">KeyError</tt> exception. The message is represented as
+an instance of the appropriate format-specific <tt class="class">Message</tt> subclass unless
+a custom message factory was specified when the <tt class="class">Mailbox</tt> instance was
+initialized.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1359' xml:id='l2h-1359' class="method">popitem</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return an arbitrary (<var>key</var>, <var>message</var>) pair, where <var>key</var> is a key
+and <var>message</var> is a message representation, and delete the corresponding
+message. If the mailbox is empty, raise a <tt class="exception">KeyError</tt> exception. The
+message is represented as an instance of the appropriate format-specific
+<tt class="class">Message</tt> subclass unless a custom message factory was specified when the
+<tt class="class">Mailbox</tt> instance was initialized.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1360' xml:id='l2h-1360' class="method">update</tt></b>(</nobr></td>
+  <td><var>arg</var>)</td></tr></table></dt>
+<dd>
+Parameter <var>arg</var> should be a <var>key</var>-to-<var>message</var> mapping or an
+iterable of (<var>key</var>, <var>message</var>) pairs. Updates the mailbox so that, for
+each given <var>key</var> and <var>message</var>, the message corresponding to <var>key</var>
+is set to <var>message</var> as if by using <tt class="method">__setitem__()</tt>. As with
+<tt class="method">__setitem__()</tt>, each <var>key</var> must already correspond to a message in
+the mailbox or else a <tt class="exception">KeyError</tt> exception will be raised, so in
+general it is incorrect for <var>arg</var> to be a <tt class="class">Mailbox</tt> instance.
+<span class="note"><b class="label">Note:</b>
+Unlike with dictionaries, keyword arguments are not supported.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1361' xml:id='l2h-1361' class="method">flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Write any pending changes to the filesystem. For some <tt class="class">Mailbox</tt>
+subclasses, changes are always written immediately and <tt class="method">flush()</tt> does
+nothing, but you should still make a habit of calling this method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1362' xml:id='l2h-1362' class="method">lock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Acquire an exclusive advisory lock on the mailbox so that other processes know
+not to modify it. An <tt class="exception">ExternalClashError</tt> is raised if the lock is
+not available. The particular locking mechanisms used depend upon the mailbox
+format.  You should <em>always</em> lock the mailbox before making any 
+modifications to its contents.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1363' xml:id='l2h-1363' class="method">unlock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Release the lock on the mailbox, if any.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1364' xml:id='l2h-1364' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Flush the mailbox, unlock it if necessary, and close any open files. For some
+<tt class="class">Mailbox</tt> subclasses, this method does nothing.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="mailbox-maildir.html">7.3.1.1 <tt class="class">Maildir</tt></a>
+<li><a href="mailbox-mbox.html">7.3.1.2 <tt class="class">mbox</tt></a>
+<li><a href="mailbox-mh.html">7.3.1.3 <tt class="class">MH</tt></a>
+<li><a href="mailbox-babyl.html">7.3.1.4 <tt class="class">Babyl</tt></a>
+<li><a href="mailbox-mmdf.html">7.3.1.5 <tt class="class">MMDF</tt></a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.1.1 Maildir"
+  href="mailbox-maildir.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-maildir.html">7.3.1.1 Maildir</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

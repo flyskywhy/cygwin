@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node31.html" />
+<link rel="prev" href="node29.html" />
+<link rel="parent" href="node29.html" />
+<link rel="next" href="node31.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.2.3.1 Generic Attribute Management</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.3 attribute Management"
+  href="node29.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2.3 attribute Management"
+  href="node29.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.3.2 type-specific Attribute Management"
+  href="node31.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node29.html">2.2.3 Attribute Management</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node29.html">2.2.3 Attribute Management</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node31.html">2.2.3.2 Type-specific Attribute Management</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION004231000000000000000">
+2.2.3.1 Generic Attribute Management</a>
+</h3>
+
+<p>
+
+<span class="versionnote">New in version 2.2.</span>
+
+<p>
+Most extension types only use <em>simple</em> attributes.  So, what
+makes the attributes simple?  There are only a couple of conditions
+that must be met:
+
+<p>
+
+<ol>
+<li>The name of the attributes must be known when
+          <tt class="cfunction">PyType_Ready()</tt> is called.
+
+<p>
+</li>
+<li>No special processing is needed to record that an attribute
+          was looked up or set, nor do actions need to be taken based
+          on the value.
+</li>
+</ol>
+
+<p>
+Note that this list does not place any restrictions on the values of
+the attributes, when the values are computed, or how relevant data is
+stored.
+
+<p>
+When <tt class="cfunction">PyType_Ready()</tt> is called, it uses three tables
+referenced by the type object to create <em>descriptors</em> which are
+placed in the dictionary of the type object.  Each descriptor controls
+access to one attribute of the instance object.  Each of the tables is
+optional; if all three are <tt class="constant">NULL</tt>, instances of the type will only have
+attributes that are inherited from their base type, and should leave
+the <tt class="member">tp_getattro</tt> and <tt class="member">tp_setattro</tt> fields <tt class="constant">NULL</tt> as
+well, allowing the base type to handle attributes.
+
+<p>
+The tables are declared as three fields of the type object:
+
+<p>
+<div class="verbatim"><pre>
+    struct PyMethodDef *tp_methods;
+    struct PyMemberDef *tp_members;
+    struct PyGetSetDef *tp_getset;
+</pre></div>
+
+<p>
+If <tt class="member">tp_methods</tt> is not <tt class="constant">NULL</tt>, it must refer to an array of
+<tt class="ctype">PyMethodDef</tt> structures.  Each entry in the table is an
+instance of this structure:
+
+<p>
+<div class="verbatim"><pre>
+typedef struct PyMethodDef {
+    char        *ml_name;       /* method name */
+    PyCFunction  ml_meth;       /* implementation function */
+    int	         ml_flags;      /* flags */
+    char        *ml_doc;        /* docstring */
+} PyMethodDef;
+</pre></div>
+
+<p>
+One entry should be defined for each method provided by the type; no
+entries are needed for methods inherited from a base type.  One
+additional entry is needed at the end; it is a sentinel that marks the
+end of the array.  The <tt class="member">ml_name</tt> field of the sentinel must be
+<tt class="constant">NULL</tt>.
+
+<p>
+XXX Need to refer to some unified discussion of the structure fields,
+shared with the next section.
+
+<p>
+The second table is used to define attributes which map directly to
+data stored in the instance.  A variety of primitive C types are
+supported, and access may be read-only or read-write.  The structures
+in the table are defined as:
+
+<p>
+<div class="verbatim"><pre>
+typedef struct PyMemberDef {
+    char *name;
+    int   type;
+    int   offset;
+    int   flags;
+    char *doc;
+} PyMemberDef;
+</pre></div>
+
+<p>
+For each entry in the table, a descriptor will be constructed and
+added to the type which will be able to extract a value from the
+instance structure.  The <tt class="member">type</tt> field should contain one of the
+type codes defined in the <span class="file">structmember.h</span> header; the value will
+be used to determine how to convert Python values to and from C
+values.  The <tt class="member">flags</tt> field is used to store flags which control
+how the attribute can be accessed.
+
+<p>
+XXX Need to move some of this to a shared section!
+
+<p>
+The following flag constants are defined in <span class="file">structmember.h</span>;
+they may be combined using bitwise-OR.
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Constant</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><tt class="constant">READONLY <a id='l2h-10' xml:id='l2h-10'></a></tt></td>
+        <td class="left"  >Never writable.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">RO <a id='l2h-11' xml:id='l2h-11'></a></tt></td>
+        <td class="left"  >Shorthand for <tt class="constant">READONLY</tt>.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">READ_RESTRICTED <a id='l2h-12' xml:id='l2h-12'></a></tt></td>
+        <td class="left"  >Not readable in restricted mode.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">WRITE_RESTRICTED <a id='l2h-13' xml:id='l2h-13'></a></tt></td>
+        <td class="left"  >Not writable in restricted mode.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">RESTRICTED <a id='l2h-14' xml:id='l2h-14'></a></tt></td>
+        <td class="left"  >Not readable or writable in restricted mode.</td></tr></tbody>
+</table></div>
+
+<p>
+An interesting advantage of using the <tt class="member">tp_members</tt> table to
+build descriptors that are used at runtime is that any attribute
+defined this way can have an associated doc string simply by providing
+the text in the table.  An application can use the introspection API
+to retrieve the descriptor from the class object, and get the
+doc string using its <tt class="member">__doc__</tt> attribute.
+
+<p>
+As with the <tt class="member">tp_methods</tt> table, a sentinel entry with a
+<tt class="member">name</tt> value of <tt class="constant">NULL</tt> is required.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.3 attribute Management"
+  href="node29.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2.3 attribute Management"
+  href="node29.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.3.2 type-specific Attribute Management"
+  href="node31.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node29.html">2.2.3 Attribute Management</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node29.html">2.2.3 Attribute Management</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node31.html">2.2.3.2 Type-specific Attribute Management</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

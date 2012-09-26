@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="doctest-unittest-api.html" />
+<link rel="prev" href="doctest-how-it-works.html" />
+<link rel="parent" href="module-doctest.html" />
+<link rel="next" href="doctest-unittest-api.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.2.4 Basic API</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.6 Warnings"
+  href="doctest-warnings.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2 doctest  "
+  href="module-doctest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.5 unittest API"
+  href="doctest-unittest-api.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-warnings.html">23.2.3.6 Warnings</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-doctest.html">23.2 doctest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-unittest-api.html">23.2.5 Unittest API</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0025240000000000000000"></a><a name="doctest-basic-api"></a>
+<br>
+23.2.4 Basic API
+</h2>
+
+<p>
+The functions <tt class="function">testmod()</tt> and <tt class="function">testfile()</tt> provide a
+simple interface to doctest that should be sufficient for most basic
+uses.  For a less formal introduction to these two functions, see
+sections <a href="doctest-simple-testmod.html#doctest-simple-testmod">23.2.1</a> and
+<a href="doctest-simple-testfile.html#doctest-simple-testfile">23.2.2</a>.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4951' xml:id='l2h-4951' class="function">testfile</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, module_relative</var><big>]</big><var></var><big>[</big><var>,
+                          name</var><big>]</big><var></var><big>[</big><var>, package</var><big>]</big><var></var><big>[</big><var>,
+                          globs</var><big>]</big><var></var><big>[</big><var>, verbose</var><big>]</big><var></var><big>[</big><var>,
+                          report</var><big>]</big><var></var><big>[</big><var>, optionflags</var><big>]</big><var></var><big>[</big><var>,
+                          extraglobs</var><big>]</big><var></var><big>[</big><var>, raise_on_error</var><big>]</big><var></var><big>[</big><var>,
+                          parser</var><big>]</big><var></var><big>[</big><var>, encoding</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+All arguments except <var>filename</var> are optional, and should be
+  specified in keyword form.
+
+<p>
+Test examples in the file named <var>filename</var>.  Return
+  "<tt class="samp">(<var>failure_count</var>, <var>test_count</var>)</tt>".
+
+<p>
+Optional argument <var>module_relative</var> specifies how the filename
+  should be interpreted:
+
+<p>
+
+<ul>
+<li>If <var>module_relative</var> is <code>True</code> (the default), then
+        <var>filename</var> specifies an OS-independent module-relative
+        path.  By default, this path is relative to the calling
+        module's directory; but if the <var>package</var> argument is
+        specified, then it is relative to that package.  To ensure
+        OS-independence, <var>filename</var> should use <code>/</code> characters
+        to separate path segments, and may not be an absolute path
+        (i.e., it may not begin with <code>/</code>).
+</li>
+<li>If <var>module_relative</var> is <code>False</code>, then <var>filename</var>
+        specifies an OS-specific path.  The path may be absolute or
+        relative; relative paths are resolved with respect to the
+        current working directory.
+  
+</li>
+</ul>
+
+<p>
+Optional argument <var>name</var> gives the name of the test; by default,
+  or if <code>None</code>, <code>os.path.basename(<var>filename</var>)</code> is used.
+
+<p>
+Optional argument <var>package</var> is a Python package or the name of a
+  Python package whose directory should be used as the base directory
+  for a module-relative filename.  If no package is specified, then
+  the calling module's directory is used as the base directory for
+  module-relative filenames.  It is an error to specify <var>package</var>
+  if <var>module_relative</var> is <code>False</code>.
+
+<p>
+Optional argument <var>globs</var> gives a dict to be used as the globals
+  when executing examples.  A new shallow copy of this dict is
+  created for the doctest, so its examples start with a clean slate.
+  By default, or if <code>None</code>, a new empty dict is used.
+
+<p>
+Optional argument <var>extraglobs</var> gives a dict merged into the
+  globals used to execute examples.  This works like
+  <tt class="method">dict.update()</tt>:  if <var>globs</var> and <var>extraglobs</var> have a
+  common key, the associated value in <var>extraglobs</var> appears in the
+  combined dict.  By default, or if <code>None</code>, no extra globals are
+  used.  This is an advanced feature that allows parameterization of
+  doctests.  For example, a doctest can be written for a base class, using
+  a generic name for the class, then reused to test any number of
+  subclasses by passing an <var>extraglobs</var> dict mapping the generic
+  name to the subclass to be tested.
+
+<p>
+Optional argument <var>verbose</var> prints lots of stuff if true, and prints
+  only failures if false; by default, or if <code>None</code>, it's true
+  if and only if <code>'-v'</code> is in <code>sys.argv</code>.
+
+<p>
+Optional argument <var>report</var> prints a summary at the end when true,
+  else prints nothing at the end.  In verbose mode, the summary is
+  detailed, else the summary is very brief (in fact, empty if all tests
+  passed).
+
+<p>
+Optional argument <var>optionflags</var> or's together option flags.  See
+  section&nbsp;<a href="doctest-options.html#doctest-options">23.2.3</a>.
+
+<p>
+Optional argument <var>raise_on_error</var> defaults to false.  If true,
+  an exception is raised upon the first failure or unexpected exception
+  in an example.  This allows failures to be post-mortem debugged.
+  Default behavior is to continue running examples.
+
+<p>
+Optional argument <var>parser</var> specifies a <tt class="class">DocTestParser</tt> (or
+  subclass) that should be used to extract tests from the files.  It
+  defaults to a normal parser (i.e., <code><tt class="class">DocTestParser</tt>()</code>).
+
+<p>
+Optional argument <var>encoding</var> specifies an encoding that should
+  be used to convert the file to unicode.
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+The parameter <var>encoding</var> was added.</span>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4952' xml:id='l2h-4952' class="function">testmod</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>m</var><big>]</big><var></var><big>[</big><var>, name</var><big>]</big><var></var><big>[</big><var>,
+                          globs</var><big>]</big><var></var><big>[</big><var>, verbose</var><big>]</big><var></var><big>[</big><var>,
+                          report</var><big>]</big><var></var><big>[</big><var>,
+                          optionflags</var><big>]</big><var></var><big>[</big><var>, extraglobs</var><big>]</big><var></var><big>[</big><var>,
+                          raise_on_error</var><big>]</big><var></var><big>[</big><var>, exclude_empty</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+All arguments are optional, and all except for <var>m</var> should be
+  specified in keyword form.
+
+<p>
+Test examples in docstrings in functions and classes reachable
+  from module <var>m</var> (or module <tt class="module">__main__</tt> if <var>m</var> is not
+  supplied or is <code>None</code>), starting with <code><var>m</var>.__doc__</code>.
+
+<p>
+Also test examples reachable from dict <code><var>m</var>.__test__</code>, if it
+  exists and is not <code>None</code>.  <code><var>m</var>.__test__</code> maps
+  names (strings) to functions, classes and strings; function and class
+  docstrings are searched for examples; strings are searched directly,
+  as if they were docstrings.
+
+<p>
+Only docstrings attached to objects belonging to module <var>m</var> are
+  searched.
+
+<p>
+Return "<tt class="samp">(<var>failure_count</var>, <var>test_count</var>)</tt>".
+
+<p>
+Optional argument <var>name</var> gives the name of the module; by default,
+  or if <code>None</code>, <code><var>m</var>.__name__</code> is used.
+
+<p>
+Optional argument <var>exclude_empty</var> defaults to false.  If true,
+  objects for which no doctests are found are excluded from consideration.
+  The default is a backward compatibility hack, so that code still
+  using <tt class="method">doctest.master.summarize()</tt> in conjunction with
+  <tt class="function">testmod()</tt> continues to get output for objects with no tests.
+  The <var>exclude_empty</var> argument to the newer <tt class="class">DocTestFinder</tt>
+  constructor defaults to true.
+
+<p>
+Optional arguments <var>extraglobs</var>, <var>verbose</var>, <var>report</var>,
+  <var>optionflags</var>, <var>raise_on_error</var>, and <var>globs</var> are the same as
+  for function <tt class="function">testfile()</tt> above, except that <var>globs</var>
+  defaults to <code><var>m</var>.__dict__</code>.
+
+<p>
+
+<span class="versionnote">Changed in version 2.3:
+The parameter <var>optionflags</var> was added.</span>
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+The parameters <var>extraglobs</var>, <var>raise_on_error</var>
+                  and <var>exclude_empty</var> were added.</span>
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+The optional argument <var>isprivate</var>, deprecated
+                  in 2.4, was removed.</span>
+
+<p>
+</dl>
+
+<p>
+There's also a function to run the doctests associated with a single object.
+This function is provided for backward compatibility.  There are no plans
+to deprecate it, but it's rarely useful:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4953' xml:id='l2h-4953' class="function">run_docstring_examples</tt></b>(</nobr></td>
+  <td><var>f, globs</var><big>[</big><var>,
+                            verbose</var><big>]</big><var></var><big>[</big><var>, name</var><big>]</big><var></var><big>[</big><var>,
+                            compileflags</var><big>]</big><var></var><big>[</big><var>, optionflags</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Test examples associated with object <var>f</var>; for example, <var>f</var> may
+  be a module, function, or class object.
+
+<p>
+A shallow copy of dictionary argument <var>globs</var> is used for the
+  execution context.
+
+<p>
+Optional argument <var>name</var> is used in failure messages, and defaults
+  to <code>"NoName"</code>.
+
+<p>
+If optional argument <var>verbose</var> is true, output is generated even
+  if there are no failures.  By default, output is generated only in case
+  of an example failure.
+
+<p>
+Optional argument <var>compileflags</var> gives the set of flags that should
+  be used by the Python compiler when running the examples.  By default, or
+  if <code>None</code>, flags are deduced corresponding to the set of future
+  features found in <var>globs</var>.
+
+<p>
+Optional argument <var>optionflags</var> works as for function
+  <tt class="function">testfile()</tt> above.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.6 Warnings"
+  href="doctest-warnings.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2 doctest  "
+  href="module-doctest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.5 unittest API"
+  href="doctest-unittest-api.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-warnings.html">23.2.3.6 Warnings</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-doctest.html">23.2 doctest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-unittest-api.html">23.2.5 Unittest API</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

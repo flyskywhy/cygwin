@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+#
+
+USAGE="[-f] <patchname>"
+. `dirname $0`/guilt
+
+case $# in
+	1)
+		# just patchname
+		force=
+		;;
+	2)
+		# -f patchname
+		if [ "$1" != "-f" ]; then
+			usage
+		fi
+
+		force=t
+		shift
+		;;
+	*)
+		usage
+		;;
+esac
+
+patch="$1"
+
+if [ -z "$patch" ]; then
+	die "You must specify a patch to delete"
+fi
+
+p=`grep -e "^[0-9a-f]\{40\}:$patch\$" < "$applied"`
+if [ ! -z "$p" ] ; then
+	die "Cannot delete an applied patch"
+fi
+
+series_remove_patch "$patch"
+
+guilt_hook "delete" "$patch"
+
+[ ! -z "$force" ] && rm -f $GUILT_DIR/$branch/$patch
+
+exit 0

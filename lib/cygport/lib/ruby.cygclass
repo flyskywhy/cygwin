@@ -1,0 +1,99 @@
+################################################################################
+#
+# ruby.cygclass - functions for building Ruby modules
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: ruby.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+check_prog_req ruby
+
+RUBY=/usr/bin/ruby
+RUBY_VERSION=$(${RUBY} -r rbconfig -e 'print Config::CONFIG["ruby_version"]')
+RUBY_LIB=$(${RUBY} -r rbconfig -e 'print Config::CONFIG["rubylibdir"]')
+RUBY_ARCH=$(${RUBY} -r rbconfig -e 'print Config::CONFIG["archdir"]')
+RUBY_SITELIB=$(${RUBY} -r rbconfig -e 'print Config::CONFIG["sitelibdir"]')
+RUBY_SITEARCH=$(${RUBY} -r rbconfig -e 'print Config::CONFIG["sitearchdir"]')
+LIBRUBY=$(${RUBY} -r rbconfig -e 'print Config::CONFIG["LIBRUBYARG"]')
+
+ruby_compile() {
+	if [ -e install.rb ]
+	then
+		${RUBY} install.rb config --prefix=/usr ${@} || error "install.rb config failed"
+		${RUBY} install.rb setup || error "install.rb setup failed"
+	elif [ -e setup.rb ]
+	then
+		${RUBY} setup.rb config --prefix=/usr ${@} || error "setup.rb config failed"
+		${RUBY} setup.rb setup || error "setup.rb setup failed"
+	elif [ -e extconf.rb ]
+	then
+		${RUBY} extconf.rb ${@} || error "extconf.rb failed"
+		cygmake
+	elif [ -e Rakefile -o -e rakefile ]
+	then
+		check_prog_req rake
+		rake ${@} || error "rake failed"
+	else
+		error "No Ruby module detected"
+	fi
+
+	if defined RDOC_SOURCE
+	then
+		rdoc ${RDOC_SOURCE} -o rdoc
+	fi
+}
+
+ruby_install() {
+	if [ -f Makefile ]
+	then
+		cyginstall ${@}
+	elif [ -e install.rb ]
+	then
+		${RUBY} install.rb config --prefix=${D}/usr ${@} || error "install.rb config failed"
+		${RUBY} install.rb install || error "install.rb install failed"
+	elif [ -e setup.rb ]
+	then
+		${RUBY} setup.rb config --prefix=/usr ${@} || error "setup.rb config failed"
+		${RUBY} setup.rb install --prefix=${D} || error "setup.rb install failed"
+	elif [ -e Rakefile -o -e rakefile ]
+	then
+		check_prog_req rake
+		rake install DESTDIR=${D} ${@} || error "rake install failed"
+	else
+		error "No Ruby module detected"
+	fi
+
+	if [ -d rdoc ] 
+	then
+		dodir /usr/share/doc/${P}
+		cp -r rdoc ${D}/usr/share/doc/${P}/
+	fi
+}
+
+src_compile() {
+	lndirs
+	cd ${B}
+	ruby_compile
+}
+
+src_install() {
+	cd ${B}
+	ruby_install
+}

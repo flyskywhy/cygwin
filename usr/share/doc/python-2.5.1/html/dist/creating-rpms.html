@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="postinstallation-script.html" />
+<link rel="prev" href="creating-dumb.html" />
+<link rel="parent" href="built-dist.html" />
+<link rel="next" href="postinstallation-script.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.2 Creating RPM packages</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.1 creating dumb built"
+  href="creating-dumb.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. creating Built Distributions"
+  href="built-dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.3 creating Windows Installers"
+  href="postinstallation-script.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="creating-dumb.html">5.1 Creating dumb built</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="built-dist.html">5. Creating Built Distributions</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="postinstallation-script.html">5.3 Creating Windows Installers</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION005200000000000000000"></a>
+<a name="creating-rpms"></a>
+<br>
+5.2 Creating RPM packages
+</h1>
+
+<p>
+The RPM format is used by many popular Linux distributions, including
+Red Hat, SuSE, and Mandrake.  If one of these (or any of the other
+RPM-based Linux distributions) is your usual environment, creating RPM
+packages for other users of that same distribution is trivial.
+Depending on the complexity of your module distribution and differences
+between Linux distributions, you may also be able to create RPMs that
+work on different RPM-based distributions.
+
+<p>
+The usual way to create an RPM of your module distribution is to run the 
+<code class="du-command">bdist_rpm</code> command:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist_rpm
+</pre></div>
+
+<p>
+or the <code class="du-command">bdist</code> command with the <b class="programopt">--format</b> option:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist --formats=rpm
+</pre></div>
+
+<p>
+The former allows you to specify RPM-specific options; the latter allows 
+you to easily specify multiple formats in one run.  If you need to do
+both, you can explicitly specify multiple <code class="du-command">bdist_*</code> commands
+and their options:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist_rpm --packager="John Doe &lt;jdoe@example.org&gt;" \
+                bdist_wininst --target_version="2.0"
+</pre></div>
+
+<p>
+Creating RPM packages is driven by a <span class="file">.spec</span> file, much as using
+the Distutils is driven by the setup script.  To make your life easier,
+the <code class="du-command">bdist_rpm</code> command normally creates a <span class="file">.spec</span> file
+based on the information you supply in the setup script, on the command
+line, and in any Distutils configuration files.  Various options and
+sections in the <span class="file">.spec</span> file are derived from options in the setup
+script as follows:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >RPM <span class="file">.spec</span> file option or section</th>
+      <th class="left"  >Distutils setup script option</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline">Name</td>
+        <td class="left"  ><span class="du-option">name</span></td></tr>
+    <tr><td class="left"   valign="baseline">Summary (in preamble)</td>
+        <td class="left"  ><span class="du-option">description</span></td></tr>
+    <tr><td class="left"   valign="baseline">Version</td>
+        <td class="left"  ><span class="du-option">version</span></td></tr>
+    <tr><td class="left"   valign="baseline">Vendor</td>
+        <td class="left"  ><span class="du-option">author</span> and <span class="du-option">author_email</span>, or 
+<br>&amp;
+                  <span class="du-option">maintainer</span> and <span class="du-option">maintainer_email</span></td></tr>
+    <tr><td class="left"   valign="baseline">Copyright</td>
+        <td class="left"  ><span class="du-option">licence</span></td></tr>
+    <tr><td class="left"   valign="baseline">Url</td>
+        <td class="left"  ><span class="du-option">url</span></td></tr>
+    <tr><td class="left"   valign="baseline">%description (section)</td>
+        <td class="left"  ><span class="du-option">long_description</span></td></tr></tbody>
+</table></div>
+
+<p>
+Additionally, there are many options in <span class="file">.spec</span> files that don't have
+corresponding options in the setup script.  Most of these are handled
+through options to the <code class="du-command">bdist_rpm</code> command as follows:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >RPM <span class="file">.spec</span> file option or section</th>
+      <th class="left"  ><code class="du-command">bdist_rpm</code> option</th>
+      <th class="left"  >default value</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline">Release</td>
+        <td class="left"  ><span class="du-option">release</span></td>
+        <td class="left"  >``1''</td></tr>
+    <tr><td class="left"   valign="baseline">Group</td>
+        <td class="left"  ><span class="du-option">group</span></td>
+        <td class="left"  >``Development/Libraries''</td></tr>
+    <tr><td class="left"   valign="baseline">Vendor</td>
+        <td class="left"  ><span class="du-option">vendor</span></td>
+        <td class="left"  >(see above)</td></tr>
+    <tr><td class="left"   valign="baseline">Packager</td>
+        <td class="left"  ><span class="du-option">packager</span></td>
+        <td class="left"  >(none)</td></tr>
+    <tr><td class="left"   valign="baseline">Provides</td>
+        <td class="left"  ><span class="du-option">provides</span></td>
+        <td class="left"  >(none)</td></tr>
+    <tr><td class="left"   valign="baseline">Requires</td>
+        <td class="left"  ><span class="du-option">requires</span></td>
+        <td class="left"  >(none)</td></tr>
+    <tr><td class="left"   valign="baseline">Conflicts</td>
+        <td class="left"  ><span class="du-option">conflicts</span></td>
+        <td class="left"  >(none)</td></tr>
+    <tr><td class="left"   valign="baseline">Obsoletes</td>
+        <td class="left"  ><span class="du-option">obsoletes</span></td>
+        <td class="left"  >(none)</td></tr>
+    <tr><td class="left"   valign="baseline">Distribution</td>
+        <td class="left"  ><span class="du-option">distribution_name</span></td>
+        <td class="left"  >(none)</td></tr>
+    <tr><td class="left"   valign="baseline">BuildRequires</td>
+        <td class="left"  ><span class="du-option">build_requires</span></td>
+        <td class="left"  >(none)</td></tr>
+    <tr><td class="left"   valign="baseline">Icon</td>
+        <td class="left"  ><span class="du-option">icon</span></td>
+        <td class="left"  >(none)</td></tr></tbody>
+</table></div>
+
+<p>
+Obviously, supplying even a few of these options on the command-line
+would be tedious and error-prone, so it's usually best to put them in
+the setup configuration file, <span class="file">setup.cfg</span>--see
+section&nbsp;<a href="setup-config.html#setup-config">3</a>.  If you distribute or package many Python
+module distributions, you might want to put options that apply to all of
+them in your personal Distutils configuration file
+(<span class="file">~/.pydistutils.cfg</span>).
+
+<p>
+There are three steps to building a binary RPM package, all of which are 
+handled automatically by the Distutils:
+
+<p>
+
+<ol>
+<li>create a <span class="file">.spec</span> file, which describes the package (analogous 
+  to the Distutils setup script; in fact, much of the information in the 
+  setup script winds up in the <span class="file">.spec</span> file)
+</li>
+<li>create the source RPM
+</li>
+<li>create the ``binary'' RPM (which may or may not contain binary
+  code, depending on whether your module distribution contains Python
+  extensions)
+</li>
+</ol>
+
+<p>
+Normally, RPM bundles the last two steps together; when you use the
+Distutils, all three steps are typically bundled together.
+
+<p>
+If you wish, you can separate these three steps.  You can use the
+<b class="programopt">--spec-only</b> option to make <code class="du-command">bdist_rpm</code> just
+create the <span class="file">.spec</span> file and exit; in this case, the <span class="file">.spec</span>
+file will be written to the ``distribution directory''--normally
+<span class="file">dist/</span>, but customizable with the <b class="programopt">--dist-dir</b>
+option.  (Normally, the <span class="file">.spec</span> file winds up deep in the ``build
+tree,'' in a temporary directory created by <code class="du-command">bdist_rpm</code>.)
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.1 creating dumb built"
+  href="creating-dumb.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. creating Built Distributions"
+  href="built-dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.3 creating Windows Installers"
+  href="postinstallation-script.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="creating-dumb.html">5.1 Creating dumb built</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="built-dist.html">5. Creating Built Distributions</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="postinstallation-script.html">5.3 Creating Windows Installers</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

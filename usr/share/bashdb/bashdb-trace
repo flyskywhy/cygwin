@@ -1,0 +1,351 @@
+# This program needs to be SOURCE'd and is not called as an executable
+#   Copyright (C) 2006, 2007  Rocky Bernstein rockyb@users.sourceforge.net
+#
+#   Bash is free software; you can redistribute it and/or modify it under
+#   the terms of the GNU General Public License as published by the Free
+#   Software Foundation; either version 2, or (at your option) any later
+#   version.
+#
+#   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#   for more details.
+#   
+#   You should have received a copy of the GNU General Public License along
+#   with Bash; see the file COPYING.  If not, write to the Free Software
+#   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+#
+
+# The alternate way to invoke debugger, "bash --debugger", has some
+# advantages: it sets $0 correctly and doesn't show this script in
+# the call trace. However the bash has been a bit inflexible and
+# quirky so sadly this script seems to be needed more than it would
+# normally.
+
+typeset _Dbg_ver=\
+'$Id: bashdb-trace.in,v 1.11 2007/02/11 23:06:41 rockyb Exp $'
+
+_Dbg_usage_long() {
+  printf "_Dbg_usage:
+    source /usr/share/bashdb/${_Dbg_pname} [OPTIONS]
+
+Sets up a script to be able to call the debugger. The function
+_Dbg_set_trace is defined here and when it is called the you will be
+at the next statement of your program in the debugger. For example, if 
+your script is:
+
+  # Lots of stuff here. ...
+  x=2
+  source /usr/share/bashdb/${_Dbg_pname}
+  _Dbg_set_trace ; : ; :
+  y=3
+
+You will be stopped before y=3 in the debugger. This mechanism allows
+you to run lots of complex code which might otherwise get messed up by
+the debugger. Another use might be in a large script where running the
+debugger every step (e.g. configure) is just too slow.
+
+You can also supply options to ${_Dbg_pname} just as you would to the 
+debugger itself. For example to suppress the banner you could use
+\"source ${_Dbg_pname} -q\" in the above example.
+
+Please note: it is important to \"source\" this file. That is use
+\"source /usr/share/bashdb/${_Dbg_pname}\" rather than call it directly.
+The _Dbg_set_trace() function and debuggers variables that have to
+persist in your program.
+
+options: 
+    -B | --basename  basename only on source listings. 
+                     (Needed in regression tests)
+    -h | --help      print this help
+    -n | --nx |--no-init   
+                     Don't run initialization files
+    -c cmd | --command cmd
+                     Run this passed command as a script
+    -q | --quiet     Quiet. Do not print introductory and quiet messages.
+    -x cmdfile | --cmdfile cmdfiles
+                     execute debugger commands from cmdfile
+    -L libdir | --library libdir
+                     set directory location of library helper file: $_Dbg_main
+                     The default directory is: $_Dbg_libdir
+    -T tmpdir | --tempdir
+                     set directory location for temporary files: $_Dbg_tmpdir
+    -t tty | --tty tty | --terminal tty
+                     set debugger terminal
+    -V | --version   show version number and no-warranty and exit.
+
+Long options may be abbreviated, e.g. --lib is okay for --library.
+" 1>&2
+}
+
+_Dbg_usage_short() {
+  printf "_Dbg_usage:
+    ${_Dbg_pname} [OPTIONS] <script_file>
+
+Runs script_file under a debugger.
+
+options: 
+    -B           basename only on source listings. (Needed in regression tests)
+    -h           print this help
+    -n           Don't run initialization files
+    -c command   Run this passed command as a script
+    -q           Quiet. Do not print introductory and quiet messages.
+    -x cmdfile   execute debugger commands from cmdfile
+    -L libdir    set directory location of library helper file: $_Dbg_main
+                 the default directory is: $_Dbg_libdir
+    -T tmpdir    set directory location for temporary files: $_Dbg_tmpdir
+    -t tty       set debugger terminal
+    -V           show version number and no-warranty and exit.
+" 1>&2
+}
+
+declare -a _Dbg_script_args="$@"
+
+# Equivalent to basename $0; the short program name
+typeset _Dbg_pname=${0##*/}  
+
+# Show basename only in location listing. This is needed in regression tests
+typeset -i _Dbg_basename_only=${BASHDB_BASENAME_ONLY:-0}
+
+typeset _Dbg_main=dbg-main.inc
+typeset _Dbg_libdir=/usr/share/bashdb
+typeset _Dbg_bindir=$(dirname $0)
+typeset _Dbg_tmpdir=/tmp
+
+typeset _Dbg_cmd='' # If command string given on command line, this is it.
+
+# What to set for location of helper routines? 
+if [[ ! -e $_Dbg_libdir/$_Dbg_main ]] ; then
+  # Use bindir/../share as fallback
+    _Dbg_libdir=
+    if [[ -d $_Dbg_bindir/../share/bashdb ]] ; then
+      _Dbg_libdir=$_Dbg_bindir/../share/bashdb
+    fi
+fi
+
+# Process using short or long options, depending on the availability
+# of getopt
+TEMP=`getopt -o testing t 2>/dev/null`
+if [ 0 = $? ] && [[ "$TEMP" == " -- 't'" ]]  ; then
+  # Process using long options
+  # Note that we use `"$@"' to let each command-line parameter expand to a 
+  # separate word. The quotes around `$@' are essential!
+  # We need TEMP as the `eval set --' would nuke the return value of getopt.
+  TEMP=`getopt -o BhL:nqt:T::V:x: \
+--long basename,command:,debugger,help,version,library:,no-init,quiet,tempdir:,terminal:,tty:: \
+     -n 'bashdb' -- "$@"`
+
+  if [ $? != 0 ] ; then 
+    echo "Use --help for option help. Terminating..." >&2 ; 
+    exit 1 ; 
+  fi
+  
+  # Note the quotes around `$TEMP': they are essential!
+  eval set -- "$TEMP"
+  
+  while true ; do
+    case $1 in
+      -B|--basename) _Dbg_basename_only=1 ;;
+      --debugger) ;;  # This option is for compatibility with bash --debugger
+      -h|--help) _Dbg_usage_long; exit 100 ;;
+      -L|--library) _Dbg_libdir=$2; shift ;;
+      -n|--nx|--no-init) _Dbg_no_init=1 ;;
+      -q|--quiet) _Dbg_quiet=1 ;;
+      -x) BASHDB_INPUT="$BASHDB_INPUT $2"; shift ;;  
+      -T|--tempdir) _Dbg_tmpdir=$2; shift ;;
+      -t|--terminal|--tty) 
+	if ! $(touch $2 >/dev/null 2>/dev/null); then 
+	  echo "${_Dbg_pname}: Can't access $2 for writing."
+	elif [[ ! -w $2 ]] ; then
+	  echo "${_Dbg_pname}: terminal $2 needs to be writable."
+	else
+	  _Dbg_tty=$2 ;
+	fi
+	shift
+	;;
+      -V|--version) show_version=1 ;;
+      --) shift ; break ;;
+      *) 
+	echo "Use --help for option help. Terminating..."
+	exit 2 ;;
+    esac
+    shift
+  done
+else 
+  # Process using short options
+  while getopts BhL:n:qt:T:V:x: opt; do
+    case $opt in
+      B) _Dbg_basename_only=1 ;;
+      h) _Dbg_usage_short; exit 100 ;;
+      n) _Dbg_no_init=1 ;;
+      q) _Dbg_quiet=1 ;;
+      x) BASHDB_INPUT="$BASHDB_INPUT $OPTARG" ;;  
+      L) _Dbg_libdir=$OPTARG ;;
+      T) _Dbg_tmpdir=$OPTARG ;;
+      t) 
+	if ! $(touch $OPTARG >/dev/null 2>/dev/null); then 
+	  echo "${_Dbg_pname}: Can't access $OPTARG for writing."
+	elif [[ ! -w $OPTARG ]] ; then
+	  echo "${_Dbg_pname}: terminal $OPTARG needs to be writable."
+	else
+	  _Dbg_tty=$OPTARG
+	fi
+	;;
+      V) show_version=1 ;;
+      *) 
+	if ((_Dbg_basename_only == 1)) ; then
+	  echo "${_Dbg_pname}: unrecognized option -- $OPTARG"
+	else
+	  echo "$0: unrecognized option -- $OPTARG"
+	fi
+	echo "Use --help for option help. Terminating..."
+	exit 2 
+	;;
+    esac
+  done
+  shift $(($OPTIND - 1))
+fi
+
+if [[ ! -d $_Dbg_libdir ]] && [[ ! -d $_Dbg_libdir ]] ; then 
+  echo "${_Dbg_pname}: cannot read $_Dbg_libdir. " \
+  "Perhaps bashdb is installed wrong." >&2
+  echo "${_Dbg_pname}: or try using -L (with a different directory)." >&2
+  exit 1
+fi
+
+if [[ ! -d $_Dbg_tmpdir ]] && [[ ! -w $_Dbg_tmpdir ]] ; then
+  echo "${_Dbg_pname}: cannot write to temp directory $_Dbg_tmpdir." >&2
+  echo "${_Dbg_pname}: Use -T try directory location." >&2
+  exit 1
+fi
+
+[[ -r $_Dbg_libdir/$_Dbg_main ]] || {
+  echo "${_Dbg_pname}: cannot read debugger file $_Dbg_libdir/$_Dbg_main." >&2
+  echo "${_Dbg_pname}: Perhaps bashdb is installed incorrectly." >&2
+  exit 1
+}
+
+# Note that this is called via bashdb rather than "bash --debugger"
+_Dbg_script=1
+
+. ${_Dbg_libdir}/dbg-pre.inc
+
+if [[ -z $_Dbg_quiet ]] ; then 
+  echo "Bourne-Again Shell Debugger, release $_Dbg_release"
+  cat <<EOF
+Copyright 2002, 2003, 2004, 2006 Rocky Bernstein
+This is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+
+EOF
+fi
+
+if (( show_version == 1 )) ; then 
+cat <<EOF
+There is absolutely no warranty for BASHDB.  Type "show warranty" for details.
+EOF
+  exit 1
+fi
+
+. $_Dbg_libdir/dbg-main.inc
+trap '' DEBUG
+
+# Enter the debugger at the calling stack frame.  This is useful to
+# hard-code a breakpoint at a given point in a program, even if the code
+# is not otherwise being debugged.
+# Leaving this the debugger terminates the program.
+
+# Any parameters are exec'd. In this way you can force specific options to
+# get set.
+_Dbg_debugger() {
+  set -o functrace
+  while [[ -n $1 ]] ; do
+    eval $1
+    shift
+  done
+
+  if [[ -z $_Dbg_set_trace_init ]] ; then
+      _Dbg_set_trace_init=1
+      _Dbg_write_journal "_Dbg_steps=0"
+      trap '_Dbg_debug_trap_handler 0 "$BASH_COMMAND" "$@"' DEBUG
+  else
+      _Dbg_steps=2
+  fi
+}
+
+# Older alias for _Dbg_debugger()
+_Dbg_set_trace() {
+  set -o functrace
+  while [[ -n $1 ]] ; do
+    eval $1
+    shift
+  done
+
+  if [[ -z $_Dbg_set_trace_init ]] ; then
+      _Dbg_set_trace_init=1
+      _Dbg_write_journal "_Dbg_steps=0"
+      trap '_Dbg_debug_trap_handler 0 "$BASH_COMMAND" "$@"' DEBUG
+  else
+      _Dbg_steps=2
+  fi
+}
+
+# Turn on line tracing. Sort of a nicer replacement for
+# set -x
+# 
+# Example:
+#   source /usr/local/share/bashdb/bashdb-trace -q 
+#   ...
+#   _Dbg_linetrace_on
+#   for i in `seq 10` ; do
+#     echo $i
+#   done
+#   _Dbg_linetrace_off
+#   BASHDB_QUIT_ON_QUIT=1   # Set this to make sure not to stay in debugger
+#                           # after program terminates. Might also do earlier.
+
+_Dbg_linetrace_on() {
+  set -o functrace
+  _Dbg_linetrace=1
+  _Dbg_steps=-1
+  trap '_Dbg_debug_trap_handler 0 "$BASH_COMMAND" "$@"' DEBUG
+}
+
+# Turn on line tracing. Sort of a nicer replacement for
+# set +x.
+#
+# See _Dbg_linetrace_on() for an example.
+_Dbg_linetrace_off() {
+  _Dbg_linetrace=0
+}
+
+# Use the debugger signal handler when getting the signal specified.
+# additional arguments can be the values for "print" "stack" and "stop"
+# Examples:
+#    _Dbg_handler INT print stack nostop      # this is the default
+#    _Dbg_handler INT                         # same thing
+#    _Dbg_hander                              # same thing
+#    _Dbg_handler HUP print stop              # stop in debugger when getting
+#                                             # a HUP signal                  
+_Dbg_handler() {
+   local signame=${1:INT}
+   shift
+   local -a rest=$*
+   if [[ -z $rest ]]; then
+       rest=("print" "stack" "stop")
+   fi
+  _Dbg_init_trap $signame
+  for attr in ${rest[@]}; do 
+      _Dbg_do_handle $signame $attr
+  done
+  _Dbg_linetrace=0
+  _Dbg_steps=-1
+}
+
+# end of bashdb-trace
+
+#;;; Local Variables: ***
+#;;; mode:shell-script ***
+#;;; eval: (sh-set-shell "bash") ***
+#;;; End: ***
+

@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="refcounts.html" />
+<link rel="prev" href="parseTupleAndKeywords.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="refcounts.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.9 Building Arbitrary Values
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.8 keyword Parameters for"
+  href="parseTupleAndKeywords.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.10 reference Counts"
+  href="refcounts.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="parseTupleAndKeywords.html">1.8 Keyword Parameters for</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="refcounts.html">1.10 Reference Counts</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION003900000000000000000"></a><a name="buildValue"></a>
+<br>
+1.9 Building Arbitrary Values
+         
+</h1>
+
+<p>
+This function is the counterpart to <tt class="cfunction">PyArg_ParseTuple()</tt>.  It is
+declared as follows:
+
+<p>
+<div class="verbatim"><pre>
+PyObject *Py_BuildValue(char *format, ...);
+</pre></div>
+
+<p>
+It recognizes a set of format units similar to the ones recognized by
+<tt class="cfunction">PyArg_ParseTuple()</tt>, but the arguments (which are input to the
+function, not output) must not be pointers, just values.  It returns a
+new Python object, suitable for returning from a C function called
+from Python.
+
+<p>
+One difference with <tt class="cfunction">PyArg_ParseTuple()</tt>: while the latter
+requires its first argument to be a tuple (since Python argument lists
+are always represented as tuples internally),
+<tt class="cfunction">Py_BuildValue()</tt> does not always build a tuple.  It builds
+a tuple only if its format string contains two or more format units.
+If the format string is empty, it returns <code>None</code>; if it contains
+exactly one format unit, it returns whatever object is described by
+that format unit.  To force it to return a tuple of size 0 or one,
+parenthesize the format string.
+
+<p>
+Examples (to the left the call, to the right the resulting Python value):
+
+<p>
+<div class="verbatim"><pre>
+    Py_BuildValue("")                        None
+    Py_BuildValue("i", 123)                  123
+    Py_BuildValue("iii", 123, 456, 789)      (123, 456, 789)
+    Py_BuildValue("s", "hello")              'hello'
+    Py_BuildValue("ss", "hello", "world")    ('hello', 'world')
+    Py_BuildValue("s#", "hello", 4)          'hell'
+    Py_BuildValue("()")                      ()
+    Py_BuildValue("(i)", 123)                (123,)
+    Py_BuildValue("(ii)", 123, 456)          (123, 456)
+    Py_BuildValue("(i,i)", 123, 456)         (123, 456)
+    Py_BuildValue("[i,i]", 123, 456)         [123, 456]
+    Py_BuildValue("{s:i,s:i}",
+                  "abc", 123, "def", 456)    {'abc': 123, 'def': 456}
+    Py_BuildValue("((ii)(ii)) (ii)",
+                  1, 2, 3, 4, 5, 6)          (((1, 2), (3, 4)), (5, 6))
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.8 keyword Parameters for"
+  href="parseTupleAndKeywords.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.10 reference Counts"
+  href="refcounts.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="parseTupleAndKeywords.html">1.8 Keyword Parameters for</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="refcounts.html">1.10 Reference Counts</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

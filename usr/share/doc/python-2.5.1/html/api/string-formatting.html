@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="arg-parsing.html" />
+<link rel="parent" href="utilities.html" />
+<link rel="next" href="abstract.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.6 String conversion and formatting </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.5 parsing arguments and"
+  href="arg-parsing.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. Utilities"
+  href="utilities.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="arg-parsing.html">5.5 Parsing arguments and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="utilities.html">5. Utilities</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="abstract.html">6. Abstract Objects Layer</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION007600000000000000000"></a><a name="string-formatting"></a>
+<br>
+5.6 String conversion and formatting 
+</h1>
+
+<p>
+Functions for number conversion and formatted string output.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-217' xml:id='l2h-217' class="cfunction">PyOS_snprintf</tt></b>(</nobr></td><td>char *<var>str</var>, size_t <var>size</var>, 
+                                      const char *<var>format</var>, ...)</td></tr></table></dt>
+<dd>
+Output not more than <var>size</var> bytes to <var>str</var> according to the format
+string <var>format</var> and the extra arguments. See the <span class="Unix">Unix</span> man
+page <span class="manpage"><i>snprintf</i>(2)</span>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-218' xml:id='l2h-218' class="cfunction">PyOS_vsnprintf</tt></b>(</nobr></td><td>char *<var>str</var>, size_t <var>size</var>,
+                                       const char *<var>format</var>, va_list <var>va</var>)</td></tr></table></dt>
+<dd>
+Output not more than <var>size</var> bytes to <var>str</var> according to the format
+string <var>format</var> and the variable argument list <var>va</var>. <span class="Unix">Unix</span>
+man page <span class="manpage"><i>vsnprintf</i>(2)</span>.
+</dd></dl>
+
+<p>
+<tt class="cfunction">PyOS_snprintf</tt> and <tt class="cfunction">PyOS_vsnprintf</tt> wrap the
+Standard C library functions <tt class="cfunction">snprintf()</tt> and
+<tt class="cfunction">vsnprintf()</tt>. Their purpose is to guarantee consistent
+behavior in corner cases, which the Standard C functions do not.
+
+<p>
+The wrappers ensure that <var>str</var>[<var>size</var>-1] is always
+"<tt class="character">\0</tt>" upon return. They never write more than
+<var>size</var> bytes (including the trailing "<tt class="character">\0</tt>"
+into str. Both functions require that <code><var>str</var> != NULL</code>,
+<code><var>size</var> &gt; 0</code> and <code><var>format</var> != NULL</code>.
+
+<p>
+If the platform doesn't have <tt class="cfunction">vsnprintf()</tt> and the buffer
+size needed to avoid truncation exceeds <var>size</var> by more than 512
+bytes, Python aborts with a <var>Py_FatalError</var>.
+
+<p>
+The return value (<var>rv</var>) for these functions should be interpreted
+as follows:
+
+<p>
+
+<ul>
+<li>When <code>0 &lt;= <var>rv</var> &lt; <var>size</var></code>, the output conversion
+  was successful and <var>rv</var> characters were written to <var>str</var>
+  (excluding the trailing "<tt class="character">\0</tt>" byte at
+  <var>str</var>[<var>rv</var>]).
+
+<p>
+</li>
+<li>When <code><var>rv</var> &gt;= <var>size</var></code>, the output conversion was
+  truncated and a buffer with <code><var>rv</var> + 1</code> bytes would have
+  been needed to succeed. <var>str</var>[<var>size</var>-1] is
+  "<tt class="character">\0</tt>" in this case.
+
+<p>
+</li>
+<li>When <code><var>rv</var> &lt; 0</code>, ``something bad happened.''
+  <var>str</var>[<var>size</var>-1] is "<tt class="character">\0</tt>" in this case
+  too, but the rest of <var>str</var> is undefined. The exact cause of the
+  error depends on the underlying platform.
+
+<p>
+</li>
+</ul>
+
+<p>
+The following functions provide locale-independent string to number
+conversions.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>double&nbsp;<b><tt id='l2h-219' xml:id='l2h-219' class="cfunction">PyOS_ascii_strtod</tt></b>(</nobr></td><td>const char *<var>nptr</var>, char **<var>endptr</var>)</td></tr></table></dt>
+<dd>
+Convert a string to a <tt class="ctype">double</tt>. This function behaves like the
+Standard C function <tt class="cfunction">strtod()</tt> does in the C locale. It does
+this without changing the current locale, since that would not be
+thread-safe.
+
+<p>
+<tt class="cfunction">PyOS_ascii_strtod</tt> should typically be used for reading
+configuration files or other non-user input that should be locale
+independent. 
+<span class="versionnote">New in version 2.4.</span>
+
+<p>
+See the <span class="Unix">Unix</span> man page <span class="manpage"><i>strtod</i>(2)</span> for details.
+
+<p>
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>char *&nbsp;<b><tt id='l2h-220' xml:id='l2h-220' class="cfunction">PyOS_ascii_formatd</tt></b>(</nobr></td><td>char *<var>buffer</var>, size_t <var>buf_len</var>,
+                                              const char *<var>format</var>, double <var>d</var>)</td></tr></table></dt>
+<dd>
+Convert a <tt class="ctype">double</tt> to a string using the "<tt class="character">.</tt>" as the
+decimal separator. <var>format</var> is a <tt class="cfunction">printf()</tt>-style format
+string specifying the number format. Allowed conversion characters are
+"<tt class="character">e</tt>", "<tt class="character">E</tt>", "<tt class="character">f</tt>", "<tt class="character">F</tt>",
+"<tt class="character">g</tt>" and "<tt class="character">G</tt>".
+
+<p>
+The return value is a pointer to <var>buffer</var> with the converted
+string or NULL if the conversion failed. 
+<span class="versionnote">New in version 2.4.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>double&nbsp;<b><tt id='l2h-221' xml:id='l2h-221' class="cfunction">PyOS_ascii_atof</tt></b>(</nobr></td><td>const char *<var>nptr</var>)</td></tr></table></dt>
+<dd>
+Convert a string to a <tt class="ctype">double</tt> in a locale-independent
+way. 
+<span class="versionnote">New in version 2.4.</span>
+
+<p>
+See the <span class="Unix">Unix</span> man page <span class="manpage"><i>atof</i>(2)</span> for details.
+</dd></dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.5 parsing arguments and"
+  href="arg-parsing.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. Utilities"
+  href="utilities.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="arg-parsing.html">5.5 Parsing arguments and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="utilities.html">5. Utilities</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="abstract.html">6. Abstract Objects Layer</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

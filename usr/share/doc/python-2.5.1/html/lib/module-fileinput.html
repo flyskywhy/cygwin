@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-stat.html" />
+<link rel="prev" href="module-os.path.html" />
+<link rel="parent" href="filesys.html" />
+<link rel="next" href="module-stat.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.2 fileinput -- Iterate over lines from multiple input streams</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.1 os.path  "
+  href="module-os.path.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.3 stat  "
+  href="module-stat.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-os.path.html">11.1 os.path  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-stat.html">11.3 stat  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0013200000000000000000">
+11.2 <tt class="module">fileinput</tt> --
+         Iterate over lines from multiple input streams</a>
+</h1>
+<a name="module-fileinput"></a>
+
+<p>
+
+<p>
+This module implements a helper class and functions to quickly write a
+loop over standard input or a list of files.
+
+<p>
+The typical use is:
+
+<p>
+<div class="verbatim"><pre>
+import fileinput
+for line in fileinput.input():
+    process(line)
+</pre></div>
+
+<p>
+This iterates over the lines of all files listed in
+<code>sys.argv[1:]</code>, defaulting to <code>sys.stdin</code> if the list is
+empty.  If a filename is <code>'-'</code>, it is also replaced by
+<code>sys.stdin</code>.  To specify an alternative list of filenames, pass
+it as the first argument to <tt class="function">input()</tt>.  A single file name is
+also allowed.
+
+<p>
+All files are opened in text mode by default, but you can override this by
+specifying the <var>mode</var> parameter in the call to <tt class="function">input()</tt>
+or <tt class="class">FileInput()</tt>.  If an I/O error occurs during opening or reading
+a file, <tt class="exception">IOError</tt> is raised.
+
+<p>
+If <code>sys.stdin</code> is used more than once, the second and further use
+will return no lines, except perhaps for interactive use, or if it has
+been explicitly reset (e.g. using <code>sys.stdin.seek(0)</code>).
+
+<p>
+Empty files are opened and immediately closed; the only time their
+presence in the list of filenames is noticeable at all is when the
+last file opened is empty.
+
+<p>
+It is possible that the last line of a file does not end in a newline
+character; lines are returned including the trailing newline when it
+is present.
+
+<p>
+You can control how files are opened by providing an opening hook via the
+<var>openhook</var> parameter to <tt class="function">input()</tt> or <tt class="class">FileInput()</tt>.
+The hook must be a function that takes two arguments, <var>filename</var>
+and <var>mode</var>, and returns an accordingly opened file-like object.
+Two useful hooks are already provided by this module.
+
+<p>
+The following function is the primary interface of this module:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2204' xml:id='l2h-2204' class="function">input</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>files</var><big>[</big><var>, inplace</var><big>[</big><var>,
+                        backup</var><big>[</big><var>, mode</var><big>[</big><var>, openhook</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Create an instance of the <tt class="class">FileInput</tt> class.  The instance
+  will be used as global state for the functions of this module, and
+  is also returned to use during iteration.  The parameters to this
+  function will be passed along to the constructor of the
+  <tt class="class">FileInput</tt> class.
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+Added the <var>mode</var> and <var>openhook</var> parameters.</span>
+
+</dl>
+
+<p>
+The following functions use the global state created by
+<tt class="function">input()</tt>; if there is no active state,
+<tt class="exception">RuntimeError</tt> is raised.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2205' xml:id='l2h-2205' class="function">filename</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the name of the file currently being read.  Before the first
+  line has been read, returns <code>None</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2206' xml:id='l2h-2206' class="function">fileno</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the integer ``file descriptor'' for the current file. When no
+  file is opened (before the first line and between files), returns
+  <code>-1</code>.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2207' xml:id='l2h-2207' class="function">lineno</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the cumulative line number of the line that has just been
+  read.  Before the first line has been read, returns <code>0</code>.  After
+  the last line of the last file has been read, returns the line
+  number of that line.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2208' xml:id='l2h-2208' class="function">filelineno</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the line number in the current file.  Before the first line
+  has been read, returns <code>0</code>.  After the last line of the last
+  file has been read, returns the line number of that line within the
+  file.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2209' xml:id='l2h-2209' class="function">isfirstline</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Returns true if the line just read is the first line of its file,
+  otherwise returns false.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2210' xml:id='l2h-2210' class="function">isstdin</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Returns true if the last line was read from <code>sys.stdin</code>,
+  otherwise returns false.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2211' xml:id='l2h-2211' class="function">nextfile</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Close the current file so that the next iteration will read the
+  first line from the next file (if any); lines not read from the file
+  will not count towards the cumulative line count.  The filename is
+  not changed until after the first line of the next file has been
+  read.  Before the first line has been read, this function has no
+  effect; it cannot be used to skip the first file.  After the last
+  line of the last file has been read, this function has no effect.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2212' xml:id='l2h-2212' class="function">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Close the sequence.
+</dl>
+
+<p>
+The class which implements the sequence behavior provided by the
+module is available for subclassing as well:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-2213' xml:id='l2h-2213' class="class">FileInput</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>files</var><big>[</big><var>,
+                             inplace</var><big>[</big><var>, backup</var><big>[</big><var>,
+                             mode</var><big>[</big><var>, openhook</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Class <tt class="class">FileInput</tt> is the implementation; its methods
+  <tt class="method">filename()</tt>, <tt class="method">fileno()</tt>, <tt class="method">lineno()</tt>,
+  <tt class="method">fileline()</tt>, <tt class="method">isfirstline()</tt>, <tt class="method">isstdin()</tt>,
+  <tt class="method">nextfile()</tt> and <tt class="method">close()</tt> correspond to the functions
+  of the same name in the module.
+  In addition it has a <tt class="method">readline()</tt> method which
+  returns the next input line, and a <tt class="method">__getitem__()</tt> method
+  which implements the sequence behavior.  The sequence must be
+  accessed in strictly sequential order; random access and
+  <tt class="method">readline()</tt> cannot be mixed.
+
+<p>
+With <var>mode</var> you can specify which file mode will be passed to
+  <tt class="function">open()</tt>. It must be one of <code>'r'</code>, <code>'rU'</code>,
+  <code>'U'</code> and <code>'rb'</code>.
+
+<p>
+The <var>openhook</var>, when given, must be a function that takes two arguments,
+  <var>filename</var> and <var>mode</var>, and returns an accordingly opened
+  file-like object.
+  You cannot use <var>inplace</var> and <var>openhook</var> together.
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+Added the <var>mode</var> and <var>openhook</var> parameters.</span>
+
+</dl>
+
+<p>
+<strong>Optional in-place filtering:</strong> if the keyword argument
+<code><var>inplace</var>=1</code> is passed to <tt class="function">input()</tt> or to the
+<tt class="class">FileInput</tt> constructor, the file is moved to a backup file and
+standard output is directed to the input file (if a file of the same
+name as the backup file already exists, it will be replaced silently).
+This makes it possible to write a filter that rewrites its input file
+in place.  If the keyword argument <code><var>backup</var>='.&lt;some
+extension&gt;'</code> is also given, it specifies the extension for the backup
+file, and the backup file remains around; by default, the extension is
+<code>'.bak'</code> and it is deleted when the output file is closed.  In-place
+filtering is disabled when standard input is read.
+
+<p>
+<strong>Caveat:</strong> The current implementation does not work for MS-DOS
+8+3 filesystems.
+
+<p>
+The two following opening hooks are provided by this module:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2214' xml:id='l2h-2214' class="function">hook_compressed</tt></b>(</nobr></td>
+  <td><var>filename, mode</var>)</td></tr></table></dt>
+<dd>
+  Transparently opens files compressed with gzip and bzip2 (recognized
+  by the extensions <code>'.gz'</code> and <code>'.bz2'</code>) using the <tt class="module">gzip</tt>
+  and <tt class="module">bz2</tt> modules.  If the filename extension is not <code>'.gz'</code>
+  or <code>'.bz2'</code>, the file is opened normally (ie,
+  using <tt class="function">open()</tt> without any decompression).
+
+<p>
+Usage example: 
+  "<tt class="samp">fi = fileinput.FileInput(openhook=fileinput.hook_compressed)</tt>"
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2215' xml:id='l2h-2215' class="function">hook_encoded</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+  Returns a hook which opens each file with <tt class="function">codecs.open()</tt>,
+  using the given <var>encoding</var> to read the file.
+
+<p>
+Usage example:
+  "<tt class="samp">fi = fileinput.FileInput(openhook=fileinput.hook_encoded("iso-8859-1"))</tt>"
+<p>
+<span class="note"><b class="label">Note:</b>
+With this hook, <tt class="class">FileInput</tt> might return Unicode strings
+        depending on the specified <var>encoding</var>.</span>
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.1 os.path  "
+  href="module-os.path.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.3 stat  "
+  href="module-stat.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-os.path.html">11.1 os.path  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-stat.html">11.3 stat  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

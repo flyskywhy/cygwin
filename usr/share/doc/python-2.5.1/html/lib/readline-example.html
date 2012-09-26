@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-readline.html" />
+<link rel="parent" href="module-readline.html" />
+<link rel="next" href="module-rlcompleter.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>15.7.1 Example </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.7 readline  "
+  href="module-readline.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15.7 readline  "
+  href="module-readline.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.8 rlcompleter  "
+  href="module-rlcompleter.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-readline.html">15.7 readline  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-readline.html">15.7 readline  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-rlcompleter.html">15.8 rlcompleter  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0017710000000000000000"></a><a name="readline-example"></a>
+<br>
+15.7.1 Example 
+</h2>
+
+<p>
+The following example demonstrates how to use the
+<tt class="module">readline</tt> module's history reading and writing functions to
+automatically load and save a history file named <span class="file">.pyhist</span> from
+the user's home directory.  The code below would normally be executed
+automatically during interactive sessions from the user's
+<a class="envvar" id='l2h-3508' xml:id='l2h-3508'>PYTHONSTARTUP</a> file.
+
+<p>
+<div class="verbatim"><pre>
+import os
+histfile = os.path.join(os.environ["HOME"], ".pyhist")
+try:
+    readline.read_history_file(histfile)
+except IOError:
+    pass
+import atexit
+atexit.register(readline.write_history_file, histfile)
+del os, histfile
+</pre></div>
+
+<p>
+The following example extends the <tt class="class">code.InteractiveConsole</tt> class to
+support history save/restore.
+
+<p>
+<div class="verbatim"><pre>
+import code
+import readline
+import atexit
+import os
+
+class HistoryConsole(code.InteractiveConsole):
+    def __init__(self, locals=None, filename="&lt;console&gt;",
+                 histfile=os.path.expanduser("~/.console-history")):
+        code.InteractiveConsole.__init__(self)
+        self.init_history(histfile)
+
+    def init_history(self, histfile):
+        readline.parse_and_bind("tab: complete")
+        if hasattr(readline, "read_history_file"):
+            try:
+                readline.read_history_file(histfile)
+            except IOError:
+                pass
+            atexit.register(self.save_history, histfile)
+
+    def save_history(self, histfile):
+        readline.write_history_file(histfile)
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.7 readline  "
+  href="module-readline.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15.7 readline  "
+  href="module-readline.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.8 rlcompleter  "
+  href="module-rlcompleter.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-readline.html">15.7 readline  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-readline.html">15.7 readline  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-rlcompleter.html">15.8 rlcompleter  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

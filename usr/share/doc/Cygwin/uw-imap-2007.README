@@ -1,0 +1,179 @@
+uw-imap
+-------------------------------------------------------------------------------
+University of Washington IMAP Toolkit Environment
+
+Runtime requirements:
+  cygwin-1.5.25
+  openssl-0.9.8g
+  
+Build requirements:
+  cygwin-1.5.25
+  cygport-0.3.8
+  bash-3.2.33
+  gcc-3.4.4
+  binutils-20060817
+  make-3.81
+  sed-4.1.5
+  coreutils-6.9
+  findutils-4.3.13
+  openssl-0.9.8g
+  openssl-devel-0.9.8g
+
+Canonical homepage:
+  http://www.washington.edu/imap/
+
+Canonical download:
+  ftp://ftp.cac.washington.edu/imap/imap.tar.Z
+  
+License:
+  <Apache License>
+
+Language:
+  <C>
+
+-------------------------------------------------------------------------------
+
+Build instructions:
+  unpack uw-imap-2007-X-src.tar.bz2
+    if you use setup to install this src package, it will be
+ unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./uw-imap-2007-X.cygport all
+
+This will create:
+  /usr/src/uw-imap-2007-X-src.tar.bz2
+  /usr/src/uw-imap-2007-X.tar.bz2
+  /usr/src/uw-imap-imapd-2007-X.tar.bz2
+  /usr/src/uw-imap-util-2007-X.tar.bz2
+  /usr/src/c-client-2007-X.tar.bz2
+
+Or use 'cygport ./uw-imap-2007-X.cygport prep' to get a patched source directory
+  
+To find out the files included in the binary distribution, you can
+use "cygcheck -l uw-imap uw-imap-imapd uw-imap-util c-client", or browse the listing
+for the appropriate version at <http://cygwin.com/packages/>.
+
+-------------------------------------------------------------------------------
+
+Port Notes:
+
+----- version uw-imap-2007-2 --- 14-03-2008 ---
+
+ o Fixed packaging bug with man page symlinks
+
+----- version uw-imap-2007-1 --- 08-03-2008 ---
+
+ o New maintainer
+ o Switched to cygport build framework
+ o The imap daemon expects mail delivered to /var/spool/mail/<username>
+   The original port used /var/mail/<username>
+ o This IMAP toolkit build is build with SSL and it disables plaintext
+   passwords unless SSL/TLS encryption is in effect (SSLTYPE=nopwd).  This
+   produces an IMAP server which is compliant with RFC 3501 security
+   requirements. The old port was build with SSL but plaintext passwords
+   were allowed in insecure sessions.
+   
+   => Check the file /usr/share/doc/uw-imap-2007/docs/SSLBUILD how to setup
+      inetd/xinetd/certificates
+
+
+
+Original Port Notes:
+
+I've included the file "README.cygwin.txt" that came with the original port
+that I downloaded from sourceforge.  If you encounter any issues that aren't
+addressed here, perhaps that file will help.
+
+Running an IMAP server:
+Add the following line to your /etc/inetd.conf file to run an imap server
+under inetd (currently in the Cygwin inetutils package):
+imap stream tcp nowait root /usr/sbin/imapd
+
+Note:  there are also pop2d and pop3d daemons in the package to allow you to
+run a POP2 or POP3 server as well.  To be courteous of other packages, the
+imapd, ipop2d, and ipop3d paths are symlinks to the actual binaries, which are
+prefixed with uw-.
+
+Mail is delivered to /var/mail/<username>
+
+Injecting mail into the system:
+If you need a sendmail-type program to "inject" mail from the command line into
+the imap system, use the tmail program.  For example:
+
+From a procmail recipe that puts all of my cygwin mailing list mail into my
+"cygwin" imap folder:
+:0 wr
+* ^TO_cygwin@cygwin.com
+|/usr/bin/tmail Abe+cygwin
+
+From when I used to use fetchmail to directly inject all my mail:
+mda /usr/bin/tmail %T
+
+
+Building, History:
+	I got a good start by grabbing the package produced by the sourceforge
+project at http://sourceforge.net/projects/uw-imap-cygwin.  The current code
+at this site was a modified 2000a version of the imap toolkit as well as the
+(then) separate "imap-utils" package.  After downloading this code and running
+a diff against the original UW sources, I was able to generate a patch file.
+This patch file helped me to understand what type of issues the original
+Cygwin port maintainers faced.  With this in mind, I spent a few months off
+and on trying to track down a couple of troublesome issues that faced me while
+attempting to port the more recent versions in the 2001 and 2002 series.
+
+Problem #1 is that the imap toolkit was putting my INBOX into the windows
+system directory.
+Problem #2 is that the injector program "tmail" would give a strange error
+after I had fed it email.
+
+Tracking down the cause of problem #1 took the most time, and I eventually
+figured out that the code wasn't using pw_dir (the home directory) early enough.
+
+For #2, this took awhile because I didn't have the slightest clue about fork(),
+pipe(), and dup2()... all of which I had to figure out in finding the solution
+to the puzzle.  Eventually, I discovered that when the tmail program got the
+EOF after I had fed it an email, the stream passed to the child process created
+by fork() was closed.  Eventually, I discovered the "freopen" API, which
+allowed me to open the "/dev/conin" (e.g. stdin) device back up.
+
+
+Additional documentation is in the source distribution, in the docs directory.
+
+Original Cygwin Port Maintainers:
+Jim Grishaw (jgrishaw@myrealbox.com)
+Adrian Hall
+
+Original Author:
+University of Washington
+Mark Crispin
+
+
+----- version 2002e-3 -----
+Fixed CRAM-MD5 patch
+Fixed flockcyg.c code to be an advisory lock.
+
+----- version 2002e-2 -----
+Added c-client patch found in pine package.
+Point inetd entry in README.Cygwin.txt to /usr/sbin instead of /usr/local/sbin
+
+----- version 2002e-1 -----
+New version of UW imap-d.  Added patches from Kevin Camera.  Put /etc/passwd
+information back into README.Cygwin.txt.
+built for cygwin 1.5.2 (64 bit)
+
+----- version 2002d-2 -----
+Identical to 2002d-1, built for cygwin 1.5.0 (64 bit)
+
+----- version 2002d-1 -----
+New version of UW imap-d.  Contains cygwin fixes, so we don't need to patch
+anymore!
+Added c-client devel package
+
+----- version 2002c1-1 -----
+Initial release
+
+
+Cygwin port maintained by: Dr. Volker Zell  <dr.volker.zell@oracle.com>
+Original Cygwin port maintained by: Abraham Backus <abraham@backus.com>
+
+Please address all questions to the Cygwin mailing list at <cygwin@cygwin.com>

@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-textwrap.html" />
+<link rel="prev" href="module-StringIO.html" />
+<link rel="parent" href="strings.html" />
+<link rel="next" href="module-textwrap.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.6 cStringIO -- Faster version of StringIO</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.5 stringio  "
+  href="module-StringIO.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.7 textwrap  "
+  href="module-textwrap.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-StringIO.html">4.5 StringIO  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-textwrap.html">4.7 textwrap  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006600000000000000000">
+4.6 <tt class="module">cStringIO</tt> --
+         Faster version of <tt class="module">StringIO</tt></a>
+</h1>
+
+<p>
+<a name="module-cStringIO"></a>
+
+<p>
+The module <tt class="module">cStringIO</tt> provides an interface similar to that of
+the <tt class="module"><a href="module-StringIO.html">StringIO</a></tt> module.  Heavy use of <tt class="class">StringIO.StringIO</tt>
+objects can be made more efficient by using the function
+<tt class="function">StringIO()</tt> from this module instead.
+
+<p>
+Since this module provides a factory function which returns objects of
+built-in types, there's no way to build your own version using
+subclassing.  Use the original <tt class="module"><a href="module-StringIO.html">StringIO</a></tt> module in that case.
+
+<p>
+Unlike the memory files implemented by the <tt class="module"><a href="module-StringIO.html">StringIO</a></tt>
+module, those provided by this module are not able to accept Unicode
+strings that cannot be encoded as plain ASCII strings.
+
+<p>
+Another difference from the <tt class="module"><a href="module-StringIO.html">StringIO</a></tt> module is that calling
+<tt class="function">StringIO()</tt> with a string parameter creates a read-only object.
+Unlike an object created without a string parameter, it does not have
+write methods.  These objects are not generally visible.  They turn up in
+tracebacks as <tt class="class">StringI</tt> and <tt class="class">StringO</tt>.
+
+<p>
+The following data objects are provided as well:
+
+<p>
+<dl><dt><b><tt id='l2h-486' xml:id='l2h-486'>InputType</tt></b></dt>
+<dd>
+  The type object of the objects created by calling
+  <tt class="function">StringIO</tt> with a string parameter.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-487' xml:id='l2h-487'>OutputType</tt></b></dt>
+<dd>
+  The type object of the objects returned by calling
+  <tt class="function">StringIO</tt> with no parameters.
+</dd></dl>
+
+<p>
+There is a C API to the module as well; refer to the module source for 
+more information.
+
+<p>
+Example usage:
+
+<p>
+<div class="verbatim"><pre>
+import cStringIO
+
+output = cStringIO.StringIO()
+output.write('First line.\n')
+print &gt;&gt;output, 'Second line.'
+
+# Retrieve file contents -- this will be
+# 'First line.\nSecond line.\n'
+contents = output.getvalue()
+
+# Close object and discard memory buffer -- 
+# .getvalue() will now raise an exception.
+output.close()
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.5 stringio  "
+  href="module-StringIO.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.7 textwrap  "
+  href="module-textwrap.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-StringIO.html">4.5 StringIO  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-textwrap.html">4.7 textwrap  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

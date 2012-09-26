@@ -1,0 +1,82 @@
+################################################################################
+#
+# distutils.cygclass - functions for building Distutils Python modules
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: distutils.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+inherit python
+
+if ! defined ORIG_PN
+then
+	case ${PN} in
+		python-py*|python-*py)
+			ORIG_PN="${PN#python-}" ;;
+		python-*)
+			ORIG_PN="${PN/python-/py}" ;;
+	esac
+fi
+
+HOMEPAGE="http://cheeseshop.python.org/pypi/${ORIG_PN}"
+SRC_URI="http://cheeseshop.python.org/packages/source/${ORIG_PN:0:1}/${ORIG_PN}/${ORIG_PN}-${PV}.tar.gz"
+
+distutils_compile() {
+	if [ ! -e setup.py ]
+	then
+		error "No Python Distutils module detected"
+	fi
+
+	${PYTHON} setup.py config || error "setup.py config failed"
+	${PYTHON} setup.py build "${@}" || error "setup.py build failed"
+}
+
+distutils_test() {
+	:
+}
+
+distutils_install() {
+	if [ ! -e setup.py ]
+	then
+		error "No Python Distutils module detected"
+	fi
+
+	${PYTHON} setup.py install -O0 --root=${D} "${@}" || error "setup.py install failed"
+
+	if [ -d ${D}${PYTHON_SITELIB} ]
+	then
+		python_optimize ${PYTHON_SITELIB}
+	fi
+}
+
+src_compile() {
+	lndirs
+	cd ${B}
+	distutils_compile
+}
+
+src_test() {
+	distutils_test
+}
+
+src_install() {
+	cd ${B}
+	distutils_install
+}

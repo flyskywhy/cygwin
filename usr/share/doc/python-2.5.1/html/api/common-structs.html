@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="type-structs.html" />
+<link rel="prev" href="allocating-objects.html" />
+<link rel="parent" href="newTypes.html" />
+<link rel="next" href="type-structs.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>10.2 Common Object Structures </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10.1 allocating Objects on"
+  href="allocating-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.3 type Objects"
+  href="type-structs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="allocating-objects.html">10.1 Allocating Objects on</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="type-structs.html">10.3 Type Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0012200000000000000000"></a><a name="common-structs"></a>
+<br>
+10.2 Common Object Structures 
+</h1>
+
+<p>
+There are a large number of structures which are used in the
+definition of object types for Python.  This section describes these
+structures and how they are used.
+
+<p>
+All Python objects ultimately share a small number of fields at the
+beginning of the object's representation in memory.  These are
+represented by the <tt class="ctype">PyObject</tt> and <tt class="ctype">PyVarObject</tt> types,
+which are defined, in turn, by the expansions of some macros also
+used, whether directly or indirectly, in the definition of all other
+Python objects.
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-963' xml:id='l2h-963'>PyObject</a></tt></b></dt>
+<dd>
+  All object types are extensions of this type.  This is a type which
+  contains the information Python needs to treat a pointer to an
+  object as an object.  In a normal ``release'' build, it contains
+  only the objects reference count and a pointer to the corresponding
+  type object.  It corresponds to the fields defined by the
+  expansion of the <code>PyObject_HEAD</code> macro.
+</dl>
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-964' xml:id='l2h-964'>PyVarObject</a></tt></b></dt>
+<dd>
+  This is an extension of <tt class="ctype">PyObject</tt> that adds the
+  <tt class="member">ob_size</tt> field.  This is only used for objects that have
+  some notion of <em>length</em>.  This type does not often appear in
+  the Python/C API.  It corresponds to the fields defined by the
+  expansion of the <code>PyObject_VAR_HEAD</code> macro.
+</dl>
+
+<p>
+These macros are used in the definition of <tt class="ctype">PyObject</tt> and
+<tt class="ctype">PyVarObject</tt>:
+
+<p>
+<dl><dt><b><tt id='l2h-965' xml:id='l2h-965' class="macro">PyObject_HEAD</tt></b></dt>
+<dd>
+  This is a macro which expands to the declarations of the fields of
+  the <tt class="ctype">PyObject</tt> type; it is used when declaring new types which
+  represent objects without a varying length.  The specific fields it
+  expands to depend on the definition of
+  Py_TRACE_REFS.  By default, that macro is not
+  defined, and PyObject_HEAD expands to:
+  <div class="verbatim"><pre>
+    Py_ssize_t ob_refcnt;
+    PyTypeObject *ob_type;
+</pre></div>
+  When Py_TRACE_REFS is defined, it expands to:
+  <div class="verbatim"><pre>
+    PyObject *_ob_next, *_ob_prev;
+    Py_ssize_t ob_refcnt;
+    PyTypeObject *ob_type;
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-966' xml:id='l2h-966' class="macro">PyObject_VAR_HEAD</tt></b></dt>
+<dd>
+  This is a macro which expands to the declarations of the fields of
+  the <tt class="ctype">PyVarObject</tt> type; it is used when declaring new types which
+  represent objects with a length that varies from instance to
+  instance.  This macro always expands to:
+  <div class="verbatim"><pre>
+    PyObject_HEAD
+    Py_ssize_t ob_size;
+</pre></div>
+  Note that PyObject_HEAD is part of the expansion, and
+  that its own expansion varies depending on the definition of
+  Py_TRACE_REFS.
+</dl>
+
+<p>
+PyObject_HEAD_INIT
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-967' xml:id='l2h-967'>PyCFunction</a></tt></b></dt>
+<dd>
+  Type of the functions used to implement most Python callables in C.
+  Functions of this type take two <tt class="ctype">PyObject*</tt> parameters and
+  return one such value.  If the return value is <tt class="constant">NULL</tt>, an exception
+  shall have been set.  If not <tt class="constant">NULL</tt>, the return value is interpreted
+  as the return value of the function as exposed in Python.  The
+  function must return a new reference.
+</dl>
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-968' xml:id='l2h-968'>PyMethodDef</a></tt></b></dt>
+<dd>
+  Structure used to describe a method of an extension type.  This
+  structure has four fields:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Field</th>
+      <th class="left"  >C Type</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><tt class="member">ml_name</tt></td>
+        <td class="left"  >char *</td>
+        <td class="left"  >name of the method</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">ml_meth</tt></td>
+        <td class="left"  >PyCFunction</td>
+        <td class="left"  >pointer to the C implementation</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">ml_flags</tt></td>
+        <td class="left"  >int</td>
+        <td class="left"  >flag bits indicating how the call should be
+                            constructed</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">ml_doc</tt></td>
+        <td class="left"  >char *</td>
+        <td class="left"  >points to the contents of the docstring</td></tr></tbody>
+</table></div>
+</dl>
+
+<p>
+The <tt class="member">ml_meth</tt> is a C function pointer.  The functions may be of
+different types, but they always return <tt class="ctype">PyObject*</tt>.  If the
+function is not of the <tt class="ctype">PyCFunction</tt>, the compiler will require
+a cast in the method table.  Even though <tt class="ctype">PyCFunction</tt> defines
+the first parameter as <tt class="ctype">PyObject*</tt>, it is common that the method
+implementation uses a the specific C type of the <var>self</var> object.
+
+<p>
+The <tt class="member">ml_flags</tt> field is a bitfield which can include the
+following flags.  The individual flags indicate either a calling
+convention or a binding convention.  Of the calling convention flags,
+only <tt class="constant">METH_VARARGS</tt> and <tt class="constant">METH_KEYWORDS</tt> can be
+combined (but note that <tt class="constant">METH_KEYWORDS</tt> alone is equivalent
+to <code><tt class="constant">METH_VARARGS</tt> | <tt class="constant">METH_KEYWORDS</tt></code>).
+Any of the calling convention flags can be combined with a
+binding flag.
+
+<p>
+<dl><dt><b><tt id='l2h-969' xml:id='l2h-969'>METH_VARARGS</tt></b></dt>
+<dd>
+  This is the typical calling convention, where the methods have the
+  type <tt class="ctype">PyCFunction</tt>. The function expects two
+  <tt class="ctype">PyObject*</tt> values.  The first one is the <var>self</var> object for
+  methods; for module functions, it has the value given to
+  <tt class="cfunction">Py_InitModule4()</tt> (or <tt class="constant">NULL</tt> if
+  <tt class="cfunction">Py_InitModule()</tt> was used).  The second parameter
+  (often called <var>args</var>) is a tuple object representing all
+  arguments. This parameter is typically processed using
+  <tt class="cfunction">PyArg_ParseTuple()</tt> or <tt class="cfunction">PyArg_UnpackTuple</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-970' xml:id='l2h-970'>METH_KEYWORDS</tt></b></dt>
+<dd>
+  Methods with these flags must be of type
+  <tt class="ctype">PyCFunctionWithKeywords</tt>.  The function expects three
+  parameters: <var>self</var>, <var>args</var>, and a dictionary of all the
+  keyword arguments.  The flag is typically combined with
+  <tt class="constant">METH_VARARGS</tt>, and the parameters are typically processed
+  using <tt class="cfunction">PyArg_ParseTupleAndKeywords()</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-971' xml:id='l2h-971'>METH_NOARGS</tt></b></dt>
+<dd>
+  Methods without parameters don't need to check whether arguments are
+  given if they are listed with the <tt class="constant">METH_NOARGS</tt> flag.  They
+  need to be of type <tt class="ctype">PyCFunction</tt>.  When used with object
+  methods, the first parameter is typically named <code>self</code> and will
+  hold a reference to the object instance.  In all cases the second
+  parameter will be <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-972' xml:id='l2h-972'>METH_O</tt></b></dt>
+<dd>
+  Methods with a single object argument can be listed with the
+  <tt class="constant">METH_O</tt> flag, instead of invoking
+  <tt class="cfunction">PyArg_ParseTuple()</tt> with a <code>"O"</code> argument. They have
+  the type <tt class="ctype">PyCFunction</tt>, with the <var>self</var> parameter, and a
+  <tt class="ctype">PyObject*</tt> parameter representing the single argument.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-973' xml:id='l2h-973'>METH_OLDARGS</tt></b></dt>
+<dd>
+  This calling convention is deprecated.  The method must be of type
+  <tt class="ctype">PyCFunction</tt>.  The second argument is <tt class="constant">NULL</tt> if no arguments
+  are given, a single object if exactly one argument is given, and a
+  tuple of objects if more than one argument is given.  There is no
+  way for a function using this convention to distinguish between a
+  call with multiple arguments and a call with a tuple as the only
+  argument.
+</dd></dl>
+
+<p>
+These two constants are not used to indicate the calling convention
+but the binding when use with methods of classes.  These may not be
+used for functions defined for modules.  At most one of these flags
+may be set for any given method.
+
+<p>
+<dl><dt><b><tt id='l2h-974' xml:id='l2h-974'>METH_CLASS</tt></b></dt>
+<dd>
+  The method will be passed the type object as the first parameter
+  rather than an instance of the type.  This is used to create
+  <em>class methods</em>, similar to what is created when using the
+  <tt class="function">classmethod()</tt><a id='l2h-975' xml:id='l2h-975'></a> built-in
+  function.
+  
+<span class="versionnote">New in version 2.3.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-976' xml:id='l2h-976'>METH_STATIC</tt></b></dt>
+<dd>
+  The method will be passed <tt class="constant">NULL</tt> as the first parameter rather than
+  an instance of the type.  This is used to create <em>static
+  methods</em>, similar to what is created when using the
+  <tt class="function">staticmethod()</tt><a id='l2h-977' xml:id='l2h-977'></a> built-in
+  function.
+  
+<span class="versionnote">New in version 2.3.</span>
+
+</dd></dl>
+
+<p>
+One other constant controls whether a method is loaded in place of
+another definition with the same method name.
+
+<p>
+<dl><dt><b><tt id='l2h-978' xml:id='l2h-978'>METH_COEXIST</tt></b></dt>
+<dd>
+  The method will be loaded in place of existing definitions.  Without
+  <var>METH_COEXIST</var>, the default is to skip repeated definitions.  Since
+  slot wrappers are loaded before the method table, the existence of a
+  <var>sq_contains</var> slot, for example, would generate a wrapped method
+  named <tt class="method">__contains__()</tt> and preclude the loading of a
+  corresponding PyCFunction with the same name.  With the flag defined,
+  the PyCFunction will be loaded in place of the wrapper object and will
+  co-exist with the slot.  This is helpful because calls to PyCFunctions
+  are optimized more than wrapper object calls.
+  
+<span class="versionnote">New in version 2.4.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-979' xml:id='l2h-979' class="cfunction">Py_FindMethod</tt></b>(</nobr></td><td>PyMethodDef table[],
+                                            PyObject *<var>ob</var>, char *<var>name</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a bound method object for an extension type implemented in
+  C.  This can be useful in the implementation of a
+  <tt class="member">tp_getattro</tt> or <tt class="member">tp_getattr</tt> handler that does not
+  use the <tt class="cfunction">PyObject_GenericGetAttr()</tt> function.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10.1 allocating Objects on"
+  href="allocating-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.3 type Objects"
+  href="type-structs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="allocating-objects.html">10.1 Allocating Objects on</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="type-structs.html">10.3 Type Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-shutil.html" />
+<link rel="prev" href="module-fnmatch.html" />
+<link rel="parent" href="filesys.html" />
+<link rel="next" href="module-shutil.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.9 linecache -- Random access to text lines</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.8 fnmatch  "
+  href="module-fnmatch.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.10 shutil  "
+  href="module-shutil.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-fnmatch.html">11.8 fnmatch  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-shutil.html">11.10 shutil  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0013900000000000000000">
+11.9 <tt class="module">linecache</tt> --
+         Random access to text lines</a>
+</h1>
+
+<p>
+<a name="module-linecache"></a>
+
+<p>
+The <tt class="module">linecache</tt> module allows one to get any line from any file,
+while attempting to optimize internally, using a cache, the common case
+where many lines are read from a single file.  This is used by the
+<tt class="module"><a href="module-traceback.html">traceback</a></tt> module to retrieve source lines for inclusion in 
+the formatted traceback.
+
+<p>
+The <tt class="module">linecache</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2295' xml:id='l2h-2295' class="function">getline</tt></b>(</nobr></td>
+  <td><var>filename, lineno</var><big>[</big><var>, module_globals</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Get line <var>lineno</var> from file named <var>filename</var>. This function
+will never throw an exception -- it will return <code>''</code> on errors
+(the terminating newline character will be included for lines that are
+found).
+
+<p>
+If a file named <var>filename</var> is not found, the function will look
+for it in the module<a id='l2h-2296' xml:id='l2h-2296'></a> search path,
+<code>sys.path</code>, after first checking for a <a class="rfc" id='rfcref-100626' xml:id='rfcref-100626'
+href="http://www.python.org/peps/pep-0302.html">PEP 302</a> <code>__loader__</code>
+in <var>module_globals</var>, in case the module was imported from a zipfile
+or other non-filesystem import source. 
+
+<p>
+
+<span class="versionnote">New in version 2.5:
+The <var>module_globals</var> parameter was added.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2297' xml:id='l2h-2297' class="function">clearcache</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Clear the cache.  Use this function if you no longer need lines from
+files previously read using <tt class="function">getline()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2298' xml:id='l2h-2298' class="function">checkcache</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>filename</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Check the cache for validity.  Use this function if files in the cache 
+may have changed on disk, and you require the updated version.  If
+<var>filename</var> is omitted, it will check all the entries in the cache.
+</dl>
+
+<p>
+Example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import linecache
+&gt;&gt;&gt; linecache.getline('/etc/passwd', 4)
+'sys:x:3:3:sys:/dev:/bin/sh\n'
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.8 fnmatch  "
+  href="module-fnmatch.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.10 shutil  "
+  href="module-shutil.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-fnmatch.html">11.8 fnmatch  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-shutil.html">11.10 shutil  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-how-callbacks-called.html" />
+<link rel="prev" href="optparse-option-callbacks.html" />
+<link rel="parent" href="optparse-option-callbacks.html" />
+<link rel="next" href="optparse-how-callbacks-called.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.4.1 Defining a callback option</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.4.2 how callbacks are"
+  href="optparse-how-callbacks-called.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-how-callbacks-called.html">14.3.4.2 How callbacks are</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016341000000000000000"></a><a name="optparse-defining-callback-option"></a>
+<br>
+14.3.4.1 Defining a callback option
+</h3>
+
+<p>
+As always, the easiest way to define a callback option is by using the
+<code>parser.add_option()</code> method.  Apart from <tt class="member">action</tt>, the only option
+attribute you must specify is <code>callback</code>, the function to call:
+<div class="verbatim"><pre>
+parser.add_option("-c", action="callback", callback=my_callback)
+</pre></div>
+
+<p>
+<code>callback</code> is a function (or other callable object), so you must have
+already defined <code>my_callback()</code> when you create this callback option.
+In this simple case, <tt class="module">optparse</tt> doesn't even know if <b class="programopt">-c</b> takes any
+arguments, which usually means that the option takes no arguments--the
+mere presence of <b class="programopt">-c</b> on the command-line is all it needs to know.  In
+some circumstances, though, you might want your callback to consume an
+arbitrary number of command-line arguments.  This is where writing
+callbacks gets tricky; it's covered later in this section.
+
+<p>
+<tt class="module">optparse</tt> always passes four particular arguments to your callback, and it
+will only pass additional arguments if you specify them via
+<code>callback_args</code> and <code>callback_kwargs</code>.  Thus, the minimal callback
+function signature is:
+<div class="verbatim"><pre>
+def my_callback(option, opt, value, parser):
+</pre></div>
+
+<p>
+The four arguments to a callback are described below.
+
+<p>
+There are several other option attributes that you can supply when you
+define a callback option:
+<dl>
+<dt><strong><tt class="member">type</tt></strong></dt>
+<dd>has its usual meaning: as with the <code>store</code> or <code>append</code> actions,
+it instructs <tt class="module">optparse</tt> to consume one argument and convert it to
+<tt class="member">type</tt>.  Rather than storing the converted value(s) anywhere,
+though, <tt class="module">optparse</tt> passes it to your callback function.
+</dd>
+<dt><strong><code>nargs</code></strong></dt>
+<dd>also has its usual meaning: if it is supplied and &gt; 1, <tt class="module">optparse</tt> will
+consume <code>nargs</code> arguments, each of which must be convertible to
+<tt class="member">type</tt>.  It then passes a tuple of converted values to your
+callback.
+</dd>
+<dt><strong><code>callback_args</code></strong></dt>
+<dd>a tuple of extra positional arguments to pass to the callback
+</dd>
+<dt><strong><code>callback_kwargs</code></strong></dt>
+<dd>a dictionary of extra keyword arguments to pass to the callback
+</dd>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.4.2 how callbacks are"
+  href="optparse-how-callbacks-called.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-how-callbacks-called.html">14.3.4.2 How callbacks are</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

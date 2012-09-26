@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-314.html" />
+<link rel="prev" href="pep-308.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-314.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2 PEP 309: Partial Function Application</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1 pep 308: Conditional"
+  href="pep-308.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3 pep 314: Metadata"
+  href="pep-314.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-308.html">1 PEP 308: Conditional</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-314.html">3 PEP 314: Metadata</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION000300000000000000000"></a><a name="pep-309"></a>
+<br>
+2 PEP 309: Partial Function Application
+</h1>
+
+<p>
+The <tt class="module">functools</tt> module is intended to contain tools for
+functional-style programming.  
+
+<p>
+One useful tool in this module is the <tt class="function">partial()</tt> function.
+For programs written in a functional style, you'll sometimes want to
+construct variants of existing functions that have some of the
+parameters filled in.  Consider a Python function <code>f(a, b, c)</code>;
+you could create a new function <code>g(b, c)</code> that was equivalent to
+<code>f(1, b, c)</code>.  This is called ``partial function application''.
+
+<p>
+<tt class="function">partial</tt> takes the arguments
+<code>(<var>function</var>, <var>arg1</var>, <var>arg2</var>, ...
+<var>kwarg1</var>=<var>value1</var>, <var>kwarg2</var>=<var>value2</var>)</code>.  The resulting
+object is callable, so you can just call it to invoke <var>function</var>
+with the filled-in arguments.
+
+<p>
+Here's a small but realistic example:
+
+<p>
+<div class="verbatim"><pre>
+import functools
+
+def log (message, subsystem):
+    "Write the contents of 'message' to the specified subsystem."
+    print '%s: %s' % (subsystem, message)
+    ...
+
+server_log = functools.partial(log, subsystem='server')
+server_log('Unable to open socket')
+</pre></div>
+
+<p>
+Here's another example, from a program that uses PyGTK.  Here a
+context-sensitive pop-up menu is being constructed dynamically.  The
+callback provided for the menu option is a partially applied version
+of the <tt class="method">open_item()</tt> method, where the first argument has been
+provided.
+
+<p>
+<div class="verbatim"><pre>
+...
+class Application:
+    def open_item(self, path):
+       ...
+    def init (self):
+        open_func = functools.partial(self.open_item, item_path)
+        popup_menu.append( ("Open", open_func, 1) )
+</pre></div>
+
+<p>
+Another function in the <tt class="module">functools</tt> module is the
+<tt class="function">update_wrapper(<var>wrapper</var>, <var>wrapped</var>)</tt> function that
+helps you write well-behaved decorators.  <tt class="function">update_wrapper()</tt>
+copies the name, module, and docstring attribute to a wrapper function
+so that tracebacks inside the wrapped function are easier to
+understand.  For example, you might write:
+
+<p>
+<div class="verbatim"><pre>
+def my_decorator(f):
+    def wrapper(*args, **kwds):
+        print 'Calling decorated function'
+        return f(*args, **kwds)
+    functools.update_wrapper(wrapper, f)
+    return wrapper
+</pre></div>
+
+<p>
+<tt class="function">wraps()</tt> is a decorator that can be used inside your own
+decorators to copy the wrapped function's information.  An alternate 
+version of the previous example would be:
+
+<p>
+<div class="verbatim"><pre>
+def my_decorator(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwds):
+        print 'Calling decorated function'
+        return f(*args, **kwds)
+    return wrapper
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0309.html"
+        title="Partial function Application"
+        >PEP 309, <em>Partial Function Application</em></a>
+    <dd>PEP proposed and written by
+Peter Harris; implemented by Hye-Shik Chang and Nick Coghlan, with
+adaptations by Raymond Hettinger.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1 pep 308: Conditional"
+  href="pep-308.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3 pep 314: Metadata"
+  href="pep-314.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-308.html">1 PEP 308: Conditional</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-314.html">3 PEP 314: Metadata</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="weakref-example.html" />
+<link rel="prev" href="module-weakref.html" />
+<link rel="parent" href="module-weakref.html" />
+<link rel="next" href="weakref-example.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.11.1 Weak Reference Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.11 weakref  "
+  href="module-weakref.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.11 weakref  "
+  href="module-weakref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.11.2 Example"
+  href="weakref-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-weakref.html">5.11 weakref  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-weakref.html">5.11 weakref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-example.html">5.11.2 Example</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0071110000000000000000"></a><a name="weakref-objects"></a>
+<br>
+5.11.1 Weak Reference Objects
+            
+</h2>
+
+<p>
+Weak reference objects have no attributes or methods, but do allow the
+referent to be obtained, if it still exists, by calling it:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import weakref
+&gt;&gt;&gt; class Object:
+...     pass
+...
+&gt;&gt;&gt; o = Object()
+&gt;&gt;&gt; r = weakref.ref(o)
+&gt;&gt;&gt; o2 = r()
+&gt;&gt;&gt; o is o2
+True
+</pre></div>
+
+<p>
+If the referent no longer exists, calling the reference object returns
+<tt class="constant">None</tt>:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; del o, o2
+&gt;&gt;&gt; print r()
+None
+</pre></div>
+
+<p>
+Testing that a weak reference object is still live should be done
+using the expression <code><var>ref</var>() is not None</code>.  Normally,
+application code that needs to use a reference object should follow
+this pattern:
+
+<p>
+<div class="verbatim"><pre>
+# r is a weak reference object
+o = r()
+if o is None:
+    # referent has been garbage collected
+    print "Object has been deallocated; can't frobnicate."
+else:
+    print "Object is still live!"
+    o.do_something_useful()
+</pre></div>
+
+<p>
+Using a separate test for ``liveness'' creates race conditions in
+threaded applications; another thread can cause a weak reference to
+become invalidated before the weak reference is called; the
+idiom shown above is safe in threaded applications as well as
+single-threaded applications.
+
+<p>
+Specialized versions of <tt class="class">ref</tt> objects can be created through
+subclassing.  This is used in the implementation of the
+<tt class="class">WeakValueDictionary</tt> to reduce the memory overhead for each
+entry in the mapping.  This may be most useful to associate additional
+information with a reference, but could also be used to insert
+additional processing on calls to retrieve the referent.
+
+<p>
+This example shows how a subclass of <tt class="class">ref</tt> can be used to store
+additional information about an object and affect the value that's
+returned when the referent is accessed:
+
+<p>
+<div class="verbatim"><pre>
+import weakref
+
+class ExtendedRef(weakref.ref):
+    def __init__(self, ob, callback=None, **annotations):
+        super(ExtendedRef, self).__init__(ob, callback)
+        self.__counter = 0
+        for k, v in annotations.iteritems():
+            setattr(self, k, v)
+
+    def __call__(self):
+        """Return a pair containing the referent and the number of
+        times the reference has been called.
+        """
+        ob = super(ExtendedRef, self).__call__()
+        if ob is not None:
+            self.__counter += 1
+            ob = (ob, self.__counter)
+        return ob
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.11 weakref  "
+  href="module-weakref.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.11 weakref  "
+  href="module-weakref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.11.2 Example"
+  href="weakref-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-weakref.html">5.11 weakref  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-weakref.html">5.11 weakref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-example.html">5.11.2 Example</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

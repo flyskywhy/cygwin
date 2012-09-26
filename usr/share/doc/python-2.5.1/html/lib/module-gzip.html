@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-bz2.html" />
+<link rel="prev" href="module-zlib.html" />
+<link rel="parent" href="archiving.html" />
+<link rel="next" href="module-bz2.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>12.2 gzip -- Support for gzip files</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="12.1 zlib  "
+  href="module-zlib.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="12. data Compression and"
+  href="archiving.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12.3 bz2  "
+  href="module-bz2.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-zlib.html">12.1 zlib  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="archiving.html">12. Data Compression and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-bz2.html">12.3 bz2  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0014200000000000000000">
+12.2 <tt class="module">gzip</tt> --
+         Support for <b class="program">gzip</b> files</a>
+</h1>
+
+<p>
+<a name="module-gzip"></a>
+
+<p>
+The data compression provided by the <code>zlib</code> module is compatible
+with that used by the GNU compression program <b class="program">gzip</b>.
+Accordingly, the <tt class="module">gzip</tt> module provides the <tt class="class">GzipFile</tt>
+class to read and write <b class="program">gzip</b>-format files, automatically
+compressing or decompressing the data so it looks like an ordinary
+file object.  Note that additional file formats which can be
+decompressed by the <b class="program">gzip</b> and <b class="program">gunzip</b> programs, such 
+as those produced by <b class="program">compress</b> and <b class="program">pack</b>, are not
+supported by this module.
+
+<p>
+The module defines the following items:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-2335' xml:id='l2h-2335' class="class">GzipFile</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>filename</var><big>[</big><var>, mode</var><big>[</big><var>,
+                            compresslevel</var><big>[</big><var>, fileobj</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Constructor for the <tt class="class">GzipFile</tt> class, which simulates most of
+the methods of a file object, with the exception of the <tt class="method">readinto()</tt>
+and <tt class="method">truncate()</tt> methods.  At least one of
+<var>fileobj</var> and <var>filename</var> must be given a non-trivial value.
+
+<p>
+The new class instance is based on <var>fileobj</var>, which can be a
+regular file, a <tt class="class">StringIO</tt> object, or any other object which
+simulates a file.  It defaults to <code>None</code>, in which case
+<var>filename</var> is opened to provide a file object.
+
+<p>
+When <var>fileobj</var> is not <code>None</code>, the <var>filename</var> argument is
+only used to be included in the <b class="program">gzip</b> file header, which may
+includes the original filename of the uncompressed file.  It defaults
+to the filename of <var>fileobj</var>, if discernible; otherwise, it
+defaults to the empty string, and in this case the original filename
+is not included in the header.
+
+<p>
+The <var>mode</var> argument can be any of <code>'r'</code>, <code>'rb'</code>,
+<code>'a'</code>, <code>'ab'</code>, <code>'w'</code>, or <code>'wb'</code>, depending on
+whether the file will be read or written.  The default is the mode of
+<var>fileobj</var> if discernible; otherwise, the default is <code>'rb'</code>.
+If not given, the 'b' flag will be added to the mode to ensure the
+file is opened in binary mode for cross-platform portability.
+
+<p>
+The <var>compresslevel</var> argument is an integer from <code>1</code> to
+<code>9</code> controlling the level of compression; <code>1</code> is fastest and
+produces the least compression, and <code>9</code> is slowest and produces
+the most compression.  The default is <code>9</code>.
+
+<p>
+Calling a <tt class="class">GzipFile</tt> object's <tt class="method">close()</tt> method does not
+close <var>fileobj</var>, since you might wish to append more material
+after the compressed data.  This also allows you to pass a
+<tt class="class">StringIO</tt> object opened for writing as <var>fileobj</var>, and
+retrieve the resulting memory buffer using the <tt class="class">StringIO</tt>
+object's <tt class="method">getvalue()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2336' xml:id='l2h-2336' class="function">open</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, mode</var><big>[</big><var>, compresslevel</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a shorthand for <code>GzipFile(<var>filename</var>,</code>
+<code><var>mode</var>,</code> <code><var>compresslevel</var>)</code>.  The <var>filename</var>
+argument is required; <var>mode</var> defaults to <code>'rb'</code> and
+<var>compresslevel</var> defaults to <code>9</code>.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-zlib.html">zlib</a></tt>:</b>
+    <dd>The basic data compression module needed to support
+                   the <b class="program">gzip</b> file format.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="12.1 zlib  "
+  href="module-zlib.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="12. data Compression and"
+  href="archiving.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12.3 bz2  "
+  href="module-bz2.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-zlib.html">12.1 zlib  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="archiving.html">12. Data Compression and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-bz2.html">12.3 bz2  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

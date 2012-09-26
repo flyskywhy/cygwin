@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="inst.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="inst.html" title='Installing python Modules' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="search-path.html" />
+<link rel="prev" href="standard-install.html" />
+<link rel="parent" href="inst.html" />
+<link rel="next" href="search-path.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3 Alternate Installation</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2 standard Build and"
+  href="standard-install.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Installing python Modules"
+  href="inst.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4 custom Installation"
+  href="search-path.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Installing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="standard-install.html">2 Standard Build and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="inst.html">Installing Python Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="search-path.html">4 Custom Installation</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="alt-install-windows.html#SECTION000310000000000000000">3.1 Alternate installation: the home scheme</a>
+<li><a href="alt-install-windows.html#SECTION000320000000000000000">3.2 Alternate installation: <span class="Unix">Unix</span> (the prefix scheme)</a>
+<li><a href="alt-install-windows.html#SECTION000330000000000000000">3.3 Alternate installation: Windows (the prefix scheme)</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION000300000000000000000"></a>
+<a name="alt-install"></a>
+<br>
+3 Alternate Installation
+</h1>
+
+<p>
+Often, it is necessary or desirable to install modules to a location
+other than the standard location for third-party Python modules.  For
+example, on a <span class="Unix">Unix</span> system you might not have permission to write to the
+standard third-party module directory.  Or you might wish to try out a
+module before making it a standard part of your local Python
+installation.  This is especially true when upgrading a distribution
+already present: you want to make sure your existing base of scripts
+still works with the new version before actually upgrading.
+
+<p>
+The Distutils <code class="du-command">install</code> command is designed to make installing
+module distributions to an alternate location simple and painless.  The
+basic idea is that you supply a base directory for the installation, and
+the <code class="du-command">install</code> command picks a set of directories (called an
+<em>installation scheme</em>) under this base directory in which to
+install files.  The details differ across platforms, so read whichever
+of the following sections applies to you.
+
+<p>
+
+<h2><a name="SECTION000310000000000000000"></a>
+<a name="alt-install-prefix"></a>
+<br>
+3.1 Alternate installation: the home scheme
+</h2>
+
+<p>
+The idea behind the ``home scheme'' is that you build and maintain a
+personal stash of Python modules.  This scheme's name is derived from
+the idea of a ``home'' directory on <span class="Unix">Unix</span>, since it's not unusual for
+a <span class="Unix">Unix</span> user to make their home directory have a layout similar to
+<span class="file">/usr/</span> or <span class="file">/usr/local/</span>.  This scheme can be used by
+anyone, regardless of the operating system their installing for.
+
+<p>
+Installing a new module distribution is as simple as
+
+<p>
+<div class="verbatim"><pre>
+python setup.py install --home=&lt;dir&gt;
+</pre></div>
+
+<p>
+where you can supply any directory you like for the
+<b class="programopt">--home</b> option.  On <span class="Unix">Unix</span>, lazy typists can just type a
+tilde (<code>~</code>); the <code class="du-command">install</code> command will
+expand this to your home directory:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py install --home=~
+</pre></div>
+
+<p>
+The <b class="programopt">--home</b> option defines the installation base
+directory.  Files are installed to the following directories under the
+installation base as follows:
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Type of file</th>
+      <th class="left"  >Installation Directory</th>
+      <th class="left"  >Override option</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline">pure module distribution</td>
+        <td class="left"  ><span class="du-filevar">home</span><span class="file">/lib/python</span></td>
+        <td class="left"  ><b class="programopt">--install-purelib</b></td></tr>
+    <tr><td class="left"   valign="baseline">non-pure module distribution</td>
+        <td class="left"  ><span class="du-filevar">home</span><span class="file">/lib/python</span></td>
+        <td class="left"  ><b class="programopt">--install-platlib</b></td></tr>
+    <tr><td class="left"   valign="baseline">scripts</td>
+        <td class="left"  ><span class="du-filevar">home</span><span class="file">/bin</span></td>
+        <td class="left"  ><b class="programopt">--install-scripts</b></td></tr>
+    <tr><td class="left"   valign="baseline">data</td>
+        <td class="left"  ><span class="du-filevar">home</span><span class="file">/share</span></td>
+        <td class="left"  ><b class="programopt">--install-data</b></td></tr></tbody>
+</table></div>
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+The <b class="programopt">--home</b> option used to be supported
+                only on <span class="Unix">Unix</span>.</span>
+
+<p>
+
+<h2><a name="SECTION000320000000000000000"></a>
+<a name="alt-install-home"></a>
+<br>
+3.2 Alternate installation: <span class="Unix">Unix</span> (the prefix scheme)
+</h2>
+
+<p>
+The ``prefix scheme'' is useful when you wish to use one Python
+installation to perform the build/install (i.e., to run the setup
+script), but install modules into the third-party module directory of a
+different Python installation (or something that looks like a different
+Python installation).  If this sounds a trifle unusual, it is--that's
+why the ``home scheme'' comes first.  However, there are at least two
+known cases where the prefix scheme will be useful.
+
+<p>
+First, consider that many Linux distributions put Python in <span class="file">/usr</span>,
+rather than the more traditional <span class="file">/usr/local</span>.  This is entirely
+appropriate, since in those cases Python is part of ``the system''
+rather than a local add-on.  However, if you are installing Python
+modules from source, you probably want them to go in
+<span class="file">/usr/local/lib/python2.<span class="du-filevar">X</span></span> rather than
+<span class="file">/usr/lib/python2.<span class="du-filevar">X</span></span>.  This can be done with
+
+<p>
+<div class="verbatim"><pre>
+/usr/bin/python setup.py install --prefix=/usr/local
+</pre></div>
+
+<p>
+Another possibility is a network filesystem where the name used to write
+to a remote directory is different from the name used to read it: for
+example, the Python interpreter accessed as <span class="file">/usr/local/bin/python</span>
+might search for modules in <span class="file">/usr/local/lib/python2.<span class="du-filevar">X</span></span>,
+but those modules would have to be installed to, say,
+<span class="file">/mnt/<span class="du-filevar">@server</span>/export/lib/python2.<span class="du-filevar">X</span></span>.  This
+could be done with
+
+<p>
+<div class="verbatim"><pre>
+/usr/local/bin/python setup.py install --prefix=/mnt/@server/export
+</pre></div>
+
+<p>
+In either case, the <b class="programopt">--prefix</b> option defines the
+installation base, and the <b class="programopt">--exec-prefix</b> option defines
+the platform-specific installation base, which is used for
+platform-specific files.  (Currently, this just means non-pure module
+distributions, but could be expanded to C libraries, binary executables,
+etc.)  If <b class="programopt">--exec-prefix</b> is not supplied, it defaults to
+<b class="programopt">--prefix</b>.  Files are installed as follows:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Type of file</th>
+      <th class="left"  >Installation Directory</th>
+      <th class="left"  >Override option</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline">pure module distribution</td>
+        <td class="left"  ><span class="du-filevar">prefix</span><span class="file">/lib/python2.<span class="du-filevar">X</span>/site-packages</span></td>
+        <td class="left"  ><b class="programopt">--install-purelib</b></td></tr>
+    <tr><td class="left"   valign="baseline">non-pure module distribution</td>
+        <td class="left"  ><span class="du-filevar">exec-prefix</span><span class="file">/lib/python2.<span class="du-filevar">X</span>/site-packages</span></td>
+        <td class="left"  ><b class="programopt">--install-platlib</b></td></tr>
+    <tr><td class="left"   valign="baseline">scripts</td>
+        <td class="left"  ><span class="du-filevar">prefix</span><span class="file">/bin</span></td>
+        <td class="left"  ><b class="programopt">--install-scripts</b></td></tr>
+    <tr><td class="left"   valign="baseline">data</td>
+        <td class="left"  ><span class="du-filevar">prefix</span><span class="file">/share</span></td>
+        <td class="left"  ><b class="programopt">--install-data</b></td></tr></tbody>
+</table></div>
+
+<p>
+There is no requirement that <b class="programopt">--prefix</b> or
+<b class="programopt">--exec-prefix</b> actually point to an alternate Python
+installation; if the directories listed above do not already exist, they
+are created at installation time.
+
+<p>
+Incidentally, the real reason the prefix scheme is important is simply
+that a standard <span class="Unix">Unix</span> installation uses the prefix scheme, but with
+<b class="programopt">--prefix</b> and <b class="programopt">--exec-prefix</b> supplied by
+Python itself as <code>sys.prefix</code> and <code>sys.exec_prefix</code>.  Thus,
+you might think you'll never use the prefix scheme, but every time you
+run <code>python setup.py install</code> without any other options, you're
+using it.
+
+<p>
+Note that installing extensions to an alternate Python installation has
+no effect on how those extensions are built: in particular, the Python
+header files (<span class="file">Python.h</span> and friends) installed with the Python
+interpreter used to run the setup script will be used in compiling
+extensions.  It is your responsibility to ensure that the interpreter
+used to run extensions installed in this way is compatible with the
+interpreter used to build them.  The best way to do this is to ensure
+that the two interpreters are the same version of Python (possibly
+different builds, or possibly copies of the same build).  (Of course, if
+your <b class="programopt">--prefix</b> and <b class="programopt">--exec-prefix</b> don't even
+point to an alternate Python installation, this is immaterial.)
+
+<p>
+
+<h2><a name="SECTION000330000000000000000"></a>
+<a name="alt-install-windows"></a>
+<br>
+3.3 Alternate installation: Windows (the prefix scheme)
+</h2>
+
+<p>
+Windows has no concept of a user's home directory, and since the
+standard Python installation under Windows is simpler than under
+<span class="Unix">Unix</span>, the <b class="programopt">--prefix</b> option has traditionally been used
+to install additional packages in separate locations on Windows.
+
+<p>
+<div class="verbatim"><pre>
+python setup.py install --prefix="\Temp\Python"
+</pre></div>
+
+<p>
+to install modules to the
+<span class="file">\Temp\Python</span> directory on the
+current drive.
+
+<p>
+The installation base is defined by the <b class="programopt">--prefix</b> option;
+the <b class="programopt">--exec-prefix</b> option is not supported under Windows.
+Files are installed as follows:
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Type of file</th>
+      <th class="left"  >Installation Directory</th>
+      <th class="left"  >Override option</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline">pure module distribution</td>
+        <td class="left"  ><span class="du-filevar">prefix</span><span class="file"></span></td>
+        <td class="left"  ><b class="programopt">--install-purelib</b></td></tr>
+    <tr><td class="left"   valign="baseline">non-pure module distribution</td>
+        <td class="left"  ><span class="du-filevar">prefix</span><span class="file"></span></td>
+        <td class="left"  ><b class="programopt">--install-platlib</b></td></tr>
+    <tr><td class="left"   valign="baseline">scripts</td>
+        <td class="left"  ><span class="du-filevar">prefix</span><span class="file">\Scripts</span></td>
+        <td class="left"  ><b class="programopt">--install-scripts</b></td></tr>
+    <tr><td class="left"   valign="baseline">data</td>
+        <td class="left"  ><span class="du-filevar">prefix</span><span class="file">\Data</span></td>
+        <td class="left"  ><b class="programopt">--install-data</b></td></tr></tbody>
+</table></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2 standard Build and"
+  href="standard-install.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Installing python Modules"
+  href="inst.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4 custom Installation"
+  href="search-path.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Installing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="standard-install.html">2 Standard Build and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="inst.html">Installing Python Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="search-path.html">4 Custom Installation</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

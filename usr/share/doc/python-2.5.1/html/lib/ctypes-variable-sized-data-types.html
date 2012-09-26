@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-bugs-todo-non-implemented-things.html" />
+<link rel="prev" href="ctypes-surprises.html" />
+<link rel="parent" href="ctypes-ctypes-tutorial.html" />
+<link rel="next" href="ctypes-bugs-todo-non-implemented-things.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.1.20 Variable-sized data types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.19 Surprises"
+  href="ctypes-surprises.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.21 Bugs, todo and"
+  href="ctypes-bugs-todo-non-implemented-things.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-surprises.html">14.14.1.19 Surprises</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-bugs-todo-non-implemented-things.html">14.14.1.21 Bugs, ToDo and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION001614120000000000000000"></a><a name="ctypes-variable-sized-data-types"></a>
+<br>
+14.14.1.20 Variable-sized data types
+</h3>
+
+<p>
+<code>ctypes</code> provides some support for variable-sized arrays and
+structures (this was added in version 0.9.9.7).
+
+<p>
+The <code>resize</code> function can be used to resize the memory buffer of an
+existing ctypes object.  The function takes the object as first
+argument, and the requested size in bytes as the second argument.  The
+memory block cannot be made smaller than the natural memory block
+specified by the objects type, a <code>ValueError</code> is raised if this is
+tried:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; short_array = (c_short * 4)()
+&gt;&gt;&gt; print sizeof(short_array)
+8
+&gt;&gt;&gt; resize(short_array, 4)
+Traceback (most recent call last):
+    ...
+ValueError: minimum size is 8
+&gt;&gt;&gt; resize(short_array, 32)
+&gt;&gt;&gt; sizeof(short_array)
+32
+&gt;&gt;&gt; sizeof(type(short_array))
+8
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+This is nice and fine, but how would one access the additional
+elements contained in this array?  Since the type still only knows
+about 4 elements, we get errors accessing other elements:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; short_array[:]
+[0, 0, 0, 0]
+&gt;&gt;&gt; short_array[7]
+Traceback (most recent call last):
+    ...
+IndexError: invalid index
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Another way to use variable-sized data types with <code>ctypes</code> is to use
+the dynamic nature of Python, and (re-)define the data type after the
+required size is already known, on a case by case basis.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.19 Surprises"
+  href="ctypes-surprises.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.21 Bugs, todo and"
+  href="ctypes-bugs-todo-non-implemented-things.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-surprises.html">14.14.1.19 Surprises</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-bugs-todo-non-implemented-things.html">14.14.1.21 Bugs, ToDo and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

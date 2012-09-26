@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="string-conversions.html" />
+<link rel="parent" href="atoms.html" />
+<link rel="next" href="primaries.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.2.8 Yield expressions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.2.7 string conversions"
+  href="string-conversions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.2 Atoms"
+  href="atoms.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.3 Primaries"
+  href="primaries.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="string-conversions.html">5.2.7 String conversions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="atoms.html">5.2 Atoms</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="primaries.html">5.3 Primaries</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION007280000000000000000"></a><a name="yieldexpr"></a>
+<br>
+5.2.8 Yield expressions
+</h2>
+<a id='l2h-372' xml:id='l2h-372'></a><a id='l2h-373' xml:id='l2h-373'></a><a id='l2h-374' xml:id='l2h-374'></a>
+<p>
+<dl><dd class="grammar">
+<div class="productions">
+<table>
+<tr>
+    <td><a id='tok-yield_atom' xml:id='tok-yield_atom'>yield_atom</a></td>
+    <td>::=</td>
+    <td>"(" <a class='grammartoken' href="yieldexpr.html#tok-yield_expression">yield_expression</a> ")"</td></tr>
+  <tr>
+    <td><a id='tok-yield_expression' xml:id='tok-yield_expression'>yield_expression</a></td>
+    <td>::=</td>
+    <td>"yield" [<a class='grammartoken' href="exprlists.html#tok-expression_list">expression_list</a>]</td></tr>
+</table>
+</div>
+<a class="grammar-footer"
+  href="grammar.txt" type="text/plain"
+  >Download entire grammar as text.</a>
+</dd></dl>
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+The <tt class="keyword">yield</tt> expression is only used when defining a generator
+function, and can only be used in the body of a function definition.
+Using a <tt class="keyword">yield</tt> expression in a function definition is
+sufficient to cause that definition to create a generator function
+instead of a normal function.
+
+<p>
+When a generator function is called, it returns an iterator known as a
+generator.  That generator then controls the execution of a generator
+function.  The execution starts when one of the generator's methods is
+called.  At that time, the execution proceeds to the first
+<tt class="keyword">yield</tt> expression, where it is suspended again, returning the
+value of <a class='grammartoken' href="exprlists.html#tok-expression_list">expression_list</a> to generator's caller.  By
+suspended we mean that all local state is retained, including the
+current bindings of local variables, the instruction pointer, and the
+internal evaluation stack.  When the execution is resumed by calling
+one of the generator's methods, the function can proceed exactly as
+if the <tt class="keyword">yield</tt> expression was just another external call.
+The value of the <tt class="keyword">yield</tt> expression after resuming depends on
+the method which resumed the execution.
+
+<p>
+<a id='l2h-382' xml:id='l2h-382'></a>
+
+<p>
+All of this makes generator functions quite similar to coroutines; they
+yield multiple times, they have more than one entry point and their
+execution can be suspended.  The only difference is that a generator
+function cannot control where should the execution continue after it
+yields; the control is always transfered to the generator's caller.
+
+<p>
+<a id='l2h-375' xml:id='l2h-375'></a>
+<p>
+The following generator's methods can be used to control the execution
+of a generator function:
+
+<p>
+<a id='l2h-376' xml:id='l2h-376'></a>
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-377' xml:id='l2h-377' class="method">next</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Starts the execution of a generator function or resumes it at the
+  last executed <tt class="keyword">yield</tt> expression.  When a generator function
+  is resumed with a <tt class="method">next()</tt> method, the current <tt class="keyword">yield</tt>
+  expression always evaluates to <tt class="constant">None</tt>.  The execution then
+  continues to the next <tt class="keyword">yield</tt> expression, where the generator
+  is suspended again, and the value of the
+  <a class='grammartoken' href="exprlists.html#tok-expression_list">expression_list</a> is returned to <tt class="method">next()</tt>'s
+  caller. If the generator exits without yielding another value, a
+  <tt class="exception">StopIteration</tt> exception is raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-378' xml:id='l2h-378' class="method">send</tt></b>(</nobr></td>
+  <td><var>value</var>)</td></tr></table></dt>
+<dd>
+  Resumes the execution and ``sends'' a value into the generator
+  function.  The <code>value</code> argument becomes the result of the
+  current <tt class="keyword">yield</tt> expression.  The <tt class="method">send()</tt> method
+  returns the next value yielded by the generator, or raises
+  <tt class="exception">StopIteration</tt> if the generator exits without yielding
+  another value.
+  When <tt class="method">send()</tt> is called to start the generator, it must be
+  called with <tt class="constant">None</tt> as the argument, because there is no
+  <tt class="keyword">yield</tt> expression that could receieve the value.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-379' xml:id='l2h-379' class="method">throw</tt></b>(</nobr></td>
+  <td><var>type</var><big>[</big><var>, value</var><big>[</big><var>, traceback</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Raises an exception of type <code>type</code> at the point where generator
+  was paused, and returns the next value yielded by the generator
+  function.  If the generator exits without yielding another value, a
+  <tt class="exception">StopIteration</tt> exception is raised.  If the generator
+  function does not catch the passed-in exception, or raises a
+  different exception, then that exception propagates to the caller.
+</dl>
+
+<p>
+<a id='l2h-380' xml:id='l2h-380'></a>
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-381' xml:id='l2h-381' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Raises a <tt class="exception">GeneratorExit</tt> at the point where the generator
+  function was paused.  If the generator function then raises
+  <tt class="exception">StopIteration</tt> (by exiting normally, or due to already
+  being closed) or <tt class="exception">GeneratorExit</tt> (by not catching the
+  exception), close returns to its caller.  If the generator yields a
+  value, a <tt class="exception">RuntimeError</tt> is raised.  If the generator raises
+  any other exception, it is propagated to the caller.  <tt class="method">close</tt>
+  does nothing if the generator has already exited due to an exception
+  or normal exit.
+</dl>
+
+<p>
+Here is a simple example that demonstrates the behavior of generators
+and generator functions:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def echo(value=None):
+...     print "Execution starts when 'next()' is called for the first time."
+...     try:
+...         while True:
+...             try:
+...                 value = (yield value)
+...             except GeneratorExit:
+...                 # never catch GeneratorExit
+...                 raise
+...             except Exception, e:
+...                 value = e
+...     finally:
+...         print "Don't forget to clean up when 'close()' is called."
+...
+&gt;&gt;&gt; generator = echo(1)
+&gt;&gt;&gt; print generator.next()
+Execution starts when 'next()' is called for the first time.
+1
+&gt;&gt;&gt; print generator.next()
+None
+&gt;&gt;&gt; print generator.send(2)
+2
+&gt;&gt;&gt; generator.throw(TypeError, "spam")
+TypeError('spam',)
+&gt;&gt;&gt; generator.close()
+Don't forget to clean up when 'close()' is called.
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0342.html"
+        title="Coroutines via Enhanced Generators"
+        >PEP 0342, <em>Coroutines via Enhanced Generators</em></a>
+    <dd>The proposal to enhance the API and syntax of generators,
+          making them usable as simple coroutines.
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.2.7 string conversions"
+  href="string-conversions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.2 Atoms"
+  href="atoms.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.3 Primaries"
+  href="primaries.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="string-conversions.html">5.2.7 String conversions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="atoms.html">5.2 Atoms</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="primaries.html">5.3 Primaries</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,635 @@
+\hypertarget{docblocks_specialblock}{}\section{Special documentation blocks}\label{docblocks_specialblock}
+A special documentation block is a C or C++ style comment block with some additional markings, so doxygen knows it is a piece of documentation that needs to end up in the generated documentation. For Python and VHDL code there are a different comment conventions, which can be found in section \hyperlink{docblocks_pythonblocks}{Special documentation blocks in Python} and \hyperlink{docblocks_vhdlblocks}{Special documentation blocks in VHDL} respectively.
+
+For each code item there are two (or in some cases three) types of descriptions, which together form the documentation: a {\em brief\/} description and {\em detailed\/} description, both are optional. For methods and functions there is also a third type of description, the so called \char`\"{}in body\char`\"{} description, which consists of the concatenation of all comment blocks found within the body of the method or function.
+
+Having more than one brief or detailed description is allowed (but not recommended, as the order in which the descriptions will appear is not specified).
+
+As the name suggest, a brief description is a short one-liner, whereas the detailed description provides longer, more detailed documentation. An \char`\"{}in body\char`\"{} description can also act as a detailed description or can describe a collection of implementation details. For the HTML output brief descriptions are also use to provide tooltips at places where an item is referenced.
+
+There are several ways to mark a comment block as a detailed description: \begin{enumerate}
+\item You can use the JavaDoc style, which consist of a C-style comment block starting with two $\ast$'s, like this:
+
+
+
+\footnotesize\begin{verbatim}
+/**
+ * ... text ...
+ */
+\end{verbatim}
+\normalsize
+
+
+\item or you can use the Qt style and add an exclamation mark (!) after the opening of a C-style comment block, as shown in this example:
+
+
+
+\footnotesize\begin{verbatim}
+/*!
+ * ... text ...
+ */
+\end{verbatim}
+\normalsize
+
+
+In both cases the intermediate $\ast$'s are optional, so
+
+
+
+\footnotesize\begin{verbatim}
+/*!
+ ... text ...
+*/
+\end{verbatim}
+\normalsize
+
+
+is also valid.
+
+\item A third alternative is to use a block of at least two C++ comment lines, where each line starts with an additional slash or an exclamation mark. Here are examples of the two cases:
+
+
+
+\footnotesize\begin{verbatim}
+///
+/// ... text ...
+///
+\end{verbatim}
+\normalsize
+
+
+or
+
+
+
+\footnotesize\begin{verbatim}
+//!
+//!... text ...
+//!
+\end{verbatim}
+\normalsize
+
+
+\item 
+
+Some people like to make their comment blocks more visible in the documentation. For this purpose you can use the following:
+
+
+
+\footnotesize\begin{verbatim}
+/********************************************//**
+ *  ... text
+ ***********************************************/
+\end{verbatim}
+\normalsize
+ (note the 2 slashes to end the normal comment block and start a special comment block).
+
+or
+
+
+
+\footnotesize\begin{verbatim}
+/////////////////////////////////////////////////
+/// ... text ...
+/////////////////////////////////////////////////
+\end{verbatim}
+\normalsize
+
+
+\end{enumerate}
+
+
+For the brief description there are also several posibilities: \begin{enumerate}
+\item One could use the \hyperlink{commands_cmdbrief}{$\backslash$brief} command with one of the above comment blocks. This command ends at the end of a paragraph, so the detailed description follows after an empty line.
+
+Here is an example:
+
+
+
+\footnotesize\begin{verbatim}
+/*! \brief Brief description.
+ *         Brief description continued.
+ *
+ *  Detailed description starts here.
+ */
+\end{verbatim}
+\normalsize
+
+
+\item If \hyperlink{config_cfg_javadoc_autobrief}{JAVADOC\_\-AUTOBRIEF} is set to {\tt YES} in the configuration file, then using JavaDoc style comment blocks will automatically start a brief description which ends at the first dot followed by a space or new line. Here is an example:
+
+
+
+\footnotesize\begin{verbatim}
+/** Brief description which ends at this dot. Details follow
+ *  here.
+ */
+\end{verbatim}
+\normalsize
+ The option has the same effect for multi-line special C++ comments: 
+
+\footnotesize\begin{verbatim}
+/// Brief description which ends at this dot. Details follow
+/// here.
+\end{verbatim}
+\normalsize
+
+
+\item A third option is to use a special C++ style comment which does not span more than one line. Here are two examples: 
+
+\footnotesize\begin{verbatim}
+/// Brief description.
+/** Detailed description. */
+\end{verbatim}
+\normalsize
+
+
+or
+
+
+
+\footnotesize\begin{verbatim}
+//! Brief descripion.
+
+//! Detailed description 
+//! starts here.
+\end{verbatim}
+\normalsize
+
+
+Note the blank line in the last example, which is required to separate the brief description from the block containing the detailed description. The \hyperlink{config_cfg_javadoc_autobrief}{JAVADOC\_\-AUTOBRIEF} should also be set to {\tt NO} for this case.
+
+\end{enumerate}
+
+
+As you can see doxygen is quite flexible. The following however is not legal
+
+
+
+\footnotesize\begin{verbatim}
+//! Brief description, which is
+//! really a detailed description since it spans multiple lines.
+/*! Oops, another detailed description!
+ */
+\end{verbatim}
+\normalsize
+
+
+because doxygen only allows one brief and one detailed description.
+
+Furthermore, if there is one brief description before a declaration and one before a definition of a code item, only the one before the {\em declaration\/} will be used. If the same situation occurs for a detailed description, the one before the {\em definition\/} is preferred and the one before the declaration will be ignored.
+
+Here is an example of a documented piece of C++ code using the Qt style: 
+
+\begin{DocInclude}\begin{verbatim}//!  A test class. 
+/*!
+  A more elaborate class description.
+*/
+
+class Test
+{
+  public:
+
+    //! An enum.
+    /*! More detailed enum description. */
+    enum TEnum { 
+                 TVal1, /*!< Enum value TVal1. */  
+                 TVal2, /*!< Enum value TVal2. */  
+                 TVal3  /*!< Enum value TVal3. */  
+               } 
+         //! Enum pointer.
+         /*! Details. */
+         *enumPtr, 
+         //! Enum variable.
+         /*! Details. */
+         enumVar;  
+    
+    //! A constructor.
+    /*!
+      A more elaborate description of the constructor.
+    */
+    Test();
+
+    //! A destructor.
+    /*!
+      A more elaborate description of the destructor.
+    */
+   ~Test();
+    
+    //! A normal member taking two arguments and returning an integer value.
+    /*!
+      \param a an integer argument.
+      \param s a constant character pointer.
+      \return The test results
+      \sa Test(), ~Test(), testMeToo() and publicVar()
+    */
+    int testMe(int a,const char *s);
+       
+    //! A pure virtual member.
+    /*!
+      \sa testMe()
+      \param c1 the first argument.
+      \param c2 the second argument.
+    */
+    virtual void testMeToo(char c1,char c2) = 0;
+   
+    //! A public variable.
+    /*!
+      Details.
+    */
+    int publicVar;
+       
+    //! A function variable.
+    /*!
+      Details.
+    */
+    int (*handler)(int a,int b);
+};
+
+\end{verbatim}
+\end{DocInclude}
+ 
+
+The one-line comments contain a brief description, whereas the multi-line comment blocks contain a more detailed description.
+
+The brief descriptions are included in the member overview of a class, namespace or file and are printed using a small italic font (this description can be hidden by setting \hyperlink{config_cfg_brief_member_desc}{BRIEF\_\-MEMBER\_\-DESC} to {\tt NO} in the config file). By default the brief descriptions become the first sentence of the detailed descriptions (but this can be changed by setting the \hyperlink{config_cfg_repeat_brief}{REPEAT\_\-BRIEF} tag to {\tt NO}). Both the brief and the detailed descriptions are optional for the Qt style.
+
+By default a JavaDoc style documentation block behaves the same way as a Qt style documentation block. This is not according the JavaDoc specification however, where the first sentence of the documentation block is automatically treated as a brief description. To enable this behaviour you should set \hyperlink{config_cfg_javadoc_autobrief}{JAVADOC\_\-AUTOBRIEF} to YES in the configuration file. If you enable this option and want to put a dot in the middle of a sentence without ending it, you should put a backslash and a space after it. Here is an example: 
+
+\footnotesize\begin{verbatim}
+  /** Brief description (e.g.\ using only a few words). Details follow. */
+\end{verbatim}
+\normalsize
+
+
+Here is the same piece of code as shown above, this time documented using the JavaDoc style and \hyperlink{config_cfg_javadoc_autobrief}{JAVADOC\_\-AUTOBRIEF} set to YES: 
+
+\begin{DocInclude}\begin{verbatim}/**
+ *  A test class. A more elaborate class description.
+ */
+
+class Test
+{
+  public:
+
+    /** 
+     * An enum.
+     * More detailed enum description.
+     */
+
+    enum TEnum { 
+          TVal1, /**< enum value TVal1. */  
+          TVal2, /**< enum value TVal2. */  
+          TVal3  /**< enum value TVal3. */  
+         } 
+       *enumPtr, /**< enum pointer. Details. */
+       enumVar;  /**< enum variable. Details. */
+       
+      /**
+       * A constructor.
+       * A more elaborate description of the constructor.
+       */
+      Test();
+
+      /**
+       * A destructor.
+       * A more elaborate description of the destructor.
+       */
+     ~Test();
+    
+      /**
+       * a normal member taking two arguments and returning an integer value.
+       * @param a an integer argument.
+       * @param s a constant character pointer.
+       * @see Test()
+       * @see ~Test()
+       * @see testMeToo()
+       * @see publicVar()
+       * @return The test results
+       */
+       int testMe(int a,const char *s);
+       
+      /**
+       * A pure virtual member.
+       * @see testMe()
+       * @param c1 the first argument.
+       * @param c2 the second argument.
+       */
+       virtual void testMeToo(char c1,char c2) = 0;
+   
+      /** 
+       * a public variable.
+       * Details.
+       */
+       int publicVar;
+       
+      /**
+       * a function variable.
+       * Details.
+       */
+       int (*handler)(int a,int b);
+};
+
+\end{verbatim}
+\end{DocInclude}
+ 
+
+Similarly, if one wishes the first sentence of a Qt style documentation block to automatically be treated as a brief description, one may set \hyperlink{config_cfg_qt_autobrief}{QT\_\-AUTOBRIEF} to YES in the configuration file.
+
+Unlike most other documentation systems, doxygen also allows you to put the documentation of members (including global functions) in front of the {\em definition\/}. This way the documentation can be placed in the source file instead of the header file. This keeps the header file compact, and allows the implementer of the members more direct access to the documentation. As a compromise the brief description could be placed before the declaration and the detailed description before the member definition.\hypertarget{docblocks_memberdoc}{}\section{Putting documentation after members}\label{docblocks_memberdoc}
+If you want to document the members of a file, struct, union, class, or enum, and you want to put the documentation for these members inside the compound, it is sometimes desired to place the documentation block after the member instead of before. For this purpose you have to put an additional $<$ marker in the comment block. Note that this also works for the parameters of a function.
+
+Here are some examples: 
+
+\footnotesize\begin{verbatim}
+int var; /*!< Detailed description after the member */
+\end{verbatim}
+\normalsize
+ This block can be used to put a Qt style detailed documentation block {\em after\/} a member. Other ways to do the same are: 
+
+\footnotesize\begin{verbatim}
+int var; /**< Detailed description after the member */
+\end{verbatim}
+\normalsize
+ or 
+
+\footnotesize\begin{verbatim}
+int var; //!< Detailed description after the member
+         //!< 
+\end{verbatim}
+\normalsize
+ or 
+
+\footnotesize\begin{verbatim}
+int var; ///< Detailed description after the member
+         ///< 
+\end{verbatim}
+\normalsize
+
+
+Most often one only wants to put a brief description after a member. This is done as follows: 
+
+\footnotesize\begin{verbatim}
+int var; //!< Brief description after the member
+\end{verbatim}
+\normalsize
+ or 
+
+\footnotesize\begin{verbatim}
+int var; ///< Brief description after the member
+\end{verbatim}
+\normalsize
+
+
+Note that these blocks have the same structure and meaning as the special comment blocks in the previous section only the $<$ indicates that the member is located in front of the block instead of after the block.
+
+Here is an example of the use of these comment blocks: 
+
+\begin{DocInclude}\begin{verbatim}/*! A test class */
+
+class Test
+{
+  public:
+    /** An enum type. 
+     *  The documentation block cannot be put after the enum! 
+     */
+    enum EnumType
+    {
+      int EVal1,     /**< enum value 1 */
+      int EVal2      /**< enum value 2 */
+    };
+    void member();   //!< a member function.
+    
+  protected:
+    int value;       /*!< an integer value */
+};
+\end{verbatim}
+\end{DocInclude}
+ 
+
+\begin{Desc}
+\item[Warning:]These blocks can only be used to document {\em members\/} and {\em parameters\/}. They cannot be used to document files, classes, unions, structs, groups, namespaces and enums themselves. Furthermore, the structural commands mentioned in the next section (like {\tt $\backslash$class}) are ignored inside these comment blocks.\end{Desc}
+\hypertarget{docblocks_structuralcommands}{}\section{Documentation at other places}\label{docblocks_structuralcommands}
+So far we have assumed that the documentation blocks are always located {\em in\/} {\em front\/} of the declaration or definition of a file, class or namespace or in front or after one of its members. Although this is often comfortable, there may sometimes be reasons to put the documentation somewhere else. For documenting a file this is even required since there is no such thing as \char`\"{}in front of a file\char`\"{}.
+
+Doxygen allows you to put your documentation blocks practically anywhere (the exception is inside the body of a function or inside a normal C style comment block).
+
+The price you pay for not putting the documentation block directly before (or after) an item is the need to put a structural command inside the documentation block, which leads to some duplication of information. So in practice you should {\em avoid\/} the use of structural commands {\em unless\/} other requirements force you to do so.
+
+Structural commands (like all other commands) start with a backslash ({\tt $\backslash$}), or an at-sign ({\tt @}) if you prefer JavaDoc style, followed by a command name and one or more parameters. For instance, if you want to document the class {\tt Test} in the example above, you could have also put the following documentation block somewhere in the input that is read by doxygen: 
+
+\footnotesize\begin{verbatim}
+/*! \class Test
+    \brief A test class.
+
+    A more detailed class description.
+*/
+\end{verbatim}
+\normalsize
+
+
+Here the special command {\tt $\backslash$class} is used to indicate that the comment block contains documentation for the class {\tt Test}. Other structural commands are: \begin{itemize}
+\item {\tt $\backslash$struct} to document a C-struct. \item {\tt $\backslash$union} to document a union. \item {\tt $\backslash$enum} to document an enumeration type. \item {\tt $\backslash$fn} to document a function. \item {\tt $\backslash$var} to document a variable or typedef or enum value. \item {\tt $\backslash$def} to document a \#define. \item {\tt $\backslash$typedef} to document a type definition. \item {\tt $\backslash$file} to document a file. \item {\tt $\backslash$namespace} to document a namespace. \item {\tt $\backslash$package} to document a Java package. \item {\tt $\backslash$interface} to document an IDL interface. \end{itemize}
+See section \hyperlink{commands}{Special Commands} for detailed information about these and many other commands.
+
+To document a member of a C++ class, you must also document the class itself. The same holds for namespaces. To document a global C function, typedef, enum or preprocessor definition you must first document the file that contains it (usually this will be a header file, because that file contains the information that is exported to other source files).
+
+Let's repeat that, because it is often overlooked: to document global objects (functions, typedefs, enum, macros, etc), you {\em must\/} document the file in which they are defined. In other words, there {\em must\/} at least be a 
+
+\footnotesize\begin{verbatim}/*! \file */ \end{verbatim}
+\normalsize
+ or a 
+
+\footnotesize\begin{verbatim}/** @file */ \end{verbatim}
+\normalsize
+ line in this file.
+
+Here is an example of a C header named {\tt structcmd.h} that is documented using structural commands: 
+
+\begin{DocInclude}\begin{verbatim}/*! \file structcmd.h
+    \brief A Documented file.
+    
+    Details.
+*/
+
+/*! \def MAX(a,b)
+    \brief A macro that returns the maximum of \a a and \a b.
+   
+    Details.
+*/
+
+/*! \var typedef unsigned int UINT32
+    \brief A type definition for a .
+    
+    Details.
+*/
+
+/*! \var int errno
+    \brief Contains the last error code.
+
+    \warning Not thread safe!
+*/
+
+/*! \fn int open(const char *pathname,int flags)
+    \brief Opens a file descriptor.
+
+    \param pathname The name of the descriptor.
+    \param flags Opening flags.
+*/
+
+/*! \fn int close(int fd)
+    \brief Closes the file descriptor \a fd.
+    \param fd The descriptor to close.
+*/
+
+/*! \fn size_t write(int fd,const char *buf, size_t count)
+    \brief Writes \a count bytes from \a buf to the filedescriptor \a fd.
+    \param fd The descriptor to write to.
+    \param buf The data buffer to write.
+    \param count The number of bytes to write.
+*/
+
+/*! \fn int read(int fd,char *buf,size_t count)
+    \brief Read bytes from a file descriptor.
+    \param fd The descriptor to read from.
+    \param buf The buffer to read into.
+    \param count The number of bytes to read.
+*/
+
+#define MAX(a,b) (((a)>(b))?(a):(b))
+typedef unsigned int UINT32;
+int errno;
+int open(const char *,int);
+int close(int);
+size_t write(int,const char *, size_t);
+int read(int,char *,size_t);
+\end{verbatim}
+\end{DocInclude}
+ 
+
+Because each comment block in the example above contains a structural command, all the comment blocks could be moved to another location or input file (the source file for instance), without affecting the generated documentation. The disadvantage of this approach is that prototypes are duplicated, so all changes have to be made twice! Because of this you should first consider if this is really needed, and avoid structural commands if possible. I often receive examples that contain $\backslash$fn command in comment blocks which are place in front of a function. This is clearly a case where the $\backslash$fn command is redundant and will only lead to problems.\hypertarget{docblocks_pythonblocks}{}\section{Special documentation blocks in Python}\label{docblocks_pythonblocks}
+For Python there is a standard way of documenting the code using so called documentation strings. Such strings are stored in {\tt \_\-\_\-doc\_\-\_\-} and can be retrieved at runtime. Doxygen will extract such comments and assume they have to be represented in a preformatted way.
+
+
+
+\begin{DocInclude}\begin{verbatim}"""@package docstring
+Documentation for this module.
+
+More details.
+"""
+
+def func():
+    """Documentation for a function.
+
+    More details.
+    """
+    pass
+
+class PyClass:
+    """Documentation for a class.
+
+    More details.
+    """
+   
+    def __init__(self):
+        """The constructor."""
+        self._memVar = 0;
+   
+    def PyMethod(self):
+        """Documentation for a method."""
+        pass
+     
+\end{verbatim}
+\end{DocInclude}
+ 
+
+Note that in this case none of doxygen's \hyperlink{commands_cmd_intro}{special commands} are supported.
+
+There is also another way to document Python code using comments that start with \char`\"{}\#\#\char`\"{}. These type of comment blocks are more in line with the way documentation blocks work for the other languages supported by doxygen and this also allows the use of special commands.
+
+Here is the same example again but now using doxygen style comments:
+
+
+
+\begin{DocInclude}\begin{verbatim}## @package pyexample
+#  Documentation for this module.
+#
+#  More details.
+
+## Documentation for a function.
+#
+#  More details.
+def func():
+    pass
+
+## Documentation for a class.
+#
+#  More details.
+class PyClass:
+   
+    ## The constructor.
+    def __init__(self):
+        self._memVar = 0;
+   
+    ## Documentation for a method.
+    #  @param self The object pointer.
+    def PyMethod(self):
+        pass
+     
+    ## A class variable.
+    classVar = 0;
+
+    ## @var _memVar
+    #  a member variable
+\end{verbatim}
+\end{DocInclude}
+ 
+
+Since python looks more like Java than like C or C++, you should set \hyperlink{config_cfg_optimize_output_java}{OPTMIZE\_\-OUTPUT\_\-JAVA} to {\tt YES} in the config file.
+
+\hypertarget{docblocks_vhdlblocks}{}\section{Special documentation blocks in VHDL}\label{docblocks_vhdlblocks}
+For VHDL a comment normally start with \char`\"{}--\char`\"{}. Doxygen will extract comments starting with \char`\"{}--!\char`\"{}. There are only two types of comment blocks in VHDL; a one line --! comment representing a brief description, and a multiline --! comment (where the --! prefix is repeated for each line) representing a detailed description.
+
+Comments are always located in front of the item that is being documented with one exception: for ports the comment can also be after the item and is then treated as a brief description for the port.
+
+Here is an example VHDL file with doxygen comments:
+
+
+
+\begin{DocInclude}\begin{verbatim}-------------------------------------------------------
+--! @file
+--! @brief 2:1 Mux using with-select
+-------------------------------------------------------
+
+--! Use standard library
+library ieee;
+--! Use logic elements
+    use ieee.std_logic_1164.all;
+
+--! Mux entity brief description
+
+--! Detailed description of this 
+--! mux design element.
+entity mux_using_with is
+    port (
+        din_0   : in  std_logic; --! Mux first input
+        din_1   : in  std_logic; --! Mux Second input
+        sel     : in  std_logic; --! Select input
+        mux_out : out std_logic  --! Mux output
+    );
+end entity;
+
+--! @brief Architure definition of the MUX
+--! @details More details about this mux element.
+architecture behavior of mux_using_with is
+begin
+    with (sel) select
+    mux_out <= din_0 when '0',
+               din_1 when others;
+end architecture;
+
+\end{verbatim}
+\end{DocInclude}
+ 
+
+To get proper looking output you need to set \hyperlink{config_cfg_optimize_output_vhdl}{OPTIMIZE\_\-OUTPUT\_\-VHDL} to {\tt YES} in the config file. This will also affect a number of other settings. When they were not already set correctly doxygen will produce a warning telling which settings where overruled. 

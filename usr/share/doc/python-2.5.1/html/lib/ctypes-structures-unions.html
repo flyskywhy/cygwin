@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-structureunion-alignment-byte-order.html" />
+<link rel="prev" href="ctypes-passing-pointers.html" />
+<link rel="parent" href="ctypes-ctypes-tutorial.html" />
+<link rel="next" href="ctypes-structureunion-alignment-byte-order.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.1.10 Structures and unions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.9 passing pointers (or:"
+  href="ctypes-passing-pointers.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.11 Structure/union alignment and"
+  href="ctypes-structureunion-alignment-byte-order.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-passing-pointers.html">14.14.1.9 Passing pointers (or:</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-structureunion-alignment-byte-order.html">14.14.1.11 Structure/union alignment and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION001614110000000000000000"></a><a name="ctypes-structures-unions"></a>
+<br>
+14.14.1.10 Structures and unions
+</h3>
+
+<p>
+Structures and unions must derive from the <tt class="class">Structure</tt> and <tt class="class">Union</tt>
+base classes which are defined in the <code>ctypes</code> module. Each subclass
+must define a <tt class="member">_fields_</tt> attribute.  <tt class="member">_fields_</tt> must be a list of
+<em>2-tuples</em>, containing a <em>field name</em> and a <em>field type</em>.
+
+<p>
+The field type must be a <code>ctypes</code> type like <tt class="class">c_int</tt>, or any other
+derived <code>ctypes</code> type: structure, union, array, pointer.
+
+<p>
+Here is a simple example of a POINT structure, which contains two
+integers named <code>x</code> and <code>y</code>, and also shows how to initialize a
+structure in the constructor:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; class POINT(Structure):
+...     _fields_ = [("x", c_int),
+...                 ("y", c_int)]
+...
+&gt;&gt;&gt; point = POINT(10, 20)
+&gt;&gt;&gt; print point.x, point.y
+10 20
+&gt;&gt;&gt; point = POINT(y=5)
+&gt;&gt;&gt; print point.x, point.y
+0 5
+&gt;&gt;&gt; POINT(1, 2, 3)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+ValueError: too many initializers
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+You can, however, build much more complicated structures. Structures
+can itself contain other structures by using a structure as a field
+type.
+
+<p>
+Here is a RECT structure which contains two POINTs named <code>upperleft</code>
+and <code>lowerright</code>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; class RECT(Structure):
+...     _fields_ = [("upperleft", POINT),
+...                 ("lowerright", POINT)]
+...
+&gt;&gt;&gt; rc = RECT(point)
+&gt;&gt;&gt; print rc.upperleft.x, rc.upperleft.y
+0 5
+&gt;&gt;&gt; print rc.lowerright.x, rc.lowerright.y
+0 0
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Nested structures can also be initialized in the constructor in
+several ways:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; r = RECT(POINT(1, 2), POINT(3, 4))
+&gt;&gt;&gt; r = RECT((1, 2), (3, 4))
+</pre></div>
+
+<p>
+Fields descriptors can be retrieved from the <em>class</em>, they are useful
+for debugging because they can provide useful information:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print POINT.x
+&lt;Field type=c_long, ofs=0, size=4&gt;
+&gt;&gt;&gt; print POINT.y
+&lt;Field type=c_long, ofs=4, size=4&gt;
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.9 passing pointers (or:"
+  href="ctypes-passing-pointers.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.11 Structure/union alignment and"
+  href="ctypes-structureunion-alignment-byte-order.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-passing-pointers.html">14.14.1.9 Passing pointers (or:</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-structureunion-alignment-byte-order.html">14.14.1.11 Structure/union alignment and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

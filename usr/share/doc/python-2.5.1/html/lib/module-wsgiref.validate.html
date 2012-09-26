@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-wsgiref.handlers.html" />
+<link rel="prev" href="module-wsgiref.simpleserver.html" />
+<link rel="parent" href="module-wsgiref.html" />
+<link rel="next" href="module-wsgiref.handlers.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.4.4 wsgiref.validate - WSGI conformance checker</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.3 wsgiref.simple_server - a"
+  href="module-wsgiref.simpleserver.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.5 wsgiref.handlers - server/gateway"
+  href="module-wsgiref.handlers.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.simpleserver.html">18.4.3 wsgiref.simple_server - a</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.handlers.html">18.4.5 wsgiref.handlers - server/gateway</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020440000000000000000">
+18.4.4 <tt class="module">wsgiref.validate</tt> - WSGI conformance checker</a>
+</h2>
+<a name="module-wsgiref.validate"></a>When creating new WSGI application objects, frameworks, servers, or
+middleware, it can be useful to validate the new code's conformance
+using <tt class="module">wsgiref.validate</tt>.  This module provides a function that
+creates WSGI application objects that validate communications between
+a WSGI server or gateway and a WSGI application object, to check both
+sides for protocol conformance.
+
+<p>
+Note that this utility does not guarantee complete <a class="rfc" id='rfcref-102702' xml:id='rfcref-102702'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a> compliance;
+an absence of errors from this module does not necessarily mean that
+errors do not exist.  However, if this module does produce an error,
+then it is virtually certain that either the server or application is
+not 100% compliant.
+
+<p>
+This module is based on the <tt class="module">paste.lint</tt> module from Ian
+Bicking's ``Python Paste'' library.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3862' xml:id='l2h-3862' class="function">validator</tt></b>(</nobr></td>
+  <td><var>application</var>)</td></tr></table></dt>
+<dd>
+Wrap <var>application</var> and return a new WSGI application object.  The
+returned application will forward all requests to the original
+<var>application</var>, and will check that both the <var>application</var> and
+the server invoking it are conforming to the WSGI specification and to
+RFC 2616.
+
+<p>
+Any detected nonconformance results in an <tt class="exception">AssertionError</tt>
+being raised; note, however, that how these errors are handled is
+server-dependent.  For example, <tt class="module">wsgiref.simple_server</tt> and other
+servers based on <tt class="module">wsgiref.handlers</tt> (that don't override the
+error handling methods to do something else) will simply output a
+message that an error has occurred, and dump the traceback to
+<code>sys.stderr</code> or some other error stream.
+
+<p>
+This wrapper may also generate output using the <tt class="module">warnings</tt> module
+to indicate behaviors that are questionable but which may not actually
+be prohibited by <a class="rfc" id='rfcref-102704' xml:id='rfcref-102704'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.  Unless they are suppressed using Python
+command-line options or the <tt class="module">warnings</tt> API, any such warnings
+will be written to <code>sys.stderr</code> (<em>not</em> <code>wsgi.errors</code>,
+unless they happen to be the same object).
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.3 wsgiref.simple_server - a"
+  href="module-wsgiref.simpleserver.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.5 wsgiref.handlers - server/gateway"
+  href="module-wsgiref.handlers.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.simpleserver.html">18.4.3 wsgiref.simple_server - a</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.handlers.html">18.4.5 wsgiref.handlers - server/gateway</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

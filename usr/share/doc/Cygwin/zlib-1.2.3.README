@@ -1,0 +1,129 @@
+zlib
+------------------------------------------
+The zlib compression library provides in-memory 
+compression and decompression functions, including 
+integrity checks of the uncompressed data.
+
+Runtime requirements:
+  cygwin-1.5.21-2
+
+Build requirements:
+  cygwin-1.5.21-2
+  gcc-core-3.4.4-1
+  binutils-20060817-1
+  make-3.81-1
+  cygport-0.2.4-1
+
+Canonical homepage:
+  http://www.zlib.net/
+
+Canonical download:
+  http://www.zlib.net/zlib-1.2.3.tar.bz2
+  
+------------------------------------
+
+Build instructions:
+  unpack zlib-1.2.3-X-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport zlib-1.2.3-X all
+
+This will create:
+  /usr/src/zlib-1.2.3-X.tar.bz2
+  /usr/src/zlib-1.2.3-X-src.tar.bz2
+
+-------------------------------------------
+
+To link this library with your projects:
+  #1) include zlib.h and zconf.h
+  #2) to link with the static library, use '-static' on the link line 
+  #3) to link with the dll, no unusual link-time flags are needed.
+In either case, there are NO special compile time flags needed
+
+-------------------------------------------
+Files included in the binary distro
+
+  /usr/bin/cygz.dll
+  /usr/include/zconf.h
+  /usr/include/zlib.h
+  /usr/lib/libz.a
+  /usr/lib/libz.dll.a
+  /usr/share/doc/Cygwin/zlib-1.2.3.README
+  /usr/share/doc/zlib-1.2.3/ChangeLog
+  /usr/share/doc/zlib-1.2.3/FAQ
+  /usr/share/doc/zlib-1.2.3/README
+  /usr/share/man/man3/zlib.3.gz
+
+------------------
+
+Port Notes:
+1.2.3-2: switch to cygport build
+
+1.2.3-1: routine update
+
+1.2.2-2: bug fix release
+  * fixes security issue can-2005-2096
+
+1.2.2-1: Routine upgrade
+  * includes security fix below
+
+1.2.1-2: Security fix
+  http://lwn.net/Articles/99288/
+
+1.2.1-1: Bump to official release
+
+1.2.0.7-2: Incorporate comments from Cosmin Truta
+
+1.2.0.7-1: update to 1.2.0.7 beta release.  Compiled against 
+           cygwin-1.5.5
+
+1.2.0.3-1: update to 1.2.0.3 beta release.  Compiled against 
+           cygwin-1.5.1
+
+1.2.0.1-1: update to 1.2.0.1 beta release.  Compiled against
+           cygwin-1.5.0
+
+1.1.4-1: update to 1.1.4 release.  1.1.4 fixes a double-free
+  error that could cause heap corruption.
+
+1.1.3-7: no more need for -DZLIB_STATIC/-DALL_STATIC; now use
+  auto-import functionality.
+
+1.1.3-6: Added -DALL_STATIC synonym for -DZLIB_STATIC
+
+As of 1.1.3-5, the dll is named "cygz.dll" NOT "libz.dll".  This 
+  helps to avoid dll naming conflicts between cygwin dll's and 
+  dlls from other platforms (native, pw, etc).  If you have an
+  executable that depends on "libz.dll" you may either recompile 
+  your app so that it links with libz.dll.a/cygz.dll, or install
+  *just* the dll from zlib-1.1.3-4.tar.gz into your /usr/bin 
+  directory.
+
+The dll is NOT versioned. (i.e. "cygz.dll" NOT "cygz1.dll") because
+  the libz package and interface is quite stable, and its interface
+  is not anticipated to change in the foreseeable future.
+
+OS_TYPE is unix (0x03) not Win9x/NT (0x0b)
+
+All #ifdef (WIN32) statements are guarded with '&& !(__CYGWIN__)' or 
+  expanded with '|| (__CYGWIN__)' as appropriate. So, the cygwin 
+  version should work whether 'WIN32' is defined or not (e.g.
+  whether '-mwin32' is used or not)
+
+Binary package does NOT include the 586 or 686 optimized assembler
+  code. See Makefile.in for instructions on how to enable 
+  assembler optimizations.
+
+Most of the patches in zlib-1.1.3-X.patch have been submitted to 
+  zlib. Since Jean-loup Gailly seems to be MIA, the other maintainer
+  of zlib, Greg Roelofs, has placed a cygwin patch in the 'contrib'
+  directory of the ftp site: 
+    ftp://ftp.info-zip.org/pub/infozip/zlib/contrib
+  The patch in that contrib directory contains most of the important
+  parts of this patch. However, until an official zlib-1.1.4 is
+  released with those changes included, cygwin-zlib will be 
+  distributed with a patch against a 'clean' zlib-1.1.3 and thus 
+  will duplicate the changes in the patches Greg has accepted.
+
+Cygwin port maintained by: Charles Wilson cwilson@ece.gatech.edu

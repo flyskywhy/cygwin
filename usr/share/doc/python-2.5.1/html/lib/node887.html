@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="node886.html" />
+<link rel="parent" href="node884.html" />
+<link rel="next" href="module-compiler.visitor.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>31.3.3 Examples</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="31.3.2 assignment nodes"
+  href="node886.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="31.3 python Abstract Syntax"
+  href="node884.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="31.4 using Visitors to"
+  href="module-compiler.visitor.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node886.html">31.3.2 Assignment nodes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node884.html">31.3 Python Abstract Syntax</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-compiler.visitor.html">31.4 Using Visitors to</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0033330000000000000000">
+31.3.3 Examples</a>
+</h2>
+
+<p>
+This section shows several simple examples of ASTs for Python source
+code.  The examples demonstrate how to use the <tt class="function">parse()</tt>
+function, what the repr of an AST looks like, and how to access
+attributes of an AST node.
+
+<p>
+The first module defines a single function.  Assume it is stored in
+<span class="file">/tmp/doublelib.py</span>. 
+
+<p>
+<div class="verbatim"><pre>
+"""This is an example module.
+
+This is the docstring.
+"""
+
+def double(x):
+    "Return twice the argument"
+    return x * 2
+</pre></div>
+
+<p>
+In the interactive interpreter session below, I have reformatted the
+long AST reprs for readability.  The AST reprs use unqualified class
+names.  If you want to create an instance from a repr, you must import
+the class names from the <tt class="module">compiler.ast</tt> module.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import compiler
+&gt;&gt;&gt; mod = compiler.parseFile("/tmp/doublelib.py")
+&gt;&gt;&gt; mod
+Module('This is an example module.\n\nThis is the docstring.\n', 
+       Stmt([Function(None, 'double', ['x'], [], 0,
+                      'Return twice the argument', 
+                      Stmt([Return(Mul((Name('x'), Const(2))))]))]))
+&gt;&gt;&gt; from compiler.ast import *
+&gt;&gt;&gt; Module('This is an example module.\n\nThis is the docstring.\n', 
+...    Stmt([Function(None, 'double', ['x'], [], 0,
+...                   'Return twice the argument', 
+...                   Stmt([Return(Mul((Name('x'), Const(2))))]))]))
+Module('This is an example module.\n\nThis is the docstring.\n', 
+       Stmt([Function(None, 'double', ['x'], [], 0,
+                      'Return twice the argument', 
+                      Stmt([Return(Mul((Name('x'), Const(2))))]))]))
+&gt;&gt;&gt; mod.doc
+'This is an example module.\n\nThis is the docstring.\n'
+&gt;&gt;&gt; for node in mod.node.nodes:
+...     print node
+... 
+Function(None, 'double', ['x'], [], 0, 'Return twice the argument',
+         Stmt([Return(Mul((Name('x'), Const(2))))]))
+&gt;&gt;&gt; func = mod.node.nodes[0]
+&gt;&gt;&gt; func.code
+Stmt([Return(Mul((Name('x'), Const(2))))])
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="31.3.2 assignment nodes"
+  href="node886.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="31.3 python Abstract Syntax"
+  href="node884.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="31.4 using Visitors to"
+  href="module-compiler.visitor.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node886.html">31.3.2 Assignment nodes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node884.html">31.3 Python Abstract Syntax</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-compiler.visitor.html">31.4 Using Visitors to</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

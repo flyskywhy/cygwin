@@ -1,0 +1,80 @@
+################################################################################
+#
+# xfce4.cygclass - functions for building Xfce 4 packages
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: xfce4.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+HOMEPAGE="http://www.xfce.org/"
+
+case ${PN} in
+	gtk2-x11-engines-xfce)
+		ORIG_PN=gtk-xfce-engine
+		XFCE_VERSION=$((PVP[0] + 2)).${PVP[1]}.${PVP[2]}
+		;;
+	thunar-thumbnails|*-plugin)
+		SRC_URI="http://goodies.xfce.org/releases/${PN}/${P}.tar.bz2"
+		;;
+	thunar) ORIG_PN=Thunar ;;
+	xfce4-terminal) ORIG_PN=Terminal ;;
+esac
+
+if ! defined SRC_URI
+then
+	case ${PN} in
+		libxfce4mcs|libxfce4util|libxfcegui4|orage|xfce-mcs-manager\
+		|xfce-mcs-plugins|xfce-utils|xfce4-appfinder|xfce4-dev-tools\
+		|xfce4-icon-theme|xfce4-mixer|xfce4-panel|xfce4-session\
+		|xfdesktop|xfprint|xfwm4|xfwm4-themes)
+			XFCE_VERSION=${PV} ;;
+	esac
+
+	if defined XFCE_VERSION
+	then
+		SRC_URI="mirror://xfce/xfce-${XFCE_VERSION}/src/${ORIG_PN:-${PN}}-${PV}.tar.bz2"
+	fi
+fi
+
+SRC_DIR=${ORIG_PN:-${PN}}-${PV}
+
+xfce4_autoreconf() {
+	check_prog_req xdt-autogen xfce4-dev-tools
+
+	NOCONFIGURE=1 xdt-autogen || error "xdt-autogen failed"	
+}
+
+xfce4_compile() {
+	cygconf \
+		--libexecdir=/usr/lib/xfce4 \
+		--sbindir=/usr/lib/xfce4 \
+		--disable-static
+	cygmake
+}
+
+src_compile() {
+	cd ${S}
+	case ${PN} in
+		xfce4-dev-tools) ;;
+		*)	xfce4_autoreconf ;;
+	esac
+	cd ${B}
+	xfce4_compile
+}

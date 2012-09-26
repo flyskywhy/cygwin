@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-gdbm.html" />
+<link rel="prev" href="module-whichdb.html" />
+<link rel="parent" href="persistence.html" />
+<link rel="next" href="module-gdbm.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.8 dbm -- Simple ``database'' interface</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.7 whichdb  "
+  href="module-whichdb.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.9 gdbm  "
+  href="module-gdbm.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-whichdb.html">13.7 whichdb  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-gdbm.html">13.9 gdbm  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0015800000000000000000">
+13.8 <tt class="module">dbm</tt> --
+         Simple ``database'' interface</a>
+</h1>
+
+<p>
+<a name="module-dbm"></a>  
+<p class="availability">Availability: <span
+ class="platform">Unix</span>.</p>
+
+<p>
+The <tt class="module">dbm</tt> module provides an interface to the <span class="Unix">Unix</span>
+(<code>n</code>)<code>dbm</code> library.  Dbm objects behave like mappings
+(dictionaries), except that keys and values are always strings.
+Printing a dbm object doesn't print the keys and values, and the
+<tt class="method">items()</tt> and <tt class="method">values()</tt> methods are not supported.
+
+<p>
+This module can be used with the ``classic'' ndbm interface, the BSD
+DB compatibility interface, or the GNU GDBM compatibility interface.
+On <span class="Unix">Unix</span>, the <b class="program">configure</b> script will attempt to locate the
+appropriate header file to simplify building this module.
+
+<p>
+The module defines the following:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-2513' xml:id='l2h-2513' class="exception">error</tt></b></dt>
+<dd>
+Raised on dbm-specific errors, such as I/O errors.
+<tt class="exception">KeyError</tt> is raised for general mapping errors like
+specifying an incorrect key.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2514' xml:id='l2h-2514'>library</tt></b></dt>
+<dd>
+Name of the <code>ndbm</code> implementation library used.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2515' xml:id='l2h-2515' class="function">open</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, flag</var><big>[</big><var>, mode</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open a dbm database and return a dbm object.  The <var>filename</var>
+argument is the name of the database file (without the <span class="file">.dir</span> or
+<span class="file">.pag</span> extensions; note that the BSD DB implementation of the
+interface will append the extension <span class="file">.db</span> and only create one
+file).
+
+<p>
+The optional <var>flag</var> argument must be one of these values:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Value</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><code>'r'</code></td>
+        <td class="left"  >Open existing database for reading only (default)</td></tr>
+    <tr><td class="center" valign="baseline"><code>'w'</code></td>
+        <td class="left"  >Open existing database for reading and writing</td></tr>
+    <tr><td class="center" valign="baseline"><code>'c'</code></td>
+        <td class="left"  >Open database for reading and writing, creating it if
+               it doesn't exist</td></tr>
+    <tr><td class="center" valign="baseline"><code>'n'</code></td>
+        <td class="left"  >Always create a new, empty database, open for reading
+               and writing</td></tr></tbody>
+</table></div>
+
+<p>
+The optional <var>mode</var> argument is the <span class="Unix">Unix</span> mode of the file, used
+only when the database has to be created.  It defaults to octal
+<code>0666</code>.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-anydbm.html">anydbm</a></tt>:</b>
+    <dd>Generic interface to <code>dbm</code>-style databases.
+  </dl>
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-gdbm.html">gdbm</a></tt>:</b>
+    <dd>Similar interface to the GNU GDBM library.
+  </dl>
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-whichdb.html">whichdb</a></tt>:</b>
+    <dd>Utility module used to determine the type of an
+                      existing database.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.7 whichdb  "
+  href="module-whichdb.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.9 gdbm  "
+  href="module-gdbm.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-whichdb.html">13.7 whichdb  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-gdbm.html">13.9 gdbm  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

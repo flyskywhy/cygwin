@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="slots.html" />
+<link rel="prev" href="descriptors.html" />
+<link rel="parent" href="attribute-access.html" />
+<link rel="next" href="slots.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.4.2.3 Invoking Descriptors </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.2.2 implementing Descriptors"
+  href="descriptors.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4.2 customizing attribute access"
+  href="attribute-access.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.2.4 __slots__"
+  href="slots.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="descriptors.html">3.4.2.2 Implementing Descriptors</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="attribute-access.html">3.4.2 Customizing attribute access</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="slots.html">3.4.2.4 __slots__</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION005423000000000000000"></a><a name="descriptor-invocation"></a>
+<br>
+3.4.2.3 Invoking Descriptors 
+</h3>
+
+<p>
+In general, a descriptor is an object attribute with ``binding behavior'',
+one whose attribute access has been overridden by methods in the descriptor
+protocol:  <tt class="method">__get__()</tt>, <tt class="method">__set__()</tt>, and <tt class="method">__delete__()</tt>.
+If any of those methods are defined for an object, it is said to be a
+descriptor.
+
+<p>
+The default behavior for attribute access is to get, set, or delete the
+attribute from an object's dictionary. For instance, <code>a.x</code> has a
+lookup chain starting with <code>a.__dict__['x']</code>, then
+<code>type(a).__dict__['x']</code>, and continuing 
+through the base classes of <code>type(a)</code> excluding metaclasses.
+
+<p>
+However, if the looked-up value is an object defining one of the descriptor
+methods, then Python may override the default behavior and invoke the
+descriptor method instead.  Where this occurs in the precedence chain depends
+on which descriptor methods were defined and how they were called.  Note that
+descriptors are only invoked for new style objects or classes
+(ones that subclass <tt class="class">object()</tt> or <tt class="class">type()</tt>).
+
+<p>
+The starting point for descriptor invocation is a binding, <code>a.x</code>.
+How the arguments are assembled depends on <code>a</code>:
+
+<p>
+<dl compact>
+<dt>Direct Call</dt>
+<dd>The simplest and least common call is when user code
+    directly invokes a descriptor method:    <code>x.__get__(a)</code>.
+
+<p>
+</dd>
+<dt>Instance Binding</dt>
+<dd>If binding to a new-style object instance,
+    <code>a.x</code> is transformed into the call:
+    <code>type(a).__dict__['x'].__get__(a, type(a))</code>.
+
+<p>
+</dd>
+<dt>Class Binding</dt>
+<dd>If binding to a new-style class, <code>A.x</code>
+    is transformed into the call: <code>A.__dict__['x'].__get__(None, A)</code>.
+
+<p>
+</dd>
+<dt>Super Binding</dt>
+<dd>If <code>a</code> is an instance of <tt class="class">super</tt>,
+    then the binding <code>super(B, obj).m()</code> searches
+    <code>obj.__class__.__mro__</code> for the base class <code>A</code> immediately
+    preceding <code>B</code> and then invokes the descriptor with the call:
+    <code>A.__dict__['m'].__get__(obj, A)</code>.
+
+<p>
+</dd>
+</dl>
+
+<p>
+For instance bindings, the precedence of descriptor invocation depends
+on the which descriptor methods are defined.  Data descriptors define
+both <tt class="method">__get__()</tt> and <tt class="method">__set__()</tt>.  Non-data descriptors have
+just the <tt class="method">__get__()</tt> method.  Data descriptors always override
+a redefinition in an instance dictionary.  In contrast, non-data
+descriptors can be overridden by instances.
+
+<p>
+Python methods (including <tt class="function">staticmethod()</tt> and <tt class="function">classmethod()</tt>)
+are implemented as non-data descriptors.  Accordingly, instances can
+redefine and override methods.  This allows individual instances to acquire
+behaviors that differ from other instances of the same class.                     
+
+<p>
+The <tt class="function">property()</tt> function is implemented as a data descriptor.
+Accordingly, instances cannot override the behavior of a property.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.2.2 implementing Descriptors"
+  href="descriptors.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4.2 customizing attribute access"
+  href="attribute-access.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.2.4 __slots__"
+  href="slots.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="descriptors.html">3.4.2.2 Implementing Descriptors</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="attribute-access.html">3.4.2 Customizing attribute access</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="slots.html">3.4.2.4 __slots__</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

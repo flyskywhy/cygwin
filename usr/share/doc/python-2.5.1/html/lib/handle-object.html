@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module--winreg.html" />
+<link rel="parent" href="module--winreg.html" />
+<link rel="next" href="module-winsound.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>36.3.1 Registry Handle Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="36.3 _winreg - Windows"
+  href="module--winreg.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="36.3 _winreg - Windows"
+  href="module--winreg.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="36.4 winsound  "
+  href="module-winsound.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module--winreg.html">36.3 _winreg - Windows</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module--winreg.html">36.3 _winreg - Windows</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-winsound.html">36.4 winsound  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0038310000000000000000"></a><a name="handle-object"></a>
+<br>
+36.3.1 Registry Handle Objects 
+</h2>
+
+<p>
+This object wraps a Windows HKEY object, automatically closing it when
+ the object is destroyed.  To guarantee cleanup, you can call either
+ the <tt class="method">Close()</tt> method on the object, or the 
+ <tt class="function">CloseKey()</tt> function.
+
+<p>
+All registry functions in this module return one of these objects.
+
+<p>
+All registry functions in this module which accept a handle object 
+ also accept an integer, however, use of the handle object is 
+ encouraged.
+
+<p>
+Handle objects provide semantics for <tt class="method">__nonzero__()</tt> - thus
+<div class="verbatim"><pre>
+    if handle:
+        print "Yes"
+</pre></div>
+ will print <code>Yes</code> if the handle is currently valid (has not been
+ closed or detached).
+
+<p>
+The object also support comparison semantics, so handle
+ objects will compare true if they both reference the same
+ underlying Windows handle value.
+
+<p>
+Handle objects can be converted to an integer (e.g., using the
+ builtin <tt class="function">int()</tt> function), in which case the underlying
+ Windows handle value is returned.  You can also use the 
+ <tt class="method">Detach()</tt> method to return the integer handle, and
+ also disconnect the Windows handle from the handle object.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5840' xml:id='l2h-5840' class="method">Close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Closes the underlying Windows handle.
+
+<p>
+If the handle is already closed, no error is raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5841' xml:id='l2h-5841' class="method">Detach</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Detaches the Windows handle from the handle object.
+
+<p>
+The result is an integer (or long on 64 bit Windows) that holds
+ the value of the handle before it is detached.  If the
+ handle is already detached or closed, this will return zero.
+
+<p>
+After calling this function, the handle is effectively invalidated,
+ but the handle is not closed.  You would call this function when 
+ you need the underlying Win32 handle to exist beyond the lifetime 
+ of the handle object.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="36.3 _winreg - Windows"
+  href="module--winreg.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="36.3 _winreg - Windows"
+  href="module--winreg.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="36.4 winsound  "
+  href="module-winsound.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module--winreg.html">36.3 _winreg - Windows</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module--winreg.html">36.3 _winreg - Windows</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-winsound.html">36.4 winsound  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="http-redirect-handler.html" />
+<link rel="prev" href="opener-director-objects.html" />
+<link rel="parent" href="module-urllib2.html" />
+<link rel="next" href="http-redirect-handler.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.6.3 BaseHandler Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.6.2 openerdirector Objects"
+  href="opener-director-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.6 urllib2  "
+  href="module-urllib2.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.6.4 httpredirecthandler Objects"
+  href="http-redirect-handler.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="opener-director-objects.html">18.6.2 OpenerDirector Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-urllib2.html">18.6 urllib2  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="http-redirect-handler.html">18.6.4 HTTPRedirectHandler Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020630000000000000000"></a><a name="base-handler-objects"></a>
+<br>
+18.6.3 BaseHandler Objects 
+</h2>
+
+<p>
+<tt class="class">BaseHandler</tt> objects provide a couple of methods that are
+directly useful, and others that are meant to be used by derived
+classes.  These are intended for direct use:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3973' xml:id='l2h-3973' class="method">add_parent</tt></b>(</nobr></td>
+  <td><var>director</var>)</td></tr></table></dt>
+<dd>
+Add a director as parent.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3974' xml:id='l2h-3974' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Remove any parents.
+</dl>
+
+<p>
+The following members and methods should only be used by classes
+derived from <tt class="class">BaseHandler</tt>.  <span class="note"><b class="label">Note:</b>
+The convention has been
+adopted that subclasses defining <tt class="method"><var>protocol</var>_request()</tt> or
+<tt class="method"><var>protocol</var>_response()</tt> methods are named
+<tt class="class">*Processor</tt>; all others are named <tt class="class">*Handler</tt>.</span>
+
+<p>
+<dl><dt><b><tt id='l2h-3975' xml:id='l2h-3975' class="member">parent</tt></b></dt>
+<dd>
+A valid <tt class="class">OpenerDirector</tt>, which can be used to open using a
+different protocol, or handle errors.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3976' xml:id='l2h-3976' class="method">default_open</tt></b>(</nobr></td>
+  <td><var>req</var>)</td></tr></table></dt>
+<dd>
+This method is <em>not</em> defined in <tt class="class">BaseHandler</tt>, but
+subclasses should define it if they want to catch all URLs.
+
+<p>
+This method, if implemented, will be called by the parent
+<tt class="class">OpenerDirector</tt>.  It should return a file-like object as
+described in the return value of the <tt class="method">open()</tt> of
+<tt class="class">OpenerDirector</tt>, or <code>None</code>.  It should raise
+<tt class="exception">URLError</tt>, unless a truly exceptional thing happens (for
+example, <tt class="exception">MemoryError</tt> should not be mapped to
+<tt class="exception">URLError</tt>).
+
+<p>
+This method will be called before any protocol-specific open method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><var>protocol</var>_open</b>(</nobr></td>
+  <td><var>req</var>)</td></tr></table></dt>
+<dd>
+This method is <em>not</em> defined in <tt class="class">BaseHandler</tt>, but
+subclasses should define it if they want to handle URLs with the given
+protocol.
+
+<p>
+This method, if defined, will be called by the parent
+<tt class="class">OpenerDirector</tt>.  Return values should be the same as for 
+<tt class="method">default_open()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3977' xml:id='l2h-3977' class="method">unknown_open</tt></b>(</nobr></td>
+  <td><var>req</var>)</td></tr></table></dt>
+<dd>
+This method is <var>not</var> defined in <tt class="class">BaseHandler</tt>, but
+subclasses should define it if they want to catch all URLs with no
+specific registered handler to open it.
+
+<p>
+This method, if implemented, will be called by the <tt class="member">parent</tt> 
+<tt class="class">OpenerDirector</tt>.  Return values should be the same as for 
+<tt class="method">default_open()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3978' xml:id='l2h-3978' class="method">http_error_default</tt></b>(</nobr></td>
+  <td><var>req, fp, code, msg, hdrs</var>)</td></tr></table></dt>
+<dd>
+This method is <em>not</em> defined in <tt class="class">BaseHandler</tt>, but
+subclasses should override it if they intend to provide a catch-all
+for otherwise unhandled HTTP errors.  It will be called automatically
+by the  <tt class="class">OpenerDirector</tt> getting the error, and should not
+normally be called in other circumstances.
+
+<p>
+<var>req</var> will be a <tt class="class">Request</tt> object, <var>fp</var> will be a
+file-like object with the HTTP error body, <var>code</var> will be the
+three-digit code of the error, <var>msg</var> will be the user-visible
+explanation of the code and <var>hdrs</var> will be a mapping object with
+the headers of the error.
+
+<p>
+Return values and exceptions raised should be the same as those
+of <tt class="function">urlopen()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3979' xml:id='l2h-3979' class="method">http_error_<var>nnn</var></tt></b>(</nobr></td>
+  <td><var>req, fp, code, msg, hdrs</var>)</td></tr></table></dt>
+<dd>
+<var>nnn</var> should be a three-digit HTTP error code.  This method is
+also not defined in <tt class="class">BaseHandler</tt>, but will be called, if it
+exists, on an instance of a subclass, when an HTTP error with code
+<var>nnn</var> occurs.
+
+<p>
+Subclasses should override this method to handle specific HTTP
+errors.
+
+<p>
+Arguments, return values and exceptions raised should be the same as
+for <tt class="method">http_error_default()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><var>protocol</var>_request</b>(</nobr></td>
+  <td><var>req</var>)</td></tr></table></dt>
+<dd>
+This method is <em>not</em> defined in <tt class="class">BaseHandler</tt>, but
+subclasses should define it if they want to pre-process requests of
+the given protocol.
+
+<p>
+This method, if defined, will be called by the parent
+<tt class="class">OpenerDirector</tt>.  <var>req</var> will be a <tt class="class">Request</tt> object.
+The return value should be a <tt class="class">Request</tt> object.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><var>protocol</var>_response</b>(</nobr></td>
+  <td><var>req, response</var>)</td></tr></table></dt>
+<dd>
+This method is <em>not</em> defined in <tt class="class">BaseHandler</tt>, but
+subclasses should define it if they want to post-process responses of
+the given protocol.
+
+<p>
+This method, if defined, will be called by the parent
+<tt class="class">OpenerDirector</tt>.  <var>req</var> will be a <tt class="class">Request</tt> object.
+<var>response</var> will be an object implementing the same interface as
+the return value of <tt class="function">urlopen()</tt>.  The return value should
+implement the same interface as the return value of
+<tt class="function">urlopen()</tt>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.6.2 openerdirector Objects"
+  href="opener-director-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.6 urllib2  "
+  href="module-urllib2.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.6.4 httpredirecthandler Objects"
+  href="http-redirect-handler.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="opener-director-objects.html">18.6.2 OpenerDirector Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-urllib2.html">18.6 urllib2  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="http-redirect-handler.html">18.6.4 HTTPRedirectHandler Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

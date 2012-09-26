@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="attribute-access.html" />
+<link rel="prev" href="specialnames.html" />
+<link rel="parent" href="specialnames.html" />
+<link rel="next" href="attribute-access.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.4.1 Basic customization</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.2 customizing attribute access"
+  href="attribute-access.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="attribute-access.html">3.4.2 Customizing attribute access</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION005410000000000000000"></a><a name="customization"></a><a id='l2h-177' xml:id='l2h-177'></a>
+<br>
+3.4.1 Basic customization
+</h2>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-178' xml:id='l2h-178' class="method">__new__</tt></b>(</nobr></td>
+  <td><var>cls</var><big>[</big><var>, ...</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Called to create a new instance of class <var>cls</var>.  <tt class="method">__new__()</tt>
+is a static method (special-cased so you need not declare it as such)
+that takes the class of which an instance was requested as its first
+argument.  The remaining arguments are those passed to the object
+constructor expression (the call to the class).  The return value of
+<tt class="method">__new__()</tt> should be the new object instance (usually an
+instance of <var>cls</var>).
+
+<p>
+Typical implementations create a new instance of the class by invoking
+the superclass's <tt class="method">__new__()</tt> method using
+"<tt class="samp">super(<var>currentclass</var>, <var>cls</var>).__new__(<var>cls</var>[, ...])</tt>"with appropriate arguments and then modifying the newly-created instance
+as necessary before returning it.
+
+<p>
+If <tt class="method">__new__()</tt> returns an instance of <var>cls</var>, then the new
+instance's <tt class="method">__init__()</tt> method will be invoked like
+"<tt class="samp">__init__(<var>self</var>[, ...])</tt>", where <var>self</var> is the new instance
+and the remaining arguments are the same as were passed to
+<tt class="method">__new__()</tt>.
+
+<p>
+If <tt class="method">__new__()</tt> does not return an instance of <var>cls</var>, then the
+new instance's <tt class="method">__init__()</tt> method will not be invoked.
+
+<p>
+<tt class="method">__new__()</tt> is intended mainly to allow subclasses of
+immutable types (like int, str, or tuple) to customize instance
+creation.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-179' xml:id='l2h-179' class="method">__init__</tt></b>(</nobr></td>
+  <td><var>self</var><big>[</big><var>, ...</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Called<a id='l2h-180' xml:id='l2h-180'></a> when the instance is created.  The
+arguments are those passed to the class constructor expression.  If a
+base class has an <tt class="method">__init__()</tt> method, the derived class's
+<tt class="method">__init__()</tt> method, if any, must explicitly call it to ensure proper
+initialization of the base class part of the instance; for example:
+"<tt class="samp">BaseClass.__init__(<var>self</var>, [<var>args</var>...])</tt>".  As a special
+constraint on constructors, no value may be returned; doing so will
+cause a <tt class="exception">TypeError</tt> to be raised at runtime.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-181' xml:id='l2h-181' class="method">__del__</tt></b>(</nobr></td>
+  <td><var>self</var>)</td></tr></table></dt>
+<dd>
+Called when the instance is about to be destroyed.  This is also
+called a destructor<a id='l2h-210' xml:id='l2h-210'></a>.  If a base class
+has a <tt class="method">__del__()</tt> method, the derived class's <tt class="method">__del__()</tt>
+method, if any,
+must explicitly call it to ensure proper deletion of the base class
+part of the instance.  Note that it is possible (though not recommended!)
+for the <tt class="method">__del__()</tt>
+method to postpone destruction of the instance by creating a new
+reference to it.  It may then be called at a later time when this new
+reference is deleted.  It is not guaranteed that
+<tt class="method">__del__()</tt> methods are called for objects that still exist when
+the interpreter exits.
+<a id='l2h-182' xml:id='l2h-182'></a>
+<p>
+<div class="note"><b class="label">Note:</b>
+"<tt class="samp">del x</tt>" doesn't directly call
+<code>x.__del__()</code> -- the former decrements the reference count for
+<code>x</code> by one, and the latter is only called when <code>x</code>'s reference
+count reaches zero.  Some common situations that may prevent the
+reference count of an object from going to zero include: circular
+references between objects (e.g., a doubly-linked list or a tree data
+structure with parent and child pointers); a reference to the object
+on the stack frame of a function that caught an exception (the
+traceback stored in <code>sys.exc_traceback</code> keeps the stack frame
+alive); or a reference to the object on the stack frame that raised an
+unhandled exception in interactive mode (the traceback stored in
+<code>sys.last_traceback</code> keeps the stack frame alive).  The first
+situation can only be remedied by explicitly breaking the cycles; the
+latter two situations can be resolved by storing <code>None</code> in
+<code>sys.exc_traceback</code> or <code>sys.last_traceback</code>.  Circular
+references which are garbage are detected when the option cycle
+detector is enabled (it's on by default), but can only be cleaned up
+if there are no Python-level <tt class="method">__del__()</tt> methods involved.
+Refer to the documentation for the <a class="ulink" href="../lib/module-gc.html"
+  ><tt class="module">gc</tt>
+module</a> for more information about how
+<tt class="method">__del__()</tt> methods are handled by the cycle detector,
+particularly the description of the <code>garbage</code> value.
+</div>
+
+<p>
+<div class="warning"><b class="label">Warning:</b>
+
+Due to the precarious circumstances under which
+<tt class="method">__del__()</tt> methods are invoked, exceptions that occur during their
+execution are ignored, and a warning is printed to <code>sys.stderr</code>
+instead.  Also, when <tt class="method">__del__()</tt> is invoked in response to a module
+being deleted (e.g., when execution of the program is done), other
+globals referenced by the <tt class="method">__del__()</tt> method may already have been
+deleted.  For this reason, <tt class="method">__del__()</tt> methods should do the
+absolute minimum needed to maintain external invariants.  Starting with
+version 1.5, Python guarantees that globals whose name begins with a single
+underscore are deleted from their module before other globals are deleted;
+if no other references to such globals exist, this may help in assuring that
+imported modules are still available at the time when the
+<tt class="method">__del__()</tt> method is called.
+</div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-183' xml:id='l2h-183' class="method">__repr__</tt></b>(</nobr></td>
+  <td><var>self</var>)</td></tr></table></dt>
+<dd>
+Called by the <tt class="function">repr()</tt><a id='l2h-184' xml:id='l2h-184'></a> built-in function
+and by string conversions (reverse quotes) to compute the ``official''
+string representation of an object.  If at all possible, this should
+look like a valid Python expression that could be used to recreate an
+object with the same value (given an appropriate environment).  If
+this is not possible, a string of the form "<tt class="samp">&lt;<var>...some useful
+description...</var>&gt;</tt>" should be returned.  The return value must be a
+string object.
+If a class defines <tt class="method">__repr__()</tt> but not <tt class="method">__str__()</tt>,
+then <tt class="method">__repr__()</tt> is also used when an ``informal'' string
+representation of instances of that class is required.		     
+
+<p>
+This is typically used for debugging, so it is important that the
+representation is information-rich and unambiguous.
+<a id='l2h-185' xml:id='l2h-185'></a><a id='l2h-186' xml:id='l2h-186'></a><a id='l2h-187' xml:id='l2h-187'></a></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-188' xml:id='l2h-188' class="method">__str__</tt></b>(</nobr></td>
+  <td><var>self</var>)</td></tr></table></dt>
+<dd>
+Called by the <tt class="function">str()</tt><a id='l2h-189' xml:id='l2h-189'></a> built-in function and
+by the <tt class="keyword">print</tt><a id='l2h-190' xml:id='l2h-190'></a> statement to compute the
+``informal'' string representation of an object.  This differs from
+<tt class="method">__repr__()</tt> in that it does not have to be a valid Python
+expression: a more convenient or concise representation may be used
+instead.  The return value must be a string object.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-191' xml:id='l2h-191' class="method">__lt__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-192' xml:id='l2h-192' class="method">__le__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-193' xml:id='l2h-193' class="method">__eq__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-194' xml:id='l2h-194' class="method">__ne__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-195' xml:id='l2h-195' class="method">__gt__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-196' xml:id='l2h-196' class="method">__ge__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd>
+<span class="versionnote">New in version 2.1.</span>
+
+These are the so-called ``rich comparison'' methods, and are called
+for comparison operators in preference to <tt class="method">__cmp__()</tt> below.
+The correspondence between operator symbols and method names is as
+follows:
+<code><var>x</var>&lt;<var>y</var></code> calls <code><var>x</var>.__lt__(<var>y</var>)</code>,
+<code><var>x</var>&lt;=<var>y</var></code> calls <code><var>x</var>.__le__(<var>y</var>)</code>,
+<code><var>x</var>==<var>y</var></code> calls <code><var>x</var>.__eq__(<var>y</var>)</code>,
+<code><var>x</var>!=<var>y</var></code> and <code><var>x</var>&lt;&gt;<var>y</var></code> call
+<code><var>x</var>.__ne__(<var>y</var>)</code>,
+<code><var>x</var>&gt;<var>y</var></code> calls <code><var>x</var>.__gt__(<var>y</var>)</code>, and
+<code><var>x</var>&gt;=<var>y</var></code> calls <code><var>x</var>.__ge__(<var>y</var>)</code>.
+
+<p>
+A rich comparison method may return the singleton <code>NotImplemented</code> if it
+does not implement the operation for a given pair of arguments.
+By convention, <code>False</code> and <code>True</code> are returned for a successful
+comparison. However, these methods can return any value, so if the
+comparison operator is used in a Boolean context (e.g., in the condition
+of an <code>if</code> statement), Python will call <tt class="function">bool()</tt> on the
+value to determine if the result is true or false.
+
+<p>
+There are no implied relationships among the comparison operators.
+The truth of <code><var>x</var>==<var>y</var></code> does not imply that <code><var>x</var>!=<var>y</var></code>
+is false.  Accordingly, when defining <tt class="method">__eq__()</tt>, one should also
+define <tt class="method">__ne__()</tt> so that the operators will behave as expected.
+
+<p>
+There are no reflected (swapped-argument) versions of these methods
+(to be used when the left argument does not support the operation but
+the right argument does); rather, <tt class="method">__lt__()</tt> and
+<tt class="method">__gt__()</tt> are each other's reflection, <tt class="method">__le__()</tt> and
+<tt class="method">__ge__()</tt> are each other's reflection, and <tt class="method">__eq__()</tt>
+and <tt class="method">__ne__()</tt> are their own reflection.
+
+<p>
+Arguments to rich comparison methods are never coerced.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-197' xml:id='l2h-197' class="method">__cmp__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd>
+Called by comparison operations if rich comparison (see above) is not
+defined.  Should return a negative integer if <code>self &lt; other</code>,
+zero if <code>self == other</code>, a positive integer if <code>self &gt;
+other</code>.  If no <tt class="method">__cmp__()</tt>, <tt class="method">__eq__()</tt> or
+<tt class="method">__ne__()</tt> operation is defined, class instances are compared
+by object identity (``address'').  See also the description of
+<tt class="method">__hash__()</tt> for some important notes on creating objects which
+support custom comparison operations and are usable as dictionary
+keys.
+(Note: the restriction that exceptions are not propagated by
+<tt class="method">__cmp__()</tt> has been removed since Python 1.5.)
+<a id='l2h-198' xml:id='l2h-198'></a></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-199' xml:id='l2h-199' class="method">__rcmp__</tt></b>(</nobr></td>
+  <td><var>self, other</var>)</td></tr></table></dt>
+<dd>
+  
+<span class="versionnote">Changed in version 2.1:
+No longer supported.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-200' xml:id='l2h-200' class="method">__hash__</tt></b>(</nobr></td>
+  <td><var>self</var>)</td></tr></table></dt>
+<dd>
+Called for the key object for dictionary <a id='l2h-201' xml:id='l2h-201'></a>operations, and by the built-in function
+<tt class="function">hash()</tt><a id='l2h-202' xml:id='l2h-202'></a>.  Should return a 32-bit integer
+usable as a hash value
+for dictionary operations.  The only required property is that objects
+which compare equal have the same hash value; it is advised to somehow
+mix together (e.g., using exclusive or) the hash values for the
+components of the object that also play a part in comparison of
+objects.  If a class does not define a <tt class="method">__cmp__()</tt> method it should
+not define a <tt class="method">__hash__()</tt> operation either; if it defines
+<tt class="method">__cmp__()</tt> or <tt class="method">__eq__()</tt> but not <tt class="method">__hash__()</tt>,
+its instances will not be usable as dictionary keys.  If a class
+defines mutable objects and implements a <tt class="method">__cmp__()</tt> or
+<tt class="method">__eq__()</tt> method, it should not implement <tt class="method">__hash__()</tt>,
+since the dictionary implementation requires that a key's hash value
+is immutable (if the object's hash value changes, it will be in the
+wrong hash bucket).
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+<tt class="method">__hash__()</tt> may now also return a long
+integer object; the 32-bit integer is then derived from the hash
+of that object.</span>
+
+<p>
+<a id='l2h-204' xml:id='l2h-204'></a></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-205' xml:id='l2h-205' class="method">__nonzero__</tt></b>(</nobr></td>
+  <td><var>self</var>)</td></tr></table></dt>
+<dd>
+Called to implement truth value testing, and the built-in operation
+<code>bool()</code>; should return <code>False</code> or <code>True</code>, or their
+integer equivalents <code>0</code> or <code>1</code>.
+When this method is not defined, <tt class="method">__len__()</tt> is
+called, if it is defined (see below).  If a class defines neither
+<tt class="method">__len__()</tt> nor <tt class="method">__nonzero__()</tt>, all its instances are
+considered true.
+<a id='l2h-207' xml:id='l2h-207'></a></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-208' xml:id='l2h-208' class="method">__unicode__</tt></b>(</nobr></td>
+  <td><var>self</var>)</td></tr></table></dt>
+<dd>
+Called to implement <tt class="function">unicode()</tt><a id='l2h-209' xml:id='l2h-209'></a> builtin;
+should return a Unicode object. When this method is not defined, string
+conversion is attempted, and the result of string conversion is converted
+to Unicode using the system default encoding.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.2 customizing attribute access"
+  href="attribute-access.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="attribute-access.html">3.4.2 Customizing attribute access</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

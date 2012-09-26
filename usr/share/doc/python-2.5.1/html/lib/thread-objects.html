@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="timer-objects.html" />
+<link rel="prev" href="event-objects.html" />
+<link rel="parent" href="module-threading.html" />
+<link rel="next" href="timer-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>15.3.6 Thread Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.3.5 event Objects"
+  href="event-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15.3 threading  "
+  href="module-threading.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.3.7 timer Objects"
+  href="timer-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="event-objects.html">15.3.5 Event Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-threading.html">15.3 threading  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="timer-objects.html">15.3.7 Timer Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0017360000000000000000"></a><a name="thread-objects"></a>
+<br>
+15.3.6 Thread Objects 
+</h2>
+
+<p>
+This class represents an activity that is run in a separate thread
+of control.  There are two ways to specify the activity: by
+passing a callable object to the constructor, or by overriding the
+<tt class="method">run()</tt> method in a subclass.  No other methods (except for the
+constructor) should be overridden in a subclass.  In other words, 
+<em>only</em>  override the <tt class="method">__init__()</tt> and <tt class="method">run()</tt>
+methods of this class.
+
+<p>
+Once a thread object is created, its activity must be started by
+calling the thread's <tt class="method">start()</tt> method.  This invokes the
+<tt class="method">run()</tt> method in a separate thread of control.
+
+<p>
+Once the thread's activity is started, the thread is considered
+'alive'. It stops being alive when its <tt class="method">run()</tt> method terminates
+- either normally, or by raising an unhandled exception.  The
+<tt class="method">isAlive()</tt> method tests whether the thread is alive.
+
+<p>
+Other threads can call a thread's <tt class="method">join()</tt> method.  This blocks
+the calling thread until the thread whose <tt class="method">join()</tt> method is
+called is terminated.
+
+<p>
+A thread has a name.  The name can be passed to the constructor,
+set with the <tt class="method">setName()</tt> method, and retrieved with the
+<tt class="method">getName()</tt> method.
+
+<p>
+A thread can be flagged as a ``daemon thread''.  The significance
+of this flag is that the entire Python program exits when only
+daemon threads are left.  The initial value is inherited from the
+creating thread.  The flag can be set with the <tt class="method">setDaemon()</tt>
+method and retrieved with the <tt class="method">isDaemon()</tt> method.
+
+<p>
+There is a ``main thread'' object; this corresponds to the
+initial thread of control in the Python program.  It is not a
+daemon thread.
+
+<p>
+There is the possibility that ``dummy thread objects'' are created.
+These are thread objects corresponding to ``alien threads'', which
+are threads of control started outside the threading module, such as
+directly from C code.  Dummy thread objects have limited
+functionality; they are always considered alive and daemonic, and
+cannot be <tt class="method">join()</tt>ed.  They are never deleted, since it is
+impossible to detect the termination of alien threads.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3456' xml:id='l2h-3456' class="class">Thread</tt></b>(</nobr></td>
+  <td><var>group=None, target=None, name=None,
+                          args=(), kwargs={}</var>)</td></tr></table></dt>
+<dd>
+This constructor should always be called with keyword
+arguments.  Arguments are:
+
+<p>
+<var>group</var> should be <code>None</code>; reserved for future extension when
+a <tt class="class">ThreadGroup</tt> class is implemented.
+
+<p>
+<var>target</var> is the callable object to be invoked by the
+<tt class="method">run()</tt> method.  Defaults to <code>None</code>, meaning nothing is
+called.
+
+<p>
+<var>name</var> is the thread name.  By default, a unique name is
+constructed of the form ``Thread-<var>N</var>'' where <var>N</var> is a small
+decimal number.
+
+<p>
+<var>args</var> is the argument tuple for the target invocation.  Defaults
+to <code>()</code>.
+
+<p>
+<var>kwargs</var> is a dictionary of keyword arguments for the target
+invocation.  Defaults to <code>{}</code>.
+
+<p>
+If the subclass overrides the constructor, it must make sure
+to invoke the base class constructor (<code>Thread.__init__()</code>)
+before doing anything else to the thread.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3457' xml:id='l2h-3457' class="method">start</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Start the thread's activity.
+
+<p>
+This must be called at most once per thread object.  It
+arranges for the object's <tt class="method">run()</tt> method to be invoked in a
+separate thread of control.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3458' xml:id='l2h-3458' class="method">run</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Method representing the thread's activity.
+
+<p>
+You may override this method in a subclass.  The standard
+<tt class="method">run()</tt> method invokes the callable object passed to the
+object's constructor as the <var>target</var> argument, if any, with
+sequential and keyword arguments taken from the <var>args</var> and
+<var>kwargs</var> arguments, respectively.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3459' xml:id='l2h-3459' class="method">join</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>timeout</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Wait until the thread terminates.
+This blocks the calling thread until the thread whose <tt class="method">join()</tt>
+method is called terminates - either normally or through an
+unhandled exception - or until the optional timeout occurs.
+
+<p>
+When the <var>timeout</var> argument is present and not <code>None</code>, it
+should be a floating point number specifying a timeout for the
+operation in seconds (or fractions thereof). As <tt class="method">join()</tt> always 
+returns <code>None</code>, you must call <tt class="method">isAlive()</tt> to decide whether 
+a timeout happened.
+
+<p>
+When the <var>timeout</var> argument is not present or <code>None</code>, the
+operation will block until the thread terminates.
+
+<p>
+A thread can be <tt class="method">join()</tt>ed many times.
+
+<p>
+A thread cannot join itself because this would cause a
+deadlock.
+
+<p>
+It is an error to attempt to <tt class="method">join()</tt> a thread before it has
+been started.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3460' xml:id='l2h-3460' class="method">getName</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the thread's name.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3461' xml:id='l2h-3461' class="method">setName</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+Set the thread's name.
+
+<p>
+The name is a string used for identification purposes only.
+It has no semantics.  Multiple threads may be given the same
+name.  The initial name is set by the constructor.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3462' xml:id='l2h-3462' class="method">isAlive</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return whether the thread is alive.
+
+<p>
+Roughly, a thread is alive from the moment the <tt class="method">start()</tt> method
+returns until its <tt class="method">run()</tt> method terminates. The module
+function <tt class="function">enumerate()</tt> returns a list of all alive threads.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3463' xml:id='l2h-3463' class="method">isDaemon</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the thread's daemon flag.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3464' xml:id='l2h-3464' class="method">setDaemon</tt></b>(</nobr></td>
+  <td><var>daemonic</var>)</td></tr></table></dt>
+<dd>
+Set the thread's daemon flag to the Boolean value <var>daemonic</var>.
+This must be called before <tt class="method">start()</tt> is called.
+
+<p>
+The initial value is inherited from the creating thread.
+
+<p>
+The entire Python program exits when no alive non-daemon threads are
+left.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.3.5 event Objects"
+  href="event-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15.3 threading  "
+  href="module-threading.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.3.7 timer Objects"
+  href="timer-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="event-objects.html">15.3.5 Event Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-threading.html">15.3 threading  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="timer-objects.html">15.3.7 Timer Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-asyncore.html" />
+<link rel="prev" href="module-signal.html" />
+<link rel="parent" href="ipc.html" />
+<link rel="next" href="popen3-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>17.4 popen2 -- Subprocesses with accessible I/O streams</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.3.1 Example"
+  href="node545.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17. interprocess Communication and"
+  href="ipc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.4.1 popen3 and Popen4"
+  href="popen3-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node545.html">17.3.1 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ipc.html">17. Interprocess Communication and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="popen3-objects.html">17.4.1 Popen3 and Popen4</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0019400000000000000000">
+17.4 <tt class="module">popen2</tt> --
+         Subprocesses with accessible I/O streams</a>
+</h1>
+
+<p>
+<a name="module-popen2"></a>
+
+<p>
+This module allows you to spawn processes and connect to their
+input/output/error pipes and obtain their return codes under
+<span class="Unix">Unix</span> and Windows.
+
+<p>
+The <tt class="module">subprocess</tt> module provides more powerful facilities for
+spawning new processes and retrieving their results.  Using the
+<tt class="module">subprocess</tt> module is preferable to using the <tt class="module">popen2</tt>
+module.
+
+<p>
+The primary interface offered by this module is a trio of factory
+functions.  For each of these, if <var>bufsize</var> is specified, 
+it specifies the buffer size for the I/O pipes.  <var>mode</var>, if
+provided, should be the string <code>'b'</code> or <code>'t'</code>; on Windows
+this is needed to determine whether the file objects should be opened
+in binary or text mode.  The default value for <var>mode</var> is
+<code>'t'</code>.
+
+<p>
+On <span class="Unix">Unix</span>, <var>cmd</var> may be a sequence, in which case arguments will be passed
+directly to the program without shell intervention (as with
+<tt class="function">os.spawnv()</tt>). If <var>cmd</var> is a string it will be passed to the
+shell (as with <tt class="function">os.system()</tt>).
+
+<p>
+The only way to retrieve the return codes for the child processes is
+by using the <tt class="method">poll()</tt> or <tt class="method">wait()</tt> methods on the
+<tt class="class">Popen3</tt> and <tt class="class">Popen4</tt> classes; these are only available on
+<span class="Unix">Unix</span>.  This information is not available when using the
+<tt class="function">popen2()</tt>, <tt class="function">popen3()</tt>, and <tt class="function">popen4()</tt>
+functions, or the equivalent functions in the <tt class="module"><a href="module-os.html">os</a></tt> module.
+(Note that the tuples returned by the <tt class="module"><a href="module-os.html">os</a></tt> module's functions
+are in a different order from the ones returned by the <tt class="module">popen2</tt>
+module.)
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3735' xml:id='l2h-3735' class="function">popen2</tt></b>(</nobr></td>
+  <td><var>cmd</var><big>[</big><var>, bufsize</var><big>[</big><var>, mode</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Executes <var>cmd</var> as a sub-process.  Returns the file objects
+<code>(<var>child_stdout</var>, <var>child_stdin</var>)</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3736' xml:id='l2h-3736' class="function">popen3</tt></b>(</nobr></td>
+  <td><var>cmd</var><big>[</big><var>, bufsize</var><big>[</big><var>, mode</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Executes <var>cmd</var> as a sub-process.  Returns the file objects
+<code>(<var>child_stdout</var>, <var>child_stdin</var>, <var>child_stderr</var>)</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3737' xml:id='l2h-3737' class="function">popen4</tt></b>(</nobr></td>
+  <td><var>cmd</var><big>[</big><var>, bufsize</var><big>[</big><var>, mode</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Executes <var>cmd</var> as a sub-process.  Returns the file objects
+<code>(<var>child_stdout_and_stderr</var>, <var>child_stdin</var>)</code>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dl>
+
+<p>
+On <span class="Unix">Unix</span>, a class defining the objects returned by the factory
+functions is also available.  These are not used for the Windows
+implementation, and are not available on that platform.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3738' xml:id='l2h-3738' class="class">Popen3</tt></b>(</nobr></td>
+  <td><var>cmd</var><big>[</big><var>, capturestderr</var><big>[</big><var>, bufsize</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This class represents a child process.  Normally, <tt class="class">Popen3</tt>
+instances are created using the <tt class="function">popen2()</tt> and
+<tt class="function">popen3()</tt> factory functions described above.
+
+<p>
+If not using one of the helper functions to create <tt class="class">Popen3</tt>
+objects, the parameter <var>cmd</var> is the shell command to execute in a
+sub-process.  The <var>capturestderr</var> flag, if true, specifies that
+the object should capture standard error output of the child process.
+The default is false.  If the <var>bufsize</var> parameter is specified, it
+specifies the size of the I/O buffers to/from the child process.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3739' xml:id='l2h-3739' class="class">Popen4</tt></b>(</nobr></td>
+  <td><var>cmd</var><big>[</big><var>, bufsize</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Similar to <tt class="class">Popen3</tt>, but always captures standard error into the
+same file object as standard output.  These are typically created
+using <tt class="function">popen4()</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="popen3-objects.html">17.4.1 Popen3 and Popen4 Objects</a>
+<li><a href="popen2-flow-control.html">17.4.2 Flow Control Issues</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.3.1 Example"
+  href="node545.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17. interprocess Communication and"
+  href="ipc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.4.1 popen3 and Popen4"
+  href="popen3-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node545.html">17.3.1 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ipc.html">17. Interprocess Communication and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="popen3-objects.html">17.4.1 Popen3 and Popen4</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

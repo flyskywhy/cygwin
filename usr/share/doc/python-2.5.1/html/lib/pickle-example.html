@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="pickle-sub.html" />
+<link rel="parent" href="module-pickle.html" />
+<link rel="next" href="module-cPickle.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.1.7 Example </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.6 subclassing Unpicklers"
+  href="pickle-sub.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1 pickle  "
+  href="module-pickle.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.2 cpickle  "
+  href="module-cPickle.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pickle-sub.html">13.1.6 Subclassing Unpicklers</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pickle.html">13.1 pickle  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-cPickle.html">13.2 cPickle  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0015170000000000000000"></a><a name="pickle-example"></a>
+<br>
+13.1.7 Example 
+</h2>
+
+<p>
+For the simplest code, use the <tt class="function">dump()</tt> and <tt class="function">load()</tt>
+functions.  Note that a self-referencing list is pickled and restored
+correctly.
+
+<p>
+<div class="verbatim"><pre>
+import pickle
+
+data1 = {'a': [1, 2.0, 3, 4+6j],
+         'b': ('string', u'Unicode string'),
+         'c': None}
+
+selfref_list = [1, 2, 3]
+selfref_list.append(selfref_list)
+
+output = open('data.pkl', 'wb')
+
+# Pickle dictionary using protocol 0.
+pickle.dump(data1, output)
+
+# Pickle the list using the highest protocol available.
+pickle.dump(selfref_list, output, -1)
+
+output.close()
+</pre></div>
+
+<p>
+The following example reads the resulting pickled data.  When reading
+a pickle-containing file, you should open the file in binary mode
+because you can't be sure if the ASCII or binary format was used.
+
+<p>
+<div class="verbatim"><pre>
+import pprint, pickle
+
+pkl_file = open('data.pkl', 'rb')
+
+data1 = pickle.load(pkl_file)
+pprint.pprint(data1)
+
+data2 = pickle.load(pkl_file)
+pprint.pprint(data2)
+
+pkl_file.close()
+</pre></div>
+
+<p>
+Here's a larger example that shows how to modify pickling behavior for a
+class.  The <tt class="class">TextReader</tt> class opens a text file, and returns
+the line number and line contents each time its <tt class="method">readline()</tt>
+method is called. If a <tt class="class">TextReader</tt> instance is pickled, all
+attributes <em>except</em> the file object member are saved. When the
+instance is unpickled, the file is reopened, and reading resumes from
+the last location. The <tt class="method">__setstate__()</tt> and
+<tt class="method">__getstate__()</tt> methods are used to implement this behavior.
+
+<p>
+<div class="verbatim"><pre>
+class TextReader:
+    """Print and number lines in a text file."""
+    def __init__(self, file):
+        self.file = file
+        self.fh = open(file)
+        self.lineno = 0
+
+    def readline(self):
+        self.lineno = self.lineno + 1
+        line = self.fh.readline()
+        if not line:
+            return None
+        if line.endswith("\n"):
+            line = line[:-1]
+        return "%d: %s" % (self.lineno, line)
+
+    def __getstate__(self):
+        odict = self.__dict__.copy() # copy the dict since we change it
+        del odict['fh']              # remove filehandle entry
+        return odict
+
+    def __setstate__(self,dict):
+        fh = open(dict['file'])      # reopen file
+        count = dict['lineno']       # read from file...
+        while count:                 # until line count is restored
+            fh.readline()
+            count = count - 1
+        self.__dict__.update(dict)   # update attributes
+        self.fh = fh                 # save the file object
+</pre></div>
+
+<p>
+A sample usage might be something like this:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import TextReader
+&gt;&gt;&gt; obj = TextReader.TextReader("TextReader.py")
+&gt;&gt;&gt; obj.readline()
+'1: #!/usr/local/bin/python'
+&gt;&gt;&gt; # (more invocations of obj.readline() here)
+... obj.readline()
+'7: class TextReader:'
+&gt;&gt;&gt; import pickle
+&gt;&gt;&gt; pickle.dump(obj,open('save.p','w'))
+</pre></div>
+
+<p>
+If you want to see that <tt class="module"><a href="module-pickle.html">pickle</a></tt> works across Python
+processes, start another Python session, before continuing.  What
+follows can happen from either the same process or a new process.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import pickle
+&gt;&gt;&gt; reader = pickle.load(open('save.p'))
+&gt;&gt;&gt; reader.readline()
+'8:     "Print and number lines in a text file."'
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-copyreg.html">copy_reg</a></tt>:</b>
+    <dd>Pickle interface constructor
+                                registration for extension types.
+  </dl>
+
+<p>
+<dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-shelve.html">shelve</a></tt>:</b>
+    <dd>Indexed databases of objects; uses <tt class="module">pickle</tt>.
+  </dl>
+
+<p>
+<dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-copy.html">copy</a></tt>:</b>
+    <dd>Shallow and deep object copying.
+  </dl>
+
+<p>
+<dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-marshal.html">marshal</a></tt>:</b>
+    <dd>High-performance serialization of built-in types.
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.6 subclassing Unpicklers"
+  href="pickle-sub.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1 pickle  "
+  href="module-pickle.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.2 cpickle  "
+  href="module-cPickle.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pickle-sub.html">13.1.6 Subclassing Unpicklers</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pickle.html">13.1 pickle  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-cPickle.html">13.2 cPickle  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

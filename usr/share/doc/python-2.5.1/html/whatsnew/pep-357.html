@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="other-lang.html" />
+<link rel="prev" href="pep-353.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="other-lang.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11 PEP 357: The '__index__' method</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10 pep 353: Using"
+  href="pep-353.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12 other Language Changes"
+  href="other-lang.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-353.html">10 PEP 353: Using</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="other-lang.html">12 Other Language Changes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0001200000000000000000"></a><a name="pep-357"></a>
+<br>
+11 PEP 357: The '__index__' method
+</h1>
+
+<p>
+The NumPy developers had a problem that could only be solved by adding
+a new special method, <tt class="method">__index__</tt>.  When using slice notation,
+as in <code>[<var>start</var>:<var>stop</var>:<var>step</var>]</code>, the values of the
+<var>start</var>, <var>stop</var>, and <var>step</var> indexes must all be either
+integers or long integers.  NumPy defines a variety of specialized
+integer types corresponding to unsigned and signed integers of 8, 16,
+32, and 64 bits, but there was no way to signal that these types could
+be used as slice indexes.
+
+<p>
+Slicing can't just use the existing <tt class="method">__int__</tt> method because
+that method is also used to implement coercion to integers.  If
+slicing used <tt class="method">__int__</tt>, floating-point numbers would also
+become legal slice indexes and that's clearly an undesirable
+behaviour.
+
+<p>
+Instead, a new special method called <tt class="method">__index__</tt> was added.  It
+takes no arguments and returns an integer giving the slice index to
+use.  For example:
+
+<p>
+<div class="verbatim"><pre>
+class C:
+    def __index__ (self):
+        return self.value
+</pre></div>
+
+<p>
+The return value must be either a Python integer or long integer.
+The interpreter will check that the type returned is correct, and
+raises a <tt class="exception">TypeError</tt> if this requirement isn't met.
+
+<p>
+A corresponding <tt class="member">nb_index</tt> slot was added to the C-level
+<tt class="ctype">PyNumberMethods</tt> structure to let C extensions implement this
+protocol.  <tt class="cfunction">PyNumber_Index(<var>obj</var>)</tt> can be used in
+extension code to call the <tt class="method">__index__</tt> function and retrieve
+its result.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0357.html"
+        title="Allowing any Object to be used for Slicing"
+        >PEP 357, <em>Allowing Any Object to be Used for Slicing</em></a>
+    <dd>PEP written 
+and implemented by Travis Oliphant.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10 pep 353: Using"
+  href="pep-353.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12 other Language Changes"
+  href="other-lang.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-353.html">10 PEP 353: Using</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="other-lang.html">12 Other Language Changes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

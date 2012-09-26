@@ -1,0 +1,11 @@
+#!/bin/sh
+# Postinstall script for git
+
+# git wants to install a lot of hard links, but setup.exe can't cope
+# with that.
+status=0
+for f in /usr/sbin/git-core/git-*.exe ; do
+  cmp /usr/bin/git.exe $f || continue
+  rm $f && ln /usr/bin/git.exe $f || status=1
+done
+exit $status

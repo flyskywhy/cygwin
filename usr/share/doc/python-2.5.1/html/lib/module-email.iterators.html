@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="email-pkg-history.html" />
+<link rel="prev" href="module-email.utils.html" />
+<link rel="parent" href="module-email.html" />
+<link rel="next" href="email-pkg-history.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.1.10 Iterators</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.9 miscellaneous utilities"
+  href="module-email.utils.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.11 package History"
+  href="email-pkg-history.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.utils.html">7.1.9 Miscellaneous utilities</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="email-pkg-history.html">7.1.11 Package History</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0091100000000000000000">
+7.1.10 Iterators</a>
+</h2>
+<a name="module-email.iterators"></a>
+
+<p>
+Iterating over a message object tree is fairly easy with the
+<tt class="method">Message.walk()</tt> method.  The <tt class="module">email.iterators</tt> module
+provides some useful higher level iterations over message object
+trees.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1329' xml:id='l2h-1329' class="function">body_line_iterator</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, decode</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This iterates over all the payloads in all the subparts of <var>msg</var>,
+returning the string payloads line-by-line.  It skips over all the
+subpart headers, and it skips over any subpart with a payload that
+isn't a Python string.  This is somewhat equivalent to reading the
+flat text representation of the message from a file using
+<tt class="method">readline()</tt>, skipping over all the intervening headers.
+
+<p>
+Optional <var>decode</var> is passed through to <tt class="method">Message.get_payload()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1330' xml:id='l2h-1330' class="function">typed_subpart_iterator</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>,
+    maintype</var><big>[</big><var>, subtype</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This iterates over all the subparts of <var>msg</var>, returning only those
+subparts that match the MIME type specified by <var>maintype</var> and
+<var>subtype</var>.
+
+<p>
+Note that <var>subtype</var> is optional; if omitted, then subpart MIME
+type matching is done only with the main type.  <var>maintype</var> is
+optional too; it defaults to <span class="mimetype">text</span>.
+
+<p>
+Thus, by default <tt class="function">typed_subpart_iterator()</tt> returns each
+subpart that has a MIME type of <span class="mimetype">text/*</span>.
+</dl>
+
+<p>
+The following function has been added as a useful debugging tool.  It
+should <em>not</em> be considered part of the supported public interface
+for the package.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1331' xml:id='l2h-1331' class="function">_structure</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, fp</var><big>[</big><var>, level</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Prints an indented representation of the content types of the
+message object structure.  For example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; msg = email.message_from_file(somefile)
+&gt;&gt;&gt; _structure(msg)
+multipart/mixed
+    text/plain
+    text/plain
+    multipart/digest
+        message/rfc822
+            text/plain
+        message/rfc822
+            text/plain
+        message/rfc822
+            text/plain
+        message/rfc822
+            text/plain
+        message/rfc822
+            text/plain
+    text/plain
+</pre></div>
+
+<p>
+Optional <var>fp</var> is a file-like object to print the output to.  It
+must be suitable for Python's extended print statement.  <var>level</var>
+is used internally.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.9 miscellaneous utilities"
+  href="module-email.utils.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.11 package History"
+  href="email-pkg-history.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.utils.html">7.1.9 Miscellaneous utilities</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="email-pkg-history.html">7.1.11 Package History</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

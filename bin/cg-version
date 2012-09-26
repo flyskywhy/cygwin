@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Show the version of the Cogito toolkit
+# Copyright (c) Petr Baudis, 2005
+#
+# Show which version of Cogito is installed.
+# Additionally, the 'HEAD' of the installed Cogito
+# is also shown if this information was available
+# at the build time.
+#
+# OPTIONS
+# -------
+# --lib-dir:: Display Cogito library directory
+#	Display the directory containing Cogito library files.
+#
+# --share-dir:: Display Cogito share directory
+#	Display the directory containing Cogito shared files.
+
+# Testsuite: TODO
+
+USAGE="cg-version [--lib-dir] [--share-dir]"
+_git_repo_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+while optparse; do
+	if optparse --lib-dir; then
+		echo "${COGITO_LIB:-/usr/lib/cogito/}"
+	elif optparse --share-dir; then
+		echo "${COGITO_SHARE:-/usr/share/cogito/}"
+	else
+		optfail
+	fi
+done
+
+version="cogito-0.18.2"
+head=""
+if [ -z "$head" ]; then
+	echo "$version"
+	exit
+elif [ "$version" = "$head" ]; then
+	echo "$version (real)"
+else
+	echo "$version ($head)"
+fi

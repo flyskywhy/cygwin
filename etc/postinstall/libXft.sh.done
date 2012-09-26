@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Reestablish symbolic link
+if [ ! -L /usr/include/X11 ] ; then
+  ln -sf  /usr/X11R6/include/X11 /usr/include/
+fi
+
+# Make libtool happy
+for d in /usr/lib /usr/X11R6/lib
+do
+  echo ">>> Processing directory $d"
+  for f in `find ${d} -name '*.la'`
+  do
+    if grep "/usr/lib/libXft.la" ${f} > /dev/null
+    then
+      echo "Processing file $f"
+      chmod 644 ${f}
+      sed -i -e 's#/usr/lib/libXft\.la#/usr/X11R6/lib/libXft\.la#g' ${f}
+    fi
+  done
+done

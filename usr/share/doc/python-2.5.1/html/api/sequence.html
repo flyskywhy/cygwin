@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="mapping.html" />
+<link rel="prev" href="number.html" />
+<link rel="parent" href="abstract.html" />
+<link rel="next" href="mapping.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3 Sequence Protocol </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.2 number Protocol"
+  href="number.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.4 mapping Protocol"
+  href="mapping.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="number.html">6.2 Number Protocol</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mapping.html">6.4 Mapping Protocol</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008300000000000000000"></a><a name="sequence"></a>
+<br>
+6.3 Sequence Protocol 
+</h1>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-318' xml:id='l2h-318' class="cfunction">PySequence_Check</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Return <code>1</code> if the object provides sequence protocol, and
+  <code>0</code> otherwise.  This function always succeeds.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>Py_ssize_t&nbsp;<b><tt id='l2h-319' xml:id='l2h-319' class="cfunction">PySequence_Size</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Returns the number of objects in sequence <var>o</var> on success, and
+  <code>-1</code> on failure.  For objects that do not provide sequence
+  protocol, this is equivalent to the Python expression
+  "<tt class="samp">len(<var>o</var>)</tt>".<a id='l2h-320' xml:id='l2h-320'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>Py_ssize_t&nbsp;<b><tt id='l2h-321' xml:id='l2h-321' class="cfunction">PySequence_Length</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Alternate name for <tt class="cfunction">PySequence_Size()</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-322' xml:id='l2h-322' class="cfunction">PySequence_Concat</tt></b>(</nobr></td><td>PyObject *<var>o1</var>, PyObject *<var>o2</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the concatenation of <var>o1</var> and <var>o2</var> on success, and
+  <tt class="constant">NULL</tt> on failure.   This is the equivalent of the Python
+  expression "<tt class="samp"><var>o1</var> + <var>o2</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-323' xml:id='l2h-323' class="cfunction">PySequence_Repeat</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>count</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the result of repeating sequence object <var>o</var> <var>count</var>
+  times, or <tt class="constant">NULL</tt> on failure.  This is the equivalent of the Python
+  expression "<tt class="samp"><var>o</var> * <var>count</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-324' xml:id='l2h-324' class="cfunction">PySequence_InPlaceConcat</tt></b>(</nobr></td><td>PyObject *<var>o1</var>,
+                                                       PyObject *<var>o2</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the concatenation of <var>o1</var> and <var>o2</var> on success, and
+  <tt class="constant">NULL</tt> on failure.  The operation is done <em>in-place</em> when
+  <var>o1</var> supports it.  This is the equivalent of the Python
+  expression "<tt class="samp"><var>o1</var> += <var>o2</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-325' xml:id='l2h-325' class="cfunction">PySequence_InPlaceRepeat</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>count</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the result of repeating sequence object <var>o</var> <var>count</var>
+  times, or <tt class="constant">NULL</tt> on failure.  The operation is done <em>in-place</em>
+  when <var>o</var> supports it.  This is the equivalent of the Python
+  expression "<tt class="samp"><var>o</var> *= <var>count</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-326' xml:id='l2h-326' class="cfunction">PySequence_GetItem</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the <var>i</var>th element of <var>o</var>, or <tt class="constant">NULL</tt> on failure.
+  This is the equivalent of the Python expression
+  "<tt class="samp"><var>o</var>[<var>i</var>]</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-327' xml:id='l2h-327' class="cfunction">PySequence_GetSlice</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i1</var>, Py_ssize_t <var>i2</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the slice of sequence object <var>o</var> between <var>i1</var> and
+  <var>i2</var>, or <tt class="constant">NULL</tt> on failure. This is the equivalent of the
+  Python expression "<tt class="samp"><var>o</var>[<var>i1</var>:<var>i2</var>]</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-328' xml:id='l2h-328' class="cfunction">PySequence_SetItem</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i</var>, PyObject *<var>v</var>)</td></tr></table></dt>
+<dd>
+  Assign object <var>v</var> to the <var>i</var>th element of <var>o</var>.  Returns
+  <code>-1</code> on failure.  This is the equivalent of the Python
+  statement "<tt class="samp"><var>o</var>[<var>i</var>] = <var>v</var></tt>".  This function <em>does not</em>
+  steal a reference to <var>v</var>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-329' xml:id='l2h-329' class="cfunction">PySequence_DelItem</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i</var>)</td></tr></table></dt>
+<dd>
+  Delete the <var>i</var>th element of object <var>o</var>.  Returns <code>-1</code>
+  on failure.  This is the equivalent of the Python statement
+  "<tt class="samp">del <var>o</var>[<var>i</var>]</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-330' xml:id='l2h-330' class="cfunction">PySequence_SetSlice</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i1</var>,
+                                            Py_ssize_t <var>i2</var>, PyObject *<var>v</var>)</td></tr></table></dt>
+<dd>
+  Assign the sequence object <var>v</var> to the slice in sequence object
+  <var>o</var> from <var>i1</var> to <var>i2</var>.  This is the equivalent of the
+  Python statement "<tt class="samp"><var>o</var>[<var>i1</var>:<var>i2</var>] = <var>v</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-331' xml:id='l2h-331' class="cfunction">PySequence_DelSlice</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i1</var>, Py_ssize_t <var>i2</var>)</td></tr></table></dt>
+<dd>
+  Delete the slice in sequence object <var>o</var> from <var>i1</var> to
+  <var>i2</var>.  Returns <code>-1</code> on failure.  This is the equivalent of
+  the Python statement "<tt class="samp">del <var>o</var>[<var>i1</var>:<var>i2</var>]</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>Py_ssize_t&nbsp;<b><tt id='l2h-332' xml:id='l2h-332' class="cfunction">PySequence_Count</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyObject *<var>value</var>)</td></tr></table></dt>
+<dd>
+  Return the number of occurrences of <var>value</var> in <var>o</var>, that is,
+  return the number of keys for which <code><var>o</var>[<var>key</var>] ==
+  <var>value</var></code>.  On failure, return <code>-1</code>.  This is equivalent to
+  the Python expression "<tt class="samp"><var>o</var>.count(<var>value</var>)</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-333' xml:id='l2h-333' class="cfunction">PySequence_Contains</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyObject *<var>value</var>)</td></tr></table></dt>
+<dd>
+  Determine if <var>o</var> contains <var>value</var>.  If an item in <var>o</var> is
+  equal to <var>value</var>, return <code>1</code>, otherwise return <code>0</code>.
+  On error, return <code>-1</code>.  This is equivalent to the Python
+  expression "<tt class="samp"><var>value</var> in <var>o</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>Py_ssize_t&nbsp;<b><tt id='l2h-334' xml:id='l2h-334' class="cfunction">PySequence_Index</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyObject *<var>value</var>)</td></tr></table></dt>
+<dd>
+  Return the first index <var>i</var> for which <code><var>o</var>[<var>i</var>] ==
+  <var>value</var></code>.  On error, return <code>-1</code>.    This is equivalent to
+  the Python expression "<tt class="samp"><var>o</var>.index(<var>value</var>)</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-335' xml:id='l2h-335' class="cfunction">PySequence_List</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a list object with the same contents as the arbitrary
+  sequence <var>o</var>.  The returned list is guaranteed to be new.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-336' xml:id='l2h-336' class="cfunction">PySequence_Tuple</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a tuple object with the same contents as the arbitrary
+  sequence <var>o</var> or <tt class="constant">NULL</tt> on failure.  If <var>o</var> is a tuple,
+  a new reference will be returned, otherwise a tuple will be
+  constructed with the appropriate contents.  This is equivalent
+  to the Python expression "<tt class="samp">tuple(<var>o</var>)</tt>".
+  <a id='l2h-337' xml:id='l2h-337'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-338' xml:id='l2h-338' class="cfunction">PySequence_Fast</tt></b>(</nobr></td><td>PyObject *<var>o</var>, const char *<var>m</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Returns the sequence <var>o</var> as a tuple, unless it is already a
+  tuple or list, in which case <var>o</var> is returned.  Use
+  <tt class="cfunction">PySequence_Fast_GET_ITEM()</tt> to access the members of the
+  result.  Returns <tt class="constant">NULL</tt> on failure.  If the object is not a
+  sequence, raises <tt class="exception">TypeError</tt> with <var>m</var> as the message
+  text.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-339' xml:id='l2h-339' class="cfunction">PySequence_Fast_GET_ITEM</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the <var>i</var>th element of <var>o</var>, assuming that <var>o</var> was
+  returned by <tt class="cfunction">PySequence_Fast()</tt>, <var>o</var> is not <tt class="constant">NULL</tt>,
+  and that <var>i</var> is within bounds.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject**&nbsp;<b><tt id='l2h-340' xml:id='l2h-340' class="cfunction">PySequence_Fast_ITEMS</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Return the underlying array of PyObject pointers.  Assumes that
+  <var>o</var> was returned by <tt class="cfunction">PySequence_Fast()</tt> and
+  <var>o</var> is not <tt class="constant">NULL</tt>.
+  
+<span class="versionnote">New in version 2.4.</span>
+  
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-341' xml:id='l2h-341' class="cfunction">PySequence_ITEM</tt></b>(</nobr></td><td>PyObject *<var>o</var>, Py_ssize_t <var>i</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the <var>i</var>th element of <var>o</var> or <tt class="constant">NULL</tt> on failure.
+  Macro form of <tt class="cfunction">PySequence_GetItem()</tt> but without checking
+  that <tt class="cfunction">PySequence_Check(<var>o</var>)</tt> is true and without
+  adjustment for negative indices.
+  
+<span class="versionnote">New in version 2.3.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>Py_ssize_t&nbsp;<b><tt id='l2h-342' xml:id='l2h-342' class="cfunction">PySequence_Fast_GET_SIZE</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Returns the length of <var>o</var>, assuming that <var>o</var> was
+  returned by <tt class="cfunction">PySequence_Fast()</tt> and that <var>o</var> is
+  not <tt class="constant">NULL</tt>.  The size can also be gotten by calling
+  <tt class="cfunction">PySequence_Size()</tt> on <var>o</var>, but
+  <tt class="cfunction">PySequence_Fast_GET_SIZE()</tt> is faster because it can
+  assume <var>o</var> is a list or tuple.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.2 number Protocol"
+  href="number.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.4 mapping Protocol"
+  href="mapping.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="number.html">6.2 Number Protocol</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mapping.html">6.4 Mapping Protocol</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

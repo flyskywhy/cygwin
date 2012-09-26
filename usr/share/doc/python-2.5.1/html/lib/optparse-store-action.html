@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-handling-boolean-options.html" />
+<link rel="prev" href="optparse-understanding-option-actions.html" />
+<link rel="parent" href="optparse-tutorial.html" />
+<link rel="next" href="optparse-handling-boolean-options.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.2.2 The store action</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.2.1 understanding option actions"
+  href="optparse-understanding-option-actions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.2 Tutorial"
+  href="optparse-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.2.3 handling boolean (flag)"
+  href="optparse-handling-boolean-options.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-understanding-option-actions.html">14.3.2.1 Understanding option actions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-tutorial.html">14.3.2 Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-handling-boolean-options.html">14.3.2.3 Handling boolean (flag)</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016322000000000000000"></a><a name="optparse-store-action"></a>
+<br>
+14.3.2.2 The store action
+</h3>
+
+<p>
+The most common option action is <code>store</code>, which tells <tt class="module">optparse</tt> to take
+the next argument (or the remainder of the current argument), ensure
+that it is of the correct type, and store it to your chosen destination.
+
+<p>
+For example:
+<div class="verbatim"><pre>
+parser.add_option("-f", "--file",
+                  action="store", type="string", dest="filename")
+</pre></div>
+
+<p>
+Now let's make up a fake command line and ask <tt class="module">optparse</tt> to parse it:
+<div class="verbatim"><pre>
+args = ["-f", "foo.txt"]
+(options, args) = parser.parse_args(args)
+</pre></div>
+
+<p>
+When <tt class="module">optparse</tt> sees the option string <code>"-f"</code>, it consumes the next
+argument, <code>"foo.txt"</code>, and stores it in <code>options.filename</code>.  So,
+after this call to <tt class="method">parse_args()</tt>, <code>options.filename</code> is
+<code>"foo.txt"</code>.
+
+<p>
+Some other option types supported by <tt class="module">optparse</tt> are <code>int</code> and <code>float</code>.
+Here's an option that expects an integer argument:
+<div class="verbatim"><pre>
+parser.add_option("-n", type="int", dest="num")
+</pre></div>
+
+<p>
+Note that this option has no long option string, which is perfectly
+acceptable.  Also, there's no explicit action, since the default is
+<code>store</code>.
+
+<p>
+Let's parse another fake command-line.  This time, we'll jam the option
+argument right up against the option: since <code>"-n42"</code> (one argument) is
+equivalent to <code>"-n 42"</code> (two arguments), the code
+<div class="verbatim"><pre>
+(options, args) = parser.parse_args(["-n42"])
+print options.num
+</pre></div>
+
+<p>
+will print <code>"42"</code>.
+
+<p>
+If you don't specify a type, <tt class="module">optparse</tt> assumes <code>string</code>.  Combined with the
+fact that the default action is <code>store</code>, that means our first example
+can be a lot shorter:
+<div class="verbatim"><pre>
+parser.add_option("-f", "--file", dest="filename")
+</pre></div>
+
+<p>
+If you don't supply a destination, <tt class="module">optparse</tt> figures out a sensible default
+from the option strings: if the first long option string is
+<code>"-foo-bar"</code>, then the default destination is <code>foo_bar</code>.  If there
+are no long option strings, <tt class="module">optparse</tt> looks at the first short option
+string: the default destination for <code>"-f"</code> is <code>f</code>.
+
+<p>
+<tt class="module">optparse</tt> also includes built-in <code>long</code> and <code>complex</code> types.  Adding
+types is covered in section&nbsp;<a href="optparse-extending-optparse.html#optparse-extending-optparse">14.3.5</a>, Extending <tt class="module">optparse</tt>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.2.1 understanding option actions"
+  href="optparse-understanding-option-actions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.2 Tutorial"
+  href="optparse-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.2.3 handling boolean (flag)"
+  href="optparse-handling-boolean-options.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-understanding-option-actions.html">14.3.2.1 Understanding option actions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-tutorial.html">14.3.2 Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-handling-boolean-options.html">14.3.2.3 Handling boolean (flag)</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

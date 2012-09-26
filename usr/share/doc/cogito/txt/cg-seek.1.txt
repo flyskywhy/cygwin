@@ -1,0 +1,75 @@
+cg-seek(1)
+==========
+
+NAME
+----
+cg-seek - seek the working tree to a given commit
+
+SYNOPSIS
+--------
+cg-seek [COMMIT_ID]
+
+DESCRIPTION
+-----------
+Seeking will bring the working tree from its current 'HEAD' to a given
+commit. Note that it changes just the 'HEAD' of the working tree, not
+the branch it is corresponding to. It will return to the 'HEAD' of
+the appropriate branch if passed no arguments.
+
+Therefore, for a quick excursion to the past of the 'master' branch:
+
+	$ cg-seek git pasky-0.1
+	$ cg-diff this master	# will do the correct thing
+	$ cg-seek		# will restore what we had before
+
+For intuitiveness, specifying the branch name (`cg-seek master`) will do
+the right thing too. If you want to migrate your working tree to _another_
+branch, use gitlink:cg-clone[1] to create a new tree for the new branch, or
+gitlink:cg-switch[1] to also change your current tree to use the new branch.
+
+Note that during the time you are seeked out, commits, merges, and some
+other operations are blocked, since the next gitlink:cg-seek[1] or gitlink:cg-reset[1]
+invocation will happily wipe out their products silently. You can override
+this in the gitlink:cg-commit[1] command by passing it a '-f' parameter - this
+can be useful e.g. when you seeked to a commit which cannot be compiled
+and you want to commit a compilation fix, as long as you are aware that
+the commit of the fix will be rendered unreachable (you will be able to
+get back to it only if you remember its ID) at the moment you do next
+seek or a reset. If you want to save the commit, you can save it to
+a separate branch using `cg-switch -n`.
+
+Takes the target commit ID to seek to as an argument.
+
+OPTIONS
+-------
+
+--
+
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-seek[1].
+--
+
+NOTES
+-----
+The gitlink:cg-seek[1] command is meant only for temporary excursions to the commit
+history. If you want to permanently switch your branch to a different commit
+id (forgetting its current contents), you can use the gitlink:cg-switch[1] command:
+
+	$ cg-switch -f -r COMMIT_ID CURRENT_HEAD_NAME
+
+Note that this command has some serious caveats! Please read the
+gitlink:cg-switch[1] documentation for details.
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-seek is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

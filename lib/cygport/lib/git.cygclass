@@ -1,0 +1,66 @@
+################################################################################
+#
+# git.cygclass - functions for building packages from GIT checkouts
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: git.cygclass 4224 2008-08-18 19:23:40Z yselkowitz $
+#
+################################################################################
+
+_USE_git_FETCH=1
+
+if ! defined GIT_URI
+then
+	error "GIT_URI must be defined"
+fi
+
+GIT_URI=${GIT_URI%/}
+GIT_MODULE=${GIT_URI##*/}
+GIT_MODULE=${GIT_MODULE%.git}
+
+git_tarball="${GIT_MODULE}-${PV}.tar.bz2"
+
+SRC_URI="${git_tarball} "
+SRC_DIR="${GIT_MODULE}"
+
+git_fetch() {
+	check_prog_req git
+
+	# T likely doesn't exist at this point, so create it first
+	mkdir -p ${T}
+	cd ${T}
+	verbose git clone --no-checkout --quiet ${GIT_URI} ${GIT_MODULE} || error "git clone failed"
+	cd ${T}/${GIT_MODULE}
+
+	if defined GIT_TAG
+	then
+		verbose git checkout tags/${GIT_TAG} || error "git checkout failed"
+	elif defined GIT_BRANCH
+	then
+		verbose git checkout remotes/${GIT_BRANCH} || error "git checkout failed"
+	elif defined GIT_REV
+	then
+		verbose git checkout ${GIT_REV} || error "git checkout failed"
+	else
+		verbose git checkout master || error "git checkout failed"
+	fi
+
+	cd ${T}
+	tar jcf ${top}/${git_tarball} --exclude=.git --exclude=.gitignore ${GIT_MODULE}
+}

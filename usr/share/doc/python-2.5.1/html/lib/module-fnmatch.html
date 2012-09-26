@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-linecache.html" />
+<link rel="prev" href="module-glob.html" />
+<link rel="parent" href="filesys.html" />
+<link rel="next" href="module-linecache.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.8 fnmatch -- Unix filename pattern matching</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.7 glob  "
+  href="module-glob.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.9 linecache  "
+  href="module-linecache.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-glob.html">11.7 glob  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-linecache.html">11.9 linecache  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0013800000000000000000">
+11.8 <tt class="module">fnmatch</tt> --
+         <span class="Unix">Unix</span> filename pattern matching</a>
+</h1>
+
+<p>
+<a name="module-fnmatch"></a>
+
+<p>
+<a id='l2h-2291' xml:id='l2h-2291'></a>
+
+<p>
+This module provides support for <span class="Unix">Unix</span> shell-style wildcards, which
+are <em>not</em> the same as regular expressions (which are documented
+in the <tt class="module"><a href="module-re.html">re</a></tt><a id='l2h-2292' xml:id='l2h-2292'></a> module).  The special
+characters used in shell-style wildcards are:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Pattern</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><code>*</code></td>
+        <td class="left"  >matches everything</td></tr>
+    <tr><td class="center" valign="baseline"><code>?</code></td>
+        <td class="left"  >matches any single character</td></tr>
+    <tr><td class="center" valign="baseline"><code>[<var>seq</var>]</code></td>
+        <td class="left"  >matches any character in <var>seq</var></td></tr>
+    <tr><td class="center" valign="baseline"><code>[!<var>seq</var>]</code></td>
+        <td class="left"  >matches any character not in <var>seq</var></td></tr></tbody>
+</table></div>
+
+<p>
+Note that the filename separator (<code>'/'</code> on <span class="Unix">Unix</span>) is <em>not</em>
+special to this module.  See module
+<tt class="module"><a href="module-glob.html">glob</a></tt><a id='l2h-2293' xml:id='l2h-2293'></a> for pathname expansion
+(<tt class="module"><a href="module-glob.html">glob</a></tt> uses <tt class="function">fnmatch()</tt> to match pathname
+segments).  Similarly, filenames starting with a period are
+not special for this module, and are matched by the <code>*</code> and
+<code>?</code> patterns.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2287' xml:id='l2h-2287' class="function">fnmatch</tt></b>(</nobr></td>
+  <td><var>filename, pattern</var>)</td></tr></table></dt>
+<dd>
+Test whether the <var>filename</var> string matches the <var>pattern</var>
+string, returning true or false.  If the operating system is
+case-insensitive, then both parameters will be normalized to all
+lower- or upper-case before the comparison is performed.  If you
+require a case-sensitive comparison regardless of whether that's
+standard for your operating system, use <tt class="function">fnmatchcase()</tt>
+instead.
+
+<p>
+This example will print all file names in the current directory with the
+extension <code>.txt</code>:
+
+<p>
+<div class="verbatim"><pre>
+import fnmatch
+import os
+
+for file in os.listdir('.'):
+    if fnmatch.fnmatch(file, '*.txt'):
+        print file
+</pre></div>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2288' xml:id='l2h-2288' class="function">fnmatchcase</tt></b>(</nobr></td>
+  <td><var>filename, pattern</var>)</td></tr></table></dt>
+<dd>
+Test whether <var>filename</var> matches <var>pattern</var>, returning true or
+false; the comparison is case-sensitive.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2289' xml:id='l2h-2289' class="function">filter</tt></b>(</nobr></td>
+  <td><var>names, pattern</var>)</td></tr></table></dt>
+<dd>
+Return the subset of the list of <var>names</var> that match <var>pattern</var>.
+It is the same as <code>[n for n in names if fnmatch(n, pattern)]</code>, but
+implemented more efficiently.
+
+<span class="versionnote">New in version 2.2.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2290' xml:id='l2h-2290' class="function">translate</tt></b>(</nobr></td>
+  <td><var>pattern</var>)</td></tr></table></dt>
+<dd>
+Return the shell-style <var>pattern</var> converted to a regular
+expression.
+
+<p>
+Example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import fnmatch, re
+&gt;&gt;&gt;
+&gt;&gt;&gt; regex = fnmatch.translate('*.txt')
+&gt;&gt;&gt; regex
+'.*\\.txt$'
+&gt;&gt;&gt; reobj = re.compile(regex)
+&gt;&gt;&gt; print reobj.match('foobar.txt')
+&lt;_sre.SRE_Match object at 0x...&gt;
+</pre></div>
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-glob.html">glob</a></tt>:</b>
+    <dd><span class="Unix">Unix</span> shell-style path expansion.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.7 glob  "
+  href="module-glob.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.9 linecache  "
+  href="module-linecache.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-glob.html">11.7 glob  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-linecache.html">11.9 linecache  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

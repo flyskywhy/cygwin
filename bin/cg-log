@@ -1,0 +1,603 @@
+#!/usr/bin/env bash
+#
+# Show the list of changes
+# Copyright (c) Petr Baudis, 2005.
+# Copyright (c) David Woodhouse, 2005.
+#
+# Display log of changes on a given branch, within a given range of commits,
+# and/or concerning given set of files. The log can be further filtered to
+# e.g. only changes touching a given string or done by a given user. Several
+# output formats are available.
+#
+# The output will automatically be displayed in a pager unless it is piped to
+# a program.
+#
+# OPTIONS
+# -------
+# Arguments not interpreted as options will be interpreted as filenames;
+# cg-log then displays only changes in those files.
+#
+# -c::	Colorize
+#	Colorize the output. You can customize the colors using the
+#	$CG_COLORS environment variable (see below).
+#
+# -d::	Show diffs against previous commits
+#	Accompany each commit with a diff against previous commit.
+#	Turns off '-f'.
+#
+# --diffcore ARGS:: Diffcore arguments to pass the Git diff command
+#	Pass the given diffcore arguments the called Git diff command.
+#	See e.g. git diff-tree(1) documentation for the list of possible
+#	arguments; '-R', '-B', and '-C' might be of particular interest
+#	('-M' is sometimes passed automatically, but not always). This
+#	is mostly only relevant in conjunction with the '-d' option.
+#
+# -f::	List affected files
+#	List affected files. (No effect when passed along '-s'.)
+#	Turns off '-d'.
+#
+# -r FROM_ID[..TO_ID]:: Limit to a set of revisions
+#	Limit the log information to a set of revisions using either
+#	'-r FROM_ID[..TO_ID]' or '-r FROM_ID -r TO_ID'. In both cases the
+#	option expects IDs which resolve to commits and will include the
+#	specified IDs. If 'TO_ID' is omitted all commits from 'FROM_ID'
+#	to the initial commit is shown. If no revisions is specified,
+#	the log information starting from 'HEAD' will be shown.
+#
+# -D DATE:: Limit to revisions newer than given DATE
+#	Limit the log information to revisions newer than given DATE,
+#	and on second time further restrain it to revisions older than
+#	given date. Therefore, '-D "2 days ago" -D "yesterday"' will
+#	show all the commits from the day before yesterday.
+#
+# -m::	End the log at the merge base of the revision set
+#	End the log listing at the merge base of the -r arguments
+#	(defaulting to HEAD and origin).
+#
+# -M, --merges:: Show merge commits
+#	Display merge commits in the log.
+#
+# -R, --no-renames:: Do not follow renames
+#	This flag is currently no-op. `cg-log` will not follow file history
+#	across renames.
+#
+# -s::	Short output format of the log entries
+#	Show the log entries one per line. The entry summary contains
+#	information about the commit date, the author, the first line
+#	of the commit log and the commit ID. Long author names and commit
+#	IDs are trimmed and marked with an ending tilde (~).
+#
+# --summary:: Group commits by author
+#	Generate the changes summary, listing the commit titles grouped
+#	by their author. This is also known as a "shortlog", suitable
+#	e.g. for contribution summaries of announcements.
+#
+# -S, --pickaxe STRING:: Limit to changes touching STRING ("pick-axe")
+#	List only commits with changes concerning STRING (also known as
+#	pick-axe). In other words, only commits where the parent contains
+#	STRING and the child does not contain it at the same place in
+#	a file or vice versa are shown. The STRING may contain any
+#	special characters or even newlines (but you might need to quote
+#	it properly when calling `cg-log` from a shell). It is matched
+#	verbatim.
+#
+# -u USERNAME:: Limit to commit where author/committer matches USERNAME
+#	List only commits where author or committer contains 'USERNAME'.
+#	The search for 'USERNAME' is case-insensitive.
+#
+# -v::	Verbose header listing
+#	By default, only the 'commit' and 'author' headers are shown. This
+#	makes `cg-log` show even the other commit headers - 'tree', 'parent',
+#	and 'committer'.
+#
+# ENVIRONMENT VARIABLES
+# ---------------------
+# PAGER::
+#	The pager to display log information in, defaults to `less`.
+#
+# PAGER_FLAGS::
+#	Flags to pass to the pager.
+#
+# CG_COLORS::
+#	Colon-separated list of 'name=color' pairs, where name is
+#	one of logcommit, logheader, logauthor, logcommitter,
+#	logfilemod, logfileadd, logfiledel, logfileren, logsignoff,
+#	logsumauthor, logsumtrim, logsumcommit, logsumdate, default,
+#	and value is an ECMA-48 SGR sequence (see e.g. console_codes(4)).
+#	You can also customize the diff colors; see `cg-diff` documentation
+#	for the appropriate color names.
+#
+# CG_COLORS_AUTO::
+#	Even if -c was passed or specified in ~/.cgrc, if this option
+#	is set, use colors only when the output is a terminal and it
+#	supports colors.
+#
+# CG_LESS::
+#	This is what the $LESS environment variable value will be set
+#	to before invoking $PAGER. It defaults to $LESS concatenated
+#	with the `R` and `S` flags to allow displaying of colorized output
+#	and to avoid long lines from wrapping when using `-s`.
+#
+# CONFIGURATION VARIABLES
+# -----------------------
+# The following GIT configuration file variables are recognized:
+#
+# log.usecolor::
+#	If enabled, colorify the output like with -c if the output
+#	is a terminal.
+#
+# EXAMPLE USAGE
+# -------------
+# To show a log of changes between two releases tagged as 'releasetag-0.9'
+# and 'releasetag-0.10' do:
+#
+#	$ cg-log -r releasetag-0.9..releasetag-0.10
+#
+# Similarily, to see which commits are in branch A but not in branch B,
+#
+#	$ cg-log -r B..A
+#
+# (meaning "all the commits which newly appear along the way from B to A").
+#
+# If you see a dubious "if (current->uid = 0)" test in a file and wonder
+# about its genesis, you can run
+#
+#	$ cg-log -d -S "if (current->uid = 0)" filename
+#
+# to show the commits adding, removing or modifying that string, together
+# with the relevant patches (you can obviously refrain from limiting
+# the pick-axe to a particular file, but it will make it significantly
+# slower).
+#
+# NOTES
+# -----
+# The ':' is equivalent to '..' in revisions range specification (to make
+# things more comfortable to SVN users). See cogito(7) for more details
+# about revision specification.
+
+# Testsuite: TODO
+
+USAGE="cg-log [-D DATE] [-r FROM_ID[..TO_ID]] [-d] [-s | --summary] [OTHER_OPTIONS] [FILE]..."
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+# Try to fix the annoying "Broken pipe" output. May not help, but apparently
+# at least somewhere it does. Bash is broken.
+trap exit SIGPIPE
+
+	
+
+setup_colors()
+{
+	local C="logcommit=32:logheader=32"
+	C="$C:logauthor=36:logcommitter=35:logsignoff=33"
+	C="$C:logfilemod=34:logfileadd=36:logfiledel=31:logfileren=33"
+	C="$C:logsumauthor=36:logsumtrim=35"
+	C="$C:logsumcommit=34:logsumdate=32"
+	C="$C:default=0"
+	[ "$show_diffs" ] && C="$C:logcommit=32;1"
+	# Remove bolds from diffcolors - they tended to overshadow cg-log's
+	# highlighting, making it less obvious where one commit ends and
+	# another appears.
+	colorify_setup "$C:${colorify_diffcolors//1;/}"
+	collogfile_M0="$collogfilemod"
+	collogfile_A0="$collogfileadd"
+	collogfile_D0="$collogfiledel"
+	collogfile_R0="$collogfileren"
+	collogfile_R1="$collogfileadd"
+}
+
+print_oneline()
+{
+	commit="${commit%:*}"
+	author="${author% <*}"
+	[ "${#author}" -gt 15 ] && author="${author:0:14}$collogsumtrim~"
+	sumcommit="${commit:0:12}$collogsumtrim~"
+
+	# We want wordsplitting in the $date here, to get
+	# TZ as separate argument.
+	date=(${committer#*> })
+	showdate ${date[*]} '+%F %H:%M'; date="$_showdate"
+
+	read -r title
+
+	printf "$collogsumcommit%s $collogsumauthor%-15s $collogsumdate%s $coldefault%s\n" \
+		"$sumcommit" "$author" "$date" "${title:3}"
+}
+
+list_commit_files()
+{
+	if [ ${#files[@]} -eq 0 ]; then
+		echo "    * no changes:"
+		echo
+		return
+	fi
+	tree1="$1"
+	tree2="$2"
+	line=
+	sep="    * "
+	for (( i=0; i < ${#files[@]}; i++ )); do
+		echo -n "$sep"
+		sep="$collogfilemod, "
+		line="$line$sep${files[$i]}"
+		if [ ${#line} -le 74 ]; then
+			echo -n "${filecols[$i]}${files[$i]}"
+		else
+			line="      ${files[$i]}"
+			echo "$coldefault"
+			echo -n "      ${filecols[$i]}${files[$i]}"
+		fi
+	done
+	echo "$coldefault:"
+	echo
+}
+
+print_commit_contents()
+{
+	[ "$list_files" ] && list_commit_files
+	echo "$msg"
+}
+
+reset_commit_info()
+{
+	commit=
+	tree=
+	parents=()
+	author=
+	committer=
+	msg=
+	files=()
+	filecols=()
+
+	# The $state variable mostly describes what should happen on the next
+	# empty line.
+	state=printhdr
+}
+
+process_commit_line()
+{
+	if [ "$key" = "%" ] || [ "$key" = "%$collogsignoff" ]; then
+		# The fast common case
+		[ "$state" = silent ] || msg="$msg    ${rest#?}
+"
+		return
+	fi
+	case "$key" in
+	"commit"|"diff-tree")
+		oldcommit="$commit"
+		reset_commit_info
+		commit="${rest:0:40}"
+		# If we've just seen a commit, we are seeing multiple
+		# instances of the same commit caused by git diff-tree --stdin
+		# hitting a merge. We show only the diff against the first
+		# parent since heuristically, this is the interesting one.
+		# In some cases, this might not be true, but this is hopefully
+		# a good general strategy (always except in the change-here-
+		# -merge-there-fastforward-here case and doing anything else
+		# results in unusably huge file lists etc).
+		[ "$commit" = "$oldcommit" ] && state=silent
+		;;
+	"tree")
+		tree="$rest"
+		;;
+	"parent")
+		parents[${#parents[@]}]="$rest"
+		;;
+	"committer")
+		committer="$rest"
+		;;
+	"author")
+		author="$rest"
+		;;
+	:)
+		orest="$rest";
+		rest="${orest#*	}"
+		crest="${orest%%	*}"
+		crest="${crest%[0-9][0-9][0-9]}" # rename similarity
+		i=0
+		while [ x"$rest" != x"$orest" ]; do
+			local l="collogfile_${crest:(-1):1}$i"
+			filecols[${#files[@]}]="${!l}"
+			files[${#files[@]}]="${rest%%	*}"
+			# Multiple tab-separated filenames are present in case
+			# of rename entries.
+			orest="$rest"
+			rest="${rest#*	}"
+			i=$((i+1))
+		done
+		;;
+	"")
+		if [ "$state" = silent ]; then
+			return
+		fi
+		if [ "$state" = waitdiff ]; then
+			# We cannot hook this to ^: since the diff may be empty
+			[ "$show_diffs" ] && msg="$msg
+"
+			state=showcommit
+			return
+		fi
+		if [ "$state" = showcommit ]; then
+			print_commit_contents
+			[ "$show_diffs" ] && echo
+			state=randomjunk
+			return
+		fi
+		if [ "$state" != printhdr ]; then
+			die "internal error - state '$state'"
+		fi
+
+		if [ "$user" ]; then
+			if ! [[ "$author" == *"$user"* || "$committer" == *"$user"* ]]; then
+				state=silent
+				return
+			fi
+		fi
+		if [ "$oneline" ]; then
+			print_oneline
+			state=silent
+			return
+		fi
+
+		merge=
+		[ ! "$verbose" -a ${#parents[@]} -gt 1 ] && merge=" (merge)"
+		echo "${collogcommit}Commit: ${commit%:*}$merge $coldefault"
+
+		if [ "$verbose" ]; then
+			echo "${collogheader}Tree: $tree $coldefault"
+
+			for parent in "${parents[@]}"; do
+				echo "${collogheader}Parent: $parent $coldefault"
+			done
+		fi
+
+		# We want wordsplitting in the $date here, to get
+		# TZ as separate argument.
+		date=(${author#*> })
+		showdate ${date[*]}; pdate="$_showdate"
+		[ "$pdate" ] && author="${author%> *}> $pdate"
+		echo "${collogauthor}Author: $author $coldefault"
+
+		if [ "$verbose" ]; then
+			date=(${committer#*> })
+			showdate ${date[*]}; pdate="$_showdate"
+			[ "$pdate" ] && committer="${committer%> *}> $pdate"
+			echo "${collogcommitter}Committer: $committer $coldefault"
+		fi
+
+		echo
+		if [ "$difffilter" ]; then
+			state=waitdiff
+		else
+			state=showcommit
+		fi
+		;;
+	esac
+}
+
+print_commit_log()
+{
+	[ "$show_diffs" ] || colorify_diffsed=
+	reset_commit_info
+	sed -e '
+		s/^:/: /
+		s/^    \(.*\)/% @\1/
+		/^% *@[Ss]igned-[Oo]ff-[Bb]y:.*/ s/^% @\(.*\)/% @'$collogsignoff'\1'$coldefault'/
+		/^% *@[Aa][Cc][Kk]ed-[Bb]y:.*/ s/^% @\(.*\)/% @'$collogsignoff'\1'$coldefault'/
+	' -e "$colorify_diffsed" | { while IFS=$'\n' read -r line; do
+		trap exit SIGPIPE
+		if [ "$state" = "showcommit" -a "$show_diffs" -a -n "$line" ]; then
+			[ x"${line#% @}" = x"$line" ] || line="    ${line#% @}" # undo sed damage
+			[ "$state" = silent ] || msg="$msg$line
+"
+			continue
+		fi
+		key="${line%%[ 	]*}"
+		rest="${line#*[ 	]}"
+		process_commit_line
+	done; [ "$state" = "showcommit" ] && print_commit_contents # the last commit
+	}
+}
+
+
+colors=
+collogheader=
+collogauthor=
+collogcommitter=
+collogfiles=
+collogsignoff=
+collogsumauthor=
+collogsumcommit=
+collogsumdate=
+collogsumtrim=
+coldefault=
+difffilter=
+followrenames=
+neverfollowrenames=
+verbose=
+
+list_files=
+show_diffs=
+diffcore=
+id1=
+id2=
+oneline=
+shortlog=
+user=
+mergebase=
+date_from=
+date_to=
+no_merges=--no-merges
+always=--always
+diffmerges=
+diffpatches=
+pickaxe=()
+
+while optparse; do
+	if optparse -c; then
+		colors=1
+	elif optparse -d; then
+		show_diffs=1
+		difffilter=showdiffs
+		diffpatches=-p
+		list_files=
+	elif optparse -f; then
+		list_files=1
+		difffilter=listfiles
+		show_diffs=
+		diffpatches=
+	elif optparse -u=; then
+		user="$OPTARG"
+	elif optparse -r=; then
+		if echo "$OPTARG" | fgrep -q '..'; then
+			id1="${OPTARG%..*}"
+			id2="${OPTARG#*..}"
+			# id2 was specified as empty commit, that is HEAD;
+			# but leaving it empty now would give the code below
+			# wrong idea.
+			[ "$id2" ] || id2="HEAD"
+		elif echo "$OPTARG" | grep -q ':'; then
+			id1="${OPTARG%:*}"
+			id2="${OPTARG#*:}"
+			[ "$id2" ] || id2="HEAD"
+		elif [ -z "$id1" ]; then
+			id1="$OPTARG"
+		elif [ -z "$id2" ]; then
+			id2="$OPTARG"
+		else
+			die "too many revisions"
+		fi
+	elif optparse -D=; then
+		if [ -z "$date_from" ]; then
+			date_from="--max-age=$(date -d "$OPTARG" +%s)" || exit 1
+		else
+			date_to="--min-age=$(date -d "$OPTARG" +%s)" || exit 1
+		fi
+	elif optparse -d=; then
+		die "the -d option was renamed to -D"
+	elif optparse -m; then
+		mergebase=1
+	elif optparse -M || optparse --merges; then
+		no_merges=
+		diffmerges=-m
+	elif optparse -R || optparse --no-renames; then
+		neverfollowrenames=1
+	elif optparse -s; then
+		oneline=1
+	elif optparse -S= || optparse --pickaxe=; then
+		always=
+		pickaxe=(-S"$OPTARG")
+		# The trouble with this is that less behaves really strange.
+		# It withholds the output until it reads all the input, for
+		# example. So this didn't work out very well so far. :-(
+		# pickaxe_less=$'+/\013\022'"${OPTARG}"
+		# pickaxe_less="${pickaxe_less%$'\n'*}" # stupid less!
+		difffilter=pickaxe
+	elif optparse --diffcore=; then
+		diffcore="$OPTARG"
+	elif optparse --summary; then
+		shortlog=1
+	elif optparse -v; then
+		verbose=1
+	else
+		optfail
+	fi
+done
+
+
+# [ "$pickaxe_less" -a "$show_diffs" ] && _local_CG_LESS="$pickaxe_less"
+colorify_detect "$colors" log && setup_colors
+if [ "$show_diffs" -a "${ARGS[*]}" ]; then
+	#warn "-d is buggy and cannot follow renames yet; implying --no-renames"
+	neverfollowrenames=1
+fi
+
+
+# Word splitting is ok here and we want to auto-drop empty dates.
+revls="$no_merges $date_from $date_to"
+
+
+if [ "$mergebase" ]; then
+	[ "$id1" ] || id1="HEAD"
+	[ "$id2" ] || { id2="$(choose_origin refs/heads "what to log against?")" || exit 1; }
+
+	id1="$(cg-object-id -c "$id1")" || exit 1
+	id2="$(cg-object-id -c "$id2")" || exit 1
+	conservative_merge_base "$id1" "$id2" || exit 1
+	[ "$_cg_base_conservative" ] &&
+		warn -b "multiple merge bases, picking the most conservative one"
+	id1="$_cg_baselist"
+
+else
+	id1="$(cg-object-id -c "$id1")" || exit 1
+fi
+
+if [ "$id2" ]; then
+	id2="$(cg-object-id -c "$id2")" || exit 1
+	revls="$revls ^$id1"
+	revlsstart="$id2"
+else
+	revlsstart="$id1"
+fi
+
+
+if [ "$shortlog" ]; then
+	fmt="--pretty=short"
+else
+	fmt="--pretty=raw"
+fi
+
+sep=
+if [ "${ARGS[*]}" ]; then
+	[ "$neverfollowrenames" ] || followrenames=1
+	sep=--
+fi
+
+# Translate arguments to relpath:
+if [ "$_git_relpath" ]; then
+	for (( i=0; i<${#ARGS[@]}; i++ )); do
+		ARGS[$i]="$_git_relpath${ARGS[$i]}"
+	done
+fi
+
+[ "$followrenames" ] && difffilter=followrenames
+
+
+# A curious pipeline:
+rev_extract()
+{
+	# XXX: Following renames is broken and turns out to be massive
+	# performance hog.
+#	if [ "$followrenames" ]; then
+#		[ "${ARGS[*]}" ] || die "internal error: no files to follow renames on"
+#		# We ignore $fmt but that's no biggie, shortlog
+#		# will actually work anyway.
+#		"${COGITO_LIB:-/usr/lib/cogito/}"cg-Xfollowrenames $revls -- \
+#			--root --pickaxe-all $diffmerges $diffpatches \
+#				$always $diffcore "${pickaxe[@]}" -- \
+#			$revlsstart -- "${ARGS[@]}"
+#	el
+	if [ "$difffilter" ]; then
+		git rev-list $revls $revlsstart $sep "${ARGS[@]}" | \
+		git diff-tree -r --stdin --root --pickaxe-all \
+			$diffmerges $diffpatches $always $diffcore $fmt \
+			"${pickaxe[@]}"
+	else
+		git rev-list $revls $revlsstart $fmt $sep "${ARGS[@]}"
+	fi
+}
+
+rev_show()
+{
+	if [ "$shortlog" ]; then
+		git shortlog | pager
+	else
+		# LESS="S" will prevent less to wrap too long titles
+		# to multiple lines; you can scroll horizontally.
+		print_commit_log | _local_CG_LESS="S $_local_CG_LESS" pager
+	fi
+}
+
+rev_extract | rev_show
+
+exit 0

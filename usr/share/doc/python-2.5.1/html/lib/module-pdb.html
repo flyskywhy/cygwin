@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="profile.html" />
+<link rel="prev" href="development.html" />
+<link rel="parent" href="lib.html" />
+<link rel="next" href="debugger-commands.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>24. The Python Debugger </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.5 test.test_support  "
+  href="module-test.testsupport.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python library Reference"
+  href="lib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="24.1 debugger Commands"
+  href="debugger-commands.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-test.testsupport.html">23.5 test.test_support  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="lib.html">Python Library Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="debugger-commands.html">24.1 Debugger Commands</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0026000000000000000000"></a><a name="debugger"></a>
+<br>
+24. The Python Debugger 
+</h1>
+
+<p>
+<a name="module-pdb"></a>
+
+<p>
+The module <tt class="module">pdb</tt> defines an interactive source code
+debugger<a id='l2h-5083' xml:id='l2h-5083'></a> for Python programs.  It supports setting
+(conditional) breakpoints and single stepping at the source line
+level, inspection of stack frames, source code listing, and evaluation
+of arbitrary Python code in the context of any stack frame.  It also
+supports post-mortem debugging and can be called under program
+control.
+
+<p>
+The debugger is extensible -- it is actually defined as the class
+<tt class="class">Pdb</tt><a id='l2h-5076' xml:id='l2h-5076'></a>.
+This is currently undocumented but easily understood by reading the
+source.  The extension interface uses the modules
+<tt class="module">bdb</tt><a id='l2h-5084' xml:id='l2h-5084'></a> (undocumented) and
+<tt class="module"><a href="module-cmd.html">cmd</a></tt><a id='l2h-5085' xml:id='l2h-5085'></a>.
+
+<p>
+The debugger's prompt is "<tt class="samp">(Pdb) </tt>".
+Typical usage to run a program under control of the debugger is:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import pdb
+&gt;&gt;&gt; import mymodule
+&gt;&gt;&gt; pdb.run('mymodule.test()')
+&gt; &lt;string&gt;(0)?()
+(Pdb) continue
+&gt; &lt;string&gt;(1)?()
+(Pdb) continue
+NameError: 'spam'
+&gt; &lt;string&gt;(1)?()
+(Pdb)
+</pre></div>
+
+<p>
+<span class="file">pdb.py</span> can also be invoked as
+a script to debug other scripts.  For example:
+
+<p>
+<div class="verbatim"><pre>
+python -m pdb myscript.py
+</pre></div>
+
+<p>
+When invoked as a script, pdb will automatically enter post-mortem debugging
+if the program being debugged exits abnormally. After post-mortem debugging
+(or after normal exit of the program), pdb will restart the program.
+Automatic restarting preserves pdb's state (such as breakpoints) and in most
+cases is more useful than quitting the debugger upon program's exit.
+
+<span class="versionnote">New in version 2.4:
+Restarting post-mortem behavior added.</span>
+
+<p>
+Typical usage to inspect a crashed program is:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import pdb
+&gt;&gt;&gt; import mymodule
+&gt;&gt;&gt; mymodule.test()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+  File "./mymodule.py", line 4, in test
+    test2()
+  File "./mymodule.py", line 3, in test2
+    print spam
+NameError: spam
+&gt;&gt;&gt; pdb.pm()
+&gt; ./mymodule.py(3)test2()
+-&gt; print spam
+(Pdb)
+</pre></div>
+
+<p>
+The module defines the following functions; each enters the debugger
+in a slightly different way:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5077' xml:id='l2h-5077' class="function">run</tt></b>(</nobr></td>
+  <td><var>statement</var><big>[</big><var>, globals</var><big>[</big><var>, locals</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Execute the <var>statement</var> (given as a string) under debugger
+control.  The debugger prompt appears before any code is executed; you
+can set breakpoints and type "<tt class="samp">continue</tt>", or you can step through
+the statement using "<tt class="samp">step</tt>" or "<tt class="samp">next</tt>" (all these commands are
+explained below).  The optional <var>globals</var> and <var>locals</var>
+arguments specify the environment in which the code is executed; by
+default the dictionary of the module <tt class="module"><a href="module-main.html">__main__</a></tt> is
+used.  (See the explanation of the <tt class="keyword">exec</tt> statement or the
+<tt class="function">eval()</tt> built-in function.)
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5078' xml:id='l2h-5078' class="function">runeval</tt></b>(</nobr></td>
+  <td><var>expression</var><big>[</big><var>, globals</var><big>[</big><var>, locals</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Evaluate the <var>expression</var> (given as a string) under debugger
+control.  When <tt class="function">runeval()</tt> returns, it returns the value of the
+expression.  Otherwise this function is similar to
+<tt class="function">run()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5079' xml:id='l2h-5079' class="function">runcall</tt></b>(</nobr></td>
+  <td><var>function</var><big>[</big><var>, argument, ...</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Call the <var>function</var> (a function or method object, not a string)
+with the given arguments.  When <tt class="function">runcall()</tt> returns, it returns
+whatever the function call returned.  The debugger prompt appears as
+soon as the function is entered.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5080' xml:id='l2h-5080' class="function">set_trace</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Enter the debugger at the calling stack frame.  This is useful to
+hard-code a breakpoint at a given point in a program, even if the code
+is not otherwise being debugged (e.g. when an assertion fails).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5081' xml:id='l2h-5081' class="function">post_mortem</tt></b>(</nobr></td>
+  <td><var>traceback</var>)</td></tr></table></dt>
+<dd>
+Enter post-mortem debugging of the given <var>traceback</var> object.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5082' xml:id='l2h-5082' class="function">pm</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Enter post-mortem debugging of the traceback found in
+<code>sys.last_traceback</code>.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="debugger-commands.html">24.1 Debugger Commands</a>
+<li><a href="debugger-hooks.html">24.2 How It Works</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.5 test.test_support  "
+  href="module-test.testsupport.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python library Reference"
+  href="lib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="24.1 debugger Commands"
+  href="debugger-commands.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-test.testsupport.html">23.5 test.test_support  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="lib.html">Python Library Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="debugger-commands.html">24.1 Debugger Commands</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

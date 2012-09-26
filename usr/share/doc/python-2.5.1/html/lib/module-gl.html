@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-DEVICE.html" />
+<link rel="prev" href="module-fm.html" />
+<link rel="parent" href="sgi.html" />
+<link rel="next" href="module-DEVICE.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>34.8 gl -- Graphics Library interface</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="34.7 fm  "
+  href="module-fm.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="34. sgi IRIX Specific"
+  href="sgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="34.9 device  "
+  href="module-DEVICE.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-fm.html">34.7 fm  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sgi.html">34. SGI IRIX Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-DEVICE.html">34.9 DEVICE  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0036800000000000000000">
+34.8 <tt class="module">gl</tt> --
+         <em>Graphics Library</em> interface</a>
+</h1>
+
+<p>
+<a name="module-gl"></a>  
+<p class="availability">Availability: <span
+ class="platform">IRIX</span>.</p>
+
+<p>
+This module provides access to the Silicon Graphics
+<em>Graphics Library</em>.
+It is available only on Silicon Graphics machines.
+
+<p>
+<span class="warning"><b class="label">Warning:</b>
+Some illegal calls to the GL library cause the Python
+interpreter to dump core.
+In particular, the use of most GL calls is unsafe before the first
+window is opened.</span>
+
+<p>
+The module is too large to document here in its entirety, but the
+following should help you to get started.
+The parameter conventions for the C functions are translated to Python as
+follows:
+
+<p>
+
+<ul>
+<li>All (short, long, unsigned) int values are represented by Python
+integers.
+</li>
+<li>All float and double values are represented by Python floating point
+numbers.
+In most cases, Python integers are also allowed.
+</li>
+<li>All arrays are represented by one-dimensional Python lists.
+In most cases, tuples are also allowed.
+</li>
+<li>All string and character arguments are represented by Python strings,
+for instance,
+<code>winopen('Hi There!')</code>
+and
+<code>rotate(900, 'z')</code>.
+
+</li>
+<li>All (short, long, unsigned) integer arguments or return values that are
+only used to specify the length of an array argument are omitted.
+For example, the C call
+
+<p>
+<div class="verbatim"><pre>
+lmdef(deftype, index, np, props)
+</pre></div>
+
+<p>
+is translated to Python as
+
+<p>
+<div class="verbatim"><pre>
+lmdef(deftype, index, props)
+</pre></div>
+
+<p>
+</li>
+<li>Output arguments are omitted from the argument list; they are
+transmitted as function return values instead.
+If more than one value must be returned, the return value is a tuple.
+If the C function has both a regular return value (that is not omitted
+because of the previous rule) and an output argument, the return value
+comes first in the tuple.
+Examples: the C call
+
+<p>
+<div class="verbatim"><pre>
+getmcolor(i, &amp;red, &amp;green, &amp;blue)
+</pre></div>
+
+<p>
+is translated to Python as
+
+<p>
+<div class="verbatim"><pre>
+red, green, blue = getmcolor(i)
+</pre></div>
+
+<p>
+</li>
+</ul>
+
+<p>
+The following functions are non-standard or have special argument
+conventions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5703' xml:id='l2h-5703' class="function">varray</tt></b>(</nobr></td>
+  <td><var>argument</var>)</td></tr></table></dt>
+<dd>
+Equivalent to but faster than a number of
+<code>v3d()</code>
+calls.
+The <var>argument</var> is a list (or tuple) of points.
+Each point must be a tuple of coordinates
+<code>(<var>x</var>, <var>y</var>, <var>z</var>)</code> or <code>(<var>x</var>, <var>y</var>)</code>.
+The points may be 2- or 3-dimensional but must all have the
+same dimension.
+Float and int values may be mixed however.
+The points are always converted to 3D double precision points
+by assuming <code><var>z</var> = 0.0</code> if necessary (as indicated in the man page),
+and for each point
+<code>v3d()</code>
+is called.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5704' xml:id='l2h-5704' class="function">nvarray</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Equivalent to but faster than a number of
+<code>n3f</code>
+and
+<code>v3f</code>
+calls.
+The argument is an array (list or tuple) of pairs of normals and points.
+Each pair is a tuple of a point and a normal for that point.
+Each point or normal must be a tuple of coordinates
+<code>(<var>x</var>, <var>y</var>, <var>z</var>)</code>.
+Three coordinates must be given.
+Float and int values may be mixed.
+For each pair,
+<code>n3f()</code>
+is called for the normal, and then
+<code>v3f()</code>
+is called for the point.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5705' xml:id='l2h-5705' class="function">vnarray</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Similar to 
+<code>nvarray()</code>
+but the pairs have the point first and the normal second.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5706' xml:id='l2h-5706' class="function">nurbssurface</tt></b>(</nobr></td>
+  <td><var>s_k, t_k, ctl, s_ord, t_ord, type</var>)</td></tr></table></dt>
+<dd>
+Defines a nurbs surface.
+The dimensions of
+<code><var>ctl</var>[][]</code>
+are computed as follows:
+<code>[len(<var>s_k</var>) - <var>s_ord</var>]</code>,
+<code>[len(<var>t_k</var>) - <var>t_ord</var>]</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5707' xml:id='l2h-5707' class="function">nurbscurve</tt></b>(</nobr></td>
+  <td><var>knots, ctlpoints, order, type</var>)</td></tr></table></dt>
+<dd>
+Defines a nurbs curve.
+The length of ctlpoints is
+<code>len(<var>knots</var>) - <var>order</var></code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5708' xml:id='l2h-5708' class="function">pwlcurve</tt></b>(</nobr></td>
+  <td><var>points, type</var>)</td></tr></table></dt>
+<dd>
+Defines a piecewise-linear curve.
+<var>points</var>
+is a list of points.
+<var>type</var>
+must be
+<code>N_ST</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5709' xml:id='l2h-5709' class="function">pick</tt></b>(</nobr></td>
+  <td><var>n</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">select</tt></b>(</nobr></td>
+  <td><var>n</var>)</td></tr></table></dt>
+<dd>The only argument to these functions specifies the desired size of the
+pick or select buffer.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5711' xml:id='l2h-5711' class="function">endpick</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">endselect</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>These functions have no arguments.
+They return a list of integers representing the used part of the
+pick/select buffer.
+No method is provided to detect buffer overrun.
+</dl>
+
+<p>
+Here is a tiny but complete example GL program in Python:
+
+<p>
+<div class="verbatim"><pre>
+import gl, GL, time
+
+def main():
+    gl.foreground()
+    gl.prefposition(500, 900, 500, 900)
+    w = gl.winopen('CrissCross')
+    gl.ortho2(0.0, 400.0, 0.0, 400.0)
+    gl.color(GL.WHITE)
+    gl.clear()
+    gl.color(GL.RED)
+    gl.bgnline()
+    gl.v2f(0.0, 0.0)
+    gl.v2f(400.0, 400.0)
+    gl.endline()
+    gl.bgnline()
+    gl.v2f(400.0, 0.0)
+    gl.v2f(0.0, 400.0)
+    gl.endline()
+    time.sleep(5)
+
+main()
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://pyopengl.sourceforge.net/"
+        >PyOpenGL: The Python OpenGL Binding</a></em></dt>
+    <dd>An interface to OpenGL<a id='l2h-5713' xml:id='l2h-5713'></a> is also available;
+            see information about the
+            <strong>PyOpenGL</strong><a id='l2h-5714' xml:id='l2h-5714'></a> project online at
+            <a class="url" href="http://pyopengl.sourceforge.net/">http://pyopengl.sourceforge.net/</a>.  This may be a
+            better option if support for SGI hardware from before
+            about 1996 is not required.</dd>
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="34.7 fm  "
+  href="module-fm.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="34. sgi IRIX Specific"
+  href="sgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="34.9 device  "
+  href="module-DEVICE.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-fm.html">34.7 fm  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sgi.html">34. SGI IRIX Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-DEVICE.html">34.9 DEVICE  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

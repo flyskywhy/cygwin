@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="memoryInterface.html" />
+<link rel="parent" href="memory.html" />
+<link rel="next" href="newTypes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>9.3 Examples </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="9.2 memory Interface"
+  href="memoryInterface.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="9. memory Management"
+  href="memory.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="memoryInterface.html">9.2 Memory Interface</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="memory.html">9. Memory Management</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="newTypes.html">10. Object Implementation Support</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0011300000000000000000"></a><a name="memoryExamples"></a>
+<br>
+9.3 Examples 
+</h1>
+
+<p>
+Here is the example from section <a href="memoryOverview.html#memoryOverview">9.1</a>, rewritten so
+that the I/O buffer is allocated from the Python heap by using the
+first function set:
+
+<p>
+<div class="verbatim"><pre>
+    PyObject *res;
+    char *buf = (char *) PyMem_Malloc(BUFSIZ); /* for I/O */
+
+    if (buf == NULL)
+        return PyErr_NoMemory();
+    /* ...Do some I/O operation involving buf... */
+    res = PyString_FromString(buf);
+    PyMem_Free(buf); /* allocated with PyMem_Malloc */
+    return res;
+</pre></div>
+
+<p>
+The same code using the type-oriented function set:
+
+<p>
+<div class="verbatim"><pre>
+    PyObject *res;
+    char *buf = PyMem_New(char, BUFSIZ); /* for I/O */
+
+    if (buf == NULL)
+        return PyErr_NoMemory();
+    /* ...Do some I/O operation involving buf... */
+    res = PyString_FromString(buf);
+    PyMem_Del(buf); /* allocated with PyMem_New */
+    return res;
+</pre></div>
+
+<p>
+Note that in the two examples above, the buffer is always
+manipulated via functions belonging to the same set. Indeed, it
+is required to use the same memory API family for a given
+memory block, so that the risk of mixing different allocators is
+reduced to a minimum. The following code sequence contains two errors,
+one of which is labeled as <em>fatal</em> because it mixes two different
+allocators operating on different heaps.
+
+<p>
+<div class="verbatim"><pre>
+char *buf1 = PyMem_New(char, BUFSIZ);
+char *buf2 = (char *) malloc(BUFSIZ);
+char *buf3 = (char *) PyMem_Malloc(BUFSIZ);
+...
+PyMem_Del(buf3);  /* Wrong -- should be PyMem_Free() */
+free(buf2);       /* Right -- allocated via malloc() */
+free(buf1);       /* Fatal -- should be PyMem_Del()  */
+</pre></div>
+
+<p>
+In addition to the functions aimed at handling raw memory blocks from
+the Python heap, objects in Python are allocated and released with
+<tt class="cfunction">PyObject_New()</tt>, <tt class="cfunction">PyObject_NewVar()</tt> and
+<tt class="cfunction">PyObject_Del()</tt>.
+
+<p>
+These will be explained in the next chapter on defining and
+implementing new object types in C.
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="9.2 memory Interface"
+  href="memoryInterface.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="9. memory Management"
+  href="memory.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="memoryInterface.html">9.2 Memory Interface</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="memory.html">9. Memory Management</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="newTypes.html">10. Object Implementation Support</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

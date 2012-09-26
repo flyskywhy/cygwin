@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node633.html" />
+<link rel="prev" href="module-SocketServer.html" />
+<link rel="parent" href="module-SocketServer.html" />
+<link rel="next" href="node633.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.18.1 Server Creation Notes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.18 socketserver  "
+  href="module-SocketServer.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.18 socketserver  "
+  href="module-SocketServer.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.18.2 server Objects"
+  href="node633.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-SocketServer.html">18.18 SocketServer  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-SocketServer.html">18.18 SocketServer  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node633.html">18.18.2 Server Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00201810000000000000000">
+18.18.1 Server Creation Notes</a>
+</h2>
+
+<p>
+There are five classes in an inheritance diagram, four of which represent
+synchronous servers of four types:
+
+<p>
+<div class="verbatim"><pre>
+        +------------+
+        | BaseServer |
+        +------------+
+              |
+              v
+        +-----------+        +------------------+
+        | TCPServer |-------&gt;| UnixStreamServer |
+        +-----------+        +------------------+
+              |
+              v
+        +-----------+        +--------------------+
+        | UDPServer |-------&gt;| UnixDatagramServer |
+        +-----------+        +--------------------+
+</pre></div>
+
+<p>
+Note that <tt class="class">UnixDatagramServer</tt> derives from <tt class="class">UDPServer</tt>, not
+from <tt class="class">UnixStreamServer</tt> -- the only difference between an IP and a
+<span class="Unix">Unix</span> stream server is the address family, which is simply repeated in both
+<span class="Unix">Unix</span> server classes.
+
+<p>
+Forking and threading versions of each type of server can be created using
+the <tt class="class">ForkingMixIn</tt> and <tt class="class">ThreadingMixIn</tt> mix-in classes.  For
+instance, a threading UDP server class is created as follows:
+
+<p>
+<div class="verbatim"><pre>
+    class ThreadingUDPServer(ThreadingMixIn, UDPServer): pass
+</pre></div>
+
+<p>
+The mix-in class must come first, since it overrides a method defined in
+<tt class="class">UDPServer</tt>.  Setting the various member variables also changes the
+behavior of the underlying server mechanism.
+
+<p>
+To implement a service, you must derive a class from
+<tt class="class">BaseRequestHandler</tt> and redefine its <tt class="method">handle()</tt> method.  You
+can then run various versions of the service by combining one of the server
+classes with your request handler class.  The request handler class must be
+different for datagram or stream services.  This can be hidden by using the
+handler subclasses <tt class="class">StreamRequestHandler</tt> or <tt class="class">DatagramRequestHandler</tt>.
+
+<p>
+Of course, you still have to use your head!  For instance, it makes no sense
+to use a forking server if the service contains state in memory that can be
+modified by different requests, since the modifications in the child process
+would never reach the initial state kept in the parent process and passed to
+each child.  In this case, you can use a threading server, but you will
+probably have to use locks to protect the integrity of the shared data.
+
+<p>
+On the other hand, if you are building an HTTP server where all data is
+stored externally (for instance, in the file system), a synchronous class
+will essentially render the service "deaf" while one request is being
+handled - which may be for a very long time if a client is slow to receive
+all the data it has requested.  Here a threading or forking server is
+appropriate.
+
+<p>
+In some cases, it may be appropriate to process part of a request
+synchronously, but to finish processing in a forked child depending on the
+request data.  This can be implemented by using a synchronous server and
+doing an explicit fork in the request handler class <tt class="method">handle()</tt>
+method.
+
+<p>
+Another approach to handling multiple simultaneous requests in an
+environment that supports neither threads nor <tt class="function">fork()</tt> (or where
+these are too expensive or inappropriate for the service) is to maintain an
+explicit table of partially finished requests and to use <tt class="function">select()</tt>
+to decide which request to work on next (or whether to handle a new incoming
+request).  This is particularly important for stream services where each
+client can potentially be connected for a long time (if threads or
+subprocesses cannot be used).
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.18 socketserver  "
+  href="module-SocketServer.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.18 socketserver  "
+  href="module-SocketServer.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.18.2 server Objects"
+  href="node633.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-SocketServer.html">18.18 SocketServer  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-SocketServer.html">18.18 SocketServer  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node633.html">18.18.2 Server Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

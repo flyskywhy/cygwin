@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pyzipfile-objects.html" />
+<link rel="prev" href="module-zipfile.html" />
+<link rel="parent" href="module-zipfile.html" />
+<link rel="next" href="pyzipfile-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>12.4.1 ZipFile Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="12.4 zipfile  "
+  href="module-zipfile.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="12.4 zipfile  "
+  href="module-zipfile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12.4.2 pyzipfile Objects"
+  href="pyzipfile-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-zipfile.html">12.4 zipfile  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-zipfile.html">12.4 zipfile  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pyzipfile-objects.html">12.4.2 PyZipFile Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0014410000000000000000"></a><a name="zipfile-objects"></a>
+<br>
+12.4.1 ZipFile Objects 
+</h2>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-2364' xml:id='l2h-2364' class="class">ZipFile</tt></b>(</nobr></td>
+  <td><var>file</var><big>[</big><var>, mode</var><big>[</big><var>, compression</var><big>[</big><var>, allowZip64</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd> 
+  Open a ZIP file, where <var>file</var> can be either a path to a file
+  (a string) or a file-like object.  The <var>mode</var> parameter
+  should be <code>'r'</code> to read an existing file, <code>'w'</code> to
+  truncate and write a new file, or <code>'a'</code> to append to an
+  existing file.  For <var>mode</var> is <code>'a'</code> and <var>file</var>
+  refers to an existing ZIP file, then additional files are added to
+  it.  If <var>file</var> does not refer to a ZIP file, then a new ZIP
+  archive is appended to the file.  This is meant for adding a ZIP
+  archive to another file, such as <span class="file">python.exe</span>.  Using
+
+<p>
+<div class="verbatim"><pre>
+cat myzip.zip &gt;&gt; python.exe
+</pre></div>
+
+<p>
+also works, and at least <b class="program">WinZip</b> can read such files.
+  <var>compression</var> is the ZIP compression method to use when writing
+  the archive, and should be <tt class="constant">ZIP_STORED</tt> or
+  <tt class="constant">ZIP_DEFLATED</tt>; unrecognized values will cause
+  <tt class="exception">RuntimeError</tt> to be raised.  If <tt class="constant">ZIP_DEFLATED</tt>
+  is specified but the <tt class="module"><a href="module-zlib.html">zlib</a></tt> module is not available,
+  <tt class="exception">RuntimeError</tt> is also raised.  The default is
+  <tt class="constant">ZIP_STORED</tt>. 
+  If <var>allowZip64</var> is <code>True</code> zipfile will create ZIP files that use
+  the ZIP64 extensions when the zipfile is larger than 2 GB. If it is 
+  false (the default) <tt class="module">zipfile</tt> will raise an exception when the
+  ZIP file would require ZIP64 extensions. ZIP64 extensions are disabled by
+  default because the default <b class="program">zip</b> and <b class="program">unzip</b> commands on
+  <span class="Unix">Unix</span> (the InfoZIP utilities) don't support these extensions.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2365' xml:id='l2h-2365' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Close the archive file.  You must call <tt class="method">close()</tt> before
+  exiting your program or essential records will not be written. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2366' xml:id='l2h-2366' class="method">getinfo</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+  Return a <tt class="class">ZipInfo</tt> object with information about the archive
+  member <var>name</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2367' xml:id='l2h-2367' class="method">infolist</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return a list containing a <tt class="class">ZipInfo</tt> object for each member of
+  the archive.  The objects are in the same order as their entries in
+  the actual ZIP file on disk if an existing archive was opened.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2368' xml:id='l2h-2368' class="method">namelist</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return a list of archive members by name.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2369' xml:id='l2h-2369' class="method">printdir</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Print a table of contents for the archive to <code>sys.stdout</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2370' xml:id='l2h-2370' class="method">read</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+  Return the bytes of the file in the archive.  The archive must be
+  open for read or append.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2371' xml:id='l2h-2371' class="method">testzip</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Read all the files in the archive and check their CRC's and file
+  headers.  Return the name of the first bad file, or else return <code>None</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2372' xml:id='l2h-2372' class="method">write</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, arcname</var><big>[</big><var>,
+                          compress_type</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Write the file named <var>filename</var> to the archive, giving it the
+  archive name <var>arcname</var> (by default, this will be the same as
+  <var>filename</var>, but without a drive letter and with leading path
+  separators removed).  If given, <var>compress_type</var> overrides the
+  value given for the <var>compression</var> parameter to the constructor
+  for the new entry.  The archive must be open with mode <code>'w'</code>
+  or <code>'a'</code>.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+There is no official file name encoding for ZIP files.
+  If you have unicode file names, please convert them to byte strings
+  in your desired encoding before passing them to <tt class="method">write()</tt>.
+  WinZip interprets all file names as encoded in CP437, also known
+  as DOS Latin.</span>
+
+<p>
+<span class="note"><b class="label">Note:</b>
+Archive names should be relative to the archive root, that is,
+        they should not start with a path separator.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2373' xml:id='l2h-2373' class="method">writestr</tt></b>(</nobr></td>
+  <td><var>zinfo_or_arcname, bytes</var>)</td></tr></table></dt>
+<dd>
+  Write the string <var>bytes</var> to the archive; <var>zinfo_or_arcname</var>
+  is either the file name it will be given in the archive, or a
+  <tt class="class">ZipInfo</tt> instance.  If it's an instance, at least the
+  filename, date, and time must be given.  If it's a name, the date
+  and time is set to the current date and time. The archive must be
+  opened with mode <code>'w'</code> or <code>'a'</code>.
+</dl>
+
+<p>
+The following data attribute is also available:
+
+<p>
+<dl><dt><b><tt id='l2h-2374' xml:id='l2h-2374' class="member">debug</tt></b></dt>
+<dd>
+  The level of debug output to use.  This may be set from <code>0</code>
+  (the default, no output) to <code>3</code> (the most output).  Debugging
+  information is written to <code>sys.stdout</code>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="12.4 zipfile  "
+  href="module-zipfile.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="12.4 zipfile  "
+  href="module-zipfile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12.4.2 pyzipfile Objects"
+  href="pyzipfile-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-zipfile.html">12.4 zipfile  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-zipfile.html">12.4 zipfile  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pyzipfile-objects.html">12.4.2 PyZipFile Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node634.html" />
+<link rel="prev" href="node632.html" />
+<link rel="parent" href="module-SocketServer.html" />
+<link rel="next" href="node634.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.18.2 Server Objects</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.18.1 server Creation Notes"
+  href="node632.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.18 socketserver  "
+  href="module-SocketServer.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.18.3 requesthandler Objects"
+  href="node634.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node632.html">18.18.1 Server Creation Notes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-SocketServer.html">18.18 SocketServer  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node634.html">18.18.3 RequestHandler Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00201820000000000000000">
+18.18.2 Server Objects</a>
+</h2>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4292' xml:id='l2h-4292' class="function">fileno</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return an integer file descriptor for the socket on which the server
+is listening.  This function is most commonly passed to
+<tt class="function">select.select()</tt>, to allow monitoring multiple servers in the
+same process.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4293' xml:id='l2h-4293' class="function">handle_request</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Process a single request.  This function calls the following methods
+in order: <tt class="method">get_request()</tt>, <tt class="method">verify_request()</tt>, and
+<tt class="method">process_request()</tt>.  If the user-provided <tt class="method">handle()</tt>
+method of the handler class raises an exception, the server's
+<tt class="method">handle_error()</tt> method will be called.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4294' xml:id='l2h-4294' class="function">serve_forever</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Handle an infinite number of requests.  This simply calls
+<tt class="method">handle_request()</tt> inside an infinite loop.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4295' xml:id='l2h-4295'>address_family</tt></b></dt>
+<dd>
+The family of protocols to which the server's socket belongs.
+<tt class="constant">socket.AF_INET</tt> and <tt class="constant">socket.AF_UNIX</tt> are two
+possible values.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4296' xml:id='l2h-4296'>RequestHandlerClass</tt></b></dt>
+<dd>
+The user-provided request handler class; an instance of this class is
+created for each request.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4297' xml:id='l2h-4297'>server_address</tt></b></dt>
+<dd>
+The address on which the server is listening.  The format of addresses
+varies depending on the protocol family; see the documentation for the
+socket module for details.  For Internet protocols, this is a tuple
+containing a string giving the address, and an integer port number:
+<code>('127.0.0.1', 80)</code>, for example.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4298' xml:id='l2h-4298'>socket</tt></b></dt>
+<dd>
+The socket object on which the server will listen for incoming requests.
+</dd></dl>
+
+<p>
+The server classes support the following class variables:
+
+<p>
+<dl><dt><b><tt id='l2h-4299' xml:id='l2h-4299'>allow_reuse_address</tt></b></dt>
+<dd>
+Whether the server will allow the reuse of an address. This defaults
+to <tt class="constant">False</tt>, and can be set in subclasses to change the policy.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4300' xml:id='l2h-4300'>request_queue_size</tt></b></dt>
+<dd>
+The size of the request queue.  If it takes a long time to process a
+single request, any requests that arrive while the server is busy are
+placed into a queue, up to <tt class="member">request_queue_size</tt> requests.  Once
+the queue is full, further requests from clients will get a
+``Connection denied'' error.  The default value is usually 5, but this
+can be overridden by subclasses.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4301' xml:id='l2h-4301'>socket_type</tt></b></dt>
+<dd>
+The type of socket used by the server; <tt class="constant">socket.SOCK_STREAM</tt>
+and <tt class="constant">socket.SOCK_DGRAM</tt> are two possible values.
+</dd></dl>
+
+<p>
+There are various server methods that can be overridden by subclasses
+of base server classes like <tt class="class">TCPServer</tt>; these methods aren't
+useful to external users of the server object.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4302' xml:id='l2h-4302' class="function">finish_request</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Actually processes the request by instantiating
+<tt class="member">RequestHandlerClass</tt> and calling its <tt class="method">handle()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4303' xml:id='l2h-4303' class="function">get_request</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Must accept a request from the socket, and return a 2-tuple containing
+the <em>new</em> socket object to be used to communicate with the
+client, and the client's address.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4304' xml:id='l2h-4304' class="function">handle_error</tt></b>(</nobr></td>
+  <td><var>request, client_address</var>)</td></tr></table></dt>
+<dd>
+This function is called if the <tt class="member">RequestHandlerClass</tt>'s
+<tt class="method">handle()</tt> method raises an exception.  The default action is
+to print the traceback to standard output and continue handling
+further requests.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4305' xml:id='l2h-4305' class="function">process_request</tt></b>(</nobr></td>
+  <td><var>request, client_address</var>)</td></tr></table></dt>
+<dd>
+Calls <tt class="method">finish_request()</tt> to create an instance of the
+<tt class="member">RequestHandlerClass</tt>.  If desired, this function can create a
+new process or thread to handle the request; the <tt class="class">ForkingMixIn</tt>
+and <tt class="class">ThreadingMixIn</tt> classes do this.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4306' xml:id='l2h-4306' class="function">server_activate</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Called by the server's constructor to activate the server.  The default
+behavior just <tt class="method">listen</tt>s to the server's socket.
+May be overridden.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4307' xml:id='l2h-4307' class="function">server_bind</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Called by the server's constructor to bind the socket to the desired
+address.  May be overridden.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4308' xml:id='l2h-4308' class="function">verify_request</tt></b>(</nobr></td>
+  <td><var>request, client_address</var>)</td></tr></table></dt>
+<dd>
+Must return a Boolean value; if the value is <tt class="constant">True</tt>, the request will be
+processed, and if it's <tt class="constant">False</tt>, the request will be denied.
+This function can be overridden to implement access controls for a server.
+The default implementation always returns <tt class="constant">True</tt>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.18.1 server Creation Notes"
+  href="node632.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.18 socketserver  "
+  href="module-SocketServer.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.18.3 requesthandler Objects"
+  href="node634.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node632.html">18.18.1 Server Creation Notes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-SocketServer.html">18.18 SocketServer  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node634.html">18.18.3 RequestHandler Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-distutils.dist.html" />
+<link rel="prev" href="module-distutils.fileutil.html" />
+<link rel="parent" href="api-reference.html" />
+<link rel="next" href="module-distutils.dist.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.13 distutils.util -- Miscellaneous other utility functions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.12 distutils.file_util  "
+  href="module-distutils.fileutil.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.14 distutils.dist  "
+  href="module-distutils.dist.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.fileutil.html">11.12 distutils.file_util  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.dist.html">11.14 distutils.dist  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00111300000000000000000">
+11.13 <tt class="module">distutils.util</tt> -- Miscellaneous other utility functions</a>
+</h1>
+<a name="module-distutils.util"></a>
+
+<p>
+This module contains other assorted bits and pieces that don't fit into 
+any other utility module.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-80' xml:id='l2h-80' class="function">get_platform</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a string that identifies the current platform.  This is used
+mainly to distinguish platform-specific build directories and
+platform-specific built distributions.  Typically includes the OS name
+and version and the architecture (as supplied by 'os.uname()'),
+although the exact information included depends on the OS; eg. for IRIX
+the architecture isn't particularly important (IRIX only runs on SGI
+hardware), but for Linux the kernel version isn't particularly
+important.
+
+<p>
+Examples of returned values:
+
+<ul>
+<li><code>linux-i586</code>
+</li>
+<li><code>linux-alpha</code>
+</li>
+<li><code>solaris-2.6-sun4u</code>
+</li>
+<li><code>irix-5.3</code>
+</li>
+<li><code>irix64-6.2</code>
+</li>
+</ul>
+
+<p>
+For non-POSIX platforms, currently just returns <code>sys.platform</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-81' xml:id='l2h-81' class="function">convert_path</tt></b>(</nobr></td>
+  <td><var>pathname</var>)</td></tr></table></dt>
+<dd>
+Return 'pathname' as a name that will work on the native filesystem,
+i.e. split it on '/' and put it back together again using the current
+directory separator.  Needed because filenames in the setup script are
+always supplied in <span class="Unix">Unix</span> style, and have to be converted to the local
+convention before we can actually use them in the filesystem.  Raises
+<tt class="exception">ValueError</tt> on non-<span class="Unix">Unix</span>-ish systems if <var>pathname</var> either 
+starts or ends with a slash.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-82' xml:id='l2h-82' class="function">change_root</tt></b>(</nobr></td>
+  <td><var>new_root, pathname</var>)</td></tr></table></dt>
+<dd>
+Return <var>pathname</var> with <var>new_root</var> prepended.  If <var>pathname</var> is
+relative, this is equivalent to "<tt class="samp">os.path.join(new_root,pathname)</tt>"Otherwise, it requires making <var>pathname</var> relative and then joining the
+two, which is tricky on DOS/Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-83' xml:id='l2h-83' class="function">check_environ</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Ensure that 'os.environ' has all the environment variables we
+guarantee that users can use in config files, command-line options,
+etc.  Currently this includes:
+
+<ul>
+<li><a class="envvar" id='l2h-91' xml:id='l2h-91'>HOME</a> - user's home directory (<span class="Unix">Unix</span> only)
+</li>
+<li><a class="envvar" id='l2h-92' xml:id='l2h-92'>PLAT</a> - description of the current platform, including
+      hardware and OS (see <tt class="function">get_platform()</tt>)
+</li>
+</ul>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-84' xml:id='l2h-84' class="function">subst_vars</tt></b>(</nobr></td>
+  <td><var>s, local_vars</var>)</td></tr></table></dt>
+<dd>
+Perform shell/Perl-style variable substitution on <var>s</var>.  Every
+occurrence of <code>$</code> followed by a name is considered a variable, and
+variable is substituted by the value found in the <var>local_vars</var>
+dictionary, or in <code>os.environ</code> if it's not in <var>local_vars</var>.
+<var>os.environ</var> is first checked/augmented to guarantee that it contains
+certain values: see <tt class="function">check_environ()</tt>.  Raise <tt class="exception">ValueError</tt> 
+for any variables not found in either <var>local_vars</var> or <code>os.environ</code>.
+
+<p>
+Note that this is not a fully-fledged string interpolation function. A
+valid <code>$variable</code> can consist only of upper and lower case letters,
+numbers and an underscore. No { } or <span class="MATH"></span> style quoting is available.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-85' xml:id='l2h-85' class="function">grok_environment_error</tt></b>(</nobr></td>
+  <td><var>exc</var><big>[</big><var>, prefix=tex2html_deferred"<tt class="samp">'error: '</tt>"</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Generate a useful error message from an <tt class="exception">EnvironmentError</tt> 
+(<tt class="exception">IOError</tt> or <tt class="exception">OSError</tt>) exception object.  
+Handles Python 1.5.1 and later styles, and does what it can to deal with 
+exception objects that don't have a filename (which happens when the error 
+is due to a two-file operation, such as <tt class="function">rename()</tt> or 
+<tt class="function">link()</tt>).  Returns the error message as a string prefixed 
+with <var>prefix</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-86' xml:id='l2h-86' class="function">split_quoted</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Split a string up according to <span class="Unix">Unix</span> shell-like rules for quotes and
+backslashes.  In short: words are delimited by spaces, as long as those
+spaces are not escaped by a backslash, or inside a quoted string.
+Single and double quotes are equivalent, and the quote characters can
+be backslash-escaped.  The backslash is stripped from any two-character
+escape sequence, leaving only the escaped character.  The quote
+characters are stripped from any quoted string.  Returns a list of
+words.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-87' xml:id='l2h-87' class="function">execute</tt></b>(</nobr></td>
+  <td><var>func, args</var><big>[</big><var>, msg=<code>None</code>, verbose=<code>0</code>, dry_run=<code>0</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Perform some action that affects the outside world (for instance,
+writing to the filesystem).  Such actions are special because they
+are disabled by the <var>dry_run</var> flag.  This method takes 
+care of all that bureaucracy for you; all you have to do is supply the
+function to call and an argument tuple for it (to embody the
+``external action'' being performed), and an optional message to
+print.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-88' xml:id='l2h-88' class="function">strtobool</tt></b>(</nobr></td>
+  <td><var>val</var>)</td></tr></table></dt>
+<dd>
+Convert a string representation of truth to true (1) or false (0).
+
+<p>
+True values are <code>y</code>, <code>yes</code>, <code>t</code>, <code>true</code>, <code>on</code> 
+and <code>1</code>; false values are <code>n</code>, <code>no</code>, <code>f</code>, <code>false</code>, 
+<code>off</code> and <code>0</code>.  Raises <tt class="exception">ValueError</tt> if <var>val</var> 
+is anything else.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-89' xml:id='l2h-89' class="function">byte_compile</tt></b>(</nobr></td>
+  <td><var>py_files</var><big>[</big><var>,
+              optimize=<code>0</code>, force=<code>0</code>,
+              prefix=<code>None</code>, base_dir=<code>None</code>,
+              verbose=<code>1</code>, dry_run=<code>0</code>,
+              direct=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Byte-compile a collection of Python source files to either <span class="file">.pyc</span>
+or <span class="file">.pyo</span> files in the same directory.  <var>py_files</var> is a list of files
+to compile; any files that don't end in <span class="file">.py</span> are silently skipped.
+<var>optimize</var> must be one of the following:
+
+<ul>
+<li><code>0</code> - don't optimize (generate <span class="file">.pyc</span>)
+</li>
+<li><code>1</code> - normal optimization (like "<tt class="samp">python -O</tt>")
+</li>
+<li><code>2</code> - extra optimization (like "<tt class="samp">python -OO</tt>")
+</li>
+</ul>
+
+<p>
+If <var>force</var> is true, all files are recompiled regardless of
+timestamps.
+
+<p>
+The source filename encoded in each bytecode file defaults to the
+filenames listed in <var>py_files</var>; you can modify these with <var>prefix</var> and
+<var>basedir</var>.  <var>prefix</var> is a string that will be stripped off of each
+source filename, and <var>base_dir</var> is a directory name that will be
+prepended (after <var>prefix</var> is stripped).  You can supply either or both
+(or neither) of <var>prefix</var> and <var>base_dir</var>, as you wish.
+
+<p>
+If <var>dry_run</var> is true, doesn't actually do anything that would
+affect the filesystem.
+
+<p>
+Byte-compilation is either done directly in this interpreter process
+with the standard <tt class="module">py_compile</tt> module, or indirectly by writing a
+temporary script and executing it.  Normally, you should let
+<tt class="function">byte_compile()</tt> figure out to use direct compilation or not (see
+the source for details).  The <var>direct</var> flag is used by the script
+generated in indirect mode; unless you know what you're doing, leave
+it set to <code>None</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-90' xml:id='l2h-90' class="function">rfc822_escape</tt></b>(</nobr></td>
+  <td><var>header</var>)</td></tr></table></dt>
+<dd>
+Return a version of <var>header</var> escaped for inclusion in an
+<a class="rfc" id='rfcref-5432' xml:id='rfcref-5432'
+href="http://www.faqs.org/rfcs/rfc822.html">RFC 822</a> header, by ensuring there are 8 spaces space after each newline.
+Note that it does no other modification of the string.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.12 distutils.file_util  "
+  href="module-distutils.fileutil.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.14 distutils.dist  "
+  href="module-distutils.dist.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.fileutil.html">11.12 distutils.file_util  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.dist.html">11.14 distutils.dist  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

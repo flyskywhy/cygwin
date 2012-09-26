@@ -1,0 +1,51 @@
+################################################################################
+#
+# qt4-cmake.cygclass - functions for building CMake-based Qt4 packages
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: qt4-cmake.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+inherit qt4
+
+qt4_cmake_compile() {
+	cygcmake \
+		-DAUTOMOC4_EXECUTABLE=/usr/bin/automoc4 \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_EXE_LINKER_FLAGS=-Wl,--enable-auto-import \
+		-DCMAKE_MODULE_LINKER_FLAGS=-Wl,--enable-auto-import \
+		-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--enable-auto-import \
+		-DQT_MOC_EXECUTABLE=${QT4_MOC} \
+		-DQT_INCLUDE_DIR=${QT4_INCLUDEDIR} \
+		-DQT_LIBRARY_DIR=${QT4_LIBDIR} \
+		-DQT_PLUGINS_DIR=${QT4_PLUGINSDIR} \
+		-DQT_QMAKE_EXECUTABLE=${QT4_QMAKE} \
+		-DQT_RCC_EXECUTABLE=${QT4_RCC} \
+		-DQT_UIC_EXECUTABLE=${QT4_UIC} \
+		-DQT_UIC3_EXECUTABLE=${QT4_UIC3} \
+		"${@}"
+
+	cygmake
+}
+
+src_compile() {
+	cd ${B}
+	qt4_cmake_compile
+}

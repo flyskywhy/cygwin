@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node33.html" />
+<link rel="prev" href="extending.html" />
+<link rel="parent" href="extending.html" />
+<link rel="next" href="node33.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>9.1 Integrating new commands</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="9. extending Distutils"
+  href="extending.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="9. extending Distutils"
+  href="extending.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="9.2 adding new distribution"
+  href="node33.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="extending.html">9. Extending Distutils</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="extending.html">9. Extending Distutils</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node33.html">9.2 Adding new distribution</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION009100000000000000000">
+9.1 Integrating new commands</a>
+</h1>
+
+<p>
+There are different ways to integrate new command implementations into
+distutils.  The most difficult is to lobby for the inclusion of the
+new features in distutils itself, and wait for (and require) a version
+of Python that provides that support.  This is really hard for many
+reasons.
+
+<p>
+The most common, and possibly the most reasonable for most needs, is
+to include the new implementations with your <span class="file">setup.py</span> script,
+and cause the <tt class="function">distutils.core.setup()</tt> function use them:
+
+<p>
+<div class="verbatim"><pre>
+from distutils.command.build_py import build_py as _build_py
+from distutils.core import setup
+
+class build_py(_build_py):
+    """Specialized Python source builder."""
+
+    # implement whatever needs to be different...
+
+setup(cmdclass={'build_py': build_py},
+      ...)
+</pre></div>
+
+<p>
+This approach is most valuable if the new implementations must be used
+to use a particular package, as everyone interested in the package
+will need to have the new command implementation.
+
+<p>
+Beginning with Python 2.4, a third option is available, intended to
+allow new commands to be added which can support existing
+<span class="file">setup.py</span> scripts without requiring modifications to the Python
+installation.  This is expected to allow third-party extensions to
+provide support for additional packaging systems, but the commands can
+be used for anything distutils commands can be used for.  A new
+configuration option, <span class="du-option">command_packages</span> (command-line option
+<b class="programopt">--command-packages</b>), can be used to specify additional
+packages to be searched for modules implementing commands.  Like all
+distutils options, this can be specified on the command line or in a
+configuration file.  This option can only be set in the
+<code>[global]</code> section of a configuration file, or before any
+commands on the command line.  If set in a configuration file, it can
+be overridden from the command line; setting it to an empty string on
+the command line causes the default to be used.  This should never be
+set in a configuration file provided with a package.
+
+<p>
+This new option can be used to add any number of packages to the list
+of packages searched for command implementations; multiple package
+names should be separated by commas.  When not specified, the search
+is only performed in the <tt class="module">distutils.command</tt> package.  When
+<span class="file">setup.py</span> is run with the option
+<b class="programopt">--command-packages</b> <b class="programopt">distcmds,buildcmds</b>,
+however, the packages <tt class="module">distutils.command</tt>, <tt class="module">distcmds</tt>,
+and <tt class="module">buildcmds</tt> will be searched in that order.  New commands
+are expected to be implemented in modules of the same name as the
+command by classes sharing the same name.  Given the example command
+line option above, the command <code class="du-command">bdist_openpkg</code> could be
+implemented by the class <tt class="class">distcmds.bdist_openpkg.bdist_openpkg</tt>
+or <tt class="class">buildcmds.bdist_openpkg.bdist_openpkg</tt>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="9. extending Distutils"
+  href="extending.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="9. extending Distutils"
+  href="extending.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="9.2 adding new distribution"
+  href="node33.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="extending.html">9. Extending Distutils</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="extending.html">9. Extending Distutils</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node33.html">9.2 Adding new distribution</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

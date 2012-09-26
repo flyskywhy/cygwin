@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="node552.html" />
+<link rel="parent" href="module-asynchat.html" />
+<link rel="next" href="internet.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>17.6.2 asynchat Example </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.6.1 asynchat - Auxiliary"
+  href="node552.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.6 asynchat  "
+  href="module-asynchat.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node552.html">17.6.1 asynchat - Auxiliary</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-asynchat.html">17.6 asynchat  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="internet.html">18. Internet Protocols and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0019620000000000000000"></a><a name="asynchat-example"></a>
+<br>
+17.6.2 asynchat Example 
+</h2>
+
+<p>
+The following partial example shows how HTTP requests can be read with
+<tt class="class">async_chat</tt>. A web server might create an <tt class="class">http_request_handler</tt> object for
+each incoming client connection. Notice that initially the
+channel terminator is set to match the blank line at the end of the HTTP
+headers, and a flag indicates that the headers are being read.
+
+<p>
+Once the headers have been read, if the request is of type POST
+(indicating that further data are present in the input stream) then the
+<code>Content-Length:</code> header is used to set a numeric terminator to
+read the right amount of data from the channel.
+
+<p>
+The <tt class="method">handle_request()</tt> method is called once all relevant input
+has been marshalled, after setting the channel terminator to <code>None</code>
+to ensure that any extraneous data sent by the web client are ignored.
+
+<p>
+<div class="verbatim"><pre>
+class http_request_handler(asynchat.async_chat):
+
+    def __init__(self, conn, addr, sessions, log):
+        asynchat.async_chat.__init__(self, conn=conn)
+        self.addr = addr
+        self.sessions = sessions
+        self.ibuffer = []
+        self.obuffer = ""
+        self.set_terminator("\r\n\r\n")
+        self.reading_headers = True
+        self.handling = False
+        self.cgi_data = None
+        self.log = log
+
+    def collect_incoming_data(self, data):
+        """Buffer the data"""
+        self.ibuffer.append(data)
+
+    def found_terminator(self):
+        if self.reading_headers:
+            self.reading_headers = False
+            self.parse_headers("".join(self.ibuffer))
+            self.ibuffer = []
+            if self.op.upper() == "POST":
+                clen = self.headers.getheader("content-length")
+                self.set_terminator(int(clen))
+            else:
+                self.handling = True
+                self.set_terminator(None)
+                self.handle_request()
+        elif not self.handling:
+            self.set_terminator(None) # browsers sometimes over-send
+            self.cgi_data = parse(self.headers, "".join(self.ibuffer))
+            self.handling = True
+            self.ibuffer = []
+            self.handle_request()
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.6.1 asynchat - Auxiliary"
+  href="node552.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.6 asynchat  "
+  href="module-asynchat.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node552.html">17.6.1 asynchat - Auxiliary</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-asynchat.html">17.6 asynchat  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="internet.html">18. Internet Protocols and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

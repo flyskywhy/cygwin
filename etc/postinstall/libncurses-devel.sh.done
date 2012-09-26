@@ -1,0 +1,21 @@
+#!/bin/sh
+# This script will create symbolic links in the toplevel include
+# directory, pointing to files 'hidden' in the ncurses subdirectory.
+prefix=/usr
+incdir=${prefix}/include
+libdir=${prefix}/lib
+
+(cd ${incdir}/ncurses;
+  ln -fs curses.h ncurses.h
+)
+LINKHEADERS="ncurses.h curses.h form.h menu.h panel.h unctrl.h ncurses_dll.h"
+for fn in ${LINKHEADERS}; do
+  (cd ${incdir}; rm -f ${fn} ; ln -s ncurses/${fn} ${fn} )
+done
+
+(cd ${libdir}; 
+  rm -f libcurses.dll.a ; ln -fs libncurses.dll.a libcurses.dll.a ;
+  rm -f libcurses.a     ; ln -fs libncurses.a libcurses.a ;
+  rm -f terminfo        ; ln -fs ../share/terminfo terminfo ;
+)
+

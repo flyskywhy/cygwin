@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-xml.dom.minidom.html" />
+<link rel="prev" href="module-xml.parsers.expat.html" />
+<link rel="parent" href="markup.html" />
+<link rel="next" href="node216.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>8.6 xml.dom -- The Document Object Model API</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.5.5 expat error constants"
+  href="expat-errors.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8. structured Markup Processing"
+  href="markup.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.6.1 module Contents"
+  href="node216.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="expat-errors.html">8.5.5 Expat error constants</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="markup.html">8. Structured Markup Processing</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node216.html">8.6.1 Module Contents</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0010600000000000000000">
+8.6 <tt class="module">xml.dom</tt> --
+         The Document Object Model API</a>
+</h1>
+
+<p>
+<a name="module-xml.dom"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.0.</span>
+
+<p>
+The Document Object Model, or ``DOM,'' is a cross-language API from
+the World Wide Web Consortium (W3C) for accessing and modifying XML
+documents.  A DOM implementation presents an XML document as a tree
+structure, or allows client code to build such a structure from
+scratch.  It then gives access to the structure through a set of
+objects which provided well-known interfaces.
+
+<p>
+The DOM is extremely useful for random-access applications.  SAX only
+allows you a view of one bit of the document at a time.  If you are
+looking at one SAX element, you have no access to another.  If you are
+looking at a text node, you have no access to a containing element.
+When you write a SAX application, you need to keep track of your
+program's position in the document somewhere in your own code.  SAX
+does not do it for you.  Also, if you need to look ahead in the XML
+document, you are just out of luck.
+
+<p>
+Some applications are simply impossible in an event driven model with
+no access to a tree.  Of course you could build some sort of tree
+yourself in SAX events, but the DOM allows you to avoid writing that
+code.  The DOM is a standard tree representation for XML data.
+
+<p>
+The Document Object Model is being defined by the W3C in stages, or
+``levels'' in their terminology.  The Python mapping of the API is
+substantially based on the DOM Level&nbsp;2 recommendation.  The mapping of
+the Level&nbsp;3 specification, currently only available in draft form, is
+being developed by the <a class="ulink" href="http://www.python.org/sigs/xml-sig/"
+  >Python XML Special Interest
+Group</a> as part of the
+<a class="ulink" href="http://pyxml.sourceforge.net/"
+  >PyXML package</a>.  Refer to the
+documentation bundled with that package for information on the current
+state of DOM Level&nbsp;3 support.
+
+<p>
+DOM applications typically start by parsing some XML into a DOM.  How
+this is accomplished is not covered at all by DOM Level&nbsp;1, and Level&nbsp;2
+provides only limited improvements: There is a
+<tt class="class">DOMImplementation</tt> object class which provides access to
+<tt class="class">Document</tt> creation methods, but no way to access an XML
+reader/parser/Document builder in an implementation-independent way.
+There is also no well-defined way to access these methods without an
+existing <tt class="class">Document</tt> object.  In Python, each DOM implementation
+will provide a function <tt class="function">getDOMImplementation()</tt>. DOM Level&nbsp;3
+adds a Load/Store specification, which defines an interface to the
+reader, but this is not yet available in the Python standard library.
+
+<p>
+Once you have a DOM document object, you can access the parts of your
+XML document through its properties and methods.  These properties are
+defined in the DOM specification; this portion of the reference manual
+describes the interpretation of the specification in Python.
+
+<p>
+The specification provided by the W3C defines the DOM API for Java,
+ECMAScript, and OMG IDL.  The Python mapping defined here is based in
+large part on the IDL version of the specification, but strict
+compliance is not required (though implementations are free to support
+the strict mapping from IDL).  See section <a href="dom-conformance.html#dom-conformance">8.6.3</a>,
+``Conformance,'' for a detailed discussion of mapping requirements.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://www.w3.org/TR/DOM-Level-2-Core/"
+        >Document Object
+            Model (DOM) Level&nbsp;2 Specification</a></em></dt>
+    <dd>The W3C recommendation upon which the Python DOM API is
+            based.</dd>
+  </dl>
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://www.w3.org/TR/REC-DOM-Level-1/"
+        >Document Object
+            Model (DOM) Level&nbsp;1 Specification</a></em></dt>
+    <dd>The W3C recommendation for the
+            DOM supported by <tt class="module">xml.dom.minidom</tt>.</dd>
+  </dl>
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://pyxml.sourceforge.net"
+        >PyXML</a></em></dt>
+    <dd>Users that require a
+            full-featured implementation of DOM should use the PyXML
+            package.</dd>
+  </dl>
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://www.omg.org/docs/formal/02-11-05.pdf"
+        >Python
+            Language Mapping Specification</a></em></dt>
+    <dd>This specifies the mapping from OMG IDL to Python.</dd>
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node216.html">8.6.1 Module Contents</a>
+<li><a href="node217.html">8.6.2 Objects in the DOM</a>
+<ul>
+<li><a href="dom-implementation-objects.html">8.6.2.1 DOMImplementation Objects</a>
+<li><a href="dom-node-objects.html">8.6.2.2 Node Objects</a>
+<li><a href="dom-nodelist-objects.html">8.6.2.3 NodeList Objects</a>
+<li><a href="dom-documenttype-objects.html">8.6.2.4 DocumentType Objects</a>
+<li><a href="dom-document-objects.html">8.6.2.5 Document Objects</a>
+<li><a href="dom-element-objects.html">8.6.2.6 Element Objects</a>
+<li><a href="dom-attr-objects.html">8.6.2.7 Attr Objects</a>
+<li><a href="dom-attributelist-objects.html">8.6.2.8 NamedNodeMap Objects</a>
+<li><a href="dom-comment-objects.html">8.6.2.9 Comment Objects</a>
+<li><a href="dom-text-objects.html">8.6.2.10 Text and CDATASection Objects</a>
+<li><a href="dom-pi-objects.html">8.6.2.11 ProcessingInstruction Objects</a>
+<li><a href="dom-exceptions.html">8.6.2.12 Exceptions</a>
+</ul>
+<li><a href="dom-conformance.html">8.6.3 Conformance</a>
+<ul>
+<li><a href="dom-type-mapping.html">8.6.3.1 Type Mapping</a>
+<li><a href="dom-accessor-methods.html">8.6.3.2 Accessor Methods</a>
+</ul></ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.5.5 expat error constants"
+  href="expat-errors.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8. structured Markup Processing"
+  href="markup.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.6.1 module Contents"
+  href="node216.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="expat-errors.html">8.5.5 Expat error constants</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="markup.html">8. Structured Markup Processing</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node216.html">8.6.1 Module Contents</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

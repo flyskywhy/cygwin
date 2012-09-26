@@ -1,0 +1,106 @@
+################################################################################
+#
+# utils.cygclass - assortment of miscellaneous functions
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: utils.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+# Checks for presence of headers in standard include path
+# Directories can be added to include path by prefacing -I<dir>
+check_header() {
+	local d
+	local h
+	local gcc_inc=$(gcc -print-search-dirs | grep '^install:' | cut -d ' ' -f 2)/include
+
+	local inc_path="/usr/include /usr/include/w32api ${gcc_inc} ${gcc_inc}/c++"
+
+	for h
+	do
+		case ${h} in
+			-I*)
+				inc_path+=" ${h#-I}"
+				continue
+		esac
+
+		for d in ${inc_path}
+		do
+			if [ -e ${d}/${h} ]
+			then
+				continue 2
+			fi
+		done
+
+		return 1
+	done
+
+	return 0
+}
+
+# Checks for presence of link libraries in standard library path
+# Directories can be added to library path by prefacing -L<dir>
+check_lib() {
+	local d
+	local l
+	local gcc_lib=$(gcc -print-search-dirs | grep '^install:' | cut -d ' ' -f 2)
+
+	local lib_path="/usr/lib /usr/lib/w32api ${gcc_lib}"
+
+	for l
+	do
+		case ${l} in
+			-L*)
+				lib_path+=" ${l#-L}"
+				continue
+		esac
+
+		for d in ${lib_path}
+		do
+			if [ -e ${d}/lib${l}.dll.a -o -e ${d}/lib${l}.a -o -e ${d}/cyg${l}.dll ]
+			then
+				continue 2
+			fi
+		done
+
+		return 1
+	done
+
+	return 0
+}
+
+# Equivalent of PKG_CHECK_MODULES aclocal macro
+# e.g.: check_pkg_config GLADE "gtk+-2.0 >= 2.6.0 libglade-2.0"
+#       will use pkg-config to verify that those devel packages are
+#       present, and define GLADE_CFLAGS and GLADE_LIBS accordingly
+check_pkg_config() {
+	local modname=${1};
+	shift;
+
+	check_prog_req pkg-config;
+
+	if ! pkg-config --exists ${*}
+	then
+		return 1;
+	fi
+
+	export ${modname}_CFLAGS="$(pkg-config --cflags ${*})";
+	export ${modname}_LIBS="$(pkg-config --libs ${*})";
+	return 0;
+}

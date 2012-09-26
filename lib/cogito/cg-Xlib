@@ -1,0 +1,938 @@
+#!/usr/bin/env bash
+#
+# Common code shared by the Cogito toolkit
+# Copyright (c) Petr Baudis, 2005
+#
+# This file provides a library containing common code shared with all the
+# Cogito programs.
+
+_cg_cmd=${0##*/}
+_cleanup_code=
+
+
+
+#######################################################################
+#
+# Program lifetime and error reporting                             {{{1
+#
+
+warn()
+{
+	local beep=
+
+	if [ "$1" = "-b" ]; then
+		beep=1
+		shift
+	fi
+
+	echo "Warning: $@" >&2
+	[ -z "$beep" ] || echo -ne "\a" >&2
+}
+
+die()
+{
+	echo "$_cg_cmd: $@" >&2
+	eval "$_cleanup_code"
+	exit 1
+}
+
+usage()
+{
+	die "usage: $USAGE"
+}
+
+# Do this in case we get interrupted or prematurely die
+cleanup_trap()
+{
+	_cleanup_code="$*"
+	# die will execute the $_cleanup_code
+	trap "echo; die \"interrupted\"" SIGINT SIGTERM
+}
+
+
+
+#######################################################################
+#
+# Stubs for tools we need but aren't everywhere                    {{{1
+#
+
+mktemp()
+{
+	if [ "$has_mktemp" ]; then
+		"$has_mktemp" "$@"
+		return
+	fi
+
+	dirarg=
+	if [ x"$1" = x"-d" ]; then
+		dirarg="-d"
+		shift
+	fi
+	prefix=
+	if [ x"$1" = x"-t" ]; then
+		prefix="${TMPDIR:-/tmp}/"
+		shift
+	fi
+
+	"$(which mktemp)" $dirarg "$prefix$1"
+}
+
+stat()
+{
+	if [ "$1" != "-c" ] || [ "$2" != "%s" -a "$2" != "%i" ]; then
+		echo "INTERNAL ERROR: Unsupported stat call $@" >&2
+		return 1
+	fi
+	if [ "$has_stat" ]; then
+		"$has_stat" "$@"
+		return
+	fi
+
+	# It's always -c '%s' now.
+	if [ "$2" = "%s" ]; then
+		ls -l "$3" | awk '{ print $5 }'
+	elif [ "$2" = "%i" ]; then
+		ls -lid "$3" | awk '{ print $1 }'
+	fi
+}
+
+readlink()
+{
+	if [ "$has_readlink" ]; then
+		"$has_readlink" "$@"
+		return
+	fi
+
+	if [ "$1" = "-f" ]; then
+		shift
+		target="$(maynormpath "$1")"
+		target="${target%/}"
+
+		# -e will test the existence of the final target; therefore,
+		# it will also protect against recursive symlinks and such
+		[ -e "$target" ] || return 1
+
+		while true; do
+			if ! [ -L "$target" ]; then
+				echo "$target"
+				return 0
+			fi
+			target2="$(readlink "$target" 2>/dev/null)" || return 1
+			[ "$target2" ] || return 1
+			target="$(maynormpath "$target2" "$target"/..)"
+		done
+		return 42
+	fi
+
+	line="$(ls -ld "$1" 2>/dev/null)" || return 1
+	case "$line" in
+	*-\>*)
+		echo "${line#* -> }";;
+	*)
+		return 1;;
+	esac
+	return 0
+}
+
+# tac is not POSIX :-(
+tac()
+{
+	if [ "$has_tac" ]; then
+		"$has_tac" "$@"
+		return
+	fi
+
+	sed -n '1!G;$p;h';
+}
+
+# Usage: path_lookup COMMAND VARNAME [CMDTEST]
+# Lookup COMMAND in $PATH and save the full path to VARNAME (optionally,
+# only if CMDTEST on the command succeeds).
+# This would have been type -P but we want to be bash2 compatible.
+path_lookup()
+{
+	local exename="$1" varname="$2" cmdtest="$3"
+
+	# We do our own $PATH iteration as it's faster than the fork()
+	# of $(which), and this happens many times every time we
+	# execute some cg tool.
+	# Cut'n'pasted to the 'cg' source.
+	local save_IFS dir cmd
+	save_IFS="$IFS"; IFS=:
+	for dir in $PATH; do
+		IFS="$save_IFS"
+		cmd="$dir/$exename"
+		if [ -x "$cmd" ] && { [ -z "$cmdtest" ] || eval "$cmdtest"; }; then
+			export $varname="$cmd"
+			break
+		fi
+	done
+	IFS="$save_IFS"
+}
+
+
+
+#######################################################################
+#
+# Non-stubbish but straightforward tool wrappers                   {{{1
+#
+
+pager()
+{
+	local cgless
+	# A little trick to tell the difference between unset and set-to-empty
+	# variable:
+	if [ "${CG_LESS+set}" = "set" ]; then
+		cgless="$CG_LESS"
+	else
+		cgless="R $LESS $_local_CG_LESS"
+	fi
+	local line
+	# Invoke pager only if there's any actual output
+	if IFS=$'\n' read -r line; then
+		( echo "$line"; cat; ) | LESS="$cgless" ${PAGER:-less} $PAGER_FLAGS
+	fi
+}
+
+# Usage: showdate SECONDS TIMEZONE [FORMAT]
+# Display date nicely based on how GIT stores it.
+# Save the date to $_showdate
+showdate()
+{
+	local secs=$1 
+	local format="$3"
+
+	# extract the timezone of the commit
+	local tzsign=${2%????}
+	local tmp=${2#?}
+	local tzhours=${tmp%??}
+	local tzminutes=${tmp#??}
+
+	# strip leading zeroes (shells don't tend to like them)
+	[ "${tzhours%?}"   = 0 ]   && tzhours=${tzhours#?}
+	[ "${tzminutes%?}" = 0 ]   && tzminutes=${tzminutes#?}
+
+	secs=$(($secs $tzsign ($tzhours * 3600 + $tzminutes * 60)))
+
+	[ "$format" ] || format="+%a, %d %b %Y %H:%M:%S $2"
+	if [ "$has_gnudate" ]; then
+		_showdate="$(LANG=C "$has_gnudate" -ud "1970-01-01 UTC + $secs sec" "$format")"
+	else
+		_showdate="$(LANG=C date -u -r $secs "$format")"
+	fi
+}
+
+
+
+#######################################################################
+#
+# Colorification routines                                          {{{1
+#
+
+colorify_detect()
+{
+	if [ -z "$1" ]; then
+		# If -c was not passed but we _are_ on a terminal,
+		# check $2.usecolor yet.
+		[ -t 1 ] || return 1
+		[ "$(git repo-config --bool $2.usecolor)" = "true" ] || return 1
+		[ "$CG_COLORS_AUTO" ] || return 0
+	else
+		[ "$CG_COLORS_AUTO" ] || return 0
+		[ -t 1 ] || return 1
+	fi
+	[ "$(tput setaf 1 2>/dev/null)" ] || return 1
+	return 0
+}
+
+# These are shared between cg-diff and cg-log:
+colorify_diffcolors="diffhdr=1;36"
+colorify_diffcolors="$colorify_diffcolors:diffhdradd=1;32:diffadd=32"
+colorify_diffcolors="$colorify_diffcolors:diffhdrmod=1;35:diffmod=35"
+colorify_diffcolors="$colorify_diffcolors:diffhdrrem=1;31:diffrem=31"
+colorify_diffcolors="$colorify_diffcolors:diffhunk=36:diffctx=34"
+colorify_diffcolors="$colorify_diffcolors:default=0"
+
+colorify_setup()
+{
+	local C="$1"
+	[ -z "$CG_COLORS" ] || C="$C:$CG_COLORS"
+
+	C=${C//=/=\'$'\e'[}
+	C=col${C//:/m\'; col}m\'
+	#coldefault=$(tput op)
+	eval "$C"
+
+	colorify_diffsed='
+		s/^diff --git.*/'$coldiffhdr'&'$coldefault'/
+		s/^+++.*/'$coldiffhdradd'&'$coldefault'/
+		s/^---.*/'$coldiffhdrrem'&'$coldefault'/
+		s/^[+].*/'$coldiffadd'&'$coldefault'/
+		s/^[-].*/'$coldiffrem'&'$coldefault'/
+		s/^new\( file\)\{0,1\} mode .*/'$coldiffadd'&'$coldefault'/
+		s/^\(deleted file\|old\) mode .*/'$coldiffrem'&'$coldefault'/
+		s/^rename to .*/'$coldiffadd'&'$coldefault'/
+		s/^rename from .*/'$coldiffrem'&'$coldefault'/
+		s/^\(@@ -.* +.* @@\)\(.*\)/'$coldiffhunk'\1'$coldiffctx'\2'$coldefault'/
+	'
+}
+
+
+
+#######################################################################
+#
+# Multi-column listing with variable column widths                 {{{1
+#
+
+# Usage: width="$(...single column... | column_width MINUSPREFIX MAXWIDTH)"
+column_width()
+{
+	local line= minusprefix="$1" maxwidth="$2"
+	[ "$maxwidth" ] || maxwidth=35
+
+	while read line; do
+		line=${line#$1};
+		echo ${#line}
+	done | sort -nr | head -n 1 |
+	(
+		read maxlen;
+		[ ${maxlen:-0} -le $maxwidth ] || maxlen=$maxwidth;
+		echo ${maxlen:-0}
+	)
+}
+
+# Usage: columns_print COL1 WIDTH COL2 - COL3 tWIDTH COL4 - ...
+columns_print()
+{
+	local fmt= cols=
+	cols=()
+	while [ $# -gt 0 ]; do
+		cols[${#cols[@]}]="$1"; shift
+		local width="$1"; shift
+		local tab=
+		if [ x"${width:0:1}" = x"t" ]; then
+			tab=1; width="${width:1}"
+		fi
+		if [ x"$width" = x"-" ]; then
+			fmt="$fmt%s"
+		else
+			fmt="$fmt%-${width}s"
+		fi
+		[ -z "$tab" ] || fmt="$fmt\t";
+	done
+	printf "$fmt\n" "${cols[@]}"
+}
+
+
+
+#######################################################################
+#
+# Ident-related tools                                              {{{1
+#
+
+pick_id()
+{
+	local lid="$1" uid="$2"
+	local pick_id_script='
+		/^'$lid' /{
+			s/'\''/'\''\\'\'\''/g
+			h
+			s/^'$lid' \([^<]*\) <[^>]*> .*$/\1/
+			s/'\''/'\''\'\'\''/g
+			s/.*/export GIT_'$uid'_NAME='\''&'\''/p
+
+			g
+			s/^'$lid' [^<]* <\([^>]*\)> .*$/\1/
+			s/'\''/'\''\'\'\''/g
+			s/.*/export GIT_'$uid'_EMAIL='\''&'\''/p
+
+			g
+			s/^'$lid' [^<]* <[^>]*> \(.*\)$/\1/
+			s/'\''/'\''\'\'\''/g
+			s/.*/export GIT_'$uid'_DATE='\''&'\''/p
+
+			q
+		}
+	'
+	LANG=C LC_ALL=C sed -ne "$pick_id_script"
+	# Ensure non-empty id name.
+	echo "[ -n \"\$GIT_${uid}_NAME\" ] || export GIT_${uid}_NAME=\"\${GIT_${uid}_EMAIL%%@*}\""
+}
+
+pick_author()
+{
+	pick_id author AUTHOR
+}
+
+
+
+#######################################################################
+#
+# Path toolkit for handling path-per-line lists                    {{{1
+#
+
+# echo PATH | normpath
+# Normalize the path, handling and removing any superfluous .. and .
+# elements. Typically
+#	echo ABSPATH/RELPATH | normpath
+# to get new absolute path.
+normpath()
+{
+local inp
+while IFS= read -r inp; do
+	local path path2
+	path=()
+	path2=()
+
+	while [[ "$inp" == */* ]]; do
+		path[${#path[@]}]="${inp%%/*}"
+		inp="${inp#*/}"
+	done
+	path[${#path[@]}]="$inp"
+	for (( i=0; $i < ${#path[@]}; i++ )); do
+		[ "${path[$i]}" != "." ] || continue
+		if [ "${path[$i]}" = ".." ]; then
+			[ "${#path2[@]}" -le 0 ] || unset path2[$((${#path2[@]} - 1))]
+			continue
+		fi
+		path2[${#path2[@]}]="${path[$i]}"
+	done
+	for (( i=0; $i < ${#path2[@]}; i++ )); do
+		echo -n "${path2[$i]}"
+		[ $i -ge $((${#path2[@]} - 1)) ] || echo -n /
+	done
+	echo
+done
+}
+
+# maynormpath PATH [BASE]
+# If $PATH is relative, make it absolute wrt. $(pwd) or $BASE if specified.
+# Basically, call this instead of normpath() if $PATH can ever be absolute.
+maynormpath()
+{
+	case "$1" in
+	/*)
+		echo "$1";;
+	*)
+		base="$2"; [ "$base" ] || base="$(pwd)"
+		echo "$base/$1" | normpath
+	esac
+}
+
+# xargs with one path argument per line
+path_xargs()
+{
+	normpath | tr '\n' '\0' | xargs -0 "$@"
+}
+
+# Equivalent to cg-status -w -n -s '?', but the filenames are delimited
+# by '\0' instead of '\n'.
+# Usage: list_untracked_files DO_EXCLUDE SQUASH_DIRS [EXTRAEXCLUDE]...
+# DO_EXCLUDE: "no", "noexclude" means not to exclude anything,
+#             otherwise the exclude rules apply
+# SQUASH_DIRS: "squashdirs" means that if a whole directory is untracked,
+#              only the dirname/ will be listed, not all its contents
+# EXTRAEXCLUDE: extra exclude pattern
+list_untracked_files()
+{
+	[ -z "$_git_no_wc" ] || die "INTERNAL ERROR: list_untracked_files() outside a working copy"
+	excludeflag="$1"; shift
+	squashflag="$1"; shift
+	EXCLUDE=()
+	if [ "$excludeflag" != "no" -a "$excludeflag" != "noexclude" ]; then
+		for excl in "$@"; do
+			EXCLUDE[${#EXCLUDE[@]}]="--exclude=$excl"
+		done
+		find_cogito_share
+		EXCLUDEFILE="${COGITO_REAL_SHARE}default-exclude"
+		if [ -f "$EXCLUDEFILE" ]; then
+			EXCLUDE[${#EXCLUDE[@]}]="--exclude-from=$EXCLUDEFILE"
+		fi
+		EXCLUDEFILE="$_git/info/exclude"
+		if [ -f "$EXCLUDEFILE" ]; then
+			EXCLUDE[${#EXCLUDE[@]}]="--exclude-from=$EXCLUDEFILE"
+		fi
+		# This is just for compatibility (2005-09-16).
+		# To be removed later.
+		EXCLUDEFILE="$_git/exclude"
+		if [ -f $EXCLUDEFILE ]; then
+			warn ".git/exclude is obsolete, use .git/info/exclude instead."
+			EXCLUDE[${#EXCLUDE[@]}]="--exclude-from=$EXCLUDEFILE"
+		fi
+		EXCLUDE[${#EXCLUDE[@]}]="--exclude-per-directory=.gitignore"
+		# Workaround for git < 1.2.0
+		if [ -n "$_git_relpath" ]; then
+			local dir="${_git_relpath%/}"
+			local reldir=".."
+			while [ "$dir" != "." ]; do
+				if [ "${dir%/*}" = "$dir" ]; then
+					dir="."
+				else
+					dir="${dir%/*}"
+				fi
+				if [ -f "$reldir/.gitignore" ]; then
+					EXCLUDE[${#EXCLUDE[@]}]="--exclude-from=$dir/.gitignore"
+				fi
+				reldir="../$reldir"
+			done
+		fi
+	fi
+	local listdirs=
+	[ "$squashflag" != "squashdirs" ] || listdirs=--directory
+	git ls-files -z --others $listdirs "${EXCLUDE[@]}"
+}
+
+
+
+#######################################################################
+#
+# Common message editor tools                                      {{{1
+#
+
+editor_comment_start()
+{
+	if [ -e "$_git/$1-template" ]; then
+		cat "$_git/$1-template" >>"$LOGMSG"
+	else
+		cat >>"$LOGMSG" <<EOT
+CG: -----------------------------------------------------------------------
+CG: Lines beginning with the CG: prefix are removed automatically.
+EOT
+	fi
+}
+
+# editor_comment_end [-f] ACTIONNAME
+editor_comment_end()
+{
+	local force= actionname=
+	if [ "$1" = "-f" ]; then
+		force=1; shift
+	fi
+	actionname="$1"; shift
+	[ "$force" ] || echo "CG: If you want to abort the $actionname, just quit without saving this file." >>"$LOGMSG"
+	echo "CG: -----------------------------------------------------------------------" >>"$LOGMSG"
+}
+
+editor_msg_end()
+{
+	echo "CG: vim: textwidth=75$*" >>"$LOGMSG"
+}
+
+editor_parse_setif()
+{
+	if ! grep -q "^CG: $2:" "$LOGMSG2"; then
+		unset $1
+	else
+		export $1="$(sed -ne "s/^CG: $2: //p" "$LOGMSG2")"
+	fi
+}
+
+editor_parse_clean()
+{
+	grep -v ^CG: "$LOGMSG2" | git stripspace >"$LOGMSG"
+}
+
+# editor_shalluse FORCEEDITOR
+# This makes sure the editor is run even if input is not a tty.
+editor_shalluse()
+{
+	[ -n "$1" ] || tty -s
+}
+
+# editor [-f] ACTIONNAME ACTIONKEY
+# W/o -f asks what-to-do if user didn't modify the log message.
+# Returns $?:
+# 0	all went fine, new log message saved in $LOGMSG2
+# 1	aborted by user
+_editor()
+{
+	local force= actionname= actionkey=
+	if [ "$1" = "-f" ]; then
+		force=1; shift
+	fi
+	actionname="$1"; shift
+	actionkey="$1"; shift
+
+	${EDITOR:-vi} "$LOGMSG2"
+	[ -z "$force" ] || return 0
+	[ ! "$LOGMSG2" -nt "$LOGMSG" ] || return 0
+
+	echo "Log message unchanged or not specified" >&2
+	while true; do
+		read -p "Abort or $actionname? [a$actionkey] " choice
+		if [ "$choice" = "a" ] || [ "$choice" = "q" ]; then
+			return 1
+		elif [ "$choice" = "$actionkey" ]; then
+			return 0
+		fi
+	done
+}
+editor()
+{
+	if tty -s; then
+		_editor "$@"
+	else
+		_editor "$@" </dev/tty
+	fi
+}
+
+
+#######################################################################
+#
+# Misc. common Git operations wrappers                             {{{1
+#
+
+# Usage: tree_timewarp [--no-head-update] DIRECTION_STR ROLLBACK_BOOL BASE BRANCH
+# Reset the current tree from version BASE to version BRANCH, properly updating
+# the working copy (if ROLLBACK_BOOL) and trying to keep local changes.
+# Returns false in case of local modifications (but only if ROLLBACK_ROLL).
+tree_timewarp()
+{
+	[ -z "$_git_no_wc" ] || die "INTERNAL ERROR: tree_timewarp() outside a working copy"
+	local no_head_update=
+	if [ "$1" = "--no-head-update" ]; then
+		no_head_update=1
+		shift
+	fi
+	local dirstr="$1"; shift
+	local rollback="$1"; shift
+	local base="$1"; shift
+	local branch="$1"; shift
+	local localmods=0
+
+	[ ! -s "$_git/merging" ] || die "merge in progress - cancel it by cg-reset first"
+
+	if [ -n "$rollback" ]; then
+		local patchfile="$(mktemp -t gituncommit.XXXXXX)"
+		cg-diff -r "$base" >"$patchfile"
+		[ ! -s "$patchfile" ] ||
+			warn "uncommitted local changes, trying to bring them $dirstr"
+		[ ! -s "$patchfile" ] || localmods=1
+
+		git read-tree -i -m "$branch" || die "$branch: bad commit"
+		[ "$no_head_update" ] || git update-ref HEAD "$branch" || :
+
+		# Kill gone files
+		git diff-tree -z --name-status -r "$base" "$branch" |
+			perl -n0e 'chomp; if (defined $meta) { print "$_\0" if $meta eq 'D'; $meta=undef } else { $meta = $_ }' |
+			xargs --null rm -f --
+		git checkout-index -u -f -a
+
+		# FIXME: Can produce bogus "contains only garbage" messages.
+		cat "$patchfile" | cg-patch
+		rm "$patchfile"
+	else
+		[ "$no_head_update" ] || git update-ref HEAD "$branch" || :
+	fi
+	return $localmods
+}
+
+# Determine the most conservative merge base of two commits - keep
+# recursing until we get only a single candidate for a merge base.
+# The merge base is returned as $_cg_baselist. If we had to recurse,
+# a non-zero number is stored in $_cg_base_conservative (otherwise,
+# it's set empty).
+conservative_merge_base()
+{
+	local baselist safecounter
+	baselist=("$@")
+	_cg_base_conservative=
+	for (( safecounter=0; $safecounter < 1000; safecounter++ )) ; do
+		baselist=($(git merge-base --all "${baselist[@]}")) || return 1
+		[ "${#baselist[@]}" -gt "1" ] || break
+	done
+	[ $safecounter -le 0 ] || _cg_base_conservative=$safecounter
+	_cg_baselist=("${baselist[@]}")
+}
+
+# update_index will refresh the index and list the local modifications
+# Note that this isn't usually safe, since some of the modifications may
+# be recorded in the index file - modulo adds and removes also cg-restore
+# to historical revisions. Besides, it gives confusing output for relpath.
+# Never use it. If you do, accompany it with a comment explaining why is
+# it safe to use it.
+update_index()
+{
+	[ -z "$_git_no_wc" ] || die "INTERNAL ERROR: update_index() outside a working copy"
+	git update-index --refresh | sed 's/needs update$/locally modified/'
+}
+
+# Takes two object directories and checks if they are the same (symlinked
+# or so).
+is_same_repo()
+{
+	local dir1="$1" dir2="$2" diff=1
+
+	# Originally, I wanted to compare readlink output, but that fails
+	# in binding setup; it isn't likely the object database directories
+	# themselves would be binded, but some trunk directories might.
+	# So we just create a file inside and see if it appears on the
+	# second side...
+	if [ ! -w "$dir1" -o ! -w "$dir2" ]; then
+		# ...except in readonly setups.
+		[ "$(readlink -f "$dir1")" != "$(readlink -f "$dir2")" ] || diff=0
+	else
+		n=$$
+		while [ -e "$dir1/.,,lnstest-$n" -o -e "$dir2/.,,lnstest-$n" ]; do
+			n=$((n+1))
+		done
+		touch "$dir1/.,,lnstest-$n"
+		[ ! -e "$dir2/.,,lnstest-$n" ] || diff=0
+		rm "$dir1/.,,lnstest-$n"
+	fi
+	return $diff
+}
+
+# Determine the appropriate origin for the current branch
+# Usage: choose_origin TESTDIR ERRORMSG
+# TESTDIR is either branches or refs/heads, depends on if you care
+# about the address or the ref to exist.
+choose_origin()
+{
+	local testdir="$1" errormsg="$2"
+	if [ x"$_git_head" != x"master" -a -s "$_git/$testdir/$_git_head-origin" ]; then
+		echo "$_git_head-origin"
+	elif [ -s "$_git/$testdir/origin" ]; then
+		echo origin
+	else
+		die "$errormsg"
+	fi
+}
+
+
+
+#######################################################################
+#
+# Meta-tools for keeping things sticking together                  {{{1
+#
+
+# Setup COGITO_REAL_SHARE to COGITO_SHARE if make install'd, or to
+# the most probable location if not.
+find_cogito_share()
+{
+	if [ -n "${COGITO_SHARE:-/usr/share/cogito/}" ]; then
+		COGITO_REAL_SHARE="${COGITO_SHARE:-/usr/share/cogito/}"
+		return
+	fi
+	if [ "${0%/*}" != "$0" ]; then
+		COGITO_REAL_SHARE="${0%/*}/"
+		return
+	fi
+	# I'm not sure if the following normally ever gets triggered.
+	# I can only do it by `sh cg-status`. --pasky
+	COGITO_REAL_SHARE="./$_git_relpath/"
+}
+
+
+
+#######################################################################
+#
+# Help and options parsing                                         {{{1
+#
+
+print_help()
+{
+ 	path_lookup "cg-$2" "_cg_cmd"
+	[ -n "$_cg_cmd" ] || exit 1
+
+	sed -n '/^USAGE=/,0s/.*"\(.*\)"/Usage: \1/p' < "$_cg_cmd"
+	if [ x"$1" = xlong ]; then
+		echo
+		# TODO: Reduce this to just one sed if possible.
+		sed -n '3,/^$/s/^# *//p' < "$_cg_cmd" | sed 's/^\(-.*\)::.*/\1::/'
+		exit
+	fi
+
+	sed -n '3s/^# *//p' < "$_cg_cmd"
+	echo
+	echo "Options:"
+	maxlen="$(sed -n 's/^# \(-.*\)::[^A-Za-z0-9].*/\1/p' < "$_cg_cmd" | column_width)"
+	[ $maxlen -ge 11 ] || maxlen=11 # --long-help
+	_cg_fmt="  %-20s %s\n"
+	sed -n 's/# \(-.*\)::[^A-Za-z0-9]\(.*\)/\1\n\2/p' < "$_cg_cmd" | while read line; do
+		case "$line" in
+		-*)
+			_cg_option="$line"
+			;;
+		*)
+			columns_print "  " - "$_cg_option" "$maxlen" "  $line" -
+			;;
+		esac
+	done
+	columns_print "  " - "-h, --help" "$maxlen" "  Print usage summary" -
+	columns_print "  " - "--long-help" "$maxlen" "  Print user manual" -
+	exit
+}
+
+for option in "$@"; do
+	[ x"$option" != x-- ] || break
+	if [ x"$option" = x"-h" ] || [ x"$option" = x"--help" ]; then
+		print_help short "${_cg_cmd##cg-}"
+	elif [ x"$option" = x"--long-help" ]; then
+		print_help long "${_cg_cmd##cg-}"
+	fi
+done
+
+
+ARGS=("$@")
+ARGPOS=0
+set '' # clear positional parameters - use $ARGS[] instead
+
+if [ -z "$CG_NORC" -a -t 1 -a -e "$HOME/.cgrc" ]; then
+	_cg_name="${_cg_cmd#cg-}"
+	# We hope that there are no weird (regex-sensitive) characters
+	# in Cogito command names.
+	_cg_defaults1="$(sed -n "/^$_cg_cmd/s/^$_cg_cmd //p" < "$HOME/.cgrc")"
+	_cg_defaults2="$(sed -n "/^$_cg_name/s/^$_cg_name //p" < "$HOME/.cgrc")"
+	# And here we explicitly do not quote, allowing multiple arguments
+	# to be specified - default word splitting will do its work here.
+	ARGS=($_cg_defaults1 $_cg_defaults2 "${ARGS[@]}")
+fi
+
+optshift()
+{
+	unset ARGS[$ARGPOS]
+	ARGS=("${ARGS[@]}")
+	[ -z "$1" -o -n "${ARGS[$ARGPOS]}" ] ||
+		die "option $1 requires an argument"
+}
+
+optfail()
+{
+	die "unrecognized option ${ARGS[$ARGPOS]}"
+}
+
+optconflict()
+{
+	die "conflicting options $CUROPT and $1"
+}
+
+optparse()
+{
+	unset OPTARG
+	if [ -z "$1" ]; then
+		case "${ARGS[$ARGPOS]}" in
+		--)	optshift; return 1 ;;
+		-*)	return 0 ;;
+		*)	while (( ++ARGPOS < ${#ARGS[@]} )); do
+				[[ "${ARGS[$ARGPOS]}" != -- ]] || return 1
+				[[ "${ARGS[$ARGPOS]}" != -* ]] || return 0
+			done;
+			return 1 ;;
+		esac
+	fi
+
+	CUROPT="${ARGS[$ARGPOS]}"
+	local match="${1%=}" minmatch="${2:-1}" opt="$CUROPT" o="$CUROPT" val
+	[[ "$1" != *= ]] || val="$match"
+	case "$match" in
+	--*)
+		[ -z "$val" ] || o="${o%%=*}"
+		[ ${#o} -ge $((2 + $minmatch)) -a \
+			"${match:0:${#o}}" = "$o" ] || return 1
+		if [[ -n "$val" && "$opt" == *=?* ]]; then
+			ARGS[$ARGPOS]="${opt#*=}"
+		else
+			optshift "$val"
+		fi ;;
+	-?)
+		[[ "$o" == $match* ]] || return 1
+		[[ "$o" != -?-* || -n "$val" ]] || optfail
+		ARGS[$ARGPOS]=${o#$match}
+		if [ -n "${ARGS[$ARGPOS]}" ]; then
+			[ -n "$val" ] || ARGS[$ARGPOS]=-"${ARGS[$ARGPOS]}";
+		else
+			optshift "$val"
+		fi ;;
+	*)
+		die "optparse cannot handle $1" ;;
+	esac
+
+	if [ "$val" ]; then
+		OPTARG="${ARGS[$ARGPOS]}"
+		optshift
+	fi
+}
+
+
+
+#######################################################################
+#
+# Common Cogito tools initialization                               {{{1
+#
+
+
+# Optional tools detection/stubbing
+
+# check_tool_presence NAME COMMAND EXENAME...
+# (use $cmd in COMMAND)
+check_tool()
+{
+	cmdname="$1"; shift
+	cmdtest="$1"; shift
+	hasname="has_$cmdname"
+
+	export $hasname=
+	for exename in "$@"; do
+		path_lookup "$exename" "$hasname" "$cmdtest"
+		[ -z "$hasname" ] || break
+	done 2>/dev/null
+}
+
+if ! [ "$__cogito_subsequent" ]; then
+	export __cogito_subsequent=1
+
+	check_tool mktemp 'todel="$("$cmd" -t)" && rm "$todel"' mktemp
+	check_tool stat '"$cmd" -c %s / >/dev/null' stat gnustat gstat
+	check_tool readlink '"$cmd" -f / >/dev/null' readlink
+	check_tool gnudate '"$cmd" -Rud "1970-01-01 UTC" >/dev/null' date gnudate gdate
+	check_tool tac 'tac </dev/null >/dev/null' tac
+fi
+
+
+
+_git="${GIT_DIR:-.git}"
+if [ ! "$_git_repo_unneeded" ] && [ ! "$GIT_DIR" ] && [ ! -d "$_git" ]; then
+	_git_abs_path="$(git rev-parse --git-dir 2>/dev/null)"
+	if [ -d "$_git_abs_path" ]; then
+		_git_relpath="$(git rev-parse --show-prefix)"
+		cd "$_git_abs_path/.."
+	fi
+fi
+_git_objects="${GIT_OBJECT_DIRECTORY:-$_git/objects}"
+
+
+# Check if we have something to work on, unless the script can do w/o it.
+if [ ! "$_git_repo_unneeded" ]; then
+	# Check if we aren't _in_ the repository (perhaps it's without
+	# a working copy).
+	if [ ! -d "$_git" -a -d objects/ -a -d refs/ -a -s HEAD ] &&
+	   GIT_DIR=. git symbolic-ref HEAD >/dev/null 2>&1; then
+		_git=.
+		export GIT_DIR=.
+	fi
+	[ "$GIT_DIR" != . ] || _git_no_wc=1
+	if [ ! -d "$_git" ]; then
+		echo "There is no GIT repository here ($_git not found)" >&2
+		exit 1
+	elif [ ! -x "$_git" ]; then
+		echo "You do not have permission to access this GIT repository" >&2
+		exit 1
+	elif [ "$_git_no_wc" -a ! "$_git_wc_unneeded" ]; then
+		echo "This command requires working copy and cannot be run inside a GIT repository" >&2
+		exit 1
+	fi
+	_git_head=master
+	[ ! -s "$_git/HEAD" ] || { _git_head="$(git symbolic-ref HEAD)"; _git_head="${_git_head#refs/heads/}"; }
+	[ ! -s "$_git/head-name" ] || _git_head="$(cat "$_git/head-name")"
+fi
+
+# Check if the script requires to be called from the workdir root.
+if [ "$_git_requires_root" ] && [ "$_git_relpath" ]; then
+	echo "This command can be run only from the project root" >&2
+	exit 1
+fi
+
+
+# Backward compatibility hacks:
+# Fortunately none as of now.

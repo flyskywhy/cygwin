@@ -1,0 +1,210 @@
+################################################################################
+#
+# ruby-gnome2.cygclass - functions for building Ruby GNOME 2.x bindings
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: ruby-gnome2.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+inherit ruby
+
+
+__ruby_gnome2_get_module_dir() {
+	local ret
+
+	if (( $# > 1 ))
+	then
+		error "$FUNCNAME: too many arguments"
+	fi
+
+	# poppler and vte were ADDED in 0.15.0
+	# gstreamer and libgda were REMOVED in 0.16.0
+	# bonobo and bonoboui were ADDED in 0.17.0
+	# gtksourceview2 will be added after 0.17.0
+	case ${@} in
+		atk|pango|gnomevfs|gtkglext|gtkhtml2|gtkmozembed|gtksourceview|\
+		gtksourceview2|poppler|vte|libgda)
+			ret=${@} ;;
+		glib2|gtk2|libglade2|bonobo2|bonoboui2|libart2|gnomecanvas2|gconf2|\
+		gnome2|gnomeprint2|gnomeprintui2|rsvg2)
+			ret=${@%2} ;;
+		gdk_pixbuf2)
+			ret=gdkpixbuf ;;
+		gst)
+			ret=gstreamer ;;
+		panelapplet2)
+			ret=panel-applet ;;
+		*)
+			# external packages
+			ret=. ;;
+	esac
+
+	echo -n ${ret}
+}
+
+
+rbg2_pn=${PN#ruby-}
+
+case ${PV} in
+	0.17.0*rc*)	rbg2_orig_src="ruby-gnome2" ;;
+	*)	rbg2_orig_src="ruby-gnome2-all" ;;
+esac
+
+
+case ${rbg2_pn} in
+	gnome2-all)
+		if ! defined RUBY_GNOME2_MODULES
+		then
+			error "ruby-gnome2: RUBY_GNOME2_MODULES undefined"
+		fi
+
+		for _mod in ${RUBY_GNOME2_MODULES}
+		do
+			rbg2_dir+="$(__ruby_gnome2_get_module_dir ${_mod}) "
+		done
+		unset _mod
+		ORIG_PN=${rbg2_orig_src}
+		;;
+	glib2|gtk2|libglade2|bonobo2|bonoboui2|libart2|gnomecanvas2|gconf2|\
+	gnome2|gnomeprint2|gnomeprintui2|rsvg2|gdk_pixbuf2|gst|panelapplet2|\
+	atk|pango|gnomevfs|gtkglext|gtkhtml2|gtkmozembed|gtksourceview|\
+	gtksourceview2|poppler|vte|libgda)
+		rbg2_dir=$(__ruby_gnome2_get_module_dir ${rbg2_pn})
+		ORIG_PN=${rbg2_orig_src}
+		RUBY_GNOME2_MODULES=${rbg2_pn}
+		;;
+	*)
+		# external package, be sure to override SRC_URI
+		rbg2_dir=.
+		ORIG_PN=${ORIG_PN:-${PN}}
+		RUBY_GNOME2_MODULES=${rbg2_pn}
+		;;
+esac
+
+DESCRIPTION="Ruby ${rbg2_pn} bindings"
+HOMEPAGE="http://ruby-gnome2.sourceforge.jp/"
+
+case ${PVP[3]} in
+[1-9]*)
+	SVN_URI="http://ruby-gnome2.svn.sourceforge.net/svnroot/ruby-gnome2/ruby-gnome2/trunk/${rbg2_dir}"
+	SVN_REV=${PVP[3]}
+	inherit svn
+	SRC_URI+="
+		http://ruby-gnome2.svn.sourceforge.net/viewvc/*checkout*/ruby-gnome2/ruby-gnome2/trunk/extconf.rb
+		http://ruby-gnome2.svn.sourceforge.net/viewvc/*checkout*/ruby-gnome2/ruby-gnome2/trunk/exec_make.rb
+		"
+	SRC_DIR=.
+	;;
+rc*|'')
+	SRC_URI="mirror://sourceforge/ruby-gnome2/${ORIG_PN}-${PV/_/-}.tar.gz"
+	SRC_DIR="${ORIG_PN}-${PV/_/-}"
+	;;
+*)	error "Unknown package version: ${PV}" ;;
+esac
+
+# WARNING: CAIRO_PATH is supposed to be the ruby-cairo builddir, not
+# the installed RUBY_SITEARCH, so this will create a bogus -L flag no
+# matter what.  We compensate by correctly defining LOCAL_LIBS below.
+#
+# However, be sure that all extconf.rb have_func() calls come BEFORE any
+# add_depend_package() calls, otherwise the tests will give false negatives
+# due to linker errors (e.g. unable to find -lruby-cairo).
+export CAIRO_PATH="${RUBY_SITEARCH}"
+
+MAKEOPTS+=" -j1"
+
+DEPS_PATH="${RUBY_SITEARCH}"
+
+ruby_gnome2_compile() {
+	local d
+
+	${RUBY} extconf.rb ${rbg2_dir} || error "extconf.rb failed"
+
+	cygmake LOCAL_LIBS="-L${RUBY_SITEARCH}"
+
+	if false; then ######### disable rdoc
+
+	for d in ${rbg2_dir}
+	do
+		if [ -d ${d}/src ]
+		then
+			rdoc ${d}/src -o ${d}/rdoc
+		else
+			rdoc ${d} -o ${d}/rdoc
+		fi
+	done
+
+	fi ######### disable rdoc
+}
+
+ruby_gnome2_install() {
+	local d mod implib
+
+	ruby_install
+
+	for mod in ${RUBY_GNOME2_MODULES}
+	do
+		d=$(__ruby_gnome2_get_module_dir ${mod})
+
+		implib=$(find ${d}/ -name '*.so' | sed -e 's|\(.*\)/\(.*\)\.so|\1/libruby-\2.a|')
+
+		insinto ${RUBY_SITEARCH}
+		doins ${implib}
+
+		insinto /usr/share/doc/ruby-${mod}-${PV}
+		for doc in COPYING.LIB ChangeLog README
+		do
+			if [ -f ${S}/${d}/${doc} ]
+			then
+				doins ${S}/${d}/${doc}
+			fi
+		done
+
+		if [ -d ${d}/rdoc ]
+		then
+			cp -r ${d}/rdoc ${D}/usr/share/doc/ruby-${mod}-${PV}/
+		fi
+	done
+}
+
+src_compile() {
+	cd ${B}
+
+	case ${rbg2_pn} in
+		glib2|gtk2|libglade2|bonobo2|bonoboui2|libart2|gnomecanvas2|gconf2|\
+		gnome2|gnomeprint2|gnomeprintui2|rsvg2|gdk_pixbuf2|gst|panelapplet2|\
+		atk|pango|gnomevfs|gtkglext|gtkhtml2|gtkmozembed|gtksourceview|\
+		gtksourceview2|poppler|vte|libgda)
+			ln -sf ${S}/*.rb ${B}
+			mkdir -p ${rbg2_dir}
+			lndirs ${S}/${rbg2_dir} ${B}/${rbg2_dir}
+			;;
+		gnome2-all|*)
+			lndirs
+			;;
+	esac
+
+	ruby_gnome2_compile
+}
+
+src_install() {
+	cd ${B}
+	ruby_gnome2_install
+}

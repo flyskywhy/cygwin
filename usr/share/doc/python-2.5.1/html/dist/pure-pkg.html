@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="single-ext.html" />
+<link rel="prev" href="pure-mod.html" />
+<link rel="parent" href="examples.html" />
+<link rel="next" href="single-ext.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>8.2 Pure Python distribution (by package)</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.1 pure Python distribution"
+  href="pure-mod.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8. Examples"
+  href="examples.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.3 single extension module"
+  href="single-ext.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pure-mod.html">8.1 Pure Python distribution</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="examples.html">8. Examples</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="single-ext.html">8.3 Single extension module</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008200000000000000000"></a>
+<a name="pure-pkg"></a>
+<br>
+8.2 Pure Python distribution (by package)
+</h1>
+
+<p>
+If you have more than a couple of modules to distribute, especially if
+they are in multiple packages, it's probably easier to specify whole
+packages rather than individual modules.  This works even if your
+modules are not in a package; you can just tell the Distutils to process
+modules from the root package, and that works the same as any other
+package (except that you don't have to have an <span class="file">__init__.py</span>
+file).
+
+<p>
+The setup script from the last example could also be written as
+<div class="verbatim"><pre>
+from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      packages=[''],
+      )
+</pre></div>
+(The empty string stands for the root package.)
+
+<p>
+If those two files are moved into a subdirectory, but remain in the root
+package, e.g.:
+<div class="verbatim"><pre>
+&lt;root&gt;/
+        setup.py
+        src/      foo.py
+                  bar.py
+</pre></div>
+then you would still specify the root package, but you have to tell the
+Distutils where source files in the root package live:
+<div class="verbatim"><pre>
+from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      package_dir={'': 'src'},
+      packages=[''],
+      )
+</pre></div>
+
+<p>
+More typically, though, you will want to distribute multiple modules in
+the same package (or in sub-packages).  For example, if the <tt class="module">foo</tt> 
+and <tt class="module">bar</tt> modules belong in package <tt class="module">foobar</tt>, one way to
+layout your source tree is
+<div class="verbatim"><pre>
+&lt;root&gt;/
+        setup.py
+        foobar/
+                 __init__.py
+                 foo.py
+                 bar.py
+</pre></div>
+This is in fact the default layout expected by the Distutils, and the
+one that requires the least work to describe in your setup script:
+<div class="verbatim"><pre>
+from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      packages=['foobar'],
+      )
+</pre></div>
+
+<p>
+If you want to put modules in directories not named for their package,
+then you need to use the <span class="du-option">package_dir</span> option again.  For
+example, if the <span class="file">src</span> directory holds modules in the
+<tt class="module">foobar</tt> package:
+<div class="verbatim"><pre>
+&lt;root&gt;/
+        setup.py
+        src/
+                 __init__.py
+                 foo.py
+                 bar.py
+</pre></div>
+an appropriate setup script would be
+<div class="verbatim"><pre>
+from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      package_dir={'foobar': 'src'},
+      packages=['foobar'],
+      )
+</pre></div>
+
+<p>
+Or, you might put modules from your main package right in the
+distribution root:
+<div class="verbatim"><pre>
+&lt;root&gt;/
+        setup.py
+        __init__.py
+        foo.py
+        bar.py
+</pre></div>
+in which case your setup script would be
+<div class="verbatim"><pre>
+from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      package_dir={'foobar': ''},
+      packages=['foobar'],
+      )
+</pre></div>
+(The empty string also stands for the current directory.)
+
+<p>
+If you have sub-packages, they must be explicitly listed in
+<span class="du-option">packages</span>, but any entries in <span class="du-option">package_dir</span>
+automatically extend to sub-packages.  (In other words, the Distutils
+does <em>not</em> scan your source tree, trying to figure out which
+directories correspond to Python packages by looking for
+<span class="file">__init__.py</span> files.)  Thus, if the default layout grows a
+sub-package:
+<div class="verbatim"><pre>
+&lt;root&gt;/
+        setup.py
+        foobar/
+                 __init__.py
+                 foo.py
+                 bar.py
+                 subfoo/
+                           __init__.py
+                           blah.py
+</pre></div>
+then the corresponding setup script would be
+<div class="verbatim"><pre>
+from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      packages=['foobar', 'foobar.subfoo'],
+      )
+</pre></div>
+(Again, the empty string in <span class="du-option">package_dir</span> stands for the current
+directory.)
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.1 pure Python distribution"
+  href="pure-mod.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8. Examples"
+  href="examples.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.3 single extension module"
+  href="single-ext.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pure-mod.html">8.1 Pure Python distribution</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="examples.html">8. Examples</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="single-ext.html">8.3 Single extension module</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

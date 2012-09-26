@@ -1,0 +1,621 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="number.html" />
+<link rel="prev" href="abstract.html" />
+<link rel="parent" href="abstract.html" />
+<link rel="next" href="number.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.1 Object Protocol </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.2 number Protocol"
+  href="number.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="number.html">6.2 Number Protocol</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008100000000000000000"></a><a name="object"></a>
+<br>
+6.1 Object Protocol 
+</h1>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-222' xml:id='l2h-222' class="cfunction">PyObject_Print</tt></b>(</nobr></td><td>PyObject *<var>o</var>, FILE *<var>fp</var>, int <var>flags</var>)</td></tr></table></dt>
+<dd>
+  Print an object <var>o</var>, on file <var>fp</var>.  Returns <code>-1</code> on
+  error.  The flags argument is used to enable certain printing
+  options.  The only option currently supported is
+  <tt class="constant">Py_PRINT_RAW</tt>; if given, the <tt class="function">str()</tt> of the
+  object is written instead of the <tt class="function">repr()</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-223' xml:id='l2h-223' class="cfunction">PyObject_HasAttrString</tt></b>(</nobr></td><td>PyObject *<var>o</var>, const char *<var>attr_name</var>)</td></tr></table></dt>
+<dd>
+  Returns <code>1</code> if <var>o</var> has the attribute <var>attr_name</var>, and
+  <code>0</code> otherwise.  This is equivalent to the Python expression
+  "<tt class="samp">hasattr(<var>o</var>, <var>attr_name</var>)</tt>".  This function always
+  succeeds.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-224' xml:id='l2h-224' class="cfunction">PyObject_GetAttrString</tt></b>(</nobr></td><td>PyObject *<var>o</var>,
+                                                     const char *<var>attr_name</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Retrieve an attribute named <var>attr_name</var> from object <var>o</var>.
+  Returns the attribute value on success, or <tt class="constant">NULL</tt> on failure.
+  This is the equivalent of the Python expression
+  "<tt class="samp"><var>o</var>.<var>attr_name</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-225' xml:id='l2h-225' class="cfunction">PyObject_HasAttr</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyObject *<var>attr_name</var>)</td></tr></table></dt>
+<dd>
+  Returns <code>1</code> if <var>o</var> has the attribute <var>attr_name</var>, and
+  <code>0</code> otherwise.  This is equivalent to the Python expression
+  "<tt class="samp">hasattr(<var>o</var>, <var>attr_name</var>)</tt>".  This function always
+  succeeds.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-226' xml:id='l2h-226' class="cfunction">PyObject_GetAttr</tt></b>(</nobr></td><td>PyObject *<var>o</var>,
+                                               PyObject *<var>attr_name</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Retrieve an attribute named <var>attr_name</var> from object <var>o</var>.
+  Returns the attribute value on success, or <tt class="constant">NULL</tt> on failure.  This
+  is the equivalent of the Python expression
+  "<tt class="samp"><var>o</var>.<var>attr_name</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-227' xml:id='l2h-227' class="cfunction">PyObject_SetAttrString</tt></b>(</nobr></td><td>PyObject *<var>o</var>,
+                                               const char *<var>attr_name</var>, PyObject *<var>v</var>)</td></tr></table></dt>
+<dd>
+  Set the value of the attribute named <var>attr_name</var>, for object
+  <var>o</var>, to the value <var>v</var>. Returns <code>-1</code> on failure.  This
+  is the equivalent of the Python statement
+  "<tt class="samp"><var>o</var>.<var>attr_name</var> = <var>v</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-228' xml:id='l2h-228' class="cfunction">PyObject_SetAttr</tt></b>(</nobr></td><td>PyObject *<var>o</var>,
+                                         PyObject *<var>attr_name</var>, PyObject *<var>v</var>)</td></tr></table></dt>
+<dd>
+  Set the value of the attribute named <var>attr_name</var>, for object
+  <var>o</var>, to the value <var>v</var>. Returns <code>-1</code> on failure.  This
+  is the equivalent of the Python statement
+  "<tt class="samp"><var>o</var>.<var>attr_name</var> = <var>v</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-229' xml:id='l2h-229' class="cfunction">PyObject_DelAttrString</tt></b>(</nobr></td><td>PyObject *<var>o</var>, const char *<var>attr_name</var>)</td></tr></table></dt>
+<dd>
+  Delete attribute named <var>attr_name</var>, for object <var>o</var>. Returns
+  <code>-1</code> on failure.  This is the equivalent of the Python
+  statement: "<tt class="samp">del <var>o</var>.<var>attr_name</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-230' xml:id='l2h-230' class="cfunction">PyObject_DelAttr</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyObject *<var>attr_name</var>)</td></tr></table></dt>
+<dd>
+  Delete attribute named <var>attr_name</var>, for object <var>o</var>. Returns
+  <code>-1</code> on failure.  This is the equivalent of the Python
+  statement "<tt class="samp">del <var>o</var>.<var>attr_name</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-231' xml:id='l2h-231' class="cfunction">PyObject_RichCompare</tt></b>(</nobr></td><td>PyObject *<var>o1</var>,
+                                                   PyObject *<var>o2</var>, int <var>opid</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Compare the values of <var>o1</var> and <var>o2</var> using the operation
+  specified by <var>opid</var>, which must be one of
+  <tt class="constant">Py_LT</tt>,
+  <tt class="constant">Py_LE</tt>,
+  <tt class="constant">Py_EQ</tt>,
+  <tt class="constant">Py_NE</tt>,
+  <tt class="constant">Py_GT</tt>, or
+  <tt class="constant">Py_GE</tt>, corresponding to
+  <code>&lt;</code>,
+  <code>&lt;=</code>,
+  <code>==</code>,
+  <code>!=</code>,
+  <code>&gt;</code>, or
+  <code>&gt;=</code> respectively. This is the equivalent of the Python expression
+  "<tt class="samp"><var>o1</var> op <var>o2</var></tt>", where <code>op</code> is the operator
+  corresponding to <var>opid</var>. Returns the value of the comparison on
+  success, or <tt class="constant">NULL</tt> on failure.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-232' xml:id='l2h-232' class="cfunction">PyObject_RichCompareBool</tt></b>(</nobr></td><td>PyObject *<var>o1</var>,
+                                                 PyObject *<var>o2</var>, int <var>opid</var>)</td></tr></table></dt>
+<dd>
+  Compare the values of <var>o1</var> and <var>o2</var> using the operation
+  specified by <var>opid</var>, which must be one of
+  <tt class="constant">Py_LT</tt>,
+  <tt class="constant">Py_LE</tt>,
+  <tt class="constant">Py_EQ</tt>,
+  <tt class="constant">Py_NE</tt>,
+  <tt class="constant">Py_GT</tt>, or
+  <tt class="constant">Py_GE</tt>, corresponding to
+  <code>&lt;</code>,
+  <code>&lt;=</code>,
+  <code>==</code>,
+  <code>!=</code>,
+  <code>&gt;</code>, or
+  <code>&gt;=</code> respectively. Returns <code>-1</code> on error, <code>0</code> if the
+  result is false, <code>1</code> otherwise. This is the equivalent of the
+  Python expression "<tt class="samp"><var>o1</var> op <var>o2</var></tt>", where
+  <code>op</code> is the operator corresponding to <var>opid</var>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-233' xml:id='l2h-233' class="cfunction">PyObject_Cmp</tt></b>(</nobr></td><td>PyObject *<var>o1</var>, PyObject *<var>o2</var>, int *<var>result</var>)</td></tr></table></dt>
+<dd>
+  Compare the values of <var>o1</var> and <var>o2</var> using a routine provided
+  by <var>o1</var>, if one exists, otherwise with a routine provided by
+  <var>o2</var>.  The result of the comparison is returned in
+  <var>result</var>.  Returns <code>-1</code> on failure.  This is the equivalent
+  of the Python statement<a id='l2h-234' xml:id='l2h-234'></a> "<tt class="samp"><var>result</var> =
+  cmp(<var>o1</var>, <var>o2</var>)</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-235' xml:id='l2h-235' class="cfunction">PyObject_Compare</tt></b>(</nobr></td><td>PyObject *<var>o1</var>, PyObject *<var>o2</var>)</td></tr></table></dt>
+<dd>
+  Compare the values of <var>o1</var> and <var>o2</var> using a routine provided
+  by <var>o1</var>, if one exists, otherwise with a routine provided by
+  <var>o2</var>.  Returns the result of the comparison on success.  On
+  error, the value returned is undefined; use
+  <tt class="cfunction">PyErr_Occurred()</tt> to detect an error.  This is equivalent
+  to the Python expression<a id='l2h-236' xml:id='l2h-236'></a> "<tt class="samp">cmp(<var>o1</var>,
+  <var>o2</var>)</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-237' xml:id='l2h-237' class="cfunction">PyObject_Repr</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Compute a string representation of object <var>o</var>.  Returns the
+  string representation on success, <tt class="constant">NULL</tt> on failure.  This is the
+  equivalent of the Python expression "<tt class="samp">repr(<var>o</var>)</tt>".  Called by
+  the <tt class="function">repr()</tt><a id='l2h-238' xml:id='l2h-238'></a> built-in function and by
+  reverse quotes.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-239' xml:id='l2h-239' class="cfunction">PyObject_Str</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Compute a string representation of object <var>o</var>.  Returns the
+  string representation on success, <tt class="constant">NULL</tt> on failure.  This is the
+  equivalent of the Python expression "<tt class="samp">str(<var>o</var>)</tt>".  Called by
+  the <tt class="function">str()</tt><a id='l2h-240' xml:id='l2h-240'></a> built-in function and by the
+  <tt class="keyword">print</tt> statement.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-241' xml:id='l2h-241' class="cfunction">PyObject_Unicode</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Compute a Unicode string representation of object <var>o</var>.  Returns
+  the Unicode string representation on success, <tt class="constant">NULL</tt> on failure.
+  This is the equivalent of the Python expression
+  "<tt class="samp">unicode(<var>o</var>)</tt>".  Called by the
+  <tt class="function">unicode()</tt><a id='l2h-242' xml:id='l2h-242'></a> built-in function.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-243' xml:id='l2h-243' class="cfunction">PyObject_IsInstance</tt></b>(</nobr></td><td>PyObject *<var>inst</var>, PyObject *<var>cls</var>)</td></tr></table></dt>
+<dd>
+  Returns <code>1</code> if <var>inst</var> is an instance of the class <var>cls</var>
+  or a subclass of <var>cls</var>, or <code>0</code> if not.  On error, returns
+  <code>-1</code> and sets an exception.  If <var>cls</var> is a type object
+  rather than a class object, <tt class="cfunction">PyObject_IsInstance()</tt>
+  returns <code>1</code> if <var>inst</var> is of type <var>cls</var>.  If <var>cls</var>
+  is a tuple, the check will be done against every entry in <var>cls</var>.
+  The result will be <code>1</code> when at least one of the checks returns
+  <code>1</code>, otherwise it will be <code>0</code>. If <var>inst</var> is not a class
+  instance and <var>cls</var> is neither a type object, nor a class object,
+  nor a tuple, <var>inst</var> must have a <tt class="member">__class__</tt> attribute
+  -- the class relationship of the value of that attribute with
+  <var>cls</var> will be used to determine the result of this function.
+  
+<span class="versionnote">New in version 2.1.</span>
+
+<span class="versionnote">Changed in version 2.2:
+Support for a tuple as the second argument added.</span>
+
+</dd></dl>
+
+<p>
+Subclass determination is done in a fairly straightforward way, but
+includes a wrinkle that implementors of extensions to the class system
+may want to be aware of.  If <tt class="class">A</tt> and <tt class="class">B</tt> are class
+objects, <tt class="class">B</tt> is a subclass of <tt class="class">A</tt> if it inherits from
+<tt class="class">A</tt> either directly or indirectly.  If either is not a class
+object, a more general mechanism is used to determine the class
+relationship of the two objects.  When testing if <var>B</var> is a
+subclass of <var>A</var>, if <var>A</var> is <var>B</var>,
+<tt class="cfunction">PyObject_IsSubclass()</tt> returns true.  If <var>A</var> and
+<var>B</var> are different objects, <var>B</var>'s <tt class="member">__bases__</tt> attribute
+is searched in a depth-first fashion for <var>A</var> -- the presence of
+the <tt class="member">__bases__</tt> attribute is considered sufficient for this
+determination.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-244' xml:id='l2h-244' class="cfunction">PyObject_IsSubclass</tt></b>(</nobr></td><td>PyObject *<var>derived</var>,
+                                            PyObject *<var>cls</var>)</td></tr></table></dt>
+<dd>
+  Returns <code>1</code> if the class <var>derived</var> is identical to or
+  derived from the class <var>cls</var>, otherwise returns <code>0</code>.  In
+  case of an error, returns <code>-1</code>. If <var>cls</var>
+  is a tuple, the check will be done against every entry in <var>cls</var>.
+  The result will be <code>1</code> when at least one of the checks returns
+  <code>1</code>, otherwise it will be <code>0</code>. If either <var>derived</var> or
+  <var>cls</var> is not an actual class object (or tuple), this function
+  uses the generic algorithm described above.
+  
+<span class="versionnote">New in version 2.1.</span>
+
+<span class="versionnote">Changed in version 2.3:
+Older versions of Python did not support a tuple
+                  as the second argument.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-245' xml:id='l2h-245' class="cfunction">PyCallable_Check</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Determine if the object <var>o</var> is callable.  Return <code>1</code> if the
+  object is callable and <code>0</code> otherwise.  This function always
+  succeeds.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-246' xml:id='l2h-246' class="cfunction">PyObject_Call</tt></b>(</nobr></td><td>PyObject *<var>callable_object</var>,
+                                            PyObject *<var>args</var>,
+                                            PyObject *<var>kw</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Call a callable Python object <var>callable_object</var>, with arguments
+  given by the tuple <var>args</var>, and named arguments given by the
+  dictionary <var>kw</var>. If no named arguments are needed, <var>kw</var> may
+  be <tt class="constant">NULL</tt>. <var>args</var> must not be <tt class="constant">NULL</tt>, use an empty tuple if
+  no arguments are needed. Returns the result of the call on success,
+  or <tt class="constant">NULL</tt> on failure.  This is the equivalent of the Python
+  expression "<tt class="samp">apply(<var>callable_object</var>, <var>args</var>, <var>kw</var>)</tt>"  or "<tt class="samp"><var>callable_object</var>(*<var>args</var>, **<var>kw</var>)</tt>".
+  <a id='l2h-247' xml:id='l2h-247'></a>  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-248' xml:id='l2h-248' class="cfunction">PyObject_CallObject</tt></b>(</nobr></td><td>PyObject *<var>callable_object</var>,
+                                                  PyObject *<var>args</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Call a callable Python object <var>callable_object</var>, with arguments
+  given by the tuple <var>args</var>.  If no arguments are needed, then
+  <var>args</var> may be <tt class="constant">NULL</tt>.  Returns the result of the call on
+  success, or <tt class="constant">NULL</tt> on failure.  This is the equivalent of the
+  Python expression "<tt class="samp">apply(<var>callable_object</var>, <var>args</var>)</tt>" or
+  "<tt class="samp"><var>callable_object</var>(*<var>args</var>)</tt>".
+  <a id='l2h-249' xml:id='l2h-249'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-250' xml:id='l2h-250' class="cfunction">PyObject_CallFunction</tt></b>(</nobr></td><td>PyObject *<var>callable</var>,
+                                                    char *<var>format</var>, ...)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Call a callable Python object <var>callable</var>, with a variable
+  number of C arguments.  The C arguments are described using a
+  <tt class="cfunction">Py_BuildValue()</tt> style format string.  The format may be
+  <tt class="constant">NULL</tt>, indicating that no arguments are provided.  Returns the
+  result of the call on success, or <tt class="constant">NULL</tt> on failure.  This is the
+  equivalent of the Python expression "<tt class="samp">apply(<var>callable</var>,
+  <var>args</var>)</tt>" or "<tt class="samp"><var>callable</var>(*<var>args</var>)</tt>".
+  Note that if you only pass <tt class="ctype">PyObject *</tt> args,
+  <tt class="cfunction">PyObject_CallFunctionObjArgs</tt> is a faster alternative.
+  <a id='l2h-251' xml:id='l2h-251'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-252' xml:id='l2h-252' class="cfunction">PyObject_CallMethod</tt></b>(</nobr></td><td>PyObject *<var>o</var>,
+                                                  char *<var>method</var>, char *<var>format</var>,
+                                                  ...)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Call the method named <var>method</var> of object <var>o</var> with a variable
+  number of C arguments.  The C arguments are described by a
+  <tt class="cfunction">Py_BuildValue()</tt> format string that should 
+  produce a tuple.  The format may be <tt class="constant">NULL</tt>,
+  indicating that no arguments are provided. Returns the result of the
+  call on success, or <tt class="constant">NULL</tt> on failure.  This is the equivalent of
+  the Python expression "<tt class="samp"><var>o</var>.<var>method</var>(<var>args</var>)</tt>".
+  Note that if you only pass <tt class="ctype">PyObject *</tt> args,
+  <tt class="cfunction">PyObject_CallMethodObjArgs</tt> is a faster alternative.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-253' xml:id='l2h-253' class="cfunction">PyObject_CallFunctionObjArgs</tt></b>(</nobr></td><td>PyObject *<var>callable</var>,
+                                                           ...,
+                                                           <code>NULL</code>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Call a callable Python object <var>callable</var>, with a variable
+  number of <tt class="ctype">PyObject*</tt> arguments.  The arguments are provided
+  as a variable number of parameters followed by <tt class="constant">NULL</tt>.
+  Returns the result of the call on success, or <tt class="constant">NULL</tt> on failure.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-254' xml:id='l2h-254' class="cfunction">PyObject_CallMethodObjArgs</tt></b>(</nobr></td><td>PyObject *<var>o</var>,
+                                                         PyObject *<var>name</var>,
+                                                         ...,
+                                                         <code>NULL</code>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Calls a method of the object <var>o</var>, where the name of the method
+  is given as a Python string object in <var>name</var>.  It is called with
+  a variable number of <tt class="ctype">PyObject*</tt> arguments.  The arguments are
+  provided as a variable number of parameters followed by <tt class="constant">NULL</tt>.
+  Returns the result of the call on success, or <tt class="constant">NULL</tt> on failure.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>long&nbsp;<b><tt id='l2h-255' xml:id='l2h-255' class="cfunction">PyObject_Hash</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Compute and return the hash value of an object <var>o</var>.  On failure,
+  return <code>-1</code>.  This is the equivalent of the Python expression
+  "<tt class="samp">hash(<var>o</var>)</tt>".<a id='l2h-256' xml:id='l2h-256'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-257' xml:id='l2h-257' class="cfunction">PyObject_IsTrue</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Returns <code>1</code> if the object <var>o</var> is considered to be true, and
+  <code>0</code> otherwise.  This is equivalent to the Python expression
+  "<tt class="samp">not not <var>o</var></tt>".  On failure, return <code>-1</code>. 
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-258' xml:id='l2h-258' class="cfunction">PyObject_Not</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Returns <code>0</code> if the object <var>o</var> is considered to be true, and
+  <code>1</code> otherwise.  This is equivalent to the Python expression
+  "<tt class="samp">not <var>o</var></tt>".  On failure, return <code>-1</code>. 
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-259' xml:id='l2h-259' class="cfunction">PyObject_Type</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  When <var>o</var> is non-<tt class="constant">NULL</tt>, returns a type object corresponding to
+  the object type of object <var>o</var>. On failure, raises
+  <tt class="exception">SystemError</tt> and returns <tt class="constant">NULL</tt>.  This is equivalent to
+  the Python expression <code>type(<var>o</var>)</code>.<a id='l2h-260' xml:id='l2h-260'></a>  This function increments the reference count of the return value.
+  There's really no reason to use this function instead of the
+  common expression <code><var>o</var>-&gt;ob_type</code>, which returns a pointer
+  of type <tt class="ctype">PyTypeObject*</tt>, except when the incremented reference
+  count is needed.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-261' xml:id='l2h-261' class="cfunction">PyObject_TypeCheck</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyTypeObject *<var>type</var>)</td></tr></table></dt>
+<dd>
+  Return true if the object <var>o</var> is of type <var>type</var> or a subtype
+  of <var>type</var>.  Both parameters must be non-<tt class="constant">NULL</tt>.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>Py_ssize_t&nbsp;<b><tt id='l2h-262' xml:id='l2h-262' class="cfunction">PyObject_Length</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>Py_ssize_t&nbsp;<b><tt id='l2h-270' xml:id='l2h-270' class="cfunction">PyObject_Size</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table>
+<dd>
+  Return the length of object <var>o</var>.  If the object <var>o</var> provides
+  either the sequence and mapping protocols, the sequence length is
+  returned.  On error, <code>-1</code> is returned.  This is the equivalent
+  to the Python expression "<tt class="samp">len(<var>o</var>)</tt>".<a id='l2h-263' xml:id='l2h-263'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-264' xml:id='l2h-264' class="cfunction">PyObject_GetItem</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyObject *<var>key</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return element of <var>o</var> corresponding to the object <var>key</var> or
+  <tt class="constant">NULL</tt> on failure.  This is the equivalent of the Python expression
+  "<tt class="samp"><var>o</var>[<var>key</var>]</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-265' xml:id='l2h-265' class="cfunction">PyObject_SetItem</tt></b>(</nobr></td><td>PyObject *<var>o</var>,
+                                         PyObject *<var>key</var>, PyObject *<var>v</var>)</td></tr></table></dt>
+<dd>
+  Map the object <var>key</var> to the value <var>v</var>.  Returns <code>-1</code> on
+  failure.  This is the equivalent of the Python statement
+  "<tt class="samp"><var>o</var>[<var>key</var>] = <var>v</var></tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-266' xml:id='l2h-266' class="cfunction">PyObject_DelItem</tt></b>(</nobr></td><td>PyObject *<var>o</var>, PyObject *<var>key</var>)</td></tr></table></dt>
+<dd>
+  Delete the mapping for <var>key</var> from <var>o</var>.  Returns <code>-1</code> on
+  failure. This is the equivalent of the Python statement "<tt class="samp">del
+  <var>o</var>[<var>key</var>]</tt>".
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-267' xml:id='l2h-267' class="cfunction">PyObject_AsFileDescriptor</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Derives a file-descriptor from a Python object.  If the object is an
+  integer or long integer, its value is returned.  If not, the
+  object's <tt class="method">fileno()</tt> method is called if it exists; the method
+  must return an integer or long integer, which is returned as the
+  file descriptor value.  Returns <code>-1</code> on failure.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-268' xml:id='l2h-268' class="cfunction">PyObject_Dir</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  This is equivalent to the Python expression "<tt class="samp">dir(<var>o</var>)</tt>",
+  returning a (possibly empty) list of strings appropriate for the
+  object argument, or <tt class="constant">NULL</tt> if there was an error.  If the argument
+  is <tt class="constant">NULL</tt>, this is like the Python "<tt class="samp">dir()</tt>", returning the names
+  of the current locals; in this case, if no execution frame is active
+  then <tt class="constant">NULL</tt> is returned but <tt class="cfunction">PyErr_Occurred()</tt> will
+  return false.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-269' xml:id='l2h-269' class="cfunction">PyObject_GetIter</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  This is equivalent to the Python expression "<tt class="samp">iter(<var>o</var>)</tt>".
+  It returns a new iterator for the object argument, or the object 
+  itself if the object is already an iterator.  Raises
+  <tt class="exception">TypeError</tt> and returns <tt class="constant">NULL</tt> if the object cannot be
+  iterated.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.2 number Protocol"
+  href="number.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="number.html">6.2 Number Protocol</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

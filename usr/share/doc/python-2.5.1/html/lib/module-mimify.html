@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-multifile.html" />
+<link rel="prev" href="module-MimeWriter.html" />
+<link rel="parent" href="netdata.html" />
+<link rel="next" href="module-multifile.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.8 mimify -- MIME processing of mail messages</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.7.1 mimewriter Objects"
+  href="MimeWriter-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.9 multifile  "
+  href="module-multifile.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="MimeWriter-objects.html">7.7.1 MimeWriter Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-multifile.html">7.9 multifile  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION009800000000000000000">
+7.8 <tt class="module">mimify</tt> --
+         MIME processing of mail messages</a>
+</h1>
+
+<p>
+<a name="module-mimify"></a>
+
+<p>
+<div class="versionnote"><b>Deprecated since release 2.3.</b>
+The <tt class="module"><a href="module-email.html">email</a></tt> package should be used in
+                 preference to the <tt class="module">mimify</tt> module.  This
+                 module is present only to maintain backward
+                 compatibility.</div><p></p>
+
+<p>
+The <tt class="module">mimify</tt> module defines two functions to convert mail messages to
+and from MIME format.  The mail message can be either a simple message
+or a so-called multipart message.  Each part is treated separately.
+Mimifying (a part of) a message entails encoding the message as
+quoted-printable if it contains any characters that cannot be
+represented using 7-bit ASCII.  Unmimifying (a part of) a message
+entails undoing the quoted-printable encoding.  Mimify and unmimify
+are especially useful when a message has to be edited before being
+sent.  Typical use would be:
+
+<p>
+<div class="verbatim"><pre>
+unmimify message
+edit message
+mimify message
+send message
+</pre></div>
+
+<p>
+The modules defines the following user-callable functions and
+user-settable variables:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1539' xml:id='l2h-1539' class="function">mimify</tt></b>(</nobr></td>
+  <td><var>infile, outfile</var>)</td></tr></table></dt>
+<dd>
+Copy the message in <var>infile</var> to <var>outfile</var>, converting parts to
+quoted-printable and adding MIME mail headers when necessary.
+<var>infile</var> and <var>outfile</var> can be file objects (actually, any
+object that has a <tt class="method">readline()</tt> method (for <var>infile</var>) or a
+<tt class="method">write()</tt> method (for <var>outfile</var>)) or strings naming the files.
+If <var>infile</var> and <var>outfile</var> are both strings, they may have the
+same value.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1540' xml:id='l2h-1540' class="function">unmimify</tt></b>(</nobr></td>
+  <td><var>infile, outfile</var><big>[</big><var>, decode_base64</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Copy the message in <var>infile</var> to <var>outfile</var>, decoding all
+quoted-printable parts.  <var>infile</var> and <var>outfile</var> can be file
+objects (actually, any object that has a <tt class="method">readline()</tt> method (for
+<var>infile</var>) or a <tt class="method">write()</tt> method (for <var>outfile</var>)) or strings
+naming the files.  If <var>infile</var> and <var>outfile</var> are both strings,
+they may have the same value.
+If the <var>decode_base64</var> argument is provided and tests true, any
+parts that are coded in the base64 encoding are decoded as well.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1541' xml:id='l2h-1541' class="function">mime_decode_header</tt></b>(</nobr></td>
+  <td><var>line</var>)</td></tr></table></dt>
+<dd>
+Return a decoded version of the encoded header line in <var>line</var>.
+This only supports the ISO 8859-1 charset (Latin-1).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1542' xml:id='l2h-1542' class="function">mime_encode_header</tt></b>(</nobr></td>
+  <td><var>line</var>)</td></tr></table></dt>
+<dd>
+Return a MIME-encoded version of the header line in <var>line</var>.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1543' xml:id='l2h-1543'>MAXLEN</tt></b></dt>
+<dd>
+By default, a part will be encoded as quoted-printable when it
+contains any non-ASCII characters (characters with the 8th bit
+set), or if there are any lines longer than <tt class="constant">MAXLEN</tt> characters
+(default value 200).  
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1544' xml:id='l2h-1544'>CHARSET</tt></b></dt>
+<dd>
+When not specified in the mail headers, a character set must be filled
+in.  The string used is stored in <tt class="constant">CHARSET</tt>, and the default
+value is ISO-8859-1 (also known as Latin1 (latin-one)).
+</dd></dl>
+
+<p>
+This module can also be used from the command line.  Usage is as
+follows:
+<div class="verbatim"><pre>
+mimify.py -e [-l length] [infile [outfile]]
+mimify.py -d [-b] [infile [outfile]]
+</pre></div>
+to encode (mimify) and decode (unmimify) respectively.  <var>infile</var>
+defaults to standard input, <var>outfile</var> defaults to standard output.
+The same file can be specified for input and output.
+
+<p>
+If the <strong>-l</strong> option is given when encoding, if there are any lines
+longer than the specified <var>length</var>, the containing part will be
+encoded.
+
+<p>
+If the <strong>-b</strong> option is given when decoding, any base64 parts will
+be decoded as well.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-quopri.html">quopri</a></tt>:</b>
+    <dd>Encode and decode MIME quoted-printable files.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.7.1 mimewriter Objects"
+  href="MimeWriter-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.9 multifile  "
+  href="module-multifile.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="MimeWriter-objects.html">7.7.1 MimeWriter Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-multifile.html">7.9 multifile  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

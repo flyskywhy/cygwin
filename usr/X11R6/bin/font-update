@@ -1,0 +1,86 @@
+#!/bin/sh
+#
+# Update font information for X11
+#
+# Creates fonts.scale, fonts.dir and fonts.cache-1
+#
+PATH="$PATH:/usr/X11R6/bin"
+#
+# /etc/X11/font-encodings contains one encoding per line
+# /etc/X11/font-dirs contains one fontdir per line
+ENC_FILE="/etc/X11/font-encodings"
+DIR_FILE="/etc/X11/font-dirs"
+ENC_DIR="/usr/X11R6/lib/X11/fonts/encodings"
+
+#
+# Build ENCODINGS parameter. This is ugly. Who can do it better?
+#
+ENCODINGS=`
+(
+cat << EOF
+microsoft-cp1250
+microsoft-cp1251
+microsoft-cp1252
+microsoft-cp1253
+microsoft-cp1254
+microsoft-cp1255
+microsoft-cp1256
+microsoft-cp1257
+microsoft-cp1258
+EOF
+test -r "$ENC_FILE" && sed -e 's/ *#.*//' "$ENC_FILE" 
+) | while read encoding; do
+    if test -z "$encoding"; then
+        continue
+    fi
+    echo "-a $encoding"
+done`
+
+(
+cat << EOF
+/usr/X11R6/lib/X11/fonts/100dpi
+/usr/X11R6/lib/X11/fonts/75dpi
+/usr/X11R6/lib/X11/fonts/misc
+/usr/X11R6/lib/X11/fonts/CID
+/usr/X11R6/lib/X11/fonts/TTF
+/usr/X11R6/lib/X11/fonts/Type1
+/usr/X11R6/lib/X11/fonts/cyrillic
+/usr/X11R6/lib/X11/fonts/local
+EOF
+test -r "$DIR_FILE" && sed 's/ *#.*//' "$DIR_FILE" 
+) | while read fontdir; do
+	if test -z "$fontdir"; then
+    	continue
+    fi
+    if test -d "$fontdir"; then
+        need_update=""
+        test -e "$fontdir/fonts.dir" || need_update=1
+        test -e "$fontdir/fonts.scale" || need_update=1
+        test -n "$need_update" || \
+            test "$ENC_FILE" -nt "$fontdir/fonts.dir" && need_update=1
+        test -n "$need_update" || \
+            find "$fontdir" -not '(' \
+            -name fonts.scale -o \
+            -name fonts.dir -o \
+            -name encodings.dir -o \
+            -name fonts.cache-1 ')' \
+            -a '(' \
+            -newer "$fontdir/fonts.dir" -o \
+            -newer "$fontdir/fonts.scale" \
+            ')' \
+            -mindepth 1 -follow | read line && need_update=1 
+        if test -n "$need_update"; then 
+            echo "updating $fontdir" >&2
+            rm -f "$fontdir/fonts.scale"
+            rm -f "$fontdir/fonts.dir"
+            mkfontscale $ENCODINGS "$fontdir" || rm -f "$fontdir/fonts.scale"
+            mkfontscale -b -s -l $ENCODINGS "$fontdir" || rm -f "$fontdir/fonts.dir"
+            mkfontscale -n -e "$ENC_DIR" "$fontdir" || rm -f "$fontdir/encodings.dir"
+            fc-cache "$fontdir"
+        else
+            echo "$fontdir is up-todate. skipping" >&2
+        fi
+    else
+        echo "$fontdir is not a directory. skipping" >&2
+    fi
+done 

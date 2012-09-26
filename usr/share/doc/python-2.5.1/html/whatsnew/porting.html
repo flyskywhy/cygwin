@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="acks.html" />
+<link rel="prev" href="ports.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="acks.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>15 Porting to Python 2.5</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14 build and C"
+  href="ports.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16 Acknowledgements"
+  href="acks.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ports.html">14 Build and C</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="acks.html">16 Acknowledgements</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0001600000000000000000"></a><a name="porting"></a>
+<br>
+15 Porting to Python 2.5
+</h1>
+
+<p>
+This section lists previously described changes that may require
+changes to your code:
+
+<p>
+
+<ul>
+<li>ASCII is now the default encoding for modules.  It's now 
+a syntax error if a module contains string literals with 8-bit
+characters but doesn't have an encoding declaration.  In Python 2.4
+this triggered a warning, not a syntax error.
+
+<p>
+</li>
+<li>Previously, the <tt class="member">gi_frame</tt> attribute of a generator
+was always a frame object.  Because of the <a class="rfc" id='rfcref-2408' xml:id='rfcref-2408'
+href="http://www.python.org/peps/pep-0342.html">PEP 342</a> changes
+described in section&nbsp;<a href="pep-342.html#pep-342">7</a>, it's now possible
+for <tt class="member">gi_frame</tt> to be <code>None</code>.
+
+<p>
+</li>
+<li>A new warning, <tt class="class">UnicodeWarning</tt>, is triggered when 
+you attempt to compare a Unicode string and an 8-bit string that can't
+be converted to Unicode using the default ASCII encoding.  Previously
+such comparisons would raise a <tt class="class">UnicodeDecodeError</tt> exception.
+
+<p>
+</li>
+<li>Library: the <tt class="module">csv</tt> module is now stricter about multi-line quoted
+fields.  If your files contain newlines embedded within fields, the
+input should be split into lines in a manner which preserves the
+newline characters.
+
+<p>
+</li>
+<li>Library: the <tt class="module">locale</tt> module's 
+<tt class="function">format()</tt> function's would previously 
+accept any string as long as no more than one %char specifier
+appeared.  In Python 2.5, the argument must be exactly one %char
+specifier with no surrounding text. 
+
+<p>
+</li>
+<li>Library: The <tt class="module">pickle</tt> and <tt class="module">cPickle</tt> modules no
+longer accept a return value of <code>None</code> from the
+<tt class="method">__reduce__()</tt> method; the method must return a tuple of
+arguments instead.  The modules also no longer accept the deprecated
+<var>bin</var> keyword parameter.
+
+<p>
+</li>
+<li>Library: The <tt class="module">SimpleXMLRPCServer</tt> and <tt class="module">DocXMLRPCServer</tt> 
+classes now have a <tt class="member">rpc_paths</tt> attribute that constrains
+XML-RPC operations to a limited set of URL paths; the default is
+to allow only <code>'/'</code> and <code>'/RPC2'</code>.  Setting 
+<tt class="member">rpc_paths</tt> to <code>None</code> or an empty tuple disables 
+this path checking.
+
+<p>
+</li>
+<li>C API: Many functions now use <tt class="ctype">Py_ssize_t</tt> 
+instead of <tt class="ctype">int</tt> to allow processing more data on 64-bit
+machines.  Extension code may need to make the same change to avoid
+warnings and to support 64-bit machines.  See the earlier
+section&nbsp;<a href="pep-353.html#pep-353">10</a> for a discussion of this change.
+
+<p>
+</li>
+<li>C API: 
+The obmalloc changes mean that 
+you must be careful to not mix usage 
+of the <tt class="cfunction">PyMem_*()</tt> and <tt class="cfunction">PyObject_*()</tt>
+families of functions. Memory allocated with 
+one family's <tt class="cfunction">*_Malloc()</tt> must be 
+freed with the corresponding family's <tt class="cfunction">*_Free()</tt> function.
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14 build and C"
+  href="ports.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16 Acknowledgements"
+  href="acks.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ports.html">14 Build and C</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="acks.html">16 Acknowledgements</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

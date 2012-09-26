@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+#
+# List contents of a particular tree in the repository
+# Copyright (c) Petr Baudis, 2005
+#
+# Optionally takes a commit or tree ID as a parameter, defaulting to
+# 'HEAD'.
+#
+# OPTIONS
+# -------
+# -t TREE_ID:: List content of the given TREE_ID
+#	List the content of the given TREE_ID.
+#
+# OUTPUT FORMAT
+# -------------
+# Each line in the output has the following format:
+#
+#	<mode>	<type>	<sha1>	<name>
+#
+# where
+#
+# <mode>::
+#	The file permission information in octal format.
+#
+# <type>::
+#	The type can be the following: `blob` refers to files
+#	and `tree` refers to directories.
+#
+# <sha1>::
+#	The object ID.
+#
+# <name>::
+#	The file or directory name.
+#
+# Example line:
+#
+#	100644  blob    c7dacd0ea28994e3c754ca4eadb2e08c011ee3d3        README
+
+# Testsuite: TODO
+
+USAGE="cg-admin-ls [-t TREE_ID] [PATH]"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+tree_id=
+while optparse; do
+	if optparse -t=; then
+		tree_id="$OPTARG"
+	else
+		optfail
+	fi
+done
+
+id="$(cg-object-id -t "$tree_id")" || exit 1
+
+git ls-tree "$id" "${ARGS[@]}"

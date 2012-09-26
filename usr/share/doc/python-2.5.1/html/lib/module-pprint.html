@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-repr.html" />
+<link rel="prev" href="module-copy.html" />
+<link rel="parent" href="datatypes.html" />
+<link rel="next" href="node117.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.18 pprint -- Data pretty printer</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.17 copy  "
+  href="module-copy.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.18.1 prettyprinter Objects"
+  href="node117.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-copy.html">5.17 copy  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node117.html">5.18.1 PrettyPrinter Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0071800000000000000000">
+5.18 <tt class="module">pprint</tt> --
+         Data pretty printer</a>
+</h1>
+
+<p>
+<a name="module-pprint"></a>
+
+<p>
+The <tt class="module">pprint</tt> module provides a capability to ``pretty-print''
+arbitrary Python data structures in a form which can be used as input
+to the interpreter.  If the formatted structures include objects which
+are not fundamental Python types, the representation may not be
+loadable.  This may be the case if objects such as files, sockets,
+classes, or instances are included, as well as many other builtin
+objects which are not representable as Python constants.
+
+<p>
+The formatted representation keeps objects on a single line if it can,
+and breaks them onto multiple lines if they don't fit within the
+allowed width.  Construct <tt class="class">PrettyPrinter</tt> objects explicitly if
+you need to adjust the width constraint.
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+Dictionaries are sorted by key before the display is
+computed; before 2.5, a dictionary was sorted only if its display
+required more than one line, although that wasn't documented.</span>
+
+<p>
+The <tt class="module">pprint</tt> module defines one class:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-900' xml:id='l2h-900' class="class">PrettyPrinter</tt></b>(</nobr></td>
+  <td><var>...</var>)</td></tr></table></dt>
+<dd>
+Construct a <tt class="class">PrettyPrinter</tt> instance.  This constructor
+understands several keyword parameters.  An output stream may be set
+using the <var>stream</var> keyword; the only method used on the stream
+object is the file protocol's <tt class="method">write()</tt> method.  If not
+specified, the <tt class="class">PrettyPrinter</tt> adopts <code>sys.stdout</code>.  Three
+additional parameters may be used to control the formatted
+representation.  The keywords are <var>indent</var>, <var>depth</var>, and
+<var>width</var>.  The amount of indentation added for each recursive level
+is specified by <var>indent</var>; the default is one.  Other values can
+cause output to look a little odd, but can make nesting easier to
+spot.  The number of levels which may be printed is controlled by
+<var>depth</var>; if the data structure being printed is too deep, the next
+contained level is replaced by "<tt class="samp">...</tt>".  By default, there is no
+constraint on the depth of the objects being formatted.  The desired
+output width is constrained using the <var>width</var> parameter; the
+default is eighty characters.  If a structure cannot be formatted
+within the constrained width, a best effort will be made.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import pprint, sys
+&gt;&gt;&gt; stuff = sys.path[:]
+&gt;&gt;&gt; stuff.insert(0, stuff[:])
+&gt;&gt;&gt; pp = pprint.PrettyPrinter(indent=4)
+&gt;&gt;&gt; pp.pprint(stuff)
+[   [   '',
+        '/usr/local/lib/python1.5',
+        '/usr/local/lib/python1.5/test',
+        '/usr/local/lib/python1.5/sunos5',
+        '/usr/local/lib/python1.5/sharedmodules',
+        '/usr/local/lib/python1.5/tkinter'],
+    '',
+    '/usr/local/lib/python1.5',
+    '/usr/local/lib/python1.5/test',
+    '/usr/local/lib/python1.5/sunos5',
+    '/usr/local/lib/python1.5/sharedmodules',
+    '/usr/local/lib/python1.5/tkinter']
+&gt;&gt;&gt;
+&gt;&gt;&gt; import parser
+&gt;&gt;&gt; tup = parser.ast2tuple(
+...     parser.suite(open('pprint.py').read()))[1][1][1]
+&gt;&gt;&gt; pp = pprint.PrettyPrinter(depth=6)
+&gt;&gt;&gt; pp.pprint(tup)
+(266, (267, (307, (287, (288, (...))))))
+</pre></div>
+</dl>
+
+<p>
+The <tt class="class">PrettyPrinter</tt> class supports several derivative functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-901' xml:id='l2h-901' class="function">pformat</tt></b>(</nobr></td>
+  <td><var>object</var><big>[</big><var>, indent</var><big>[</big><var>,
+width</var><big>[</big><var>, depth</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return the formatted representation of <var>object</var> as a string.  <var>indent</var>,
+<var>width</var> and <var>depth</var> will be passed to the <tt class="class">PrettyPrinter</tt>
+constructor as formatting parameters.
+
+<span class="versionnote">Changed in version 2.4:
+The parameters <var>indent</var>, <var>width</var> and <var>depth</var>
+were added.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-902' xml:id='l2h-902' class="function">pprint</tt></b>(</nobr></td>
+  <td><var>object</var><big>[</big><var>, stream</var><big>[</big><var>,
+indent</var><big>[</big><var>, width</var><big>[</big><var>, depth</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Prints the formatted representation of <var>object</var> on <var>stream</var>,
+followed by a newline.  If <var>stream</var> is omitted, <code>sys.stdout</code>
+is used.  This may be used in the interactive interpreter instead of a
+<tt class="keyword">print</tt> statement for inspecting values.    <var>indent</var>,
+<var>width</var> and <var>depth</var> will be passed to the <tt class="class">PrettyPrinter</tt>
+constructor as formatting parameters.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; stuff = sys.path[:]
+&gt;&gt;&gt; stuff.insert(0, stuff)
+&gt;&gt;&gt; pprint.pprint(stuff)
+[&lt;Recursion on list with id=869440&gt;,
+ '',
+ '/usr/local/lib/python1.5',
+ '/usr/local/lib/python1.5/test',
+ '/usr/local/lib/python1.5/sunos5',
+ '/usr/local/lib/python1.5/sharedmodules',
+ '/usr/local/lib/python1.5/tkinter']
+</pre></div>
+
+<span class="versionnote">Changed in version 2.4:
+The parameters <var>indent</var>, <var>width</var> and <var>depth</var>
+were added.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-903' xml:id='l2h-903' class="function">isreadable</tt></b>(</nobr></td>
+  <td><var>object</var>)</td></tr></table></dt>
+<dd>
+Determine if the formatted representation of <var>object</var> is
+``readable,'' or can be used to reconstruct the value using
+<tt class="function">eval()</tt><a id='l2h-904' xml:id='l2h-904'></a>.  This always returns false for
+recursive objects.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; pprint.isreadable(stuff)
+False
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-905' xml:id='l2h-905' class="function">isrecursive</tt></b>(</nobr></td>
+  <td><var>object</var>)</td></tr></table></dt>
+<dd>
+Determine if <var>object</var> requires a recursive representation.
+</dl>
+
+<p>
+One more support function is also defined:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-906' xml:id='l2h-906' class="function">saferepr</tt></b>(</nobr></td>
+  <td><var>object</var>)</td></tr></table></dt>
+<dd>
+Return a string representation of <var>object</var>, protected against
+recursive data structures.  If the representation of <var>object</var>
+exposes a recursive entry, the recursive reference will be represented
+as "<tt class="samp">&lt;Recursion on <var>typename</var> with id=<var>number</var>&gt;</tt>".  The
+representation is not otherwise formatted.
+</dl>
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; pprint.saferepr(stuff)
+"[&lt;Recursion on list with id=682968&gt;, '', '/usr/local/lib/python1.5', '/usr/loca
+l/lib/python1.5/test', '/usr/local/lib/python1.5/sunos5', '/usr/local/lib/python
+1.5/sharedmodules', '/usr/local/lib/python1.5/tkinter']"
+</pre></div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node117.html">5.18.1 PrettyPrinter Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.17 copy  "
+  href="module-copy.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.18.1 prettyprinter Objects"
+  href="node117.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-copy.html">5.17 copy  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node117.html">5.18.1 PrettyPrinter Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

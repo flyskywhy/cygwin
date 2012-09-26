@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+#
+# Fetch and merge changes from a remote repository
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes the branch name as an argument, defaulting to 'origin'.
+#
+# This is similar to running cg-fetch and cg-merge commands successively.
+# Please refer to the documentation of those commands for more details
+# about the operation. Note that if you are not doing own development
+# but only following some project, it is recommended to use this command
+# instead of `cg-fetch` + `cg-merge` since `cg-update` can handle some
+# additional corner cases (in particular, if the remote branch rebases,
+# `cg-update` will fast-forward instead of doing a tree merge and diverging).
+#
+# Note that in the GIT newspeak, the operation being performed by cg-update
+# is now called 'pull', even though in the past, 'pull' was the name for
+# the operation being now done by cg-fetch, which is even still aliased
+# to cg-pull. Please do not let this confuse you. (Cogito won't call this
+# 'update' operation 'pull', since about everyone but GIT and BK users uses
+# it in the 'fetch' meaning.)
+#
+# OPTIONS
+# -------
+# -f:: Force the complete fetch even if the heads are the same.
+#	Force the complete fetch even if the heads are the same.
+#
+# --squash:: Use "squash" merge to record pending commits as a single merge commit
+#	"Squash" merge - condense all the to-be-merged commits to a single
+#	merge commit. This is not to be used lightly; see the cg-merge
+#	documentation for further details.
+#
+# -v:: Enable verbosity
+#	Display more verbose output - most notably list all the files
+#	touched by the pulled changes.
+#
+# ENVIRONMENT
+# -----------
+# CGFETCH_FLAGS::
+#	Additional flags to pass cg-fetch (useful e.g. for -v -v).
+
+# Testsuite: Largely covered (t9210-update, incomplete coverage; missing:
+# passing the -f, --squash options and CGFETCH_FLAGS)
+
+USAGE="cg-update [-f] [--squash] [-v] [BRANCH_NAME]"
+_git_requires_root=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+force=
+squash=
+verbose=
+while optparse; do
+	if optparse -f; then
+		force=-f
+	elif optparse --squash; then
+		squash=--squash
+	elif optparse -v; then
+		verbose=-v
+	else
+		optfail
+	fi
+done
+
+name="${ARGS[0]}"
+[ "$name" ] || name="$(choose_origin branches "where to update from?")" || exit 1
+
+# cg-merge can do better decision about fast-forwarding if it sees this.
+[ -s "$_git/refs/heads/$name" ] && export _cg_orig_head="$(cat "$_git/refs/heads/$name")"
+
+if [ -s "$_git/branches/$name" ]; then
+	cg-fetch $CGFETCH_FLAGS $force "$name" || exit 1
+else
+	echo "Updating from a local branch."
+fi
+echo
+echo "Applying changes..."
+cg-merge $squash $verbose "$name"

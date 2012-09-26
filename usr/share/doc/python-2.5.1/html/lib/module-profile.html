@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="profile-limits.html" />
+<link rel="prev" href="node796.html" />
+<link rel="parent" href="profile.html" />
+<link rel="next" href="profile-stats.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>25.4 Reference Manual - profile and cProfile</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.3 what Is Deterministic"
+  href="node796.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.4.1 the Stats Class"
+  href="profile-stats.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node796.html">25.3 What Is Deterministic</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="profile-stats.html">25.4.1 The Stats Class</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0027400000000000000000">
+25.4 Reference Manual - <tt class="module">profile</tt> and <tt class="module">cProfile</tt></a>
+</h1>
+
+<p>
+<a name="module-profile"></a><a name="module-cProfile"></a>
+
+<p>
+The primary entry point for the profiler is the global function
+<tt class="function">profile.run()</tt> (resp. <tt class="function">cProfile.run()</tt>).
+It is typically used to create any profile
+information.  The reports are formatted and printed using methods of
+the class <tt class="class">pstats.Stats</tt>.  The following is a description of all
+of these standard entry points and functions.  For a more in-depth
+view of some of the code, consider reading the later section on
+Profiler Extensions, which includes discussion of how to derive
+``better'' profilers from the classes presented, or reading the source
+code for these modules.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5093' xml:id='l2h-5093' class="function">run</tt></b>(</nobr></td>
+  <td><var>command</var><big>[</big><var>, filename</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+This function takes a single argument that can be passed to the
+<tt class="keyword">exec</tt> statement, and an optional file name.  In all cases this
+routine attempts to <tt class="keyword">exec</tt> its first argument, and gather profiling
+statistics from the execution. If no file name is present, then this
+function automatically prints a simple profiling report, sorted by the
+standard name string (file/line/function-name) that is presented in
+each line.  The following is a typical output from such a call:
+
+<p>
+<div class="verbatim"><pre>
+      2706 function calls (2004 primitive calls) in 4.504 CPU seconds
+
+Ordered by: standard name
+
+ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     2    0.006    0.003    0.953    0.477 pobject.py:75(save_objects)
+  43/3    0.533    0.012    0.749    0.250 pobject.py:99(evaluate)
+ ...
+</pre></div>
+
+<p>
+The first line indicates that 2706 calls were
+monitored.  Of those calls, 2004 were <i class="dfn">primitive</i>.  We define
+<i class="dfn">primitive</i> to mean that the call was not induced via recursion.
+The next line: <code>Ordered by: standard name</code>, indicates that
+the text string in the far right column was used to sort the output.
+The column headings include:
+
+<p>
+<dl>
+<dt><strong>ncalls </strong></dt>
+<dd>for the number of calls,
+
+<p>
+</dd>
+<dt><strong>tottime </strong></dt>
+<dd>for the total time spent in the given function (and excluding time
+made in calls to sub-functions),
+
+<p>
+</dd>
+<dt><strong>percall </strong></dt>
+<dd>is the quotient of <code>tottime</code> divided by <code>ncalls</code>
+
+<p>
+</dd>
+<dt><strong>cumtime </strong></dt>
+<dd>is the total time spent in this and all subfunctions (from invocation
+till exit). This figure is accurate <em>even</em> for recursive
+functions.
+
+<p>
+</dd>
+<dt><strong>percall </strong></dt>
+<dd>is the quotient of <code>cumtime</code> divided by primitive calls
+
+<p>
+</dd>
+<dt><strong>filename:lineno(function) </strong></dt>
+<dd>provides the respective data of each function
+
+<p>
+</dd>
+</dl>
+
+<p>
+When there are two numbers in the first column (for example,
+"<tt class="samp">43/3</tt>"), then the latter is the number of primitive calls, and
+the former is the actual number of calls.  Note that when the function
+does not recurse, these two values are the same, and only the single
+figure is printed.
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5094' xml:id='l2h-5094' class="function">runctx</tt></b>(</nobr></td>
+  <td><var>command, globals, locals</var><big>[</big><var>, filename</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This function is similar to <tt class="function">run()</tt>, with added
+arguments to supply the globals and locals dictionaries for the
+<var>command</var> string.
+</dl>
+
+<p>
+Analysis of the profiler data is done using the <tt class="class">Stats</tt> class.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+The <tt class="class">Stats</tt> class is defined in the <tt class="module">pstats</tt> module.</span>
+
+<p>
+<a id='l2h-5096' xml:id='l2h-5096'></a>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5095' xml:id='l2h-5095' class="class">Stats</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, stream=sys.stdout</var><big>[</big><var>, ...</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This class constructor creates an instance of a ``statistics object''
+from a <var>filename</var> (or set of filenames).  <tt class="class">Stats</tt> objects are
+manipulated by methods, in order to print useful reports.  You may specify
+an alternate output stream by giving the keyword argument, <code>stream</code>.
+
+<p>
+The file selected by the above constructor must have been created by the
+corresponding version of <tt class="module">profile</tt> or <tt class="module">cProfile</tt>.  To be
+specific, there is <em>no</em> file compatibility guaranteed with future
+versions of this profiler, and there is no compatibility with files produced
+by other profilers.
+
+<p>
+If several files are provided, all the statistics for identical
+functions will be coalesced, so that an overall view of several
+processes can be considered in a single report.  If additional files
+need to be combined with data in an existing <tt class="class">Stats</tt> object, the
+<tt class="method">add()</tt> method can be used.
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+The <var>stream</var> parameter was added.</span>
+
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="profile-stats.html">25.4.1 The <tt class="class">Stats</tt> Class</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.3 what Is Deterministic"
+  href="node796.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.4.1 the Stats Class"
+  href="profile-stats.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node796.html">25.3 What Is Deterministic</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="profile-stats.html">25.4.1 The Stats Class</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

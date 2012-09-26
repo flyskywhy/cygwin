@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="parseTupleAndKeywords.html" />
+<link rel="prev" href="callingPython.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="parseTupleAndKeywords.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.7 Extracting Parameters in Extension Functions
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.6 calling Python Functions"
+  href="callingPython.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.8 keyword Parameters for"
+  href="parseTupleAndKeywords.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="callingPython.html">1.6 Calling Python Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="parseTupleAndKeywords.html">1.8 Keyword Parameters for</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION003700000000000000000"></a><a name="parseTuple"></a>
+<br>
+1.7 Extracting Parameters in Extension Functions
+         
+</h1>
+
+<p>
+<a id='l2h-2' xml:id='l2h-2'></a>
+
+<p>
+The <tt class="cfunction">PyArg_ParseTuple()</tt> function is declared as follows:
+
+<p>
+<div class="verbatim"><pre>
+int PyArg_ParseTuple(PyObject *arg, char *format, ...);
+</pre></div>
+
+<p>
+The <var>arg</var> argument must be a tuple object containing an argument
+list passed from Python to a C function.  The <var>format</var> argument
+must be a format string, whose syntax is explained in
+``<a class="ulink" href="../api/arg-parsing.html"
+  >Parsing arguments and building
+values</a>'' in the
+<em class="citetitle"><a
+ href="../api/api.html"
+ title="Python/C API Reference Manual"
+ >Python/C API Reference Manual</a></em>.  The
+remaining arguments must be addresses of variables whose type is
+determined by the format string.
+
+<p>
+Note that while <tt class="cfunction">PyArg_ParseTuple()</tt> checks that the Python
+arguments have the required types, it cannot check the validity of the
+addresses of C variables passed to the call: if you make mistakes
+there, your code will probably crash or at least overwrite random bits
+in memory.  So be careful!
+
+<p>
+Note that any Python object references which are provided to the
+caller are <em>borrowed</em> references; do not decrement their
+reference count!
+
+<p>
+Some example calls:
+
+<p>
+<div class="verbatim"><pre>
+    int ok;
+    int i, j;
+    long k, l;
+    const char *s;
+    int size;
+
+    ok = PyArg_ParseTuple(args, ""); /* No arguments */
+        /* Python call: f() */
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+    ok = PyArg_ParseTuple(args, "s", &amp;s); /* A string */
+        /* Possible Python call: f('whoops!') */
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+    ok = PyArg_ParseTuple(args, "lls", &amp;k, &amp;l, &amp;s); /* Two longs and a string */
+        /* Possible Python call: f(1, 2, 'three') */
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+    ok = PyArg_ParseTuple(args, "(ii)s#", &amp;i, &amp;j, &amp;s, &amp;size);
+        /* A pair of ints and a string, whose size is also returned */
+        /* Possible Python call: f((1, 2), 'three') */
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+    {
+        const char *file;
+        const char *mode = "r";
+        int bufsize = 0;
+        ok = PyArg_ParseTuple(args, "s|si", &amp;file, &amp;mode, &amp;bufsize);
+        /* A string, and optionally another string and an integer */
+        /* Possible Python calls:
+           f('spam')
+           f('spam', 'w')
+           f('spam', 'wb', 100000) */
+    }
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+    {
+        int left, top, right, bottom, h, v;
+        ok = PyArg_ParseTuple(args, "((ii)(ii))(ii)",
+                 &amp;left, &amp;top, &amp;right, &amp;bottom, &amp;h, &amp;v);
+        /* A rectangle and a point */
+        /* Possible Python call:
+           f(((0, 0), (400, 300)), (10, 10)) */
+    }
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+    {
+        Py_complex c;
+        ok = PyArg_ParseTuple(args, "D:myfunction", &amp;c);
+        /* a complex, also providing a function name for errors */
+        /* Possible Python call: myfunction(1+2j) */
+    }
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.6 calling Python Functions"
+  href="callingPython.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.8 keyword Parameters for"
+  href="parseTupleAndKeywords.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="callingPython.html">1.6 Calling Python Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="parseTupleAndKeywords.html">1.8 Keyword Parameters for</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

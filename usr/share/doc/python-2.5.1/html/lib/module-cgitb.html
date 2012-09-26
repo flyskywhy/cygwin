@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-wsgiref.html" />
+<link rel="prev" href="module-cgi.html" />
+<link rel="parent" href="internet.html" />
+<link rel="next" href="module-wsgiref.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.3 cgitb -- Traceback manager for CGI scripts</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.10 common problems and"
+  href="node567.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node567.html">18.2.10 Common problems and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.html">18.4 wsgiref  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0020300000000000000000">
+18.3 <tt class="module">cgitb</tt> --
+         Traceback manager for CGI scripts</a>
+</h1>
+
+<p>
+<a name="module-cgitb"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.2.</span>
+
+<a id='l2h-3837' xml:id='l2h-3837'></a>
+
+<p>
+The <tt class="module">cgitb</tt> module provides a special exception handler for Python
+scripts.  (Its name is a bit misleading.  It was originally designed to
+display extensive traceback information in HTML for CGI scripts.  It was
+later generalized to also display this information in plain text.)  After
+this module is activated, if an uncaught exception occurs, a detailed,
+formatted report will be displayed.  The report
+includes a traceback showing excerpts of the source code for each level,
+as well as the values of the arguments and local variables to currently
+running functions, to help you debug the problem.  Optionally, you can
+save this information to a file instead of sending it to the browser.
+
+<p>
+To enable this feature, simply add one line to the top of your CGI script:
+
+<p>
+<div class="verbatim"><pre>
+import cgitb; cgitb.enable()
+</pre></div>
+
+<p>
+The options to the <tt class="function">enable()</tt> function control whether the
+report is displayed in the browser and whether the report is logged
+to a file for later analysis.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3833' xml:id='l2h-3833' class="function">enable</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>display</var><big>[</big><var>, logdir</var><big>[</big><var>,
+                         context</var><big>[</big><var>, format</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  This function causes the <tt class="module">cgitb</tt> module to take over the
+  interpreter's default handling for exceptions by setting the
+  value of <code><tt class="module"><a href="module-sys.html">sys</a></tt>.excepthook</code>.
+  <a id='l2h-3835' xml:id='l2h-3835'></a>
+<p>
+The optional argument <var>display</var> defaults to <code>1</code> and can be set
+  to <code>0</code> to suppress sending the traceback to the browser.
+  If the argument <var>logdir</var> is present, the traceback reports are
+  written to files.  The value of <var>logdir</var> should be a directory
+  where these files will be placed.
+  The optional argument <var>context</var> is the number of lines of
+  context to display around the current line of source code in the
+  traceback; this defaults to <code>5</code>.
+  If the optional argument <var>format</var> is <code>"html"</code>, the output is
+  formatted as HTML.  Any other value forces plain text output.  The default
+  value is <code>"html"</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3836' xml:id='l2h-3836' class="function">handler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>info</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  This function handles an exception using the default settings
+  (that is, show a report in the browser, but don't log to a file).
+  This can be used when you've caught an exception and want to
+  report it using <tt class="module">cgitb</tt>.  The optional <var>info</var> argument
+  should be a 3-tuple containing an exception type, exception
+  value, and traceback object, exactly like the tuple returned by
+  <code><tt class="module"><a href="module-sys.html">sys</a></tt>.exc_info()</code>.  If the <var>info</var> argument
+  is not supplied, the current exception is obtained from
+  <code><tt class="module"><a href="module-sys.html">sys</a></tt>.exc_info()</code>.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.10 common problems and"
+  href="node567.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node567.html">18.2.10 Common problems and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.html">18.4 wsgiref  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

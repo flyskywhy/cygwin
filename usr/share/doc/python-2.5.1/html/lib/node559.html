@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node560.html" />
+<link rel="prev" href="cgi-intro.html" />
+<link rel="parent" href="module-cgi.html" />
+<link rel="next" href="node560.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.2.2 Using the cgi module</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.1 Introduction"
+  href="cgi-intro.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.3 higher Level Interface"
+  href="node560.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cgi-intro.html">18.2.1 Introduction</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node560.html">18.2.3 Higher Level Interface</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020220000000000000000">
+18.2.2 Using the cgi module</a>
+</h2>
+<a name="Using_the_cgi_module"></a>
+<p>
+Begin by writing "<tt class="samp">import cgi</tt>".  Do not use "<tt class="samp">from cgi import
+*</tt>" -- the module defines all sorts of names for its own use or for
+backward compatibility that you don't want in your namespace.
+
+<p>
+When you write a new script, consider adding the line:
+
+<p>
+<div class="verbatim"><pre>
+import cgitb; cgitb.enable()
+</pre></div>
+
+<p>
+This activates a special exception handler that will display detailed
+reports in the Web browser if any errors occur.  If you'd rather not
+show the guts of your program to users of your script, you can have
+the reports saved to files instead, with a line like this:
+
+<p>
+<div class="verbatim"><pre>
+import cgitb; cgitb.enable(display=0, logdir="/tmp")
+</pre></div>
+
+<p>
+It's very helpful to use this feature during script development.
+The reports produced by <tt class="module"><a href="module-cgitb.html">cgitb</a></tt> provide information that
+can save you a lot of time in tracking down bugs.  You can always
+remove the <code>cgitb</code> line later when you have tested your script
+and are confident that it works correctly.
+
+<p>
+To get at submitted form data,
+it's best to use the <tt class="class">FieldStorage</tt> class.  The other classes
+defined in this module are provided mostly for backward compatibility.
+Instantiate it exactly once, without arguments.  This reads the form
+contents from standard input or the environment (depending on the
+value of various environment variables set according to the CGI
+standard).  Since it may consume standard input, it should be
+instantiated only once.
+
+<p>
+The <tt class="class">FieldStorage</tt> instance can be indexed like a Python
+dictionary, and also supports the standard dictionary methods
+<tt class="method">has_key()</tt> and <tt class="method">keys()</tt>.  The built-in <tt class="function">len()</tt>
+is also supported.  Form fields containing empty strings are ignored
+and do not appear in the dictionary; to keep such values, provide
+a true value for the optional <var>keep_blank_values</var> keyword
+parameter when creating the <tt class="class">FieldStorage</tt> instance.
+
+<p>
+For instance, the following code (which assumes that the 
+<span class="mailheader">Content-Type:</span> header and blank line have already been
+printed) checks that the fields <code>name</code> and <code>addr</code> are both
+set to a non-empty string:
+
+<p>
+<div class="verbatim"><pre>
+form = cgi.FieldStorage()
+if not (form.has_key("name") and form.has_key("addr")):
+    print "&lt;H1&gt;Error&lt;/H1&gt;"
+    print "Please fill in the name and addr fields."
+    return
+print "&lt;p&gt;name:", form["name"].value
+print "&lt;p&gt;addr:", form["addr"].value
+...further form processing here...
+</pre></div>
+
+<p>
+Here the fields, accessed through "<tt class="samp">form[<var>key</var>]</tt>", are
+themselves instances of <tt class="class">FieldStorage</tt> (or
+<tt class="class">MiniFieldStorage</tt>, depending on the form encoding).
+The <tt class="member">value</tt> attribute of the instance yields the string value
+of the field.  The <tt class="method">getvalue()</tt> method returns this string value
+directly; it also accepts an optional second argument as a default to
+return if the requested key is not present.
+
+<p>
+If the submitted form data contains more than one field with the same
+name, the object retrieved by "<tt class="samp">form[<var>key</var>]</tt>" is not a
+<tt class="class">FieldStorage</tt> or <tt class="class">MiniFieldStorage</tt>
+instance but a list of such instances.  Similarly, in this situation,
+"<tt class="samp">form.getvalue(<var>key</var>)</tt>" would return a list of strings.
+If you expect this possibility
+(when your HTML form contains multiple fields with the same name), use
+the <tt class="function">getlist()</tt> function, which always returns a list of values (so that you
+do not need to special-case the single item case).  For example, this
+code concatenates any number of username fields, separated by
+commas:
+
+<p>
+<div class="verbatim"><pre>
+value = form.getlist("username")
+usernames = ",".join(value)
+</pre></div>
+
+<p>
+If a field represents an uploaded file, accessing the value via the
+<tt class="member">value</tt> attribute or the <tt class="function">getvalue()</tt> method reads the
+entire file in memory as a string.  This may not be what you want.
+You can test for an uploaded file by testing either the <tt class="member">filename</tt>
+attribute or the <tt class="member">file</tt> attribute.  You can then read the data at
+leisure from the <tt class="member">file</tt> attribute:
+
+<p>
+<div class="verbatim"><pre>
+fileitem = form["userfile"]
+if fileitem.file:
+    # It's an uploaded file; count lines
+    linecount = 0
+    while 1:
+        line = fileitem.file.readline()
+        if not line: break
+        linecount = linecount + 1
+</pre></div>
+
+<p>
+The file upload draft standard entertains the possibility of uploading
+multiple files from one field (using a recursive
+<span class="mimetype">multipart/*</span> encoding).  When this occurs, the item will be
+a dictionary-like <tt class="class">FieldStorage</tt> item.  This can be determined
+by testing its <tt class="member">type</tt> attribute, which should be
+<span class="mimetype">multipart/form-data</span> (or perhaps another MIME type matching
+<span class="mimetype">multipart/*</span>).  In this case, it can be iterated over
+recursively just like the top-level form object.
+
+<p>
+When a form is submitted in the ``old'' format (as the query string or
+as a single data part of type
+<span class="mimetype">application/x-www-form-urlencoded</span>), the items will actually
+be instances of the class <tt class="class">MiniFieldStorage</tt>.  In this case, the
+<tt class="member">list</tt>, <tt class="member">file</tt>, and <tt class="member">filename</tt> attributes are
+always <code>None</code>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.1 Introduction"
+  href="cgi-intro.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.3 higher Level Interface"
+  href="node560.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cgi-intro.html">18.2.1 Introduction</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node560.html">18.2.3 Higher Level Interface</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

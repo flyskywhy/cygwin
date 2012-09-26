@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+#
+# Mark certain commit with a tag
+# Copyright (c) Petr Baudis, 2005
+#
+# Creates a tag referencing the given commit (or 'HEAD'). You can then
+# use the tag anywhere you specify a commit or tree ID.
+#
+# cg-tag will try to sign the tag if you give it the -s option.
+# You can override the default key choice by passing it the -k argument.
+#
+# Takes the tag name and optionally the associated ID as arguments.
+# When the standard input is not a terminal, it will accept the tag
+# description on stdin.
+#
+# OPTIONS
+# -------
+# -e:: Run tag description message editor
+#	Open editor for the tag description message.
+#
+# -f:: Overwrite existing tag if exists
+#	This will make cg-tag silently overwrite the tag if it already
+#	exists.
+#
+# -m MESSAGE:: Specify tag description message
+#	Message associated with the tag, describing it. Multiple -m
+#	parameters will cause several description paragraphs to appear.
+#
+# -M FILE:: Read tag description message from a file
+#	Include tag description message from a file (this has the same
+#	effect as if you would cat it to stdin).
+#
+# -k KEYNAME:: Use the given KEYNAME to sign the tag
+#	Use the given key to sign the tag, instead of the default one.
+#	You can use any key identifier GPG recognizes - the argument
+#	is passed verbatim as the '--default-key' argument to GPG.
+#
+# -s:: Sign the tag by your private key using GPG.
+#	Sign the tag by your private key using GPG.
+#
+# OBJECT_ID::
+#	This is most usually the ID of the commit to tag. Tagging
+#	other objects than commits is possible, but rather "unusual".
+
+# Testsuite: Marginal (part of t9206-merge-multi-base)
+
+USAGE="cg-tag [-m MESSAGE]... [-e] [-s] [OTHER_OPTIONS] TAG_NAME [OBJECT_ID]"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+sign=
+keyname=
+msgs=()
+msgfile=
+editor=
+force=
+while optparse; do
+	if optparse -s; then
+		sign=1
+	elif optparse -k=; then
+		keyname="$OPTARG"
+	elif optparse -m=; then
+		msgs[${#msgs[@]}]="$OPTARG"
+	elif optparse -d=; then
+		# 20060407 cogito-0.17.1-g382c125
+		warn -b "cg-tag -d is obsolete, please use cg-tag -m instead"
+		msgs[${#msgs[@]}]="$OPTARG"
+	elif optparse -M=; then
+		msgfile="$OPTARG"
+	elif optparse -e; then
+		editor=1
+	elif optparse -f; then
+		force=1
+	else
+		optfail
+	fi
+done
+
+name="${ARGS[0]}"
+id="${ARGS[1]}"
+
+[ -n "$name" ] || usage
+
+id="$(cg-object-id -n "$id")" || exit 1
+type="$(git cat-file -t "$id")"
+id="${id% *}"
+
+git check-ref-format "refs/tags/$name" || \
+	die "name contains invalid characters"
+
+mkdir -p "$_git/refs/tags"
+[ "$force" ] || [ ! -s "$_git/refs/tags/$name" ] || \
+	die "tag already exists ($name)"
+
+[ "$id" ] || id="$(cat "$_git/$(git symbolic-ref HEAD)")"
+
+
+tagdir="$(mktemp -d -t gittag.XXXXXX)"
+
+LOGMSG="$tagdir/log"
+LOGMSG2="$tagdir/log2"
+
+written=
+
+for msg in "${msgs[@]}"; do
+	[ "$written" ] && echo >>"$LOGMSG"
+	echo "$msg" | fmt -s >>"$LOGMSG"
+	written=1
+done
+
+if [ "$msgfile" ]; then
+	[ "$written" ] && echo >>"$LOGMSG"
+	cat "$msgfile" >>"$LOGMSG" || exit 1
+	written=1
+fi
+
+# Always have at least one blank line, to ease the editing for
+# the poor people whose text editor has no 'O' command.
+[ "$written" ] || { editor_shalluse "$editor" && echo >>"$LOGMSG"; }
+
+editor_comment_start tag
+echo "CG: You can edit the following fields to adjust cg-tag's behaviour." >>"$LOGMSG"
+echo "CG:" >>"$LOGMSG"
+signyn=No; [ "$sign" ] && signyn=Yes
+echo "CG: Sign the tag: $signyn" >>"$LOGMSG"
+[ -n "$keyname" ] || keyname="(default)"
+echo "CG: GPG key name: $keyname" >>"$LOGMSG"
+echo "CG:" >>"$LOGMSG"
+editor_comment_end tag
+editor_msg_end
+
+cp "$LOGMSG" "$LOGMSG2"
+if editor_shalluse "$editor"; then
+	if [ "$editor" ] && ! editor $commitalways tag t; then
+		rm -rf "$tagdir"
+		echo "Tag message not modified, tagging aborted" >&2
+		exit 1
+	fi
+	editor_parse_setif signyn "Sign the tag"
+	case "$signyn" in
+		y|Y|Yes|yes|1|true) sign=1;;
+		*) sign=;;
+	esac
+	editor_parse_setif keyname "GPG key name"
+	[ x"$keyname" = x"(default)" ] && keyname=
+else
+	cat >>"$LOGMSG2"
+fi
+
+editor_parse_clean
+rm "$LOGMSG2"
+
+
+cat <<SIGEND >"$tagdir/tag"
+object $id
+type $type
+tag $name
+tagger $(git var GIT_COMMITTER_IDENT)
+SIGEND
+if [ -s "$LOGMSG" ]; then
+	echo >>"$tagdir/tag"
+	cat "$LOGMSG" >>"$tagdir/tag"
+fi
+if [ "$sign" ]; then
+	echo >>"$tagdir/tag"
+	if ! gpg ${keyname:+--default-key "$keyname"} -bsa "$tagdir/tag"; then
+		rm -rf "$tagdir"
+		die "error signing the tag"
+	fi
+	cat "$tagdir/tag.asc" >>"$tagdir/tag"
+fi
+if ! git mktag <"$tagdir/tag" >"$_git/refs/tags/$name"; then
+	rm -rf "$tagdir"
+	die "error creating tag"
+fi
+echo "Tagged $id as $name"
+
+rm -rf "$tagdir"

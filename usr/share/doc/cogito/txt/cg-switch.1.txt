@@ -1,0 +1,111 @@
+cg-switch(1)
+============
+
+NAME
+----
+cg-switch - switch the working tree to a different (or new) local branch
+
+SYNOPSIS
+--------
+cg-switch [-f] [-l | -n | -p] [-c | -r COMMIT_ID] BRANCH
+
+DESCRIPTION
+-----------
+gitlink:cg-switch[1] can switch your current local branch (and working copy)
+to an existing branch, or create a new branch based on a given commit.
+
+Terminology note: This command concerns local branches (also called
+"heads"), not remote branches (those managed by gitlink:cg-branch-add[1]).
+
+Note that gitlink:cg-switch[1] is meant for permanent switching of your current
+local branch (permanent in the sense that you are going to work on it;
+you can obviously gitlink:cg-switch[1] again later). If you want to just casually
+explore the current state of a particular branch of commit, use gitlink:cg-seek[1].
+
+OPTIONS
+-------
+
+--
+-c::
+	Create a new branch of given name, based on your current commit
+	(HEAD). This option is equivalent to specifying '-r HEAD'. If
+	'-f' is passed and the branch already exists, it is forcibly
+	repointed to point to the current commit.
+
+-f::
+	Force the branch's head pointer to be updated to whatever you
+	passed as the '-r' argument even if the branch already exists.
+	WARNING: The pointer to the original contents of the branch will
+	be lost! The contents itself will not be deleted right away,
+	`git fsck-objects --unreachable` might help you to find it.
+	Besides, this can get very troublesome if you are pushing the
+	branch out - please refer to the documentation of a close
+	relative, gitlink:cg-admin-uncommit[1].
+
+-l::
+	If your working tree has uncommitted local changes, the default
+	behaviour is that the changes will be reapplied to the new
+	branch after switching. With this option, however, the local
+	changes will be "kept" with your previous branch, you will
+	get a pristine tree of the new branch and when you switch back
+	to the original branch you will also get back the local changes.
+	(You do not need to pass any special switches when switching
+	back, '-l' has effect only on the branch you are switching _away_
+	from.)
+
+-n::
+	Do not switch your current branch to the given branch. This
+	will make cg-switch to only create or update the branch, but
+	leave your working copy alone.
+
+-p::
+	Do not touch the working copy when switching. This _will_ switch
+	your current branch, but the checked out working copy will have
+	the original contents kept (so further gitlink:cg-diff[1] will list a lot
+	of changes, relative to the new branch).
+
+-r COMMIT_ID::
+	Point the branch at the given commit. Required when creating
+	a new branch. When switching to an existing branch, the branch
+	pointer is modified if '-r' is passed and confirmed by '-f'.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-switch[1].
+--
+
+
+EXAMPLE USAGE
+-------------
+To create a "v1.x" branch based on the commit "v1.0" and switch the
+working copy to it, making it your current branch, do:
+
+	$ cg-switch -r v1.0 v1.x
+
+If you want to create the branch (let's say based on the current
+commit) but don't switch your working copy to it (so that your
+current branch stays the same as before), do:
+
+	$ cg-switch -n -c v1.x
+
+If you want to go back to the 'master' branch, just do:
+
+	$ cg-switch master
+
+To change the "v1.x" branch to refer to the latest commit on the
+"testing" branch, do (WARNING: you will lose the pointer to the
+original contents of the "v1.x" branch, be careful!):
+
+	$ cg-switch -f -r testing v1.x
+
+COPYRIGHT
+---------
+Copyright (C) Yann Dirson, Petr Baudis  2005
+
+SEE ALSO
+--------
+cg-switch is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

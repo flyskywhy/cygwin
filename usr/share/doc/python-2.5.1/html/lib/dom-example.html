@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="minidom-and-dom.html" />
+<link rel="prev" href="dom-objects.html" />
+<link rel="parent" href="module-xml.dom.minidom.html" />
+<link rel="next" href="minidom-and-dom.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>8.7.2 DOM Example </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.7.1 dom Objects"
+  href="dom-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8.7 xml.dom.minidom  "
+  href="module-xml.dom.minidom.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.7.3 minidom and the"
+  href="minidom-and-dom.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dom-objects.html">8.7.1 DOM Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-xml.dom.minidom.html">8.7 xml.dom.minidom  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="minidom-and-dom.html">8.7.3 minidom and the</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0010720000000000000000"></a><a name="dom-example"></a>
+<br>
+8.7.2 DOM Example 
+</h2>
+
+<p>
+This example program is a fairly realistic example of a simple
+program. In this particular case, we do not take much advantage
+of the flexibility of the DOM.
+
+<p>
+<div class="verbatim">
+<pre>import xml.dom.minidom
+
+document = """\
+&lt;slideshow&gt;
+&lt;title&gt;Demo slideshow&lt;/title&gt;
+&lt;slide&gt;&lt;title&gt;Slide title&lt;/title&gt;
+&lt;point&gt;This is a demo&lt;/point&gt;
+&lt;point&gt;Of a program for processing slides&lt;/point&gt;
+&lt;/slide&gt;
+
+&lt;slide&gt;&lt;title&gt;Another demo slide&lt;/title&gt;
+&lt;point&gt;It is important&lt;/point&gt;
+&lt;point&gt;To have more than&lt;/point&gt;
+&lt;point&gt;one slide&lt;/point&gt;
+&lt;/slide&gt;
+&lt;/slideshow&gt;
+"""
+
+dom = xml.dom.minidom.parseString(document)
+
+def getText(nodelist):
+    rc = ""
+    for node in nodelist:
+        if node.nodeType == node.TEXT_NODE:
+            rc = rc + node.data
+    return rc
+
+def handleSlideshow(slideshow):
+    print "&lt;html&gt;"
+    handleSlideshowTitle(slideshow.getElementsByTagName("title")[0])
+    slides = slideshow.getElementsByTagName("slide")
+    handleToc(slides)
+    handleSlides(slides)
+    print "&lt;/html&gt;"
+
+def handleSlides(slides):
+    for slide in slides:
+        handleSlide(slide)
+
+def handleSlide(slide):
+    handleSlideTitle(slide.getElementsByTagName("title")[0])
+    handlePoints(slide.getElementsByTagName("point"))
+
+def handleSlideshowTitle(title):
+    print "&lt;title&gt;%s&lt;/title&gt;" % getText(title.childNodes)
+
+def handleSlideTitle(title):
+    print "&lt;h2&gt;%s&lt;/h2&gt;" % getText(title.childNodes)
+
+def handlePoints(points):
+    print "&lt;ul&gt;"
+    for point in points:
+        handlePoint(point)
+    print "&lt;/ul&gt;"
+
+def handlePoint(point):
+    print "&lt;li&gt;%s&lt;/li&gt;" % getText(point.childNodes)
+
+def handleToc(slides):
+    for slide in slides:
+        title = slide.getElementsByTagName("title")[0]
+        print "&lt;p&gt;%s&lt;/p&gt;" % getText(title.childNodes)
+
+handleSlideshow(dom)
+</pre>
+<div class="footer">
+<a href="minidom-example.txt" type="text/plain">Download as text (original file name: <span class="file">minidom-example.py</span>).</a>
+</div></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.7.1 dom Objects"
+  href="dom-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8.7 xml.dom.minidom  "
+  href="module-xml.dom.minidom.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.7.3 minidom and the"
+  href="minidom-and-dom.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dom-objects.html">8.7.1 DOM Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-xml.dom.minidom.html">8.7 xml.dom.minidom  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="minidom-and-dom.html">8.7.3 minidom and the</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-distutils.unixccompiler.html" />
+<link rel="prev" href="module-distutils.core.html" />
+<link rel="parent" href="api-reference.html" />
+<link rel="next" href="module-distutils.unixccompiler.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.2 distutils.ccompiler -- CCompiler base class</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.1 distutils.core  "
+  href="module-distutils.core.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.3 distutils.unixccompiler  "
+  href="module-distutils.unixccompiler.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.core.html">11.1 distutils.core  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.unixccompiler.html">11.3 distutils.unixccompiler  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0011200000000000000000">
+11.2 <tt class="module">distutils.ccompiler</tt> -- CCompiler base class</a>
+</h1>
+<a name="module-distutils.ccompiler"></a>
+
+<p>
+This module provides the abstract base class for the <tt class="class">CCompiler</tt> 
+classes.  A <tt class="class">CCompiler</tt> instance can be used for all the compile 
+and link steps needed to build a single project. Methods are provided to 
+set options for the compiler -- macro definitions, include directories, 
+link path, libraries and the like.
+
+<p>
+This module provides the following functions.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-13' xml:id='l2h-13' class="function">gen_lib_options</tt></b>(</nobr></td>
+  <td><var>compiler, library_dirs, runtime_library_dirs, libraries</var>)</td></tr></table></dt>
+<dd>
+Generate linker options for searching library directories and
+linking with specific libraries.  <var>libraries</var> and <var>library_dirs</var> are,
+respectively, lists of library names (not filenames!) and search
+directories.  Returns a list of command-line options suitable for use
+with some compiler (depending on the two format strings passed in).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-14' xml:id='l2h-14' class="function">gen_preprocess_options</tt></b>(</nobr></td>
+  <td><var>macros, include_dirs</var>)</td></tr></table></dt>
+<dd>
+Generate C pre-processor options (<b class="programopt">-D</b>, <b class="programopt">-U</b>,
+<b class="programopt">-I</b>) as used by at least
+two types of compilers: the typical <span class="Unix">Unix</span> compiler and Visual C++.
+<var>macros</var> is the usual thing, a list of 1- or 2-tuples, where
+<code>(<var>name</var>,)</code> means undefine (<b class="programopt">-U</b>) macro <var>name</var>,
+and <code>(<var>name</var>, <var>value</var>)</code> means define (<b class="programopt">-D</b>)
+macro <var>name</var> to <var>value</var>.  <var>include_dirs</var> is just a list of
+directory names to be added to the header file search path (<b class="programopt">-I</b>).
+Returns a list of command-line options suitable for either <span class="Unix">Unix</span> compilers
+or Visual C++.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-15' xml:id='l2h-15' class="function">get_default_compiler</tt></b>(</nobr></td>
+  <td><var>osname, platform</var>)</td></tr></table></dt>
+<dd>
+Determine the default compiler to use for the given platform.
+
+<p>
+<var>osname</var> should be one of the standard Python OS names (i.e. the
+ones returned by <code>os.name</code>) and <var>platform</var> the common value
+returned by <code>sys.platform</code> for the platform in question.
+
+<p>
+The default values are <code>os.name</code> and <code>sys.platform</code> in case the
+parameters are not given.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-16' xml:id='l2h-16' class="function">new_compiler</tt></b>(</nobr></td>
+  <td><var>plat=<code>None</code>, compiler=<code>None</code>, verbose=<code>0</code>, dry_run=<code>0</code>, force=<code>0</code></var>)</td></tr></table></dt>
+<dd>
+Factory function to generate an instance of some CCompiler subclass
+for the supplied platform/compiler combination. <var>plat</var> defaults
+to <code>os.name</code> (eg. <code>'posix'</code>, <code>'nt'</code>), and <var>compiler</var> 
+defaults to the default compiler for that platform. Currently only
+<code>'posix'</code> and <code>'nt'</code> are supported, and the default
+compilers are ``traditional <span class="Unix">Unix</span> interface'' (<tt class="class">UnixCCompiler</tt>
+class) and Visual C++(<tt class="class">MSVCCompiler</tt> class).  Note that it's
+perfectly possible to ask for a <span class="Unix">Unix</span> compiler object under Windows,
+and a Microsoft compiler object under <span class="Unix">Unix</span>--if you supply a value
+for <var>compiler</var>, <var>plat</var> is ignored.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-17' xml:id='l2h-17' class="function">show_compilers</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Print list of available compilers (used by the
+<b class="programopt">--help-compiler</b> options to <code class="du-command">build</code>,
+<code class="du-command">build_ext</code>, <code class="du-command">build_clib</code>).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-18' xml:id='l2h-18' class="class">CCompiler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>verbose=<code>0</code>, dry_run=<code>0</code>, force=<code>0</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+The abstract base class <tt class="class">CCompiler</tt> defines the interface that 
+must be implemented by real compiler classes.  The class also has 
+some utility methods used by several compiler classes.
+
+<p>
+The basic idea behind a compiler abstraction class is that each
+instance can be used for all the compile/link steps in building a
+single project.  Thus, attributes common to all of those compile and
+link steps -- include directories, macros to define, libraries to link
+against, etc. -- are attributes of the compiler instance.  To allow for
+variability in how individual files are treated, most of those
+attributes may be varied on a per-compilation or per-link basis.
+
+<p>
+The constructor for each subclass creates an instance of the Compiler
+object. Flags are <var>verbose</var> (show verbose output), <var>dry_run</var>
+(don't actually execute the steps) and <var>force</var> (rebuild
+everything, regardless of dependencies). All of these flags default to
+<code>0</code> (off). Note that you probably don't want to instantiate
+<tt class="class">CCompiler</tt> or one of its subclasses directly - use the
+<tt class="function">distutils.CCompiler.new_compiler()</tt> factory function
+instead.
+
+<p>
+The following methods allow you to manually alter compiler options for 
+the instance of the Compiler class.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-19' xml:id='l2h-19' class="method">add_include_dir</tt></b>(</nobr></td>
+  <td><var>dir</var>)</td></tr></table></dt>
+<dd>
+Add <var>dir</var> to the list of directories that will be searched for
+header files.  The compiler is instructed to search directories in
+the order in which they are supplied by successive calls to
+<tt class="method">add_include_dir()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-20' xml:id='l2h-20' class="method">set_include_dirs</tt></b>(</nobr></td>
+  <td><var>dirs</var>)</td></tr></table></dt>
+<dd>
+Set the list of directories that will be searched to <var>dirs</var> (a
+list of strings).  Overrides any preceding calls to
+<tt class="method">add_include_dir()</tt>; subsequent calls to
+<tt class="method">add_include_dir()</tt> add to the list passed to
+<tt class="method">set_include_dirs()</tt>.  This does not affect any list of
+standard include directories that the compiler may search by default.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-21' xml:id='l2h-21' class="method">add_library</tt></b>(</nobr></td>
+  <td><var>libname</var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Add <var>libname</var> to the list of libraries that will be included in
+all links driven by this compiler object.  Note that <var>libname</var>
+should *not* be the name of a file containing a library, but the
+name of the library itself: the actual filename will be inferred by
+the linker, the compiler, or the compiler class (depending on the
+platform).
+
+<p>
+The linker will be instructed to link against libraries in the
+order they were supplied to <tt class="method">add_library()</tt> and/or
+<tt class="method">set_libraries()</tt>.  It is perfectly valid to duplicate library
+names; the linker will be instructed to link against libraries as
+many times as they are mentioned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-22' xml:id='l2h-22' class="method">set_libraries</tt></b>(</nobr></td>
+  <td><var>libnames</var>)</td></tr></table></dt>
+<dd>
+Set the list of libraries to be included in all links driven by
+this compiler object to <var>libnames</var> (a list of strings).  This does
+not affect any standard system libraries that the linker may
+include by default.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-23' xml:id='l2h-23' class="method">add_library_dir</tt></b>(</nobr></td>
+  <td><var>dir</var>)</td></tr></table></dt>
+<dd>
+Add <var>dir</var> to the list of directories that will be searched for
+libraries specified to <tt class="method">add_library()</tt> and
+<tt class="method">set_libraries()</tt>.  The linker will be instructed to search for
+libraries in the order they are supplied to <tt class="method">add_library_dir()</tt>
+and/or <tt class="method">set_library_dirs()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-24' xml:id='l2h-24' class="method">set_library_dirs</tt></b>(</nobr></td>
+  <td><var>dirs</var>)</td></tr></table></dt>
+<dd>
+Set the list of library search directories to <var>dirs</var> (a list of
+strings).  This does not affect any standard library search path
+that the linker may search by default.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-25' xml:id='l2h-25' class="method">add_runtime_library_dir</tt></b>(</nobr></td>
+  <td><var>dir</var>)</td></tr></table></dt>
+<dd>
+Add <var>dir</var> to the list of directories that will be searched for
+shared libraries at runtime.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-26' xml:id='l2h-26' class="method">set_runtime_library_dirs</tt></b>(</nobr></td>
+  <td><var>dirs</var>)</td></tr></table></dt>
+<dd>
+Set the list of directories to search for shared libraries at
+runtime to <var>dirs</var> (a list of strings).  This does not affect any
+standard search path that the runtime linker may search by
+default.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-27' xml:id='l2h-27' class="method">define_macro</tt></b>(</nobr></td>
+  <td><var>name</var><big>[</big><var>, value=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Define a preprocessor macro for all compilations driven by this
+compiler object.  The optional parameter <var>value</var> should be a
+string; if it is not supplied, then the macro will be defined
+without an explicit value and the exact outcome depends on the
+compiler used (XXX true? does ANSI say anything about this?)
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-28' xml:id='l2h-28' class="method">undefine_macro</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+Undefine a preprocessor macro for all compilations driven by
+this compiler object.  If the same macro is defined by
+<tt class="method">define_macro()</tt> and undefined by <tt class="method">undefine_macro()</tt> 
+the last call takes precedence (including multiple redefinitions or
+undefinitions).  If the macro is redefined/undefined on a
+per-compilation basis (ie. in the call to <tt class="method">compile()</tt>), then that
+takes precedence.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-29' xml:id='l2h-29' class="method">add_link_object</tt></b>(</nobr></td>
+  <td><var>object</var>)</td></tr></table></dt>
+<dd>
+Add <var>object</var> to the list of object files (or analogues, such as
+explicitly named library files or the output of ``resource
+compilers'') to be included in every link driven by this compiler
+object.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-30' xml:id='l2h-30' class="method">set_link_objects</tt></b>(</nobr></td>
+  <td><var>objects</var>)</td></tr></table></dt>
+<dd>
+Set the list of object files (or analogues) to be included in
+every link to <var>objects</var>.  This does not affect any standard object
+files that the linker may include by default (such as system
+libraries).
+</dl>
+
+<p>
+The following methods implement methods for autodetection of compiler 
+options, providing some functionality similar to GNU <b class="program">autoconf</b>.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-31' xml:id='l2h-31' class="method">detect_language</tt></b>(</nobr></td>
+  <td><var>sources</var>)</td></tr></table></dt>
+<dd>
+Detect the language of a given file, or list of files. Uses the 
+instance attributes <tt class="member">language_map</tt> (a dictionary), and 
+<tt class="member">language_order</tt> (a list) to do the job.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-32' xml:id='l2h-32' class="method">find_library_file</tt></b>(</nobr></td>
+  <td><var>dirs, lib</var><big>[</big><var>, debug=<code>0</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Search the specified list of directories for a static or shared
+library file <var>lib</var> and return the full path to that file.  If
+<var>debug</var> is true, look for a debugging version (if that makes sense on
+the current platform).  Return <code>None</code> if <var>lib</var> wasn't found in any of
+the specified directories.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-33' xml:id='l2h-33' class="method">has_function</tt></b>(</nobr></td>
+  <td><var>funcname </var><big>[</big><var>, includes=<code>None</code>, include_dirs=<code>None</code>, libraries=<code>None</code>, library_dirs=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a boolean indicating whether <var>funcname</var> is supported on
+the current platform.  The optional arguments can be used to
+augment the compilation environment by providing additional include
+files and paths and libraries and paths.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-34' xml:id='l2h-34' class="method">library_dir_option</tt></b>(</nobr></td>
+  <td><var>dir</var>)</td></tr></table></dt>
+<dd>
+Return the compiler option to add <var>dir</var> to the list of
+directories searched for libraries.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-35' xml:id='l2h-35' class="method">library_option</tt></b>(</nobr></td>
+  <td><var>lib</var>)</td></tr></table></dt>
+<dd>
+Return the compiler option to add <var>dir</var> to the list of libraries
+linked into the shared library or executable.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-36' xml:id='l2h-36' class="method">runtime_library_dir_option</tt></b>(</nobr></td>
+  <td><var>dir</var>)</td></tr></table></dt>
+<dd>
+Return the compiler option to add <var>dir</var> to the list of
+directories searched for runtime libraries.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-37' xml:id='l2h-37' class="method">set_executables</tt></b>(</nobr></td>
+  <td><var>**args</var>)</td></tr></table></dt>
+<dd>
+Define the executables (and options for them) that will be run
+to perform the various stages of compilation.  The exact set of
+executables that may be specified here depends on the compiler
+class (via the 'executables' class attribute), but most will have:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >attribute</th>
+      <th class="left"  >description</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><attribute>compiler</attribute></td>
+        <td class="left"  >the C/C++ compiler</td></tr>
+    <tr><td class="left"   valign="baseline"><attribute>linker_so</attribute></td>
+        <td class="left"  >linker used to create shared objects and libraries</td></tr>
+    <tr><td class="left"   valign="baseline"><attribute>linker_exe</attribute></td>
+        <td class="left"  >linker used to create binary executables</td></tr>
+    <tr><td class="left"   valign="baseline"><attribute>archiver</attribute></td>
+        <td class="left"  >static library creator</td></tr></tbody>
+</table></div>
+
+<p>
+On platforms with a command-line (<span class="Unix">Unix</span>, DOS/Windows), each of these
+is a string that will be split into executable name and (optional)
+list of arguments.  (Splitting the string is done similarly to how
+<span class="Unix">Unix</span> shells operate: words are delimited by spaces, but quotes and
+backslashes can override this.  See
+<tt class="function">distutils.util.split_quoted()</tt>.)
+</dl>
+
+<p>
+The following methods invoke stages in the build process.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-38' xml:id='l2h-38' class="method">compile</tt></b>(</nobr></td>
+  <td><var>sources</var><big>[</big><var>, output_dir=<code>None</code>, macros=<code>None</code>, include_dirs=<code>None</code>, debug=<code>0</code>, extra_preargs=<code>None</code>, extra_postargs=<code>None</code>, depends=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Compile one or more source files. Generates object files (e.g. 
+transforms a <span class="file">.c</span> file to a <span class="file">.o</span> file.)
+
+<p>
+<var>sources</var> must be a list of filenames, most likely C/C++
+files, but in reality anything that can be handled by a
+particular compiler and compiler class (eg. <tt class="class">MSVCCompiler</tt> can
+handle resource files in <var>sources</var>).  Return a list of object
+filenames, one per source filename in <var>sources</var>.  Depending on
+the implementation, not all source files will necessarily be
+compiled, but all corresponding object filenames will be
+returned.
+
+<p>
+If <var>output_dir</var> is given, object files will be put under it, while
+retaining their original path component.  That is, <span class="file">foo/bar.c</span>
+normally compiles to <span class="file">foo/bar.o</span> (for a <span class="Unix">Unix</span> implementation); if
+<var>output_dir</var> is <var>build</var>, then it would compile to
+<span class="file">build/foo/bar.o</span>.
+
+<p>
+<var>macros</var>, if given, must be a list of macro definitions.  A macro
+definition is either a <code>(<var>name</var>, <var>value</var>)</code> 2-tuple or a
+<code>(<var>name</var>,)</code> 1-tuple.
+The former defines a macro; if the value is <code>None</code>, the macro is
+defined without an explicit value.  The 1-tuple case undefines a
+macro.  Later definitions/redefinitions/undefinitions take
+precedence.
+
+<p>
+<var>include_dirs</var>, if given, must be a list of strings, the
+directories to add to the default include file search path for this
+compilation only.
+
+<p>
+<var>debug</var> is a boolean; if true, the compiler will be instructed to
+output debug symbols in (or alongside) the object file(s).
+
+<p>
+<var>extra_preargs</var> and <var>extra_postargs</var> are implementation-dependent.
+On platforms that have the notion of a command-line (e.g. <span class="Unix">Unix</span>,
+DOS/Windows), they are most likely lists of strings: extra
+command-line arguments to prepend/append to the compiler command
+line.  On other platforms, consult the implementation class
+documentation.  In any event, they are intended as an escape hatch
+for those occasions when the abstract compiler framework doesn't
+cut the mustard.
+
+<p>
+<var>depends</var>, if given, is a list of filenames that all targets
+depend on.  If a source file is older than any file in
+depends, then the source file will be recompiled.  This
+supports dependency tracking, but only at a coarse
+granularity.
+
+<p>
+Raises <tt class="exception">CompileError</tt> on failure.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-39' xml:id='l2h-39' class="method">create_static_lib</tt></b>(</nobr></td>
+  <td><var>objects, output_libname</var><big>[</big><var>, output_dir=<code>None</code>, debug=<code>0</code>, target_lang=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Link a bunch of stuff together to create a static library file.
+The ``bunch of stuff'' consists of the list of object files supplied
+as <var>objects</var>, the extra object files supplied to
+<tt class="method">add_link_object()</tt> and/or <tt class="method">set_link_objects()</tt>, the libraries
+supplied to <tt class="method">add_library()</tt> and/or <tt class="method">set_libraries()</tt>, and the
+libraries supplied as <var>libraries</var> (if any).
+
+<p>
+<var>output_libname</var> should be a library name, not a filename; the
+filename will be inferred from the library name.  <var>output_dir</var> is
+the directory where the library file will be put. XXX defaults to what?
+
+<p>
+<var>debug</var> is a boolean; if true, debugging information will be
+included in the library (note that on most platforms, it is the
+compile step where this matters: the <var>debug</var> flag is included here
+just for consistency).
+
+<p>
+<var>target_lang</var> is the target language for which the given objects
+are being compiled. This allows specific linkage time treatment of
+certain languages.
+
+<p>
+Raises <tt class="exception">LibError</tt> on failure.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-40' xml:id='l2h-40' class="method">link</tt></b>(</nobr></td>
+  <td><var>target_desc, objects, output_filename</var><big>[</big><var>, output_dir=<code>None</code>, libraries=<code>None</code>, library_dirs=<code>None</code>, runtime_library_dirs=<code>None</code>, export_symbols=<code>None</code>, debug=<code>0</code>, extra_preargs=<code>None</code>, extra_postargs=<code>None</code>, build_temp=<code>None</code>, target_lang=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Link a bunch of stuff together to create an executable or
+shared library file.
+
+<p>
+The ``bunch of stuff'' consists of the list of object files supplied
+as <var>objects</var>.  <var>output_filename</var> should be a filename.  If
+<var>output_dir</var> is supplied, <var>output_filename</var> is relative to it
+(i.e. <var>output_filename</var> can provide directory components if
+needed).
+
+<p>
+<var>libraries</var> is a list of libraries to link against.  These are
+library names, not filenames, since they're translated into
+filenames in a platform-specific way (eg. <var>foo</var> becomes <span class="file">libfoo.a</span>
+on <span class="Unix">Unix</span> and <span class="file">foo.lib</span> on DOS/Windows).  However, they can include a
+directory component, which means the linker will look in that
+specific directory rather than searching all the normal locations.
+
+<p>
+<var>library_dirs</var>, if supplied, should be a list of directories to
+search for libraries that were specified as bare library names
+(ie. no directory component).  These are on top of the system
+default and those supplied to <tt class="method">add_library_dir()</tt> and/or
+<tt class="method">set_library_dirs()</tt>.  <var>runtime_library_dirs</var> is a list of
+directories that will be embedded into the shared library and used
+to search for other shared libraries that *it* depends on at
+run-time.  (This may only be relevant on <span class="Unix">Unix</span>.)
+
+<p>
+<var>export_symbols</var> is a list of symbols that the shared library will
+export.  (This appears to be relevant only on Windows.)
+
+<p>
+<var>debug</var> is as for <tt class="method">compile()</tt> and <tt class="method">create_static_lib()</tt>, 
+with the slight distinction that it actually matters on most platforms (as
+opposed to <tt class="method">create_static_lib()</tt>, which includes a <var>debug</var> flag
+mostly for form's sake).
+
+<p>
+<var>extra_preargs</var> and <var>extra_postargs</var> are as for <tt class="method">compile()</tt> 
+(except of course that they supply command-line arguments for the
+particular linker being used).
+
+<p>
+<var>target_lang</var> is the target language for which the given objects
+are being compiled. This allows specific linkage time treatment of
+certain languages.
+
+<p>
+Raises <tt class="exception">LinkError</tt> on failure.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-41' xml:id='l2h-41' class="method">link_executable</tt></b>(</nobr></td>
+  <td><var>objects, output_progname</var><big>[</big><var>, output_dir=<code>None</code>, libraries=<code>None</code>, library_dirs=<code>None</code>, runtime_library_dirs=<code>None</code>, debug=<code>0</code>, extra_preargs=<code>None</code>, extra_postargs=<code>None</code>, target_lang=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Link an executable. 
+<var>output_progname</var> is the name of the file executable,
+while <var>objects</var> are a list of object filenames to link in. Other arguments 
+are as for the <tt class="method">link</tt> method. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-42' xml:id='l2h-42' class="method">link_shared_lib</tt></b>(</nobr></td>
+  <td><var>objects, output_libname</var><big>[</big><var>, output_dir=<code>None</code>, libraries=<code>None</code>, library_dirs=<code>None</code>, runtime_library_dirs=<code>None</code>, export_symbols=<code>None</code>, debug=<code>0</code>, extra_preargs=<code>None</code>, extra_postargs=<code>None</code>, build_temp=<code>None</code>, target_lang=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Link a shared library. <var>output_libname</var> is the name of the output 
+library, while <var>objects</var> is a list of object filenames to link in. 
+Other arguments are as for the <tt class="method">link</tt> method. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-43' xml:id='l2h-43' class="method">link_shared_object</tt></b>(</nobr></td>
+  <td><var>objects, output_filename</var><big>[</big><var>, output_dir=<code>None</code>, libraries=<code>None</code>, library_dirs=<code>None</code>, runtime_library_dirs=<code>None</code>, export_symbols=<code>None</code>, debug=<code>0</code>, extra_preargs=<code>None</code>, extra_postargs=<code>None</code>, build_temp=<code>None</code>, target_lang=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Link a shared object. <var>output_filename</var> is the name of the shared object
+that will be created, while <var>objects</var> is a list of object filenames 
+to link in. Other arguments are as for the <tt class="method">link</tt> method. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-44' xml:id='l2h-44' class="method">preprocess</tt></b>(</nobr></td>
+  <td><var>source</var><big>[</big><var>, output_file=<code>None</code>, macros=<code>None</code>, include_dirs=<code>None</code>, extra_preargs=<code>None</code>, extra_postargs=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Preprocess a single C/C++ source file, named in <var>source</var>.
+Output will be written to file named <var>output_file</var>, or <var>stdout</var> if
+<var>output_file</var> not supplied.  <var>macros</var> is a list of macro
+definitions as for <tt class="method">compile()</tt>, which will augment the macros set
+with <tt class="method">define_macro()</tt> and <tt class="method">undefine_macro()</tt>.  
+<var>include_dirs</var> is a list of directory names that will be added to the 
+default list, in the same way as <tt class="method">add_include_dir()</tt>.
+
+<p>
+Raises <tt class="exception">PreprocessError</tt> on failure.
+</dl>
+
+<p>
+The following utility methods are defined by the <tt class="class">CCompiler</tt> class,
+for use by the various concrete subclasses.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-45' xml:id='l2h-45' class="method">executable_filename</tt></b>(</nobr></td>
+  <td><var>basename</var><big>[</big><var>, strip_dir=<code>0</code>, output_dir=<code>''</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns the filename of the executable for the given <var>basename</var>. 
+Typically for non-Windows platforms this is the same as the basename, 
+while Windows will get a <span class="file">.exe</span> added.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-46' xml:id='l2h-46' class="method">library_filename</tt></b>(</nobr></td>
+  <td><var>libname</var><big>[</big><var>, lib_type=<code>'static'</code>, strip_dir=<code>0</code>, output_dir=<code>''</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns the filename for the given library name on the current platform.
+On <span class="Unix">Unix</span> a library with <var>lib_type</var> of <code>'static'</code> will typically 
+be of the form <span class="file">liblibname.a</span>, while a <var>lib_type</var> of <code>'dynamic'</code> 
+will be of the form <span class="file">liblibname.so</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-47' xml:id='l2h-47' class="method">object_filenames</tt></b>(</nobr></td>
+  <td><var>source_filenames</var><big>[</big><var>, strip_dir=<code>0</code>, output_dir=<code>''</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns the name of the object files for the given source files. 
+<var>source_filenames</var> should be a list of filenames. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-48' xml:id='l2h-48' class="method">shared_object_filename</tt></b>(</nobr></td>
+  <td><var>basename</var><big>[</big><var>, strip_dir=<code>0</code>, output_dir=<code>''</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns the name of a shared object file for the given file name <var>basename</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-49' xml:id='l2h-49' class="method">execute</tt></b>(</nobr></td>
+  <td><var>func, args</var><big>[</big><var>, msg=<code>None</code>, level=<code>1</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Invokes <tt class="function">distutils.util.execute()</tt> This method invokes a 
+Python function <var>func</var> with the given arguments <var>args</var>, after 
+logging and taking into account the <var>dry_run</var> flag. XXX see also.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-50' xml:id='l2h-50' class="method">spawn</tt></b>(</nobr></td>
+  <td><var>cmd</var>)</td></tr></table></dt>
+<dd>
+Invokes <tt class="function">distutils.util.spawn()</tt>. This invokes an external 
+process to run the given command. XXX see also.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-51' xml:id='l2h-51' class="method">mkpath</tt></b>(</nobr></td>
+  <td><var>name</var><big>[</big><var>, mode=<code>511</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Invokes <tt class="function">distutils.dir_util.mkpath()</tt>. This creates a directory 
+and any missing ancestor directories. XXX see also.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-52' xml:id='l2h-52' class="method">move_file</tt></b>(</nobr></td>
+  <td><var>src, dst</var>)</td></tr></table></dt>
+<dd>
+Invokes <tt class="method">distutils.file_util.move_file()</tt>. Renames <var>src</var> to 
+<var>dst</var>.  XXX see also.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-53' xml:id='l2h-53' class="method">announce</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, level=<code>1</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Write a message using <tt class="function">distutils.log.debug()</tt>. XXX see also.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-54' xml:id='l2h-54' class="method">warn</tt></b>(</nobr></td>
+  <td><var>msg</var>)</td></tr></table></dt>
+<dd>
+Write a warning message <var>msg</var> to standard error.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-55' xml:id='l2h-55' class="method">debug_print</tt></b>(</nobr></td>
+  <td><var>msg</var>)</td></tr></table></dt>
+<dd>
+If the <var>debug</var> flag is set on this <tt class="class">CCompiler</tt> instance, print 
+<var>msg</var> to standard output, otherwise do nothing.
+</dl>
+
+<p>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.1 distutils.core  "
+  href="module-distutils.core.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.3 distutils.unixccompiler  "
+  href="module-distutils.unixccompiler.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.core.html">11.1 distutils.core  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.unixccompiler.html">11.3 distutils.unixccompiler  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

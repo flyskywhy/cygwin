@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-dumbdbm.html" />
+<link rel="parent" href="persistence.html" />
+<link rel="next" href="sqlite3-Module-Contents.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.13 sqlite3 -- DB-API 2.0 interface for SQLite databases</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.12.1 dumbdbm Objects"
+  href="dumbdbm-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.1 module functions and"
+  href="sqlite3-Module-Contents.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dumbdbm-objects.html">13.12.1 Dumbdbm Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sqlite3-Module-Contents.html">13.13.1 Module functions and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00151300000000000000000">
+13.13 <tt class="module">sqlite3</tt> --
+         DB-API 2.0 interface for SQLite databases</a>
+</h1>
+
+<p>
+<a name="module-sqlite3"></a>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+SQLite is a C library that provides a lightweight disk-based database
+that doesn't require a separate server process and allows accessing
+the database using a nonstandard variant of the SQL query language.
+Some applications can use SQLite for internal data storage.  It's also
+possible to prototype an application using SQLite and then port the
+code to a larger database such as PostgreSQL or Oracle.
+
+<p>
+pysqlite was written by Gerhard Häring and provides a SQL interface
+compliant with the DB-API 2.0 specification described by
+<a class="rfc" id='rfcref-100968' xml:id='rfcref-100968'
+href="http://www.python.org/peps/pep-0249.html">PEP 249</a>. 
+
+<p>
+To use the module, you must first create a <tt class="class">Connection</tt> object
+that represents the database.  Here the data will be stored in the 
+<span class="file">/tmp/example</span> file:
+
+<p>
+<div class="verbatim"><pre>
+conn = sqlite3.connect('/tmp/example')
+</pre></div>
+
+<p>
+You can also supply the special name "<tt class="samp">:memory:</tt>" to create
+a database in RAM.
+
+<p>
+Once you have a <tt class="class">Connection</tt>, you can create a <tt class="class">Cursor</tt> 
+object and call its <tt class="method">execute()</tt> method to perform SQL commands:
+
+<p>
+<div class="verbatim"><pre>
+c = conn.cursor()
+
+# Create table
+c.execute('''create table stocks
+(date text, trans text, symbol text,
+ qty real, price real)''')
+
+# Insert a row of data
+c.execute("""insert into stocks
+          values ('2006-01-05','BUY','RHAT',100,35.14)""")
+</pre></div>    
+
+<p>
+Usually your SQL operations will need to use values from Python
+variables.  You shouldn't assemble your query using Python's string
+operations because doing so is insecure; it makes your program
+vulnerable to an SQL injection attack.  
+
+<p>
+Instead, use the DB-API's parameter substitution.  Put "<tt class="samp">?</tt>" as a
+placeholder wherever you want to use a value, and then provide a tuple
+of values as the second argument to the cursor's <tt class="method">execute()</tt>
+method.  (Other database modules may use a different placeholder,
+such as "<tt class="samp">%s</tt>" or "<tt class="samp">:1</tt>".) For example:
+
+<p>
+<div class="verbatim"><pre>    
+# Never do this -- insecure!
+symbol = 'IBM'
+c.execute("... where symbol = '%s'" % symbol)
+
+# Do this instead
+t = (symbol,)
+c.execute('select * from stocks where symbol=?', t)
+
+# Larger example
+for t in (('2006-03-28', 'BUY', 'IBM', 1000, 45.00),
+          ('2006-04-05', 'BUY', 'MSOFT', 1000, 72.00),
+          ('2006-04-06', 'SELL', 'IBM', 500, 53.00),
+         ):
+    c.execute('insert into stocks values (?,?,?,?,?)', t)
+</pre></div>
+
+<p>
+To retrieve data after executing a SELECT statement, you can either 
+treat the cursor as an iterator, call the cursor's <tt class="method">fetchone()</tt>
+method to retrieve a single matching row, 
+or call <tt class="method">fetchall()</tt> to get a list of the matching rows.
+
+<p>
+This example uses the iterator form:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; c = conn.cursor()
+&gt;&gt;&gt; c.execute('select * from stocks order by price')
+&gt;&gt;&gt; for row in c:
+...    print row
+...
+(u'2006-01-05', u'BUY', u'RHAT', 100, 35.140000000000001)
+(u'2006-03-28', u'BUY', u'IBM', 1000, 45.0)
+(u'2006-04-06', u'SELL', u'IBM', 500, 53.0)
+(u'2006-04-05', u'BUY', u'MSOFT', 1000, 72.0)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.pysqlite.org"
+        class="url">http://www.pysqlite.org</a></dt>
+    <dd>The pysqlite web page.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.sqlite.org"
+        class="url">http://www.sqlite.org</a></dt>
+    <dd>The SQLite web page; the documentation describes the syntax and the
+available data types for the supported SQL dialect.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0249.html"
+        title="Database api Specification 2.0"
+        >PEP 249, <em>Database API Specification 2.0</em></a>
+    <dd>PEP written by
+Marc-André Lemburg.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="sqlite3-Module-Contents.html">13.13.1 Module functions and constants</a>
+<li><a href="sqlite3-Connection-Objects.html">13.13.2 Connection Objects</a>
+<li><a href="sqlite3-Cursor-Objects.html">13.13.3 Cursor Objects</a>
+<li><a href="sqlite3-Types.html">13.13.4 SQLite and Python types</a>
+<ul>
+<li><a href="node345.html">13.13.4.1 Introduction</a>
+<li><a href="node346.html">13.13.4.2 Using adapters to store additional Python types in SQLite databases</a>
+<ul>
+<li><a href="node346.html#SECTION00151342100000000000000">13.13.4.2.1 Letting your object adapt itself</a>
+<li><a href="node346.html#SECTION00151342200000000000000">13.13.4.2.2 Registering an adapter callable</a>
+</ul>
+<li><a href="node347.html">13.13.4.3 Converting SQLite values to custom Python types</a>
+<li><a href="node348.html">13.13.4.4 Default adapters and converters</a>
+</ul>
+<li><a href="sqlite3-Controlling-Transactions.html">13.13.5 Controlling Transactions</a>
+<li><a href="node350.html">13.13.6 Using pysqlite efficiently</a>
+<ul>
+<li><a href="node351.html">13.13.6.1 Using shortcut methods</a>
+<li><a href="node352.html">13.13.6.2 Accessing columns by name instead of by index</a>
+</ul></ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.12.1 dumbdbm Objects"
+  href="dumbdbm-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.1 module functions and"
+  href="sqlite3-Module-Contents.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dumbdbm-objects.html">13.12.1 Dumbdbm Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sqlite3-Module-Contents.html">13.13.1 Module functions and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

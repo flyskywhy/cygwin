@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# Add new files to the repository
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes a list of file names at the command line, and schedules them
+# for addition to the GIT repository at the next commit. Those files
+# are denoted by 'A' in the `cg-status` list. You can add `cg-rm`oved
+# files to undo the removal (use `cg-restore` if the file is already
+# deleted from the working copy as well); you can undo additions in
+# an analogous way using `cg-rm`.
+#
+# The command will fail if one of the given files does not exist.
+#
+# Note that directories never have to be added to the repository, and are
+# not tracked on their own. That means, you cannot currently add an empty
+# directory to 'Cogito'. The reason for this is that 'Cogito' manages
+# content and empty directories have no content. Directories are added
+# automatically when adding files inside them, or you can add all files in
+# a directory using cg-add -r.
+#
+# OPTIONS
+# -------
+# -a::	Add all untracked files
+#	Add all files in the repository that are currently untracked. Useful
+#	when there were some random files added/removed (e.g. by some
+#	third-party application) and you want to get the repository in sync:
+#	just use `cg-rm -a && cg-add -a`. Note that contrary to `cg-add -r .`,
+#	this will not re-add `cg-rm`oved files.
+#
+# -N::	Only update the lowlevel cache file
+#	Only update the cache: do not copy the data into the object database.
+#	This is for special purposes when you might not actually _have_ any
+#	object database. This option is normally not interesting.
+#
+# -r::	Add files recursively
+#	If you pass cg-add this flag and any directory names, it will try
+#	to add files in those directories recursively (with regard to your
+#	ignore rules - see `cg-status` for a more detailed description of
+#	those). See also above for more notes about cg-add vs. directories.
+
+# Testsuite: Partial (used in many tests but a dedicated testsuite is missing)
+
+USAGE="cg-add [-a] [-N] [-r] FILE..."
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+addnew=
+infoonly=
+recursive=
+while optparse; do
+	if optparse -N; then
+		infoonly=--info-only
+	elif optparse -r; then
+		recursive=1
+	elif optparse -a; then
+		addnew=1
+	else
+		optfail
+	fi
+done
+
+[ ${#ARGS[*]} -ge 1 -o "$addnew" ] || usage
+
+TMPFILE="$(mktemp -t gitadd.XXXXXX)" || exit 1
+error=
+for file in "${ARGS[@]}"; do
+	file="${file%/}"
+	absfile="$(echo "$_git_relpath$file" | normpath)"
+	if [ -d "$absfile" ] || [ -z "$absfile" ]; then
+		if [ "$recursive" ]; then
+			# XXX: This all relpath business is so ugly.
+			(cd "$_git_relpath" && cg-status -wnSs D\? "$file") >>"$TMPFILE"
+		else
+			echo "$file is a directory (use cg-add -r?)" >&2
+			error=1
+		fi
+	elif [ ! -f "$absfile" ] && [ -h "$absfile" ]; then
+		echo "$file does not exist or is not a regular file or a symlink" >&2
+		error=1
+	else
+		echo "$file" >>"$TMPFILE"
+	fi
+done
+
+if [ "$addnew" ]; then
+	(cd "$_git_relpath" && cg-status -S -s \? -n -w) >>"$TMPFILE"
+	if [ ! -s "$TMPFILE" ]; then
+		rm "$TMPFILE"
+		die "no files to add"
+	fi
+fi
+
+cat "$TMPFILE" | sed 's/^/Adding file /'
+cat "$TMPFILE" | sed "s|^|$_git_relpath|" | path_xargs git update-index --add ${infoonly} -- || error=1
+
+rm "$TMPFILE"
+
+[ "$error" ] && die "warning: not all items could have been added"
+exit 0

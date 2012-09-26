@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+#
+# Get the SHA1 id of an object associated with the given symbolic id
+# Copyright (c) Petr Baudis, Pavel Roskin, Philip Pokorny  2005
+#
+# Resolves a given symbolic id to the raw SHA1 id (or a symbolic
+# description when passed the '-d' parameter). The symbolic id can be
+# an SHA1 id, a unique starting segment of an existing SHA1 id, a ref
+# name, date, empty string, etc. See the 'COMMIT_ID' description in
+# cogito(7) for the full list.
+#
+# Normally, you do not use this command directly (except with the '-d'
+# parameter), but it is used in other Cogito scripts to resolve passed
+# object identifiers. If the ID is not provided, HEAD is assumed.  The
+# default behavior is to show the commit ID, but you should always
+# explicitly write '-c' if using this in a script.
+#
+# OPTIONS
+# -------
+# -b:: Get branch name
+#	Get name of the current branch.
+#
+# -c:: Get commit ID
+#	Get ID of commit matching the object ID (error out if it is not
+#	a commit). This is the default if you do not pass any parameter
+#	as well, but that is only for the human usage. For clarity, all
+#	scripted usage of cg-object-id should use -c explicitly if it
+#	wants a commit.
+#
+# -d:: Get commit string description
+#	Get a commit description in form of a short string. It shows the
+#	most recent tag in past of the commit and if it is not the commit
+#	itself, it appends first few chars of the commit id to id. See
+#	`git describe`(1) for details.
+#
+# -n:: Disable object type checking
+#	Normalize only - don't check the object type.
+#
+# -p:: Get parent commit ID(s)
+#	Get ID of the first parent commit of a given revision or HEAD.
+#	NOTE: Multiple SHA1s separated by newlines will be returned for
+#	commits with multiple parents.
+#
+# -t:: Get tree ID
+#	Get ID of tree associated with given commit or HEAD.
+#
+# OBJECT_ID::
+#	An ID resolving to a commit.
+
+# Testsuite: Partial (used in many tests but a dedicated testsuite is missing)
+
+USAGE="cg-object-id [-b | -c | -d | -n | -p | -t] [OBJECT_ID]"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib
+
+
+# Normalize argument.  The normalized SHA1 ID is put to $normid,
+# type is put to $type.
+normalize_id()
+{
+	local id="$1"
+	local revid=
+	local valid=
+
+	if [ ! "$id" ] || [ "$id" = "this" ]; then
+		id=HEAD;
+	fi
+
+	revid="$(git rev-parse --verify "$id" 2>/dev/null)"
+	if [ "$revid" ] && [ ${#revid} -eq 40 ] && [ "${revid//[0-9a-f]/}" = "" ]; then
+		id="$revid"
+		valid=1
+	fi
+
+	# date does the wrong thing for empty and single-letter ids
+	if [ ${#id} -gt 1 ] && [ ! "$valid" ]; then
+		reqsecs="$(date --date="$id" +'%s' 2>/dev/null)"
+
+		if [ "$reqsecs" ]; then
+			revid="$(git rev-list "--min-age=$reqsecs" --max-count=1 HEAD)"
+			if [ "$revid" ]; then
+				id="$revid"
+				valid=1
+			fi
+		fi
+	fi
+
+	# If we don't have a 40-char ID by now, it's an error
+	if [ ! "$valid" ]; then
+		echo "Invalid id: $id" >&2
+		exit 1
+	fi
+
+	type="$(git cat-file -t "$id")"
+	if [ "$type" = "tag" ]; then
+		id="$(git cat-file tag "$id" | head -n 1)"
+		id="${id#object }"
+		type=
+	fi
+
+	normid="$id"
+}
+
+
+
+show_commit= # this is really only for the options-exclusivity-checking
+describe=
+show_parent=
+show_tree=
+normalize_only=
+while optparse; do
+	if optparse -b; then
+		# one-shot
+		echo "$_git_head"
+		exit
+	elif optparse -c; then
+		show_commit=1
+	elif optparse -d; then
+		describe=1
+	elif optparse -n; then
+		normalize_only=1
+	elif optparse -p; then
+		show_parent=1
+	elif optparse -t; then
+		show_tree=1
+	else
+		optfail
+	fi
+done
+
+# Compatibility code
+case "$_cg_cmd" in
+	*parent*) show_parent=1;;
+	*tree*) show_tree=1;;
+esac
+
+case "$show_commit$describe$show_parent$show_tree$normalize_only" in
+	11*)	usage;;
+esac
+
+id="${ARGS[0]}"
+normalize_id "$id"
+
+if [ "$normalize_only" ]; then
+	echo "$normid"
+	exit 0
+fi
+if [ "$describe" ]; then
+	git describe "$normid"
+	exit 0
+fi
+
+
+if [ "$show_parent" ]; then
+	git rev-list --parents -n 1 "$normid" | tr ' ' '\n' | tail -n +2
+	exit 0
+fi
+
+[ "$type" ] || type="$(git cat-file -t "$normid")"
+if [ "$show_tree" ]; then
+	if [ "$type" = "commit" ]; then
+		normid="$(git cat-file commit "$normid" | sed -e 's/tree //;q')"
+		type="$(git cat-file -t "$normid")"
+	fi
+
+	if [ "$type" != "tree" ]; then
+		echo "Invalid tree id: $normid" >&2
+		exit 1
+	fi
+else
+	if [ "$type" != "commit" ]; then
+		echo "Invalid commit id: $normid" >&2
+		exit 1
+	fi
+fi
+
+echo "$normid"

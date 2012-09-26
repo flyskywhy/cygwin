@@ -1,0 +1,114 @@
+cg-diff(1)
+==========
+
+NAME
+----
+cg-diff - show changes in the diff format
+
+SYNOPSIS
+--------
+cg-diff [-c] [-m] [-s] [-p] [-r FROM_ID[..TO_ID]] [FILE]...
+
+DESCRIPTION
+-----------
+Outputs a diff for converting the first tree to the second one.
+By default compares the current working tree to the state at the
+last commit. The output will automatically be displayed in a pager
+unless it is piped to a program.
+
+OPTIONS
+-------
+
+--
+-c::
+	Colorize the output. You can customize the colors using the
+	$CG_COLORS environment variable (see below).
+
+--diffcore ARGS::
+	Pass the given diffcore arguments the called Git diff command.
+	See e.g. git diff-tree(1) documentation for the list of possible
+	arguments; '-R', '-B', and '-C' might be of particular interest
+	('-M' is already passed by default).
+
+--no-renames::
+	By default, gitlink:cg-diff[1] will automatically detect file renames.
+	Diff produced by the rename-aware gitlink:cg-diff[1] will be unappliable
+	using patch(1) (you need to use gitlink:cg-patch[1]) and the renames
+	detection can add slight extra performance penalty. This switch
+	will turn the rename detection off.
+
+-p::
+	Show diff to the parent of the current commit (or the commit
+	specified by the -r parameter).
+
+-s::
+	Summarize the diff by showing a histogram for removed and added
+	lines (similar to the output of diffstat(1)) and information
+	about added and renamed files and mode changes.
+
+-r FROM_ID[..TO_ID]::
+	Specify the revisions to diff using either '-r rev1..rev2' or
+	'-r rev1 -r rev2'. If no revision is specified, the current
+	working tree is implied. Note that no revision is different from
+	empty revision which means '-r rev..' compares between 'rev' and
+	'HEAD', while '-r rev' compares between 'rev' and working tree.
+
+-m::
+	Base the diff at the merge base of the -r arguments (defaulting
+	to HEAD and origin).
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-diff[1].
+--
+
+
+ENVIRONMENT VARIABLES
+---------------------
+PAGER::
+	The pager to display log information in, defaults to `less`.
+
+PAGER_FLAGS::
+	Flags to pass to the pager.
+
+CG_COLORS::
+	Colon-separated list of 'name=color' pairs, where name is
+	one of diffhdr, diffhdradd, diffhdrmod, diffhdrrem, diffadd,
+	diffmod, diffrem, diffhunk, diffctx, default, and value is
+	an ECMA-48 SGR sequence (see e.g. console_codes(4)).
+
+CG_COLORS_AUTO::
+	Even if -c was passed or specified in ~/.cgrc, if this option
+	is set, use colors only when the output is a terminal and it
+	supports colors.
+
+CG_LESS::
+	This is what the $LESS environment variable value will be set
+	to before invoking $PAGER. It defaults to $LESS concatenated
+	with the `R` flag to allow displaying of colorized output.
+
+CONFIGURATION VARIABLES
+-----------------------
+The following GIT configuration file variables are recognized:
+
+diff.usecolor::
+	If enabled, colorify the output like with -c if the output
+	is a terminal.
+
+NOTES
+-----
+The ':' is equivalent to '..' in revisions range specification (to make
+things more comfortable to SVN users). See cogito(7) for more details
+about revision specification.
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-diff is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

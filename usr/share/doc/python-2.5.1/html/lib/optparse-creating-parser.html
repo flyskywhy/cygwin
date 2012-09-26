@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-populating-parser.html" />
+<link rel="prev" href="optparse-reference-guide.html" />
+<link rel="parent" href="optparse-reference-guide.html" />
+<link rel="next" href="optparse-populating-parser.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.3.1 Creating the parser</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.3 reference Guide"
+  href="optparse-reference-guide.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.3 reference Guide"
+  href="optparse-reference-guide.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.3.2 populating the parser"
+  href="optparse-populating-parser.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-reference-guide.html">14.3.3 Reference Guide</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-reference-guide.html">14.3.3 Reference Guide</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-populating-parser.html">14.3.3.2 Populating the parser</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016331000000000000000"></a><a name="optparse-creating-parser"></a>
+<br>
+14.3.3.1 Creating the parser
+</h3>
+
+<p>
+The first step in using <tt class="module">optparse</tt> is to create an OptionParser instance:
+<div class="verbatim"><pre>
+parser = OptionParser(...)
+</pre></div>
+
+<p>
+The OptionParser constructor has no required arguments, but a number of
+optional keyword arguments.  You should always pass them as keyword
+arguments, i.e. do not rely on the order in which the arguments are
+declared.
+<blockquote>
+</blockquote><dl>
+<dt><strong><code>usage</code> (default: <code>"%prog [options]"</code>)</strong></dt>
+<dd>The usage summary to print when your program is run incorrectly or
+with a help option.  When <tt class="module">optparse</tt> prints the usage string, it expands
+<code>%prog</code> to <code>os.path.basename(sys.argv[0])</code> (or to <code>prog</code> if
+you passed that keyword argument).  To suppress a usage message,
+pass the special value <code>optparse.SUPPRESS_USAGE</code>.
+</dd>
+<dt><strong><code>option_list</code> (default: <code>[]</code>)</strong></dt>
+<dd>A list of Option objects to populate the parser with.  The options
+in <code>option_list</code> are added after any options in
+<code>standard_option_list</code> (a class attribute that may be set by
+OptionParser subclasses), but before any version or help options.
+Deprecated; use <tt class="method">add_option()</tt> after creating the parser instead.
+</dd>
+<dt><strong><code>option_class</code> (default: optparse.Option)</strong></dt>
+<dd>Class to use when adding options to the parser in <tt class="method">add_option()</tt>.
+</dd>
+<dt><strong><code>version</code> (default: <code>None</code>)</strong></dt>
+<dd>A version string to print when the user supplies a version option.
+If you supply a true value for <code>version</code>, <tt class="module">optparse</tt> automatically adds
+a version option with the single option string <code>"-version"</code>.  The
+substring <code>"%prog"</code> is expanded the same as for <code>usage</code>.
+</dd>
+<dt><strong><code>conflict_handler</code> (default: <code>"error"</code>)</strong></dt>
+<dd>Specifies what to do when options with conflicting option strings
+are added to the parser; see section&nbsp;<a href="optparse-conflicts-between-options.html#optparse-conflicts-between-options">14.3.3</a>, Conflicts between options.
+</dd>
+<dt><strong><code>description</code> (default: <code>None</code>)</strong></dt>
+<dd>A paragraph of text giving a brief overview of your program.  <tt class="module">optparse</tt>
+reformats this paragraph to fit the current terminal width and
+prints it when the user requests help (after <code>usage</code>, but before
+the list of options).
+</dd>
+<dt><strong><code>formatter</code> (default: a new IndentedHelpFormatter)</strong></dt>
+<dd>An instance of optparse.HelpFormatter that will be used for
+printing help text.  <tt class="module">optparse</tt> provides two concrete classes for this
+purpose: IndentedHelpFormatter and TitledHelpFormatter.
+</dd>
+<dt><strong><code>add_help_option</code> (default: <code>True</code>)</strong></dt>
+<dd>If true, <tt class="module">optparse</tt> will add a help option (with option strings <code>"-h"</code>
+and <code>"-help"</code>) to the parser.
+</dd>
+<dt><strong><code>prog</code></strong></dt>
+<dd>The string to use when expanding <code>"%prog"</code> in <code>usage</code> and
+<code>version</code> instead of <code>os.path.basename(sys.argv[0])</code>.
+</dd>
+</dl><blockquote>
+</blockquote>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.3 reference Guide"
+  href="optparse-reference-guide.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.3 reference Guide"
+  href="optparse-reference-guide.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.3.2 populating the parser"
+  href="optparse-populating-parser.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-reference-guide.html">14.3.3 Reference Guide</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-reference-guide.html">14.3.3 Reference Guide</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-populating-parser.html">14.3.3.2 Populating the parser</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

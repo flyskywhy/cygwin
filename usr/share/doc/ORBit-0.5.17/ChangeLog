@@ -1,0 +1,162 @@
+2002-06-06  Michael Meeks  <michael@ximian.com>
+
+	* Version 0.5.17
+
+2002-06-06  Huw Rogers <count0@building2.co.jp>
+
+	* src/orb/typecode.c: update builtin typecode names
+	so introspection works nicely for perl.
+
+	* acconfig.h: fix HAVE_ALLOCA bits.
+
+2002-05-27  Michael Meeks  <michael@ximian.com>
+
+	* Version 0.5.16
+
+2002-05-27  Huw Rogers <count0@building2.co.jp>
+
+	* src/orb/poa.c (PortableServer_DynamicImpl__init):
+	rename to IDL:omg.org/CORBA/Object:1.0
+
+	* src/orb/env.c (exception_table): rename all
+	exceptions to prepend omg.org.
+
+	* src/orb/corba_object.c (CORBA_Object_is_a):
+	tolerate CORBA/Object but add omg.org/CORBA/Object
+
+2002-04-03  Michael Meeks  <michael@ximian.com>
+
+	* src/IIOP/giop-msg-buffer.c
+	(giop_recv_message_buffer_use): handle EINTR.
+
+2002-03-20  Michael Meeks  <michael@ximian.com>
+
+	* Version 0.5.15
+
+2002-03-20  Michael Meeks  <michael@ximian.com>
+
+	* configure.in: copy the autoconf macro into here so we
+	can rely on it not changing across autoconf versions.
+
+2002-03-11  Michael Meeks  <michael@ximian.com>
+
+	* Version 0.5.14
+
+2002-03-11  Michael Meeks  <michael@ximian.com>
+
+	* src/IIOP/giop-msg-buffer.c
+	kill #define writev mess.
+	(giop_send_buffer_write): handle EINTR, handle EAGAIN
+	correctly, handle short writev's correctly, test
+	thorougly.
+
+	* src/ORBitutil/compat.c (g_writev): kill this
+	abomination.
+
+2002-02-11  Sebastian Wilhelmi  <wilhelmi@ira.uka.de>
+
+	* src/orb/allocators.h, src/orb/allocators.c (ORBit_alloc_2,
+	ORBit_free): Make the free marker really always sit directly in
+	front of the memory block, not at some random lower position.
+
+2002-02-09 Elliot Lee <sopwith@redhat.com>
+	* src/ORBitutil/os-feature-alloca.h: Don't redefine alloca if it is already defined.
+
+2002-01-27  Darin Adler  <darin@bentspoon.com>
+
+	* test/everything/Makefile.am: Added -lm -- can't build without it.
+
+2002-01-25  Mark McLoughlin  <mark@skynet.ie>
+
+	* configure.in: (AC_CHECK_ALIGNOF): error out if an alignment
+	is found to be zero. 
+
+2002-01-07  Mark McLoughlin  <mark@skynet.ie>
+
+	* Version 0.5.13
+
+2002-01-07  Mark McLoughlin  <mark@skynet.ie>
+
+	Reported by Chris Waters <xtifr@debian.org>
+
+	* src/orbit-idl-compiler/orbit-idl-main.c: fix --skeleton-impl
+	help output.
+
+	* src/services/event/Makefile.am:
+	* src/services/name/Makefile.am:
+	* src/services/time/Makefile.am: install idl files in
+	$(datadir)/orbit-1.0/idl.
+
+2002-01-03  Huw Rogers <count0@building2.co.jp>
+
+	reviewed by: Mark McLoughlin <mark@skynet.ie>
+
+	* src/orb/corba_any.c: (ORBit_marshal_value): don't do pointer
+	arithmetic on void pointers.
+
+	* src/orb/orb.c: (CORBA_ORB_resolve_initial_references):
+	Sun compiler workaround.
+	
+	* src/orb/orbit_typecode.c: (ORBit_encode_CORBA_TypeCode),
+	(ORBit_decode_CORBA_TypeCode): properly align then buffers
+	before encoding or decoding tyepcodes.
+
+2001-11-01  Michael Meeks  <michael@ximian.com>
+
+	* Version 0.5.12
+
+2001-11-01  Michael Meeks  <michael@ximian.com>
+
+	* src/orb/allocators.c (ORBit_free): fix hideous flow
+	control and, release the typecode once here.
+	(ORBit_free_via_TypeCode): don't release the typecode
+	here - we might be in a sequence or somesuch. Remove
+	slow bloat of continualy re-referencing types. Make the
+	code look pleasant.
+
+	* test/everything/client.c (testAnyStrSeq): impl.
+	(main): hook it up.
+
+	* test/everything/anyServer.c (AnyServer_opAnyStrSeq): impl.
+
+	* src/orb/orbit_typecode.c (ORBit_TypeCode_release):
+	zap the memory so we can detect badness more easily.
+
+2001-10-24  Michael Meeks  <michael@ximian.com>
+
+	* Version 0.5.11
+
+2001-10-23  Michael Meeks  <michael@ximian.com>
+
+	* src/orb/orbit_poa.c (ORBit_POA_handle_request): if
+	oid == NULL don't segv, return ex_CORBA_OBJECT_NOT_EXIST.
+
+2001-10-03  Michael Meeks  <michael@ximian.com>
+
+	* Version 0.5.10
+
+2001-10-03  Michael Meeks  <michael@ximian.com>
+
+	* src/IIOP/giop-msg-buffer.c (giop_dump_recv, dump): add
+	improved debugging infastructure.
+	(giop_recv_message_buffer_use): add debugging.
+	(giop_recv_reply_decode_message): re-hash debugging,
+	add > 128 error msgs.
+
+	* src/orb/orbit_object.c (ORBit_demarshal_profile): accept
+	IOP_TAG_MULTIPLE_COMPONENTS silently, ditto for TAG_GENERIC_IOP,
+	and return NULL not a duff struct.
+	(ORBit_free_profile, ORBit_marshal_profile): silence.
+	(ORBit_demarshal_IOR): tolerate / silently ignore unknown
+	profiles without whacking them on the profile list, as done by
+	ORBit_demarshal_object.
+	(ORBit_demarshal_profile): 
+
+	* src/orb/orb.c (ORBit_emit_profile): silence.
+
+	* src/orb/iop.h (IOP_TAG_GENERIC_IOP): add.
+
+2001-05-30  Michael Meeks  <michael@ximian.com>
+
+	* src/orb/dynany.c (dynany_sequence_realloc_to): fix
+	bug overrunning sequence.

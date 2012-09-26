@@ -1,0 +1,95 @@
+################################################################################
+#
+# python.cygclass - functions for installing Python modules
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: python.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+check_prog_req python
+
+PYTHON=/usr/bin/python
+PYTHON_VERSION=$(${PYTHON} -c 'from distutils.sysconfig import * ; print get_python_version();')
+PYTHON_LIB=$(${PYTHON} -c 'from distutils.sysconfig import * ; print get_python_lib(0,1);')
+PYTHON_SITELIB=$(${PYTHON} -c 'from distutils.sysconfig import * ; print get_python_lib(0,0);')
+PYTHON_INCLUDEDIR=$(${PYTHON} -c 'from distutils.sysconfig import * ; print get_python_inc();')
+LIBPYTHON="-L${PYTHON_LIB}/config -lpython${PYTHON_VERSION}"
+
+pythoninto() {
+	if (( $# != 1 ))
+	then
+	    error "pythoninto accepts exactly one argument";
+	fi
+
+	case ${1} in
+    	/*) error "pythoninto argument should be only a subdirectory" ;;
+	esac
+
+	export _pythoninto_dir=${1};
+}
+
+dopython() {
+	local pydir
+	local i
+
+	if defined _pythoninto_dir
+	then
+		pydir=${PYTHON_SITELIB}/${_pythoninto_dir}
+	else
+		pydir=${PYTHON_SITELIB}
+	fi
+
+	dodir ${pydir}
+
+	for i
+	do
+		if [ -e ${i} ]
+		then
+			case ${i} in
+				*.dll)
+					/bin/install -m0755 ${i} ${D}${pydir} || error "dopython ${i} failed"
+					;;
+				*)
+					/bin/install -m0644 ${i} ${D}${pydir} || error "dopython ${i} failed"
+					;;
+			esac
+		else
+			error "dopython: ${i}: file not found"
+		fi
+	done
+}
+
+python_optimize() {
+	local pyd
+
+	for pyd in "${@:-${PYTHON_SITELIB}}"
+	do
+		if [ ! -d ${D}${pyd} ]
+		then
+			error "directory ${pyd} does not exist"
+		fi
+
+		inform "Compiling ${pyd}..."
+		${PYTHON} ${PYTHON_LIB}/compileall.py ${D}${pyd} &> /dev/null
+		${PYTHON} -OO ${PYTHON_LIB}/compileall.py ${D}${pyd} &> /dev/null
+	done
+}
+
+python_compile() { python_optimize ${@} ; }

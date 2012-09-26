@@ -1,0 +1,65 @@
+################################################################################
+#
+# apache.cygclass - wrapper for versioned apache cygclasses
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: apache.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+case ${PN} in
+	apache-*)
+		APACHE_MAJOR=1
+		;;
+	apache2-*)
+		APACHE_MAJOR=2
+		;;
+	*)
+		case ${APACHE_MAJOR} in
+			1|2)	;;
+			*|'')	error "APACHE_MAJOR must be defined to 1 or 2" ;;
+		esac
+		;;
+esac
+
+inherit apache${APACHE_MAJOR}
+
+apache_compile() {
+	apache${APACHE_MAJOR}_compile "$@"
+}
+
+apache_apxs_compile() {
+	apache${APACHE_MAJOR}_apxs_compile "$@"
+}
+
+apxs_compile() {
+	apache${APACHE_MAJOR}_apxs_compile "$@"
+}
+
+doapacheconf() {
+	doapache${APACHE_MAJOR}conf "$@"
+}
+
+doapachemod() {
+	doapache${APACHE_MAJOR}mod "$@"
+}
+
+apache_postinst() {
+	apache${APACHE_MAJOR}_postinst
+}

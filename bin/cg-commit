@@ -1,0 +1,628 @@
+#!/usr/bin/env bash
+#
+# Commit changes in the working tree to the repository
+# Copyright (c) Petr Baudis, 2005
+#
+# Commits your changes to the GIT repository. Accepts the commit message
+# from `stdin`. If the commit message is not modified the commit will be
+# aborted.
+#
+# Note that you can undo a commit by the `cg-admin-uncommit` command,
+# but that is possible only under special circumstances. See the CAVEATS
+# section of its documentation.
+#
+# Commit author
+# ~~~~~~~~~~~~~
+# Each commit has two user identification fields - commit author and committer.
+# By default, it is recorded that you authored the commit, but it is considered
+# a good practice to change this to the actual author of the change if you are
+# merely applying someone else's patch. It is always recorded that you were the
+# patch committer.
+#
+# The commit author is determined by examining various sources in this order:
+#
+# * '--author' (see OPTIONS)
+#
+# * 'GIT_AUTHOR_*' (see ENVIRONMENT)
+#
+# * Configuration file: you can insert this to '.git/config' or '~/.gitconfig':
+#
+#	[user]
+#		name = "Your Name"
+#		email = "your@email.address.xz"
+#
+# * System information: The author name defaults to the GECOS field of your
+#   '/etc/passwd' entry, which is taken almost verbatim. The author email
+#   defaults to your 'username@hostname.domainname' (but you should change this
+#   to the real email address you use if it is any different).
+#
+# OPTIONS
+# -------
+# --amend:: Amend the last commit (dangerous: see `cg-admin-uncommit`)
+#	Amend the last commit with some additional stuff; this will use your
+#	current working copy as the new commit "contents" and otherwise
+#	have similar effects as -c HEAD; the new commit will _replace_ the
+#	current HEAD - which means that you should read `cg-admin-uncommit`
+#	caveats section. If you want to adjust the log message or authorship
+#	information, use it with combination with the '-e' option.
+#
+# --author AUTHOR_STRING:: Set the author information according to the argument
+#	Set the commit author information according to the argument instead
+#	of your environment, .git/author, or user information.
+#
+#	The 'AUTHOR_STRING' format is `Author Name <author@email> Date`. The
+#	author name and date is optional, only the email is required to be
+#	always present (e.g. '--author "<pasky@ucw.cz>"' will use the current
+#	date and the real name set for your system account (usually in
+#	the GECOS field), but a different email address).
+#
+# -c COMMIT_ID:: Copy author info and commit message from COMMIT_ID
+#	Copy the commit metainformation from a given commit ID (that is, only
+#	the author information and the commit message - NOT committer
+#	information and NOT the commit diff). This option is typically used
+#	when replaying commits from one lineage or repository to another - see
+#	also `cg-patch -C` (if you want to apply the diffs as well).
+#
+# -C:: Ignore cache
+#	Make `cg-commit` ignore the cache and just commit the thing as-is.
+#	Note, this is used internally by 'Cogito' when merging, and it is
+#	also useful when you are performing the initial commit manually. This
+#	option does not make sense when files are given on the command line.
+#
+# -m MESSAGE:: Specify commit message
+#	Specify the commit message, which is used instead of starting
+#	up an editor (if the input is not `stdin`, the input is appended
+#	after all the '-m' messages). Multiple '-m' parameters are appended
+#	to a single commit message, each as separate paragraph.
+#
+# -M FILE:: Read commit message from a file
+#	Include commit message from a file (this has the same effect as if
+#	you would cat it to stdin).
+#
+# -e:: Force message editing of messages given with -m
+#	Force the editor to be brought up even when '-m' parameters were
+#	passed to `cg-commit`.
+#
+# -E:: Force message editing and commit the result
+#	Force the editor to be brought up and do the commit even if
+#	the default commit message is not changed.
+#
+# -f:: Force commit when no changes has been made
+#	Force the commit even when there's "nothing to commit", that is
+#	the tree is the same as the last time you committed, no changes
+#	happened. This also forces the commit even if committing is blocked
+#	for some reason.
+#
+# -N:: Only update the cache
+#	Don't add the files to the object database, just update the caches
+#	and the commit information. This is for special purposes when you
+#	might not actually _have_ any object database. This option is
+#	normally not interesting.
+#
+# --no-hooks:: Do not call any commit hooks
+#	Do not call any commit hooks during the commit.
+#
+# -p, --review:: Show and enable editing of changes being committed
+#	Show changes being committed as a patch appended to the commit message
+#	buffer. Changes made to the patch will be reapplied before completing
+#	the commit. This implies '-e'.
+#
+# -q:: Be very very quiet
+#	Be quiet in case there's "nothing to commit", and silently exit
+#	returning success. In a sense, this is the opposite to '-f'.
+#
+# -s, --signoff[=STRING]:: Automatically append a sign off line
+#	Add Signed-off-by line at the end of the commit message.
+#	Optionally, specify the exact name and email to sign off with by
+#	passing: `--signoff="Author Name <user@example.com>"`.
+#
+# FILES
+# -----
+# $GIT_DIR/commit-template::
+#	If the file exists it will be used as a template when creating
+#	the commit message. The template file makes it possible to
+#	automatically add `Signed-off-by` line to the log message.
+#
+# $GIT_DIR/hooks/commit-post::
+#	If the file exists and is executable it will be executed upon
+#	completion of the commit. The script is passed two arguments.
+#	The first argument is the commit ID and the second is the
+#	branchname. A sample `commit-post` script might look like:
+#
+#	#!/bin/sh
+#	id=$1
+#	branch=$2
+#	echo "Committed $id in $branch" | mail user@host
+#
+# ENVIRONMENT VARIABLES
+# ---------------------
+# See the 'Commit author' section above for details about the name/email/date
+# environment variables meaning and default values.
+#
+# GIT_AUTHOR_NAME::
+#	Author's name.
+#
+# GIT_AUTHOR_EMAIL::
+#	Author's e-mail address.
+#
+# GIT_AUTHOR_DATE::
+#	Date, useful when applying patches submitted over e-mail.
+#
+# GIT_COMMITTER_NAME::
+#	Committer's name.
+#
+# GIT_COMMITTER_EMAIL::
+#	Committer's e-mail address. The recommended policy is not to change
+#	this, though - it may not be necessarily a valid e-mail address, but
+#	its purpose is more to identify the actual user and machine
+#	where the commit was done. However, it is obviously ultimately
+#	a policy decision of a particular project to determine whether
+#	this should be a real e-mail or not.
+#
+# GIT_COMMITTER_DATE::
+#	This is the date of the commit itself. It should be never
+#	overridden, unless you know you absolutely need to override it
+#	(to ensure the commit gets the same ID as another or when
+#	migrating history around).
+#
+# EDITOR::
+#	The editor used for entering revision log information.
+#
+# CONFIGURATION VARIABLES
+# -----------------------
+# The following GIT configuration file variables are recognized:
+#
+# user.author, user.email::
+#	User credentials. See the "Commit author" section for details.
+#
+# cogito.hooks.commit.post.allmerged::
+#	If set to "true" and you are committing a merge, the post-hook will
+#	be called for all the merged commits in sequence (the earliest first).
+#	Otherwise, the hook will be called only for the merge commit.
+
+# Testsuite: Partial (used in many tests but a dedicated testsuite is missing)
+
+USAGE="cg-commit [-m MESSAGE]... [-e] [-c COMMIT_ID] [OTHER_OPTIONS] [FILE]... [< MESSAGE]"
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+
+### XXX: The spaghetti code below got rather messy and convoluted over
+### the time. Someone should clean it up. :/ --pasky
+
+
+load_author()
+{
+	local astr="$1" force="$2"
+	if [ "$force" -o -z "$GIT_AUTHOR_NAME" ] && echo "$astr" | grep -q '^[^< ]'; then
+		export GIT_AUTHOR_NAME="$(echo "$astr" | sed 's/ *<.*//')"
+	fi
+	if [ "$force" -o -z "$GIT_AUTHOR_EMAIL" ] && echo "$astr" | grep -q '<.*>'; then
+		export GIT_AUTHOR_EMAIL="$(echo "$astr" | sed 's/.*<\(.*\)>.*/\1/')"
+	fi
+	if [ "$force" -o -z "$GIT_AUTHOR_DATE" ] && echo "$astr" | grep -q '[^> ]$'; then
+		export GIT_AUTHOR_DATE="$(echo "$astr" | sed 's/.*> *//')"
+	fi
+}
+
+if [ -s "$_git/author" ]; then
+	warn ".git/author is obsolete, use .git/config instead (see the cg-commit docs)"
+	load_author "$(cat "$_git/author")"
+fi
+if [ -z "$GIT_AUTHOR_NAME" -o -z "$GIT_AUTHOR_EMAIL" ]; then
+	# Always pre-fill those so that the user can modify them in the
+	# commit template.
+	idline="$(git var GIT_AUTHOR_IDENT)"
+	[ -z "$GIT_AUTHOR_NAME" ] && export GIT_AUTHOR_NAME="$(echo "$idline" | sed 's/ *<.*//')"
+	[ -z "$GIT_AUTHOR_EMAIL" ] && export GIT_AUTHOR_EMAIL="$(echo "$idline" | sed 's/.*<\(.*\)>.*/\1/')"
+fi
+
+force=
+forceeditor=
+ignorecache=
+infoonly=
+commitalways=
+missingok=
+amend=
+review=
+signoff=
+copy_commit=
+msgs=()
+msgfile=
+quiet=
+no_hooks=
+while optparse; do
+	if optparse --author=; then
+		load_author "$OPTARG" force
+	elif optparse -C; then
+		ignorecache=1
+	elif optparse -N; then
+		missingok=--missing-ok
+		infoonly=--info-only
+	elif optparse -e; then
+		forceeditor=1
+	elif optparse -E; then
+		forceeditor=1
+		commitalways=-f
+	elif optparse -f; then
+		force=1
+	elif optparse -q; then
+		quiet=1
+	elif optparse --amend; then
+		amend=1
+		copy_commit="$(cg-object-id -c HEAD)" || exit 1
+	elif optparse -p || optparse --review; then
+		review=1
+		forceeditor=1
+	elif optparse -s || optparse --signoff; then
+		[ "$signoff" ] || signoff="$(git var GIT_AUTHOR_IDENT | sed 's/> .*/>/')"
+	elif optparse --signoff=; then
+		signoff="$OPTARG"
+	elif optparse -m=; then
+		msgs[${#msgs[@]}]="$OPTARG"
+	elif optparse -M=; then
+		msgfile="$OPTARG"
+	elif optparse -c=; then
+		copy_commit="$(cg-object-id -c "$OPTARG")" || exit 1
+	elif optparse --no-hooks; then
+		no_hooks=1
+	else
+		optfail
+	fi
+done
+
+if [ -s "$_git/blocked" ]; then
+	if [ "$force" ]; then
+		warn "committing to a blocked repository. Assuming you know what are you doing."
+	else
+		die "committing blocked: $(cat "$_git/blocked")"
+	fi
+fi
+
+[ "$ignorecache" ] || cg-object-id HEAD >/dev/null 2>&1 || die "no previous commit; use -C for the initial commit"
+
+editor=
+[ "$forceeditor" ] && editor=1
+no_custom_messages=
+[ ! "$msgs" ] && [ ! "$msgfile" ] && no_custom_messages=1
+[ "$no_custom_messages" ] && [ ! "$copy_commit" ] && editor=1
+
+tmpdir="$(mktemp -d -t gitci.XXXXXX)"
+cleanup () { rm -rf "$tmpdir"; }
+cleanup_trap "cleanup"
+trap "cleanup" EXIT
+
+if [ "$review" ]; then
+	PATCH="$tmpdir/patch.diff"
+	PATCH2="$tmpdir/patch2.diff"
+	editor=1
+fi
+
+if [ "$amend" ]; then
+	[ "$merging" ] && die "cannot amend previous commit in the middle of a merge"
+	# Recommit even with no changes to the content; meta might change
+	force=1
+fi
+
+if [ "$ARGS" -o "$_git_relpath" ]; then
+	[ "$ignorecache" ] && die "-C and listing files to commit does not make sense"
+	[ -s "$_git/merging" ] && die "cannot commit individual files when merging"
+
+	filter="$tmpdir/filter"
+	[ "$_git_relpath" -a ! "$ARGS" ] && echo "$_git_relpath" >>"$filter"
+	for file in "${ARGS[@]}"; do
+		echo "${_git_relpath}$file" >>"$filter"
+	done
+
+	eval "commitfiles=($(cat "$filter" | path_xargs git diff-index --name-status -z -r -m HEAD -- | \
+		perl -n0e 'chomp; if (defined $meta) { s/([\"\\])/\\\1/; print "\"$meta $_\"\n"; $meta=undef } else { $meta = $_ }'))"
+	customfiles=1
+
+	[ "$review" ] && cat "$filter" | path_xargs git diff-index -r -m -p HEAD -- > "$PATCH"
+	rm "$filter"
+
+else
+	# We bother with added/removed files here instead of updating
+	# the cache at the time of cg-(add|rm), since we want to
+	# have the cache in a consistent state representing the tree
+	# as it was the last time we committed. Otherwise, e.g. partial
+	# conflicts would be a PITA since added/removed files would
+	# be committed along automagically as well.
+
+	if [ ! "$ignorecache" ]; then
+		# \t instead of the tab character itself works only with new
+		# sed versions.
+		eval "commitfiles=($(git diff-index --name-status -z -r -m HEAD | \
+			perl -n0e 'chomp; if (defined $meta) { s/([\"\\])/\\\1/; print "\"$meta $_\"\n"; $meta=undef } else { $meta = $_ }'))"
+
+		if [ -s "$_git/commit-ignore" ]; then
+			newcommitfiles=()
+			for file in "${commitfiles[@]}"; do
+				fgrep -qx "${file:2}" "$_git/commit-ignore" && continue
+				newcommitfiles[${#newcommitfiles[@]}]="$file"
+			done
+			commitfiles=("${newcommitfiles[@]}")
+		fi
+	fi
+
+	[ "$review" ] && git diff-index -r -m -p HEAD > "$PATCH"
+
+	merging=
+	[ -s "$_git/merging" ] && merging="$(cat "$_git/merging" | sed 's/^/-p /')"
+fi
+
+
+if [ "$review" ]; then
+	LOGMSG="$tmpdir/logmsg.diff"
+	LOGMSG2="$tmpdir/logmsg2.diff"
+else
+	LOGMSG="$tmpdir/logmsg"
+	LOGMSG2="$tmpdir/logmsg2"
+fi
+
+written=
+if [ "$merging" ] && [ ! "$editor" ]; then
+	warn "suppressing default merge log messages in favour of the custom -m passed to me."
+elif [ "$merging" ]; then
+	echo -n 'Merge with ' >>"$LOGMSG"
+	[ -s "$_git/merging-sym" ] || cp "$_git/merging" "$_git/merging-sym"
+	for sym in $(cat "$_git/merging-sym"); do
+		uri="$(cat "$_git/branches/$sym" 2>/dev/null)"
+		[ "$uri" ] || uri="$sym"
+		echo "$uri" >>"$LOGMSG"
+	done
+	echo >>"$LOGMSG"
+	if [ -s "$_git/squashing" ]; then
+		# We are squashing all the merged commits to a single one.
+		# Therefore, helpfully pre-fill the commit message with
+		# the messages of all the merged commits.
+		git rev-list --pretty "$(cat "$_git/merging")" ^HEAD >>"$LOGMSG"
+	fi
+	written=1
+fi
+for msg in "${msgs[@]}"; do
+	[ "$written" ] && echo >>"$LOGMSG"
+	echo "$msg" | fmt -s >>"$LOGMSG"
+	written=1
+done
+
+if [ "$copy_commit" ]; then
+	[ "$written" ] && echo >>"$LOGMSG"
+	eval "$(git cat-file commit "$copy_commit" | pick_author)"
+	# --amend -m _replaces_ the original message
+	if [ ! "$amend" ] || [ "$editor" ] || [ "$no_custom_messages" ]; then
+		git cat-file commit "$copy_commit" | sed -e '1,/^$/d' >>"$LOGMSG"
+		written=1
+	fi
+fi
+
+if [ "$msgfile" ]; then
+	[ "$written" ] && echo >>"$LOGMSG"
+	cat "$_git_relpath$msgfile" >>"$LOGMSG" || exit 1
+	written=1
+fi
+
+add_signoff() {
+	local logmsg="$1"
+	if [ "$signoff" ] && ! grep -q -i "signed-off-by: $signoff" $logmsg; then
+		grep -q -i signed-off-by $logmsg || echo
+		echo "Signed-off-by: $signoff"
+	fi >>"$logmsg"
+}
+
+if editor_shalluse "$forceeditor"; then
+	# Always have at least one blank line, to ease the editing for
+	# the poor people whose text editor has no 'O' command.
+	[ "$written" ] || echo >>"$LOGMSG"
+	# Also, add the signoff line _now_ before spewing out CG: lines.
+	# (In case of non-tty input we do it later after taking the actual
+	# log message from stdin.)
+	add_signoff "$LOGMSG"
+fi
+
+# CG: -----------------------------------------------------------------------
+editor_comment_start commit
+
+if [ "$GIT_AUTHOR_NAME" -o "$GIT_AUTHOR_EMAIL" -o "$GIT_AUTHOR_DATE" ]; then
+	echo "CG:" >>"$LOGMSG"
+	[ "$GIT_AUTHOR_NAME" ] && echo "CG: Author: $GIT_AUTHOR_NAME" >>"$LOGMSG"
+	[ "$GIT_AUTHOR_EMAIL" ] && echo "CG: Email: $GIT_AUTHOR_EMAIL" >>"$LOGMSG"
+	[ "$GIT_AUTHOR_DATE" ] && echo "CG: Date: $GIT_AUTHOR_DATE" >>"$LOGMSG"
+	echo "CG:" >>"$LOGMSG"
+fi
+
+if [ ! "$ignorecache" ] && [ ! "$review" ]; then
+	if [ ! "$merging" ]; then
+		if [ ! "$force" ] && [ ! "${commitfiles[*]}" ]; then
+			rm "$LOGMSG"
+			[ "$quiet" ] && exit 0 || die 'Nothing to commit'
+		fi
+		echo "CG: By deleting lines beginning with CG:F, the associated file" >>"$LOGMSG"
+		echo "CG: will be removed from the commit list." >>"$LOGMSG"
+	fi	
+	echo "CG:" >>"$LOGMSG"
+	echo "CG: Modified files:" >>"$LOGMSG"
+	for file in "${commitfiles[@]}"; do
+		# TODO: Prepend a letter describing whether it's addition,
+		# removal or update. Or call git status on those files.
+		echo "CG:F   $file" >>"$LOGMSG"
+		[ ! "$editor" ] && echo "$file"
+	done
+	if [ -s "$_git/commit-ignore" ]; then
+		echo "CG:" >>"$LOGMSG"
+		echo "CG: I have kept back the $(wc -l "$_git/commit-ignore" | cut -d ' ' -f 1) file(s) containing your local changes." >>"$LOGMSG"
+		echo "CG: You need not worry, the local changes will not interfere with the merge." >>"$LOGMSG"
+	fi
+fi
+if [ "$review" ]; then
+	echo "CG: Changes summary:"
+	echo "CG:"
+	git apply --stat --summary < "$PATCH" | sed 's/^/CG: /'
+	echo "CG:"
+fi >>"$LOGMSG"
+
+# CG: -----------------------------------------------------------------------
+editor_comment_end $commitalways commit
+
+ftdiff=
+if [ "$review" ]; then
+	{
+		echo "CG:"
+		echo "CG: The patch being committed:"
+		echo "CG: (You can edit it; your tree will be modified accordingly and"
+		echo "CG: the modified patch will be committed.)"
+		echo "CG:"
+		cat "$PATCH"
+	} >>"$LOGMSG"
+fi
+editor_msg_end
+
+cp "$LOGMSG" "$LOGMSG2"
+if editor_shalluse "$forceeditor"; then
+	if [ "$editor" ] && ! editor $commitalways commit c; then
+		rm "$LOGMSG" "$LOGMSG2"
+		[ "$review" ] && rm "$PATCH"
+		echo "Commit message not modified, commit aborted" >&2
+		if [ "$merging" ]; then
+			cat >&2 <<__END__
+Note that the merge is NOT aborted - you can cg-commit again, cg-reset will abort it.
+__END__
+			[ -s "$_git/commit-ignore" ] && cat >&2 <<__END__
+(But note that cg-reset will remove your pending local changes as well!)
+__END__
+		fi
+		exit 1
+	fi
+	if [ ! "$ignorecache" ] && [ ! "$merging" ] && [ ! "$review" ]; then
+		eval "newcommitfiles=($(grep ^CG:F "$LOGMSG2" | sed -e 's/\"/\\&/g' -e 's/^CG:F *\(.*\)$/"\1"/'))"
+		if [ ! "$force" ] && [ ! "${newcommitfiles[*]}" ]; then
+			rm "$LOGMSG" "$LOGMSG2"
+			[ "$quiet" ] && exit 0 || die 'Nothing to commit'
+		fi
+		if [ "${commitfiles[*]}" != "${newcommitfiles[*]}" ]; then
+			commitfiles=("${newcommitfiles[@]}")
+			customfiles=1
+		fi
+	fi
+	editor_parse_setif GIT_AUTHOR_NAME Author
+	editor_parse_setif GIT_AUTHOR_EMAIL Email
+	editor_parse_setif GIT_AUTHOR_DATE Date
+else
+	cat >>"$LOGMSG2"
+	add_signoff "$LOGMSG2"
+fi
+
+if [ ! "$review" ]; then
+	editor_parse_clean
+else
+	sed '/^CG: Changes summary:/,$d' < "$LOGMSG2" > "$LOGMSG"
+	sed -n '/^CG: Changes summary:/,$p' < "$LOGMSG2" | grep -v ^CG: > "$PATCH2"
+	mv "$LOGMSG" "$LOGMSG2"; editor_parse_clean
+fi
+rm "$LOGMSG2"
+
+if [ "$review" ]; then
+	if ! cmp -s "$PATCH" "$PATCH2"; then
+		echo "Reverting the original patch..."
+		if ! cg-patch -R < "$PATCH"; then
+			die "unable to revert the original patch; the original patch is available in $PATCH, your edited patch is available in $PATCH2, your log message is in $LOGMSG, your working copy is in undefined state now and the world is about to end in ten minutes, have a nice day"
+		fi
+		echo "Applying the edited patch..."
+		if ! cg-patch < "$PATCH2"; then
+			# FIXME: Do something better to alleviate this situation.
+			# At least restore the tree to the original state.
+			die "unable to apply the edited patch; the original patch is available in $PATCH, your edited patch is available in $PATCH2, your log message is in $LOGMSG, your working copy is in undefined state now and the world is about to end in five minutes, have a nice day"
+		fi
+	fi
+fi
+
+
+precommit_update()
+{
+	queueN=(); queueD=(); queueM=();
+	for file in "$@"; do
+		op="${file%% *}"
+		fname="${file#* }"
+		[ "$op" = "N" ] && op=A # N is to be renamed to A
+		[ "$op" = "A" ] || [ "$op" = "D" ] || [ "$op" = "M" ] || op=M
+		eval "queue$op[\${#queue$op[@]}]=\"\$fname\""
+	done
+	oldIFS="$IFS"
+	IFS=$'\n'
+	# XXX: Do we even need to do the --add and --remove update-caches?
+	[ "$queueA" ] && { ( echo "${queueA[*]}" | path_xargs git update-index --add ${infoonly} -- ) || return 1; }
+	[ "$queueD" ] && { ( echo "${queueD[*]}" | path_xargs git update-index --force-remove -- ) || return 1;  }
+	[ "$queueM" ] && { ( echo "${queueM[*]}" | path_xargs git update-index ${infoonly} -- ) || return 1; }
+	IFS="$oldIFS"
+	return 0
+}
+
+if [ ! "$ignorecache" ]; then
+	if [ "$customfiles" ]; then
+		precommit_update "${commitfiles[@]}" || die "update-cache failed"
+		export GIT_INDEX_FILE="$tmpdir/index"
+		git read-tree HEAD
+	fi
+	precommit_update "${commitfiles[@]}" || die "update-cache failed"
+fi
+
+
+oldhead=
+oldheadname="$(git symbolic-ref HEAD)"
+if [ -s "$_git/$oldheadname" ]; then
+	oldhead="$(cat "$_git/$oldheadname")"
+	oldheadstr="-p $oldhead"
+fi
+if [ "$amend" ]; then
+	oldheadstr="$(cg-object-id -p "$oldhead" | sed 's/^/-p /')"
+fi
+
+treeid="$(git write-tree ${missingok})"
+[ "$treeid" ] || die "git write-tree failed"
+if [ ! "$force" ] && [ ! "$merging" ] && [ "$oldhead" ] &&
+   [ "$treeid" = "$(cg-object-id -t)" ]; then
+	echo "Refusing to make an empty commit - the tree was not modified" >&2
+	echo "since the previous commit. If you really want to make the" >&2
+	echo "commit, pass cg-commit the -f argument." >&2
+	exit 2;
+fi
+
+[ -s "$_git/squashing" ] && merging=" " # viciously prevent recording a proper merge
+newhead=$(git commit-tree $treeid $oldheadstr $merging <"$LOGMSG")
+rm "$LOGMSG"
+
+if [ "$customfiles" ]; then
+	rm "$GIT_INDEX_FILE"
+	export GIT_INDEX_FILE=
+fi
+
+if [ "$newhead" ]; then
+	git update-ref HEAD $newhead $oldhead || die "unable to move to the new commit $newhead"
+	echo "Committed as $newhead"
+	[ "$merging" ] && rm -f "$_git/merging" "$_git/merging-sym" "$_git/merge-base" "$_git/squashing"
+	rm -f "$_git/commit-ignore"
+
+	# Trigger the postcommit hook
+	branchname=
+	if [ -s "$_git/branch-name" ]; then
+		warn ".git/branch-name is deprecated and support for it will be removed soon."
+		warn "So please stop relying on it, or complain at pasky@suse.cz. Thanks."
+		branchname="$(cat "$_git/branch-name")"
+	fi
+	[ -z "$branchname" ] && [ "$_git_head" != "master" ] && branchname="$_git_head"
+	if [ -x "$_git/hooks/commit-post" -a ! "$no_hooks" ]; then
+		if [ "$(git repo-config --bool cogito.hooks.commit.post.allmerged)" = "true" ]; then
+			# We just hope that for the initial commit, the user didn't
+			# manage to install the hook yet.
+			for merged in $(git rev-list $newhead ^$oldhead | tac); do
+				"$_git/hooks/commit-post" "$merged" "$branchname"
+			done
+		else
+			"$_git/hooks/commit-post" "$newhead" "$branchname"
+		fi
+	fi
+
+	exit 0
+else
+	die "error during commit (oldhead $oldhead, treeid $treeid)"
+fi

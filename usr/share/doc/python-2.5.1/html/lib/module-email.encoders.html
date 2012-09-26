@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-email.errors.html" />
+<link rel="prev" href="module-email.charset.html" />
+<link rel="parent" href="module-email.html" />
+<link rel="next" href="module-email.errors.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.1.7 Encoders</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.6 representing character sets"
+  href="module-email.charset.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.8 exception and Defect"
+  href="module-email.errors.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.charset.html">7.1.6 Representing character sets</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.errors.html">7.1.8 Exception and Defect</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009170000000000000000">
+7.1.7 Encoders</a>
+</h2>
+<a name="module-email.encoders"></a>
+
+<p>
+When creating <tt class="class">Message</tt> objects from scratch, you often need to
+encode the payloads for transport through compliant mail servers.
+This is especially true for <span class="mimetype">image/*</span> and <span class="mimetype">text/*</span>
+type messages containing binary data.
+
+<p>
+The <tt class="module">email</tt> package provides some convenient encodings in its
+<tt class="module">encoders</tt> module.  These encoders are actually used by the
+<tt class="class">MIMEAudio</tt> and <tt class="class">MIMEImage</tt> class constructors to provide default
+encodings.  All encoder functions take exactly one argument, the message
+object to encode.  They usually extract the payload, encode it, and reset the
+payload to this newly encoded value.  They should also set the
+<span class="mailheader">Content-Transfer-Encoding:</span> header as appropriate.
+
+<p>
+Here are the encoding functions provided:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1303' xml:id='l2h-1303' class="function">encode_quopri</tt></b>(</nobr></td>
+  <td><var>msg</var>)</td></tr></table></dt>
+<dd>
+Encodes the payload into quoted-printable form and sets the
+<span class="mailheader">Content-Transfer-Encoding:</span> header to
+<code>quoted-printable</code><a name="tex2html56"
+  href="#foot21544"><sup>7.2</sup></a>.
+This is a good encoding to use when most of your payload is normal
+printable data, but contains a few unprintable characters.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1304' xml:id='l2h-1304' class="function">encode_base64</tt></b>(</nobr></td>
+  <td><var>msg</var>)</td></tr></table></dt>
+<dd>
+Encodes the payload into base64 form and sets the
+<span class="mailheader">Content-Transfer-Encoding:</span> header to
+<code>base64</code>.  This is a good encoding to use when most of your payload
+is unprintable data since it is a more compact form than
+quoted-printable.  The drawback of base64 encoding is that it
+renders the text non-human readable.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1305' xml:id='l2h-1305' class="function">encode_7or8bit</tt></b>(</nobr></td>
+  <td><var>msg</var>)</td></tr></table></dt>
+<dd>
+This doesn't actually modify the message's payload, but it does set
+the <span class="mailheader">Content-Transfer-Encoding:</span> header to either <code>7bit</code> or
+<code>8bit</code> as appropriate, based on the payload data.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1306' xml:id='l2h-1306' class="function">encode_noop</tt></b>(</nobr></td>
+  <td><var>msg</var>)</td></tr></table></dt>
+<dd>
+This does nothing; it doesn't even set the
+<span class="mailheader">Content-Transfer-Encoding:</span> header.
+</dl>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot21544">...quoted-printable</a><A
+ href="module-email.encoders.html#tex2html56"><sup>7.2</sup></a></dt>
+<dd>Note that encoding with
+<tt class="method">encode_quopri()</tt> also encodes all tabs and space characters in
+the data.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.6 representing character sets"
+  href="module-email.charset.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.8 exception and Defect"
+  href="module-email.errors.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.charset.html">7.1.6 Representing character sets</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.errors.html">7.1.8 Exception and Defect</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

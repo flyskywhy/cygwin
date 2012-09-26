@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="python-terms.html" />
+<link rel="prev" href="concepts.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="python-terms.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.2 A Simple Example</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.1 concepts &amp; Terminology"
+  href="concepts.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. an Introduction to"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.3 general Python terminology"
+  href="python-terms.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="concepts.html">1.1 Concepts &amp; Terminology</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. An Introduction to</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="python-terms.html">1.3 General Python terminology</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION001200000000000000000"></a>
+<a name="simple-example"></a>
+<br>
+1.2 A Simple Example
+</h1>
+
+<p>
+The setup script is usually quite simple, although since it's written
+in Python, there are no arbitrary limits to what you can do with it,
+though you should be careful about putting arbitrarily expensive
+operations in your setup script. Unlike, say, Autoconf-style configure
+scripts, the setup script may be run multiple times in the course of
+building and installing your module distribution.  
+
+<p>
+If all you want to do is distribute a module called <tt class="module">foo</tt>,
+contained in a file <span class="file">foo.py</span>, then your setup script can be as
+simple as this:
+
+<p>
+<div class="verbatim"><pre>
+from distutils.core import setup
+setup(name='foo',
+      version='1.0',
+      py_modules=['foo'],
+      )
+</pre></div>
+
+<p>
+Some observations:
+
+<ul>
+<li>most information that you supply to the Distutils is supplied as
+  keyword arguments to the <tt class="function">setup()</tt> function
+</li>
+<li>those keyword arguments fall into two categories: package
+  metadata (name, version number) and information about what's in the
+  package (a list of pure Python modules, in this case)
+</li>
+<li>modules are specified by module name, not filename (the same will
+  hold true for packages and extensions)
+</li>
+<li>it's recommended that you supply a little more metadata, in
+  particular your name, email address and a URL for the project
+  (see section&nbsp;<a href="setup-script.html#setup-script">2</a> for an example)
+</li>
+</ul>
+
+<p>
+To create a source distribution for this module, you would create a
+setup script, <span class="file">setup.py</span>, containing the above code, and run:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py sdist
+</pre></div>
+
+<p>
+which will create an archive file (e.g., tarball on <span class="Unix">Unix</span>, ZIP file on
+Windows) containing your setup script <span class="file">setup.py</span>, and your module
+<span class="file">foo.py</span>.  The archive file will be named <span class="file">foo-1.0.tar.gz</span> (or
+<span class="file">.zip</span>), and will unpack into a directory <span class="file">foo-1.0</span>.
+
+<p>
+If an end-user wishes to install your <tt class="module">foo</tt> module, all she has
+to do is download <span class="file">foo-1.0.tar.gz</span> (or <span class="file">.zip</span>), unpack it,
+and--from the <span class="file">foo-1.0</span> directory--run
+
+<p>
+<div class="verbatim"><pre>
+python setup.py install
+</pre></div>
+
+<p>
+which will ultimately copy <span class="file">foo.py</span> to the appropriate directory
+for third-party modules in their Python installation.
+
+<p>
+This simple example demonstrates some fundamental concepts of the
+Distutils. First, both developers and installers have the same basic
+user interface, i.e. the setup script.  The difference is which
+Distutils <em>commands</em> they use: the <code class="du-command">sdist</code> command is
+almost exclusively for module developers, while <code class="du-command">install</code> is
+more often for installers (although most developers will want to install
+their own code occasionally).
+
+<p>
+If you want to make things really easy for your users, you can create
+one or more built distributions for them.  For instance, if you are
+running on a Windows machine, and want to make things easy for other
+Windows users, you can create an executable installer (the most
+appropriate type of built distribution for this platform) with the
+<code class="du-command">bdist_wininst</code> command.  For example:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist_wininst
+</pre></div>
+
+<p>
+will create an executable installer, <span class="file">foo-1.0.win32.exe</span>, in the
+current directory.
+
+<p>
+Other useful built distribution formats are RPM, implemented by the
+<code class="du-command">bdist_rpm</code> command, Solaris <b class="program">pkgtool</b>
+(<code class="du-command">bdist_pkgtool</code>), and HP-UX <b class="program">swinstall</b>
+(<code class="du-command">bdist_sdux</code>).  For example, the following command will
+create an RPM file called <span class="file">foo-1.0.noarch.rpm</span>:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist_rpm
+</pre></div>
+
+<p>
+(The <code class="du-command">bdist_rpm</code> command uses the <code class="du-command">rpm</code> executable,
+therefore this has to be run on an RPM-based system such as Red Hat
+Linux, SuSE Linux, or Mandrake Linux.)
+
+<p>
+You can find out what distribution formats are available at any time by
+running
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist --help-formats
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.1 concepts &amp; Terminology"
+  href="concepts.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. an Introduction to"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.3 general Python terminology"
+  href="python-terms.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="concepts.html">1.1 Concepts &amp; Terminology</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. An Introduction to</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="python-terms.html">1.3 General Python terminology</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

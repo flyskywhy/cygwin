@@ -1,0 +1,215 @@
+2005-03-04  Owen Taylor  <otaylor@redhat.com>
+
+	* === Released 1.8.1 ===
+
+	* configure.in: Version 1.8.1
+
+	* NEWS: Updated
+
+2005-03-03  Owen Taylor  <otaylor@redhat.com>
+
+	* modules/indic/indic-ot.[ch] modules/indic-ot-class-tables.c:
+	Split out handling of sinhala al-lakuna character from
+	handling of Virama in the state table to avoid implicit
+	formation of conjucts for Sinhala. (Patch from 
+	Harshula, ##161981)
+
+	* modules/indic/indic-fc.c modules/indic/indic-ot.h:
+	Add a new script flag SF_PROCESS_ZWJ indicating
+	whether zero width characters should be passed to
+	gsub/gpos.
+
+	* modules/indic/indic-ot-class-tables.c: Set SF_PROCESS_ZWJ
+	for Sinhala. (#161981, Harshula)
+
+2005-03-03  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pango-fontmap.c (pango_font_map_load_font): Add
+	a g_return_if_fail() if desc doesn't have a family.
+	(#165866, Kees Cook)
+
+2005-03-03  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pangoxft-render.c (pango_xft_renderer_draw_glyphs):
+	Call XftCharIndex() on the right font. (#163511)
+
+2005-03-03  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/opentype/ftxopen.c (Coverage_Index1, Coverage_Index2, 
+	Get_Class2): For all binary searches, handle the case where
+	the number of items is 0. (#162977, Nick Lamb)
+
+	* pango/opentype/ftxgdef.c (TT_GDEF_Build_ClassDefinition):
+	Handle the case where glyph_count == 0 properly. Fix a problem 
+	with cleanups on memory allocation failure.
+	(Get_New_Count, Add_Glyph_Property): Avoid reading off the
+	end of the ClassRangeRecord array.
+
+2005-03-02  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/fonts.c (pango_font_description_from_string_: For
+	family names that add in numbers add a , to distinguish
+	them from family+size (#166540, debugging/testing by
+	Manish Singh)
+
+2005-03-02  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pango-attributes.c (pango_attr_iterator_get_attrs):
+	Fix various typos in the docs (#163244, Morten Welinder)
+
+2005-03-02  Owen Taylor  <otaylor@redhat.com>
+  
+	* pango/pangoxft-font.c (pango_xft_font_get_glyph_extents): 
+	Go back to using Xft-reported metrics for all non-transformed
+	fonts. Reporting non-integer glyph metrics for fonts
+	where people have disabled hinting in their config causes
+	various problems. (reported variously, including #167801, 
+	Adam Sampson)
+	
+2005-03-02  Owen Taylor  <otaylor@redhat.com>
+
+	Redo the handling of absolute sizes for PangoAttribute
+	to work around compatibility problems with GtkHTML which
+	was counting on the details of the implementation of
+	size attributes. (#163154)
+
+	* pango/pango-attributes.[ch] docs/tmpl/text-attributes.sgml:
+	Split PANGO_ATTR_SIZE into PANGO_ATTR_SIZE and 
+	PANGO_ATTR_ABSOLUTE_SIZE, and use that distinction
+	rather than the boolean field in PangoAttrSize to
+	distinguish between attributes created 
+	pango_attr_size_new_absolute() and
+	pango_attr_size_new()
+
+2005-03-01  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pango-layout.c (process_item): Don't break
+	lines on LINE_SEPARATOR in single-paragraph mode.
+	(#168589, Damon Chaplin)
+
+2005-03-01  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pangoxft-font.c: Fix a typo in the last
+	commit (Manish Singh)
+
+2005-03-01  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pangoxft-font.c (xft_font_get_font): Delete
+	FC_SPACING value out of pattern before passing it
+	to Xft, to prevent Xft clipping characters and
+	trashing metrics. (#164879, Billy Biggs)
+
+2005-03-01  Owen Taylor  <otaylor@redhat.com>
+
+	Build fixes from Andrew P. Lentvorski, Jr, #164655
+
+	* pango/pangoft2-render.c: Duplicate the 
+	FT_LOAD_TARGET_MONO/FT_LOAD_MONOCHROME back-compat
+	define from pangoft2.c here
+
+	* examples/Makefile.am (pango_xftview_LDADD): Add
+	X_LIBS to pango_xftview_LDADD since some old versions
+	of xft.pc didn't add -lX11.
+
+2005-03-01  Owen Taylor  <otaylor@redhat.com>
+
+	* configure.in: Use PKG_CHECK_MODULES not AM_PATH_GLIB_2_0
+	to avoid a problem where older verisons of AM_PATH_GLIB_2_0
+	silently ignored gmodule-no-export causing mysterious
+	build failures. (#161786)
+
+	* pango/Makefile.am (DISTCLEANFILES): Move some 
+	configure.in output files from CLEANFILES to DISTCLEANFILES.
+
+2005-03-01  Tor Lillqvist  <tml@novell.com>
+
+	* tests/cxx-test.C: Include pangowin32.h first to avoid
+	a namespace collision. (#163584)
+
+2005-02-21  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/fonts.c (pango_font_get_glyph_extents): 
+	* pango/shape.c (pango_shape): Minor doc fixes.
+	(#167922, #167924, Billy Biggs)
+
+2005-01-31  Matthias Clasen  <mclasen@redhat.com>
+
+	* modules/hebrew/hebrew-fc.c (get_cluster_glyphs): Show
+	unknown glyphs; this may lead to overlapping boxes when
+	accents are involved, but it is better than text vanishing
+	without any traces.
+
+2005-01-25  Tor Lillqvist  <tml@novell.com>
+
+	* pango/pango.def: Add missing entry points.
+
+	* modules/basic/Makefile.am (usp10.h): Don't use -p option to cp,
+	can cause "failed to preserve ownership" errors.
+
+	* modules/*/Makefile.am (INCLUDES): Remove extraneous slash that
+	confuse gcc on Win32.
+
+2005-01-08  Matthias Clasen  <mclasen@redhat.com>
+
+	* pango.pc.in: Require gmodule-no-export-2.0 instead
+	of gmodule-2.0
+
+Thu Jan  6 14:12:35 2005  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pangofc-fontmap.[ch]: Revert some accidentally
+	committed changes.
+
+Thu Jan  6 12:29:31 2005  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pango-attributes.c (pango_attr_iterator_get_font): 
+	Fix reversed test on attr->absolute that was causing 
+	pixels sizes to be used inappropriately. (#163105,
+	Ross Burton)
+
+Tue Jan  4 14:14:28 2005  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/break.c (enum): Fix trailing comma in enum (#162618)
+
+Tue Jan  4 14:11:43 2005  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pango-attributes.c (pango_attr_list_splice): Fix
+	doc sentences to parse. (#161812, Morten Welinder)
+
+Tue Jan  4 14:05:13 2005  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pango-renderer.c (pango_renderer_draw_trapezoid): Rename
+	y1 parameters to y1_ to avoid conflicts with the math.h Bessel
+	function. (#161969)
+
+Fri Dec 31 10:20:55 2004  Owen Taylor  <otaylor@redhat.com>
+ 
+ 	* pango/pangofc-fontmap.c (pango_fc_convert_weight_to_pango): 
+ 	Fix problem where MEDIUM was getting grouped with SEMIBOLD
+ 	rather than NORMAL. 
+ 	(http://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=143832)
+ 
+Wed Dec 22 13:21:01 2004  Owen Taylor  <otaylor@redhat.com>
+ 
+ 	* pango/pango-script.c pango/pango-types.h: Fix a couple
+ 	of documentation typos (#161647, Torsten Schoenfeld)
+ 
+Fri Dec 17 14:37:49 2004  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pangofc-fontmap.c (pango_fc_convert_weight_to_fc): Use
+	FC_WEIGHT_MEDIUM, not FC_WEIGHT_NORMAL in old-fontconfig
+	case. (#161568, Vincent Noel)
+
+Fri Dec 17 12:44:10 2004  Owen Taylor  <otaylor@redhat.com>
+
+	* configure.in: Fix a couple of typos in the handling of
+	tibetan for --with-included-modules. (#161501, Sebastien Bacher)
+
+Fri Dec 17 12:28:56 2004  Owen Taylor  <otaylor@redhat.com>
+
+	* pango/pango-layout.c (pango_layout_get_extents_internal): Fix 
+	bug in computing logical_rect.x when layout->width == -1.
+	(#161510, Morten Welinder)
+
+Thu Dec 16 14:03:32 2004  Owen Taylor  <otaylor@redhat.com>
+
+	* docs/tmpl/pango-renderer.sgml: Add short and long descriptions.

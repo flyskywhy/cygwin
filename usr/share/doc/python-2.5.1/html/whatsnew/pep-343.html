@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-352.html" />
+<link rel="prev" href="pep-342.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-352.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>8 PEP 343: The 'with' statement</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7 pep 342: New"
+  href="pep-342.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="9 pep 352: Exceptions"
+  href="pep-352.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-342.html">7 PEP 342: New</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-352.html">9 PEP 352: Exceptions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="pep-343.html#SECTION000910000000000000000">8.1 Writing Context Managers</a>
+<li><a href="pep-343.html#SECTION000920000000000000000">8.2 The contextlib module</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION000900000000000000000"></a><a name="pep-343"></a>
+<br>
+8 PEP 343: The 'with' statement
+</h1>
+
+<p>
+The '<tt class="keyword">with</tt>' statement clarifies code that previously would
+use <code>try...finally</code> blocks to ensure that clean-up code is
+executed.  In this section, I'll discuss the statement as it will
+commonly be used.  In the next section, I'll examine the
+implementation details and show how to write objects for use with this
+statement.
+
+<p>
+The '<tt class="keyword">with</tt>' statement is a new control-flow structure whose
+basic structure is:
+
+<p>
+<div class="verbatim"><pre>
+with expression [as variable]:
+    with-block
+</pre></div>
+
+<p>
+The expression is evaluated, and it should result in an object that
+supports the context management protocol.  This object may return a
+value that can optionally be bound to the name <var>variable</var>.  (Note
+carefully that <var>variable</var> is <em>not</em> assigned the result of
+<var>expression</var>.)  The object can then run set-up code
+before <var>with-block</var> is executed and some clean-up code
+is executed after the block is done, even if the block raised an exception.
+
+<p>
+To enable the statement in Python 2.5, you need 
+to add the following directive to your module:
+
+<p>
+<div class="verbatim"><pre>
+from __future__ import with_statement
+</pre></div>
+
+<p>
+The statement will always be enabled in Python 2.6.
+
+<p>
+Some standard Python objects now support the context management
+protocol and can be used with the '<tt class="keyword">with</tt>' statement. File
+objects are one example:
+
+<p>
+<div class="verbatim"><pre>
+with open('/etc/passwd', 'r') as f:
+    for line in f:
+        print line
+        ... more processing code ...
+</pre></div>
+
+<p>
+After this statement has executed, the file object in <var>f</var> will
+have been automatically closed, even if the 'for' loop
+raised an exception part-way through the block.
+
+<p>
+The <tt class="module">threading</tt> module's locks and condition variables 
+also support the '<tt class="keyword">with</tt>' statement:
+
+<p>
+<div class="verbatim"><pre>
+lock = threading.Lock()
+with lock:
+    # Critical section of code
+    ...
+</pre></div>
+
+<p>
+The lock is acquired before the block is executed and always released once 
+the block is complete.
+
+<p>
+The new <tt class="function">localcontext()</tt> function in the <tt class="module">decimal</tt> module
+makes it easy to save and restore the current decimal context, which
+encapsulates the desired precision and rounding characteristics for
+computations:
+
+<p>
+<div class="verbatim"><pre>
+from decimal import Decimal, Context, localcontext
+
+# Displays with default precision of 28 digits
+v = Decimal('578')
+print v.sqrt()
+
+with localcontext(Context(prec=16)):
+    # All code in this block uses a precision of 16 digits.
+    # The original context is restored on exiting the block.
+    print v.sqrt()
+</pre></div>
+
+<p>
+
+<h2><a name="SECTION000910000000000000000"></a><a name="context-managers"></a>
+<br>
+8.1 Writing Context Managers
+</h2>
+
+<p>
+Under the hood, the '<tt class="keyword">with</tt>' statement is fairly complicated.
+Most people will only use '<tt class="keyword">with</tt>' in company with existing
+objects and don't need to know these details, so you can skip the rest
+of this section if you like.  Authors of new objects will need to
+understand the details of the underlying implementation and should
+keep reading.
+
+<p>
+A high-level explanation of the context management protocol is:
+
+<p>
+
+<ul>
+<li>The expression is evaluated and should result in an object
+called a ``context manager''.  The context manager must have
+<tt class="method">__enter__()</tt> and <tt class="method">__exit__()</tt> methods.
+
+<p>
+</li>
+<li>The context manager's <tt class="method">__enter__()</tt> method is called.  The value
+returned is assigned to <var>VAR</var>.  If no <code>'as <var>VAR</var>'</code> clause
+is present, the value is simply discarded.
+
+<p>
+</li>
+<li>The code in <var>BLOCK</var> is executed.
+
+<p>
+</li>
+<li>If <var>BLOCK</var> raises an exception, the
+<tt class="method">__exit__(<var>type</var>, <var>value</var>, <var>traceback</var>)</tt> is called
+with the exception details, the same values returned by
+<tt class="function">sys.exc_info()</tt>.  The method's return value controls whether
+the exception is re-raised: any false value re-raises the exception,
+and <code>True</code> will result in suppressing it.  You'll only rarely
+want to suppress the exception, because if you do
+the author of the code containing the
+'<tt class="keyword">with</tt>' statement will never realize anything went wrong.
+
+<p>
+</li>
+<li>If <var>BLOCK</var> didn't raise an exception, 
+the <tt class="method">__exit__()</tt> method is still called,
+but <var>type</var>, <var>value</var>, and <var>traceback</var> are all <code>None</code>.
+
+<p>
+</li>
+</ul>
+
+<p>
+Let's think through an example.  I won't present detailed code but
+will only sketch the methods necessary for a database that supports
+transactions.
+
+<p>
+(For people unfamiliar with database terminology: a set of changes to
+the database are grouped into a transaction.  Transactions can be
+either committed, meaning that all the changes are written into the
+database, or rolled back, meaning that the changes are all discarded
+and the database is unchanged.  See any database textbook for more
+information.)
+
+<p>
+Let's assume there's an object representing a database connection.
+Our goal will be to let the user write code like this:
+
+<p>
+<div class="verbatim"><pre>
+db_connection = DatabaseConnection()
+with db_connection as cursor:
+    cursor.execute('insert into ...')
+    cursor.execute('delete from ...')
+    # ... more operations ...
+</pre></div>
+
+<p>
+The transaction should be committed if the code in the block
+runs flawlessly or rolled back if there's an exception.
+Here's the basic interface
+for <tt class="class">DatabaseConnection</tt> that I'll assume:
+
+<p>
+<div class="verbatim"><pre>
+class DatabaseConnection:
+    # Database interface
+    def cursor (self):
+        "Returns a cursor object and starts a new transaction"
+    def commit (self):
+        "Commits current transaction"
+    def rollback (self):
+        "Rolls back current transaction"
+</pre></div>
+
+<p>
+The <tt class="method">__enter__()</tt> method is pretty easy, having only to start
+a new transaction.  For this application the resulting cursor object
+would be a useful result, so the method will return it.  The user can
+then add <code>as cursor</code> to their '<tt class="keyword">with</tt>' statement to bind
+the cursor to a variable name.
+
+<p>
+<div class="verbatim"><pre>
+class DatabaseConnection:
+    ...
+    def __enter__ (self):
+        # Code to start a new transaction
+        cursor = self.cursor()
+        return cursor
+</pre></div>
+
+<p>
+The <tt class="method">__exit__()</tt> method is the most complicated because it's
+where most of the work has to be done.  The method has to check if an
+exception occurred.  If there was no exception, the transaction is
+committed.  The transaction is rolled back if there was an exception.
+
+<p>
+In the code below, execution will just fall off the end of the
+function, returning the default value of <code>None</code>.  <code>None</code> is
+false, so the exception will be re-raised automatically.  If you
+wished, you could be more explicit and add a <tt class="keyword">return</tt>
+statement at the marked location.
+
+<p>
+<div class="verbatim"><pre>
+class DatabaseConnection:
+    ...
+    def __exit__ (self, type, value, tb):
+        if tb is None:
+            # No exception, so commit
+            self.commit()
+        else:
+            # Exception occurred, so rollback.
+            self.rollback()
+            # return False
+</pre></div>
+
+<p>
+
+<h2><a name="SECTION000920000000000000000"></a><a name="module-contextlib"></a>
+<br>
+8.2 The contextlib module
+</h2>
+
+<p>
+The new <tt class="module">contextlib</tt> module provides some functions and a
+decorator that are useful for writing objects for use with the
+'<tt class="keyword">with</tt>' statement.
+
+<p>
+The decorator is called <tt class="function">contextmanager</tt>, and lets you write
+a single generator function instead of defining a new class.  The generator
+should yield exactly one value.  The code up to the <tt class="keyword">yield</tt>
+will be executed as the <tt class="method">__enter__()</tt> method, and the value
+yielded will be the method's return value that will get bound to the
+variable in the '<tt class="keyword">with</tt>' statement's <tt class="keyword">as</tt> clause, if
+any.  The code after the <tt class="keyword">yield</tt> will be executed in the
+<tt class="method">__exit__()</tt> method.  Any exception raised in the block will be
+raised by the <tt class="keyword">yield</tt> statement.
+
+<p>
+Our database example from the previous section could be written 
+using this decorator as:
+
+<p>
+<div class="verbatim"><pre>
+from contextlib import contextmanager
+
+@contextmanager
+def db_transaction (connection):
+    cursor = connection.cursor()
+    try:
+        yield cursor
+    except:
+        connection.rollback()
+        raise
+    else:
+        connection.commit()
+
+db = DatabaseConnection()
+with db_transaction(db) as cursor:
+    ...
+</pre></div>
+
+<p>
+The <tt class="module">contextlib</tt> module also has a <tt class="function">nested(<var>mgr1</var>,
+<var>mgr2</var>, ...)</tt> function that combines a number of context managers so you
+don't need to write nested '<tt class="keyword">with</tt>' statements.  In this
+example, the single '<tt class="keyword">with</tt>' statement both starts a database
+transaction and acquires a thread lock:
+
+<p>
+<div class="verbatim"><pre>
+lock = threading.Lock()
+with nested (db_transaction(db), lock) as (cursor, locked):
+    ...
+</pre></div>
+
+<p>
+Finally, the <tt class="function">closing(<var>object</var>)</tt> function
+returns <var>object</var> so that it can be bound to a variable,
+and calls <code><var>object</var>.close()</code> at the end of the block.
+
+<p>
+<div class="verbatim"><pre>
+import urllib, sys
+from contextlib import closing
+
+with closing(urllib.urlopen('http://www.yahoo.com')) as f:
+    for line in f:
+        sys.stdout.write(line)
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0343.html"
+        title="The ``with'' statement"
+        >PEP 343, <em>The ``with'' statement</em></a>
+    <dd>PEP written by Guido van&nbsp;Rossum
+and Nick Coghlan; implemented by Mike Bland, Guido van&nbsp;Rossum, and
+Neal Norwitz.  The PEP shows the code generated for a '<tt class="keyword">with</tt>'
+statement, which can be helpful in learning how the statement works.
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="../lib/module-contextlib.html"
+        class="url">../lib/module-contextlib.html</a></dt>
+    <dd>The documentation 
+for the <tt class="module">contextlib</tt> module.</dd>
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7 pep 342: New"
+  href="pep-342.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="9 pep 352: Exceptions"
+  href="pep-352.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-342.html">7 PEP 342: New</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-352.html">9 PEP 352: Exceptions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

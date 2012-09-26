@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-cStringIO.html" />
+<link rel="prev" href="module-difflib.html" />
+<link rel="parent" href="strings.html" />
+<link rel="next" href="module-cStringIO.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.5 StringIO -- Read and write strings as files</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.4.4 differ Example"
+  href="differ-examples.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.6 cstringio  "
+  href="module-cStringIO.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="differ-examples.html">4.4.4 Differ Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-cStringIO.html">4.6 cStringIO  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006500000000000000000">
+4.5 <tt class="module">StringIO</tt> --
+         Read and write strings as files</a>
+</h1>
+
+<p>
+<a name="module-StringIO"></a>
+
+<p>
+This module implements a file-like class, <tt class="class">StringIO</tt>,
+that reads and writes a string buffer (also known as <em>memory
+files</em>).  See the description of file objects for operations (section
+<a href="bltin-file-objects.html#bltin-file-objects">3.9</a>).
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-482' xml:id='l2h-482' class="class">StringIO</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>buffer</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+When a <tt class="class">StringIO</tt> object is created, it can be initialized
+to an existing string by passing the string to the constructor.
+If no string is given, the <tt class="class">StringIO</tt> will start empty.
+In both cases, the initial file position starts at zero.
+
+<p>
+The <tt class="class">StringIO</tt> object can accept either Unicode or 8-bit
+strings, but mixing the two may take some care.  If both are used,
+8-bit strings that cannot be interpreted as 7-bit ASCII (that
+use the 8th bit) will cause a <tt class="exception">UnicodeError</tt> to be raised
+when <tt class="method">getvalue()</tt> is called.
+</dl>
+
+<p>
+The following methods of <tt class="class">StringIO</tt> objects require special
+mention:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-483' xml:id='l2h-483' class="method">getvalue</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Retrieve the entire contents of the ``file'' at any time before the
+<tt class="class">StringIO</tt> object's <tt class="method">close()</tt> method is called.  See the
+note above for information about mixing Unicode and 8-bit strings;
+such mixing can cause this method to raise <tt class="exception">UnicodeError</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-484' xml:id='l2h-484' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Free the memory buffer.
+</dl>
+
+<p>
+Example usage:
+
+<p>
+<div class="verbatim"><pre>
+import StringIO
+
+output = StringIO.StringIO()
+output.write('First line.\n')
+print &gt;&gt;output, 'Second line.'
+
+# Retrieve file contents -- this will be
+# 'First line.\nSecond line.\n'
+contents = output.getvalue()
+
+# Close object and discard memory buffer -- 
+# .getvalue() will now raise an exception.
+output.close()
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.4.4 differ Example"
+  href="differ-examples.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.6 cstringio  "
+  href="module-cStringIO.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="differ-examples.html">4.4.4 Differ Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-cStringIO.html">4.6 cStringIO  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

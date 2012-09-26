@@ -1,0 +1,449 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="modules.html" />
+<link rel="prev" href="pep-357.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="modules.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>12 Other Language Changes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11 pep 357: The"
+  href="pep-357.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13 New, Improved, and"
+  href="modules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-357.html">11 PEP 357: The</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="modules.html">13 New, Improved, and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="other-lang.html#SECTION0001310000000000000000">12.1 Interactive Interpreter Changes</a>
+<li><a href="other-lang.html#SECTION0001320000000000000000">12.2 Optimizations</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION0001300000000000000000"></a><a name="other-lang"></a>
+<br>
+12 Other Language Changes
+</h1>
+
+<p>
+Here are all of the changes that Python 2.5 makes to the core Python
+language.
+
+<p>
+
+<ul>
+<li>The <tt class="class">dict</tt> type has a new hook for letting subclasses
+provide a default value when a key isn't contained in the dictionary.
+When a key isn't found, the dictionary's
+<tt class="method">__missing__(<var>key</var>)</tt>
+method will be called.  This hook is used to implement
+the new <tt class="class">defaultdict</tt> class in the <tt class="module">collections</tt>
+module.  The following example defines a dictionary 
+that returns zero for any missing key:
+
+<p>
+<div class="verbatim"><pre>
+class zerodict (dict):
+    def __missing__ (self, key):
+        return 0
+
+d = zerodict({1:1, 2:2})
+print d[1], d[2]   # Prints 1, 2
+print d[3], d[4]   # Prints 0, 0
+</pre></div>
+
+<p>
+</li>
+<li>Both 8-bit and Unicode strings have new <tt class="method">partition(sep)</tt> 
+and <tt class="method">rpartition(sep)</tt> methods that simplify a common use case.
+
+<p>
+The <tt class="method">find(S)</tt> method is often used to get an index which is
+then used to slice the string and obtain the pieces that are before
+and after the separator.  
+<tt class="method">partition(sep)</tt> condenses this
+pattern into a single method call that returns a 3-tuple containing
+the substring before the separator, the separator itself, and the
+substring after the separator.  If the separator isn't found, the
+first element of the tuple is the entire string and the other two
+elements are empty.  <tt class="method">rpartition(sep)</tt> also returns a 3-tuple
+but starts searching from the end of the string; the "<tt class="samp">r</tt>" stands
+for 'reverse'.
+
+<p>
+Some examples:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; ('http://www.python.org').partition('://')
+('http', '://', 'www.python.org')
+&gt;&gt;&gt; ('file:/usr/share/doc/index.html').partition('://')
+('file:/usr/share/doc/index.html', '', '')
+&gt;&gt;&gt; (u'Subject: a quick question').partition(':')
+(u'Subject', u':', u' a quick question')
+&gt;&gt;&gt; 'www.python.org'.rpartition('.')
+('www.python', '.', 'org')
+&gt;&gt;&gt; 'www.python.org'.rpartition(':')
+('', '', 'www.python.org')
+</pre></div>
+
+<p>
+(Implemented by Fredrik Lundh following a suggestion by Raymond Hettinger.)
+
+<p>
+</li>
+<li>The <tt class="method">startswith()</tt> and <tt class="method">endswith()</tt> methods
+of string types now accept tuples of strings to check for.
+
+<p>
+<div class="verbatim"><pre>
+def is_image_file (filename):
+    return filename.endswith(('.gif', '.jpg', '.tiff'))
+</pre></div>
+
+<p>
+(Implemented by Georg Brandl following a suggestion by Tom Lynn.)
+
+<p>
+</li>
+<li>The <tt class="function">min()</tt> and <tt class="function">max()</tt> built-in functions
+gained a <code>key</code> keyword parameter analogous to the <code>key</code>
+argument for <tt class="method">sort()</tt>.  This parameter supplies a function that
+takes a single argument and is called for every value in the list;
+<tt class="function">min()</tt>/<tt class="function">max()</tt> will return the element with the 
+smallest/largest return value from this function.
+For example, to find the longest string in a list, you can do:
+
+<p>
+<div class="verbatim"><pre>
+L = ['medium', 'longest', 'short']
+# Prints 'longest'
+print max(L, key=len)              
+# Prints 'short', because lexicographically 'short' has the largest value
+print max(L)
+</pre></div>
+
+<p>
+(Contributed by Steven Bethard and Raymond Hettinger.)
+
+<p>
+</li>
+<li>Two new built-in functions, <tt class="function">any()</tt> and
+<tt class="function">all()</tt>, evaluate whether an iterator contains any true or
+false values.  <tt class="function">any()</tt> returns <tt class="constant">True</tt> if any value
+returned by the iterator is true; otherwise it will return
+<tt class="constant">False</tt>.  <tt class="function">all()</tt> returns <tt class="constant">True</tt> only if
+all of the values returned by the iterator evaluate as true.
+(Suggested by Guido van&nbsp;Rossum, and implemented by Raymond Hettinger.)
+
+<p>
+</li>
+<li>The result of a class's <tt class="method">__hash__()</tt> method can now 
+be either a long integer or a regular integer.  If a long integer is
+returned, the hash of that value is taken.  In earlier versions the
+hash value was required to be a regular integer, but in 2.5 the
+<tt class="function">id()</tt> built-in was changed to always return non-negative
+numbers, and users often seem to use <code>id(self)</code> in
+<tt class="method">__hash__()</tt> methods (though this is discouraged).
+
+<p>
+</li>
+<li>ASCII is now the default encoding for modules.  It's now 
+a syntax error if a module contains string literals with 8-bit
+characters but doesn't have an encoding declaration.  In Python 2.4
+this triggered a warning, not a syntax error.  See <a class="rfc" id='rfcref-2381' xml:id='rfcref-2381'
+href="http://www.python.org/peps/pep-0263.html">PEP 263</a> 
+for how to declare a module's encoding; for example, you might add 
+a line like this near the top of the source file:
+
+<p>
+<div class="verbatim"><pre>
+# -*- coding: latin1 -*-
+</pre></div>
+
+<p>
+</li>
+<li>A new warning, <tt class="class">UnicodeWarning</tt>, is triggered when 
+you attempt to compare a Unicode string and an 8-bit string 
+that can't be converted to Unicode using the default ASCII encoding.  
+The result of the comparison is false:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; chr(128) == unichr(128)   # Can't convert chr(128) to Unicode
+__main__:1: UnicodeWarning: Unicode equal comparison failed 
+  to convert both arguments to Unicode - interpreting them 
+  as being unequal
+False
+&gt;&gt;&gt; chr(127) == unichr(127)   # chr(127) can be converted
+True
+</pre></div>
+
+<p>
+Previously this would raise a <tt class="class">UnicodeDecodeError</tt> exception,
+but in 2.5 this could result in puzzling problems when accessing a
+dictionary.  If you looked up <code>unichr(128)</code> and <code>chr(128)</code>
+was being used as a key, you'd get a <tt class="class">UnicodeDecodeError</tt>
+exception.  Other changes in 2.5 resulted in this exception being
+raised instead of suppressed by the code in <span class="file">dictobject.c</span> that
+implements dictionaries.
+
+<p>
+Raising an exception for such a comparison is strictly correct, but
+the change might have broken code, so instead 
+<tt class="class">UnicodeWarning</tt> was introduced.
+
+<p>
+(Implemented by Marc-André Lemburg.)
+
+<p>
+</li>
+<li>One error that Python programmers sometimes make is forgetting
+to include an <span class="file">__init__.py</span> module in a package directory.
+Debugging this mistake can be confusing, and usually requires running
+Python with the <b class="programopt">-v</b> switch to log all the paths searched.
+In Python 2.5, a new <tt class="exception">ImportWarning</tt> warning is triggered when
+an import would have picked up a directory as a package but no
+<span class="file">__init__.py</span> was found.  This warning is silently ignored by default;
+provide the <b class="programopt">-Wd</b> option when running the Python executable
+to display the warning message.
+(Implemented by Thomas Wouters.)
+
+<p>
+</li>
+<li>The list of base classes in a class definition can now be empty.  
+As an example, this is now legal:
+
+<p>
+<div class="verbatim"><pre>
+class C():
+    pass
+</pre></div>
+(Implemented by Brett Cannon.)
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<h2><a name="SECTION0001310000000000000000"></a><a name="interactive"></a>
+<br>
+12.1 Interactive Interpreter Changes
+</h2>
+
+<p>
+In the interactive interpreter, <code>quit</code> and <code>exit</code> 
+have long been strings so that new users get a somewhat helpful message
+when they try to quit:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; quit
+'Use Ctrl-D (i.e. EOF) to exit.'
+</pre></div>
+
+<p>
+In Python 2.5, <code>quit</code> and <code>exit</code> are now objects that still
+produce string representations of themselves, but are also callable.
+Newbies who try <code>quit()</code> or <code>exit()</code> will now exit the
+interpreter as they expect.  (Implemented by Georg Brandl.)
+
+<p>
+The Python executable now accepts the standard long options 
+<b class="programopt">--help</b> and <b class="programopt">--version</b>; on Windows, 
+it also accepts the <b class="programopt">/?</b> option for displaying a help message.
+(Implemented by Georg Brandl.)
+
+<p>
+
+<h2><a name="SECTION0001320000000000000000"></a><a name="opts"></a>
+<br>
+12.2 Optimizations
+</h2>
+
+<p>
+Several of the optimizations were developed at the NeedForSpeed
+sprint, an event held in Reykjavik, Iceland, from May 21-28 2006.
+The sprint focused on speed enhancements to the CPython implementation
+and was funded by EWT LLC with local support from CCP Games.  Those
+optimizations added at this sprint are specially marked in the
+following list.
+
+<p>
+
+<ul>
+<li>When they were introduced 
+in Python 2.4, the built-in <tt class="class">set</tt> and <tt class="class">frozenset</tt> types
+were built on top of Python's dictionary type.  
+In 2.5 the internal data structure has been customized for implementing sets,
+and as a result sets will use a third less memory and are somewhat faster.
+(Implemented by Raymond Hettinger.)
+
+<p>
+</li>
+<li>The speed of some Unicode operations, such as finding
+substrings, string splitting, and character map encoding and decoding,
+has been improved.  (Substring search and splitting improvements were
+added by Fredrik Lundh and Andrew Dalke at the NeedForSpeed
+sprint. Character maps were improved by Walter Dörwald and
+Martin von&nbsp;Löwis.)
+
+<p>
+</li>
+<li>The <tt class="function">long(<var>str</var>, <var>base</var>)</tt> function is now
+faster on long digit strings because fewer intermediate results are
+calculated.  The peak is for strings of around 800-1000 digits where 
+the function is 6 times faster.
+(Contributed by Alan McIntyre and committed at the NeedForSpeed sprint.)
+
+<p>
+</li>
+<li>It's now illegal to mix iterating over a file 
+with <code>for line in <var>file</var></code> and calling 
+the file object's <tt class="method">read()</tt>/<tt class="method">readline()</tt>/<tt class="method">readlines()</tt>
+methods.  Iteration uses an internal buffer and the 
+<tt class="method">read*()</tt> methods don't use that buffer.  
+Instead they would return the data following the buffer, causing the
+data to appear out of order.  Mixing iteration and these methods will
+now trigger a <tt class="exception">ValueError</tt> from the <tt class="method">read*()</tt> method.
+(Implemented by Thomas Wouters.)
+
+<p>
+</li>
+<li>The <tt class="module">struct</tt> module now compiles structure format 
+strings into an internal representation and caches this
+representation, yielding a 20% speedup.  (Contributed by Bob Ippolito
+at the NeedForSpeed sprint.)
+
+<p>
+</li>
+<li>The <tt class="module">re</tt> module got a 1 or 2% speedup by switching to 
+Python's allocator functions instead of the system's 
+<tt class="cfunction">malloc()</tt> and <tt class="cfunction">free()</tt>.
+(Contributed by Jack Diederich at the NeedForSpeed sprint.)
+
+<p>
+</li>
+<li>The code generator's peephole optimizer now performs
+simple constant folding in expressions.  If you write something like
+<code>a = 2+3</code>, the code generator will do the arithmetic and produce
+code corresponding to <code>a = 5</code>.  (Proposed and implemented 
+by Raymond Hettinger.)
+
+<p>
+</li>
+<li>Function calls are now faster because code objects now keep 
+the most recently finished frame (a ``zombie frame'') in an internal
+field of the code object, reusing it the next time the code object is
+invoked.  (Original patch by Michael Hudson, modified by Armin Rigo
+and Richard Jones; committed at the NeedForSpeed sprint.)
+
+<p>
+Frame objects are also slightly smaller, which may improve cache locality
+and reduce memory usage a bit.  (Contributed by Neal Norwitz.)
+
+<p>
+</li>
+<li>Python's built-in exceptions are now new-style classes, a change
+that speeds up instantiation considerably.  Exception handling in
+Python 2.5 is therefore about 30% faster than in 2.4.
+(Contributed by Richard Jones, Georg Brandl and Sean Reifschneider at
+the NeedForSpeed sprint.)
+
+<p>
+</li>
+<li>Importing now caches the paths tried, recording whether 
+they exist or not so that the interpreter makes fewer 
+<tt class="cfunction">open()</tt> and <tt class="cfunction">stat()</tt> calls on startup.
+(Contributed by Martin von&nbsp;Löwis and Georg Brandl.)
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11 pep 357: The"
+  href="pep-357.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13 New, Improved, and"
+  href="modules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-357.html">11 PEP 357: The</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="modules.html">13 New, Improved, and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

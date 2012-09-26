@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-utility-functions.html" />
+<link rel="prev" href="ctypes-foreign-functions.html" />
+<link rel="parent" href="ctypes-ctypes-reference.html" />
+<link rel="next" href="ctypes-utility-functions.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.2.4 Function prototypes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.3 foreign functions"
+  href="ctypes-foreign-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.5 utility functions"
+  href="ctypes-utility-functions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-foreign-functions.html">14.14.2.3 Foreign functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-utility-functions.html">14.14.2.5 Utility functions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00161424000000000000000"></a><a name="ctypes-function-prototypes"></a>
+<br>
+14.14.2.4 Function prototypes
+</h3>
+
+<p>
+Foreign functions can also be created by instantiating function
+prototypes.  Function prototypes are similar to function prototypes in
+C; they describe a function (return type, argument types, calling
+convention) without defining an implementation.  The factory
+functions must be called with the desired result type and the argument
+types of the function.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3324' xml:id='l2h-3324' class="function">CFUNCTYPE</tt></b>(</nobr></td>
+  <td><var>restype, *argtypes</var>)</td></tr></table></dt>
+<dd>
+The returned function prototype creates functions that use the
+standard C calling convention.  The function will release the GIL
+during the call.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3325' xml:id='l2h-3325' class="function">WINFUNCTYPE</tt></b>(</nobr></td>
+  <td><var>restype, *argtypes</var>)</td></tr></table></dt>
+<dd>
+Windows only: The returned function prototype creates functions
+that use the <code>stdcall</code> calling convention, except on Windows CE
+where <tt class="function">WINFUNCTYPE</tt> is the same as <tt class="function">CFUNCTYPE</tt>.  The function
+will release the GIL during the call.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3326' xml:id='l2h-3326' class="function">PYFUNCTYPE</tt></b>(</nobr></td>
+  <td><var>restype, *argtypes</var>)</td></tr></table></dt>
+<dd>
+The returned function prototype creates functions that use the
+Python calling convention.  The function will <em>not</em> release the
+GIL during the call.
+</dl>
+
+<p>
+Function prototypes created by the factory functions can be
+instantiated in different ways, depending on the type and number of
+the parameters in the call.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">prototype</tt></b>(</nobr></td>
+  <td><var>address</var>)</td></tr></table></dt>
+<dd>
+Returns a foreign function at the specified address.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">prototype</tt></b>(</nobr></td>
+  <td><var>callable</var>)</td></tr></table></dt>
+<dd>
+Create a C callable function (a callback function) from a Python
+<code>callable</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">prototype</tt></b>(</nobr></td>
+  <td><var>func_spec</var><big>[</big><var>, paramflags</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns a foreign function exported by a shared library.
+<code>func_spec</code> must be a 2-tuple <code>(name_or_ordinal, library)</code>.
+The first item is the name of the exported function as string, or
+the ordinal of the exported function as small integer.  The second
+item is the shared library instance.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">prototype</tt></b>(</nobr></td>
+  <td><var>vtbl_index, name</var><big>[</big><var>, paramflags</var><big>[</big><var>, iid</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns a foreign function that will call a COM method.
+<code>vtbl_index</code> is the index into the virtual function table, a
+small nonnegative integer. <var>name</var> is name of the COM method.
+<var>iid</var> is an optional pointer to the interface identifier which
+is used in extended error reporting.
+
+<p>
+COM methods use a special calling convention: They require a
+pointer to the COM interface as first argument, in addition to
+those parameters that are specified in the <tt class="member">argtypes</tt> tuple.
+</dl>
+
+<p>
+The optional <var>paramflags</var> parameter creates foreign function
+wrappers with much more functionality than the features described
+above.
+
+<p>
+<var>paramflags</var> must be a tuple of the same length as <tt class="member">argtypes</tt>.
+
+<p>
+Each item in this tuple contains further information about a
+parameter, it must be a tuple containing 1, 2, or 3 items.
+
+<p>
+The first item is an integer containing flags for the parameter:
+
+<p>
+<dl><dt><b><tt>1</tt></b></dt>
+<dd>
+Specifies an input parameter to the function.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt>2</tt></b></dt>
+<dd>
+Output parameter.  The foreign function fills in a value.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt>4</tt></b></dt>
+<dd>
+Input parameter which defaults to the integer zero.
+</dd></dl>
+
+<p>
+The optional second item is the parameter name as string.  If this is
+specified, the foreign function can be called with named parameters.
+
+<p>
+The optional third item is the default value for this parameter.
+
+<p>
+This example demonstrates how to wrap the Windows <code>MessageBoxA</code>
+function so that it supports default parameters and named arguments.
+The C declaration from the windows header file is this:
+<div class="verbatim"><pre>
+WINUSERAPI int WINAPI
+MessageBoxA(
+    HWND hWnd ,
+    LPCSTR lpText,
+    LPCSTR lpCaption,
+    UINT uType);
+</pre></div>
+
+<p>
+Here is the wrapping with <code>ctypes</code>:
+<blockquote>
+</blockquote><div class="verbatim"><pre>&gt;&gt;&gt; from ctypes import c_int, WINFUNCTYPE, windll
+&gt;&gt;&gt; from ctypes.wintypes import HWND, LPCSTR, UINT
+&gt;&gt;&gt; prototype = WINFUNCTYPE(c_int, HWND, LPCSTR, LPCSTR, UINT)
+&gt;&gt;&gt; paramflags = (1, "hwnd", 0), (1, "text", "Hi"), (1, "caption", None), (1, "flags", 0)
+&gt;&gt;&gt; MessageBox = prototype(("MessageBoxA", windll.user32), paramflags)
+&gt;&gt;&gt;
+</pre></div><blockquote>
+</blockquote>
+
+<p>
+The MessageBox foreign function can now be called in these ways:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; MessageBox()
+&gt;&gt;&gt; MessageBox(text="Spam, spam, spam")
+&gt;&gt;&gt; MessageBox(flags=2, text="foo bar")
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+A second example demonstrates output parameters.  The win32
+<code>GetWindowRect</code> function retrieves the dimensions of a specified
+window by copying them into <code>RECT</code> structure that the caller has to
+supply.  Here is the C declaration:
+<div class="verbatim"><pre>
+WINUSERAPI BOOL WINAPI
+GetWindowRect(
+     HWND hWnd,
+     LPRECT lpRect);
+</pre></div>
+
+<p>
+Here is the wrapping with <code>ctypes</code>:
+<blockquote>
+</blockquote><div class="verbatim"><pre>&gt;&gt;&gt; from ctypes import POINTER, WINFUNCTYPE, windll, WinError
+&gt;&gt;&gt; from ctypes.wintypes import BOOL, HWND, RECT
+&gt;&gt;&gt; prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
+&gt;&gt;&gt; paramflags = (1, "hwnd"), (2, "lprect")
+&gt;&gt;&gt; GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
+&gt;&gt;&gt;
+</pre></div><blockquote>
+</blockquote>
+
+<p>
+Functions with output parameters will automatically return the output
+parameter value if there is a single one, or a tuple containing the
+output parameter values when there are more than one, so the
+GetWindowRect function now returns a RECT instance, when called.
+
+<p>
+Output parameters can be combined with the <tt class="member">errcheck</tt> protocol to do
+further output processing and error checking.  The win32
+<code>GetWindowRect</code> api function returns a <code>BOOL</code> to signal success or
+failure, so this function could do the error checking, and raises an
+exception when the api call failed:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def errcheck(result, func, args):
+...     if not result:
+...         raise WinError()
+...     return args
+&gt;&gt;&gt; GetWindowRect.errcheck = errcheck
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+If the <tt class="member">errcheck</tt> function returns the argument tuple it receives
+unchanged, <code>ctypes</code> continues the normal processing it does on the
+output parameters.  If you want to return a tuple of window
+coordinates instead of a <code>RECT</code> instance, you can retrieve the
+fields in the function and return them instead, the normal processing
+will no longer take place:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def errcheck(result, func, args):
+...     if not result:
+...         raise WinError()
+...     rc = args[1]
+...     return rc.left, rc.top, rc.bottom, rc.right
+&gt;&gt;&gt;
+&gt;&gt;&gt; GetWindowRect.errcheck = errcheck
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.3 foreign functions"
+  href="ctypes-foreign-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.5 utility functions"
+  href="ctypes-utility-functions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-foreign-functions.html">14.14.2.3 Foreign functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-utility-functions.html">14.14.2.5 Utility functions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

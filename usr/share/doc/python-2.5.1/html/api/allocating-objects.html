@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="common-structs.html" />
+<link rel="prev" href="newTypes.html" />
+<link rel="parent" href="newTypes.html" />
+<link rel="next" href="common-structs.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>10.1 Allocating Objects on the Heap </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.2 common Object Structures"
+  href="common-structs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="common-structs.html">10.2 Common Object Structures</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0012100000000000000000"></a><a name="allocating-objects"></a>
+<br>
+10.1 Allocating Objects on the Heap
+         
+</h1>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-951' xml:id='l2h-951' class="cfunction">_PyObject_New</tt></b>(</nobr></td><td>PyTypeObject *<var>type</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyVarObject*&nbsp;<b><tt id='l2h-952' xml:id='l2h-952' class="cfunction">_PyObject_NewVar</tt></b>(</nobr></td><td>PyTypeObject *<var>type</var>, Py_ssize_t <var>size</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>void&nbsp;<b><tt id='l2h-953' xml:id='l2h-953' class="cfunction">_PyObject_Del</tt></b>(</nobr></td><td>PyObject *<var>op</var>)</td></tr></table></dt>
+<dd>
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-954' xml:id='l2h-954' class="cfunction">PyObject_Init</tt></b>(</nobr></td><td>PyObject *<var>op</var>,
+					    PyTypeObject *<var>type</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Initialize a newly-allocated object <var>op</var> with its type and
+  initial reference.  Returns the initialized object.  If <var>type</var>
+  indicates that the object participates in the cyclic garbage
+  detector, it is added to the detector's set of observed objects.
+  Other fields of the object are not affected.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyVarObject*&nbsp;<b><tt id='l2h-955' xml:id='l2h-955' class="cfunction">PyObject_InitVar</tt></b>(</nobr></td><td>PyVarObject *<var>op</var>,
+						  PyTypeObject *<var>type</var>, Py_ssize_t <var>size</var>)</td></tr></table></dt>
+<dd>
+  This does everything <tt class="cfunction">PyObject_Init()</tt> does, and also
+  initializes the length information for a variable-size object.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr><var>TYPE</var>*&nbsp;<b><tt id='l2h-956' xml:id='l2h-956' class="cfunction">PyObject_New</tt></b>(</nobr></td><td>TYPE, PyTypeObject *<var>type</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Allocate a new Python object using the C structure type <var>TYPE</var>
+  and the Python type object <var>type</var>.  Fields not defined by the
+  Python object header are not initialized; the object's reference
+  count will be one.  The size of the memory
+  allocation is determined from the <tt class="member">tp_basicsize</tt> field of the
+  type object.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr><var>TYPE</var>*&nbsp;<b><tt id='l2h-957' xml:id='l2h-957' class="cfunction">PyObject_NewVar</tt></b>(</nobr></td><td>TYPE, PyTypeObject *<var>type</var>,
+                                                Py_ssize_t <var>size</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Allocate a new Python object using the C structure type <var>TYPE</var>
+  and the Python type object <var>type</var>.  Fields not defined by the
+  Python object header are not initialized.  The allocated memory
+  allows for the <var>TYPE</var> structure plus <var>size</var> fields of the
+  size given by the <tt class="member">tp_itemsize</tt> field of <var>type</var>.  This is
+  useful for implementing objects like tuples, which are able to
+  determine their size at construction time.  Embedding the array of
+  fields into the same allocation decreases the number of allocations,
+  improving the memory management efficiency.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>void&nbsp;<b><tt id='l2h-958' xml:id='l2h-958' class="cfunction">PyObject_Del</tt></b>(</nobr></td><td>PyObject *<var>op</var>)</td></tr></table></dt>
+<dd>
+  Releases memory allocated to an object using
+  <tt class="cfunction">PyObject_New()</tt> or <tt class="cfunction">PyObject_NewVar()</tt>.  This
+  is normally called from the <tt class="member">tp_dealloc</tt> handler specified in
+  the object's type.  The fields of the object should not be accessed
+  after this call as the memory is no longer a valid Python object.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-959' xml:id='l2h-959' class="cfunction">Py_InitModule</tt></b>(</nobr></td><td>char *<var>name</var>,
+                                            PyMethodDef *<var>methods</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Create a new module object based on a name and table of functions,
+  returning the new module object.
+
+<p>
+
+<span class="versionnote">Changed in version 2.3:
+Older versions of Python did not support <tt class="constant">NULL</tt> as
+                  the value for the <var>methods</var> argument.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-960' xml:id='l2h-960' class="cfunction">Py_InitModule3</tt></b>(</nobr></td><td>char *<var>name</var>,
+                                             PyMethodDef *<var>methods</var>,
+                                             char *<var>doc</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Create a new module object based on a name and table of functions,
+  returning the new module object.  If <var>doc</var> is non-<tt class="constant">NULL</tt>, it will
+  be used to define the docstring for the module.
+
+<p>
+
+<span class="versionnote">Changed in version 2.3:
+Older versions of Python did not support <tt class="constant">NULL</tt> as
+                  the value for the <var>methods</var> argument.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-961' xml:id='l2h-961' class="cfunction">Py_InitModule4</tt></b>(</nobr></td><td>char *<var>name</var>,
+                                             PyMethodDef *<var>methods</var>,
+                                             char *<var>doc</var>, PyObject *<var>self</var>,
+                                             int <var>apiver</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Create a new module object based on a name and table of functions,
+  returning the new module object.  If <var>doc</var> is non-<tt class="constant">NULL</tt>, it will
+  be used to define the docstring for the module.  If <var>self</var> is
+  non-<tt class="constant">NULL</tt>, it will passed to the functions of the module as their
+  (otherwise <tt class="constant">NULL</tt>) first parameter.  (This was added as an
+  experimental feature, and there are no known uses in the current
+  version of Python.)  For <var>apiver</var>, the only value which should
+  be passed is defined by the constant <tt class="constant">PYTHON_API_VERSION</tt>.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+Most uses of this function should probably be using
+  the <tt class="cfunction">Py_InitModule3()</tt> instead; only use this if you are
+  sure you need it.</span>
+
+<p>
+
+<span class="versionnote">Changed in version 2.3:
+Older versions of Python did not support <tt class="constant">NULL</tt> as
+                  the value for the <var>methods</var> argument.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt>PyObject <b><tt id='l2h-962' xml:id='l2h-962' class="cdata">_Py_NoneStruct</tt></b></dt>
+<dd>
+  Object which is visible in Python as <code>None</code>.  This should only
+  be accessed using the <code>Py_None</code> macro, which evaluates to a
+  pointer to this object.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.2 common Object Structures"
+  href="common-structs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="common-structs.html">10.2 Common Object Structures</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

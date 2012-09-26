@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-msvcrt.html" />
+<link rel="prev" href="node922.html" />
+<link rel="parent" href="node922.html" />
+<link rel="next" href="database-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>36.1 msilib -- Read and write Microsoft Installer files</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="36. ms Windows Specific"
+  href="node922.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="36. ms Windows Specific"
+  href="node922.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="36.1.1 database Objects"
+  href="database-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node922.html">36. MS Windows Specific</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node922.html">36. MS Windows Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="database-objects.html">36.1.1 Database Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0038100000000000000000">
+36.1 <tt class="module">msilib</tt> --
+         Read and write Microsoft Installer files</a>
+</h1>
+
+<p>
+<a name="module-msilib"></a>  
+<p class="availability">Availability: <span
+ class="platform">Windows</span>.</p>
+
+<p>
+<a id='l2h-5761' xml:id='l2h-5761'></a>
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+The <tt class="module">msilib</tt> supports the creation of Microsoft Installer
+(<code>.msi</code>) files.  Because these files often contain an embedded
+``cabinet'' file (<code>.cab</code>), it also exposes an API to create
+CAB files. Support for reading <code>.cab</code> files is currently not
+implemented; read support for the <code>.msi</code> database is possible.
+
+<p>
+This package aims to provide complete access to all tables in an
+<code>.msi</code> file, therefore, it is a fairly low-level API. Two
+primary applications of this package are the <tt class="module">distutils</tt>
+command <code>bdist_msi</code>, and the creation of Python installer
+package itself (although that currently uses a different version
+of <code>msilib</code>).
+
+<p>
+The package contents can be roughly split into four parts:
+low-level CAB routines, low-level MSI routines, higher-level
+MSI routines, and standard table structures.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5751' xml:id='l2h-5751' class="function">FCICreate</tt></b>(</nobr></td>
+  <td><var>cabname, files</var>)</td></tr></table></dt>
+<dd>
+  Create a new CAB file named <var>cabname</var>. <var>files</var> must
+  be a list of tuples, each containing the name of the file on
+  disk, and the name of the file inside the CAB file.
+
+<p>
+The files are added to the CAB file in the order they appear
+  in the list. All files are added into a single CAB file,
+  using the MSZIP compression algorithm.
+
+<p>
+Callbacks to Python for the various steps of MSI creation
+  are currently not exposed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5752' xml:id='l2h-5752' class="function">UUIDCreate</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the string representation of a new unique identifier.
+  This wraps the Windows API functions <tt class="cfunction">UuidCreate</tt> and
+  <tt class="cfunction">UuidToString</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5753' xml:id='l2h-5753' class="function">OpenDatabase</tt></b>(</nobr></td>
+  <td><var>path, persist</var>)</td></tr></table></dt>
+<dd>
+  Return a new database object by calling MsiOpenDatabase.  
+  <var>path</var> is the file name of the
+  MSI file; <var>persist</var> can be one of the constants 
+  <code>MSIDBOPEN_CREATEDIRECT</code>, <code>MSIDBOPEN_CREATE</code>,
+  <code>MSIDBOPEN_DIRECT</code>, <code>MSIDBOPEN_READONLY</code>, or
+  <code>MSIDBOPEN_TRANSACT</code>, and may include the flag
+  <code>MSIDBOPEN_PATCHFILE</code>. See the Microsoft documentation for
+  the meaning of these flags; depending on the flags,
+  an existing database is opened, or a new one created.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5754' xml:id='l2h-5754' class="function">CreateRecord</tt></b>(</nobr></td>
+  <td><var>count</var>)</td></tr></table></dt>
+<dd>
+  Return a new record object by calling <tt class="cfunction">MSICreateRecord</tt>.
+  <var>count</var> is the number of fields of the record.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5755' xml:id='l2h-5755' class="function">init_database</tt></b>(</nobr></td>
+  <td><var>name, schema, ProductName, ProductCode, ProductVersion, Manufacturer</var>)</td></tr></table></dt>
+<dd>
+  Create and return a new database <var>name</var>, initialize it 
+  with <var>schema</var>,  and set the properties <var>ProductName</var>,
+  <var>ProductCode</var>, <var>ProductVersion</var>, and <var>Manufacturer</var>.
+
+<p>
+<var>schema</var> must be a module object containing <code>tables</code> and
+  <code>_Validation_records</code> attributes; typically,
+  <tt class="module">msilib.schema</tt> should be used.
+
+<p>
+The database will contain just the schema and the validation
+  records when this function returns.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5756' xml:id='l2h-5756' class="function">add_data</tt></b>(</nobr></td>
+  <td><var>database, records</var>)</td></tr></table></dt>
+<dd>
+  Add all <var>records</var> to <var>database</var>.  <var>records</var> should
+  be a list of tuples, each one containing all fields of a record
+  according to the schema of the table.  For optional fields,
+  <code>None</code> can be passed.
+
+<p>
+Field values can be int or long numbers, strings, or instances
+  of the Binary class.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5757' xml:id='l2h-5757' class="class">Binary</tt></b>(</nobr></td>
+  <td><var>filename</var>)</td></tr></table></dt>
+<dd>
+  Represents entries in the Binary table; inserting such
+  an object using <tt class="function">add_data</tt> reads the file named
+  <var>filename</var> into the table.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5758' xml:id='l2h-5758' class="function">add_tables</tt></b>(</nobr></td>
+  <td><var>database, module</var>)</td></tr></table></dt>
+<dd>
+  Add all table content from <var>module</var> to <var>database</var>.
+  <var>module</var> must contain an attribute <var>tables</var>
+  listing all tables for which content should be added,
+  and one attribute per table that has the actual content.
+
+<p>
+This is typically used to install the sequence tables.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5759' xml:id='l2h-5759' class="function">add_stream</tt></b>(</nobr></td>
+  <td><var>database, name, path</var>)</td></tr></table></dt>
+<dd>
+  Add the file <var>path</var> into the <code>_Stream</code> table
+  of <var>database</var>, with the stream name <var>name</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5760' xml:id='l2h-5760' class="function">gen_uuid</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return a new UUID, in the format that MSI typically
+  requires (i.e. in curly braces, and with all hexdigits
+  in upper-case).
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/devnotes/winprog/fcicreate.asp"
+        >FCICreateFile</a></em></dt>
+    <dd></dd>
+  </dl>
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/rpc/rpc/uuidcreate.asp"
+        >UuidCreate</a></em></dt>
+    <dd></dd>
+  </dl>
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/rpc/rpc/uuidtostring.asp"
+        >UuidToString</a></em></dt>
+    <dd></dd>
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="database-objects.html">36.1.1 Database Objects</a>
+<li><a href="view-objects.html">36.1.2 View Objects</a>
+<li><a href="summary-objects.html">36.1.3 Summary Information Objects</a>
+<li><a href="record-objects.html">36.1.4 Record Objects</a>
+<li><a href="msi-errors.html">36.1.5 Errors</a>
+<li><a href="cab.html">36.1.6 CAB Objects</a>
+<li><a href="msi-directory.html">36.1.7 Directory Objects</a>
+<li><a href="features.html">36.1.8 Features</a>
+<li><a href="msi-gui.html">36.1.9 GUI classes</a>
+<li><a href="msi-tables.html">36.1.10 Precomputed tables</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="36. ms Windows Specific"
+  href="node922.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="36. ms Windows Specific"
+  href="node922.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="36.1.1 database Objects"
+  href="database-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node922.html">36. MS Windows Specific</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node922.html">36. MS Windows Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="database-objects.html">36.1.1 Database Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

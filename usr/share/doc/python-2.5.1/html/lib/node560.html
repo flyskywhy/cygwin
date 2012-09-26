@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node561.html" />
+<link rel="prev" href="node559.html" />
+<link rel="parent" href="module-cgi.html" />
+<link rel="next" href="node561.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.2.3 Higher Level Interface</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.2 using the cgi"
+  href="node559.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.4 old classes"
+  href="node561.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node559.html">18.2.2 Using the cgi</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node561.html">18.2.4 Old classes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020230000000000000000">
+18.2.3 Higher Level Interface</a>
+</h2>
+
+<p>
+
+<span class="versionnote">New in version 2.2.</span>
+  
+<p>
+The previous section explains how to read CGI form data using the
+<tt class="class">FieldStorage</tt> class.  This section describes a higher level
+interface which was added to this class to allow one to do it in a
+more readable and intuitive way.  The interface doesn't make the
+techniques described in previous sections obsolete -- they are still
+useful to process file uploads efficiently, for example.
+
+<p>
+The interface consists of two simple methods. Using the methods
+you can process form data in a generic way, without the need to worry
+whether only one or more values were posted under one name.
+
+<p>
+In the previous section, you learned to write following code anytime
+you expected a user to post more than one value under one name:
+
+<p>
+<div class="verbatim"><pre>
+item = form.getvalue("item")
+if isinstance(item, list):
+    # The user is requesting more than one item.
+else:
+    # The user is requesting only one item.
+</pre></div>
+
+<p>
+This situation is common for example when a form contains a group of
+multiple checkboxes with the same name:
+
+<p>
+<div class="verbatim"><pre>
+&lt;input type="checkbox" name="item" value="1" /&gt;
+&lt;input type="checkbox" name="item" value="2" /&gt;
+</pre></div>
+
+<p>
+In most situations, however, there's only one form control with a
+particular name in a form and then you expect and need only one value
+associated with this name.  So you write a script containing for
+example this code:
+
+<p>
+<div class="verbatim"><pre>
+user = form.getvalue("user").upper()
+</pre></div>
+
+<p>
+The problem with the code is that you should never expect that a
+client will provide valid input to your scripts.  For example, if a
+curious user appends another "<tt class="samp">user=foo</tt>" pair to the query string,
+then the script would crash, because in this situation the
+<code>getvalue("user")</code> method call returns a list instead of a
+string.  Calling the <tt class="method">toupper()</tt> method on a list is not valid
+(since lists do not have a method of this name) and results in an
+<tt class="exception">AttributeError</tt> exception.
+
+<p>
+Therefore, the appropriate way to read form data values was to always
+use the code which checks whether the obtained value is a single value
+or a list of values.  That's annoying and leads to less readable
+scripts.
+
+<p>
+A more convenient approach is to use the methods <tt class="method">getfirst()</tt>
+and <tt class="method">getlist()</tt> provided by this higher level interface.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3814' xml:id='l2h-3814' class="method">getfirst</tt></b>(</nobr></td>
+  <td><var>name</var><big>[</big><var>, default</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  This method always returns only one value associated with form field
+  <var>name</var>.  The method returns only the first value in case that
+  more values were posted under such name.  Please note that the order
+  in which the values are received may vary from browser to browser
+  and should not be counted on.<a name="tex2html129"
+  href="#foot56643"><sup>18.1</sup></a>  If no such form
+  field or value exists then the method returns the value specified by
+  the optional parameter <var>default</var>.  This parameter defaults to
+  <code>None</code> if not specified.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3815' xml:id='l2h-3815' class="method">getlist</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+  This method always returns a list of values associated with form
+  field <var>name</var>.  The method returns an empty list if no such form
+  field or value exists for <var>name</var>.  It returns a list consisting
+  of one item if only one such value exists.
+</dl>
+
+<p>
+Using these methods you can write nice compact code:
+
+<p>
+<div class="verbatim"><pre>
+import cgi
+form = cgi.FieldStorage()
+user = form.getfirst("user", "").upper()    # This way it's safe.
+for item in form.getlist("item"):
+    do_something(item)
+</pre></div>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot56643">... on.</a><A
+ HREF="node560.html#tex2html129"><sup>18.1</sup></a></dt>
+<dd>Note that some recent
+      versions of the HTML specification do state what order the
+      field values should be supplied in, but knowing whether a
+      request was received from a conforming browser, or even from a
+      browser at all, is tedious and error-prone.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.2 using the cgi"
+  href="node559.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.4 old classes"
+  href="node561.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node559.html">18.2.2 Using the cgi</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node561.html">18.2.4 Old classes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

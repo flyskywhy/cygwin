@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+#
+# Remove files from the repository
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes a list of file names at the command line, and schedules them
+# for removal from the GIT repository at the next commit. Those files
+# are denoted by 'D' in the `cg-status` list. You can remove `cg-add`ed
+# files to undo the addition; you can undo removals in an analogous way
+# using `cg-add` and restore files deleted from the working copy using
+# `cg-restore`.
+#
+# OPTIONS
+# -------
+# -a:: Remove all files which are gone from the working copy
+#	Record removal of all files which have been deleted from
+#	the working copy. Useful when there were some random files
+#	added/removed (e.g. by some third-party application) and you
+#	want to get the repository in sync: just use
+#	`cg-rm -a && cg-add -a`.
+#
+# -f:: Force removal of the physical files
+#	Also delete the files from the tree physically.
+#
+# -n:: Keep the physical files
+#	Do not delete the files from the tree physically, if they are
+#	still there. So it effectively just makes Cogito to stop caring
+#	about the file. This is the default.
+#
+# -r:: Remove files recursively
+#	If you pass cg-rm this flag and any directory names, it will try
+#	to remove files in those directories recursively.
+
+# Testsuite: Partial (used in many tests but a dedicated testsuite is missing)
+
+USAGE="cg-rm [-a] [-f] [-n] [-r] FILE..."
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+delete=
+recursive=
+rmgone=
+while optparse; do
+	if optparse -f; then
+		delete=1
+	elif optparse -n; then
+		delete=
+	elif optparse -r; then
+		recursive=1
+	elif optparse -a; then
+		rmgone=1
+	else
+		optfail
+	fi
+done
+
+[ -n "${ARGS[*]}" -o "$rmgone" ] || usage
+
+TMPFILE="$(mktemp -t gitrm.XXXXXX)" || exit 1
+TMPDIRFILE="$(mktemp -t gitrm.XXXXXX)" || exit 1
+error=
+non_existent=""
+
+for file in "${ARGS[@]}"; do
+	absfile="$_git_relpath$file"
+
+	if [ ! -e "$absfile" ]; then
+		non_existent=" - not found, only recording removal"
+	fi
+
+	if [ -d "$absfile" ]; then
+		if [ "$recursive" ]; then
+			echo "$file" >>"$TMPDIRFILE"
+			git ls-files "$absfile" | while IFS=$'' read path; do
+				echo "${path#$_git_relpath}"
+			done >>"$TMPFILE"
+		else
+			echo "$file is a directory (use cg-rm -r?)" >&2
+			error=1
+		fi
+	else
+		echo "$file" >>"$TMPFILE"
+	fi
+done
+
+if [ "$rmgone" ]; then
+	(cd "$_git_relpath" && cg-status -s \! -n -w) >>"$TMPFILE"
+	if [ ! -s "$TMPFILE" ]; then
+		rm "$TMPFILE" "$TMPDIRFILE"
+		die "no files to remove"
+	fi
+fi
+
+cat "$TMPFILE" | sed -e 's/^/Removing file /' -e "s/\$/${non_existent}/"
+if [ "$delete" ]; then (
+	cd "${_git_relpath:-.}"
+	cat "$TMPFILE" | tr '\n' '\0' | xargs -0 rm -f
+	[ -s "$TMPDIRFILE" ] && cat "$TMPDIRFILE" | tr '\n' '\0' | xargs -0 rmdir --ignore-fail-on-non-empty -p
+); fi
+cat "$TMPFILE" | sed "s|^|$_git_relpath|" | path_xargs git update-index --force-remove -- || error=1
+
+rm "$TMPFILE" "$TMPDIRFILE"
+
+[ "$error" ] && die "warning: not all items could have been removed"
+exit 0

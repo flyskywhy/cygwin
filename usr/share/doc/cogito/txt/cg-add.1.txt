@@ -1,0 +1,69 @@
+cg-add(1)
+=========
+
+NAME
+----
+cg-add - add new files to the repository
+
+SYNOPSIS
+--------
+cg-add [-a] [-N] [-r] FILE...
+
+DESCRIPTION
+-----------
+Takes a list of file names at the command line, and schedules them
+for addition to the GIT repository at the next commit. Those files
+are denoted by 'A' in the gitlink:cg-status[1] list. You can add gitlink:cg-rm[1]oved
+files to undo the removal (use gitlink:cg-restore[1] if the file is already
+deleted from the working copy as well); you can undo additions in
+an analogous way using gitlink:cg-rm[1].
+
+The command will fail if one of the given files does not exist.
+
+Note that directories never have to be added to the repository, and are
+not tracked on their own. That means, you cannot currently add an empty
+directory to 'Cogito'. The reason for this is that 'Cogito' manages
+content and empty directories have no content. Directories are added
+automatically when adding files inside them, or you can add all files in
+a directory using cg-add -r.
+
+OPTIONS
+-------
+
+--
+-a::
+	Add all files in the repository that are currently untracked. Useful
+	when there were some random files added/removed (e.g. by some
+	third-party application) and you want to get the repository in sync:
+	just use `cg-rm -a && cg-add -a`. Note that contrary to `cg-add -r .`,
+	this will not re-add gitlink:cg-rm[1]oved files.
+
+-N::
+	Only update the cache: do not copy the data into the object database.
+	This is for special purposes when you might not actually _have_ any
+	object database. This option is normally not interesting.
+
+-r::
+	If you pass cg-add this flag and any directory names, it will try
+	to add files in those directories recursively (with regard to your
+	ignore rules - see gitlink:cg-status[1] for a more detailed description of
+	those). See also above for more notes about cg-add vs. directories.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-add[1].
+--
+
+
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-add is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

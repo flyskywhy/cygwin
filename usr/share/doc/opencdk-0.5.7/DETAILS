@@ -1,0 +1,28 @@
+Actually the basic idea of the callback design was stolen from the 
+GNU Privacy Guard. 
+
+
+The idea is to make it easy as possible for software which don't need
+any low-level functionality so it just use the high-level API. For example
+if the package just want to use the cdk_file_xxx functions but it needs
+a way to present some information to the end-user.
+
+
+We use a simple callback function for this purpose:
+
+        callback (void * opaque, int type, const char * data)
+
+The @opaque value can be used for a handle that stores various data
+and structs needed by the callback function itself.
+
+The @type is the type of status. Opencdk.h defines all types which
+are accessable by the end-user.
+
+The @data contains all needed information as a string.
+
+
+Defined status messages
+-----------------------
+
+CDK_CB_PUBKEY_ENC = 1       [long keyid] [keytype] [keylength]
+        Used when a public key encrypted packet was parsed.

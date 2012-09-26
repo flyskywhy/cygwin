@@ -1,0 +1,30 @@
+#!/bin/sh
+# cygwin-doc.sh
+# requires "mkshortcut" from cygutils
+
+# determine if there is a Start Menu "Cygwin" directory, put links in place if so
+CYGWIN_ASM="$(cygpath -AP)/Cygwin"
+CYGWIN_SM="$(cygpath -P)/Cygwin"
+if [ -d "$CYGWIN_ASM" ]; then
+	CYG_USER_FLAGS="-AP"
+elif [ -d "$CYGWIN_SM" ]; then
+	CYG_USER_FLAGS="-P"
+else
+	exit 0
+fi
+
+mkshortcut $CYG_USER_FLAGS -n "Cygwin/Cygwin FAQ" /usr/share/doc/cygwin-doc-1.4/html/faq/index.html
+mkshortcut $CYG_USER_FLAGS -n "Cygwin/Cygwin User's Guide" /usr/share/doc/cygwin-doc-1.4/html/cygwin-ug-net/index.html
+mkshortcut $CYG_USER_FLAGS -n "Cygwin/User's Guide (One file)" /usr/share/doc/cygwin-doc-1.4/cygwin-ug-net.html
+mkshortcut $CYG_USER_FLAGS -n "Cygwin/User's Guide (PDF)" /usr/share/doc/cygwin-doc-1.4/cygwin-ug-net.pdf
+mkshortcut $CYG_USER_FLAGS -n "Cygwin/Cygwin API Reference" /usr/share/doc/cygwin-doc-1.4/cygwin-api.html
+
+# Remove old preformatted man pages, if any
+for i in $(zcat /etc/setup/cygwin-doc.lst.gz ); do 
+	if [ -f /usr/man/cat${i#usr/man/man*}.gz ]; then
+		rm -f /usr/man/cat${i#usr/man/man*}.gz
+	fi	
+	if [ -f /usr/share/man/cat${i#usr/share/man/man*}.gz ]; then
+		rm -f /usr/share/man/cat${i#usr/man/man*}.gz
+	fi	
+done

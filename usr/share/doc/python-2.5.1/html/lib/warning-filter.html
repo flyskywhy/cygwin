@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="warning-functions.html" />
+<link rel="prev" href="warning-categories.html" />
+<link rel="parent" href="module-warnings.html" />
+<link rel="next" href="warning-functions.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>26.4.2 The Warnings Filter </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.4.1 warning Categories"
+  href="warning-categories.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26.4 warnings  "
+  href="module-warnings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.4.3 available Functions"
+  href="warning-functions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="warning-categories.html">26.4.1 Warning Categories</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-warnings.html">26.4 warnings  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="warning-functions.html">26.4.3 Available Functions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0028420000000000000000"></a><a name="warning-filter"></a>
+<br>
+26.4.2 The Warnings Filter 
+</h2>
+
+<p>
+The warnings filter controls whether warnings are ignored, displayed,
+or turned into errors (raising an exception).
+
+<p>
+Conceptually, the warnings filter maintains an ordered list of filter
+specifications; any specific warning is matched against each filter
+specification in the list in turn until a match is found; the match
+determines the disposition of the match.  Each entry is a tuple of the
+form (<var>action</var>, <var>message</var>, <var>category</var>, <var>module</var>,
+<var>lineno</var>), where:
+
+<p>
+
+<ul>
+<li><var>action</var> is one of the following strings:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Value</th>
+      <th class="left"  >Disposition</th>
+      </tr>
+    </thead>
+  <tbody>
+<p>
+
+    <tr><td class="left"   valign="baseline"><code>"error"</code></td>
+        <td class="left"  >turn matching warnings into exceptions</td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><code>"ignore"</code></td>
+        <td class="left"  >never print matching warnings</td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><code>"always"</code></td>
+        <td class="left"  >always print matching warnings</td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><code>"default"</code></td>
+        <td class="left"  >print the first occurrence of matching
+    warnings for each location where the warning is issued</td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><code>"module"</code></td>
+        <td class="left"  >print the first occurrence of matching
+    warnings for each module where the warning is issued</td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><code>"once"</code></td>
+        <td class="left"  >print only the first occurrence of matching
+    warnings, regardless of location</td></tr><p>
+
+    </tbody>
+</table></div>
+
+<p>
+</li>
+<li><var>message</var> is a string containing a regular expression that
+the warning message must match (the match is compiled to always be 
+case-insensitive) 
+
+<p>
+</li>
+<li><var>category</var> is a class (a subclass of <tt class="exception">Warning</tt>) of
+      which the warning category must be a subclass in order to match
+
+<p>
+</li>
+<li><var>module</var> is a string containing a regular expression that the module
+      name must match (the match is compiled to be case-sensitive)
+
+<p>
+</li>
+<li><var>lineno</var> is an integer that the line number where the
+      warning occurred must match, or <code>0</code> to match all line
+      numbers
+
+<p>
+</li>
+</ul>
+
+<p>
+Since the <tt class="exception">Warning</tt> class is derived from the built-in
+<tt class="exception">Exception</tt> class, to turn a warning into an error we simply
+raise <code>category(message)</code>.
+
+<p>
+The warnings filter is initialized by <b class="programopt">-W</b> options passed
+to the Python interpreter command line.  The interpreter saves the
+arguments for all <b class="programopt">-W</b> options without interpretation in
+<code>sys.warnoptions</code>; the <tt class="module">warnings</tt> module parses these when
+it is first imported (invalid options are ignored, after printing a
+message to <code>sys.stderr</code>).
+
+<p>
+The warnings that are ignored by default may be enabled by passing
+ <b class="programopt">-Wd</b> to the interpreter. This enables default handling
+for all warnings, including those that are normally ignored by
+default. This is particular useful for enabling ImportWarning when
+debugging problems importing a developed package. ImportWarning can
+also be enabled explicitly in Python code using:
+
+<p>
+<div class="verbatim"><pre>
+    warnings.simplefilter('default', ImportWarning)
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.4.1 warning Categories"
+  href="warning-categories.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26.4 warnings  "
+  href="module-warnings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.4.3 available Functions"
+  href="warning-functions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="warning-categories.html">26.4.1 Warning Categories</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-warnings.html">26.4 warnings  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="warning-functions.html">26.4.3 Available Functions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

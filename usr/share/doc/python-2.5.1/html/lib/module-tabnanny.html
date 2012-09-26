@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-pyclbr.html" />
+<link rel="prev" href="module-tokenize.html" />
+<link rel="parent" href="language.html" />
+<link rel="next" href="module-pyclbr.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>30.6 tabnanny -- Detection of ambiguous indentation</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="30.5 tokenize  "
+  href="module-tokenize.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="30. python Language Services"
+  href="language.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="30.7 pyclbr  "
+  href="module-pyclbr.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-tokenize.html">30.5 tokenize  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="language.html">30. Python Language Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-pyclbr.html">30.7 pyclbr  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0032600000000000000000">
+30.6 <tt class="module">tabnanny</tt> --
+         Detection of ambiguous indentation</a>
+</h1>
+
+<p>
+<a name="module-tabnanny"></a>
+
+<p>
+For the time being this module is intended to be called as a script.
+However it is possible to import it into an IDE and use the function
+<tt class="function">check()</tt> described below.
+
+<p>
+<span class="warning"><b class="label">Warning:</b>
+The API provided by this module is likely to change 
+in future releases; such changes may not be backward compatible.</span>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5445' xml:id='l2h-5445' class="function">check</tt></b>(</nobr></td>
+  <td><var>file_or_dir</var>)</td></tr></table></dt>
+<dd>
+  If <var>file_or_dir</var> is a directory and not a symbolic link, then
+  recursively descend the directory tree named by <var>file_or_dir</var>,
+  checking all <span class="file">.py</span> files along the way.  If <var>file_or_dir</var>
+  is an ordinary Python source file, it is checked for whitespace
+  related problems.  The diagnostic messages are written to standard
+  output using the print statement.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5446' xml:id='l2h-5446'>verbose</tt></b></dt>
+<dd>
+  Flag indicating whether to print verbose messages.
+  This is incremented by the <code>-v</code> option if called as a script.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5447' xml:id='l2h-5447'>filename_only</tt></b></dt>
+<dd>
+  Flag indicating whether to print only the filenames of files
+  containing whitespace related problems.  This is set to true by the
+  <code>-q</code> option if called as a script.
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-5448' xml:id='l2h-5448' class="exception">NannyNag</tt></b></dt>
+<dd>
+  Raised by <tt class="function">tokeneater()</tt> if detecting an ambiguous indent.
+  Captured and handled in <tt class="function">check()</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5449' xml:id='l2h-5449' class="function">tokeneater</tt></b>(</nobr></td>
+  <td><var>type, token, start, end, line</var>)</td></tr></table></dt>
+<dd>
+  This function is used by <tt class="function">check()</tt> as a callback parameter to
+  the function <tt class="function">tokenize.tokenize()</tt>.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-tokenize.html">tokenize</a></tt>:</b>
+    <dd>Lexical scanner for Python source code.
+  </dl>
+  </div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="30.5 tokenize  "
+  href="module-tokenize.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="30. python Language Services"
+  href="language.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="30.7 pyclbr  "
+  href="module-pyclbr.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-tokenize.html">30.5 tokenize  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="language.html">30. Python Language Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-pyclbr.html">30.7 pyclbr  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

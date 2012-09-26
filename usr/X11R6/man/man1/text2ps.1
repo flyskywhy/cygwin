@@ -1,0 +1,216 @@
+.TH TEXT2PS L
+.SH NAME
+text2ps \- convert text files to PostScript
+.SH SYNOPSIS
+.B text2ps
+[
+.I options
+] [
+.I files
+]
+.SH DESCRIPTION
+.I Text2ps
+reads the input files (standard input if none are specified) and produces
+PostScript code which, when fed to a PostScript printer, will print the files.
+With
+.I text2ps
+it is possible to select any font, point size and number of columns.
+Options and files can be intermixed on the command line.
+Options are effective for all following files until they are overridden.
+.PP
+.B Options
+.PP
+Here follows a list of options that
+.I text2ps
+recognizes.
+Most numeric arguments are significant to one decimal place.
+Options are evaluated from left to right.
+Later options override earlier ones.
+.IP "\f3\-#\fP \f2n\fP"
+Print
+.I n
+copies of each page.
+(Default
+.BR 1 .)
+.IP "\f3\-c\fP \f2n\fP"
+Print in
+.I n
+columns.
+(Default
+.BR 1 .)
+.IP "\f3\-f\fP \f2font\fP"
+Print using font
+.IR font .
+(Default
+.BR Courier .)
+.IP "\f3\-p\fP \f2n\fP"
+Print with point size
+.IR n .
+(Default
+.BR 9 .)
+.IP "\f3\-v\fP \f2n\fP"
+Use a vertical spacing of
+.I n
+points.
+If the vertical spacing is set to 0, the spacing will be 1.2 times the
+point size.
+(Default
+.BR 0 .)
+.IP "\f3\-l\fP \f2n\fP"
+Print
+.I n
+lines per column.
+When the line count is 0, print as many lines as will fit.
+(Default
+.BR 0 .)
+.IP "\f3\-r\fP [\f3p\fP|\f3l\fP]"
+Set the orientation to either portrait mode (\f3p\fP) or landscape mode
+(\f3l\fP).
+(Default
+.BR p .)
+.IP "\f3\-b\fP [\f3+\fP|\f3\-\fP]"
+Set page break mode.
+An argument
+.B +
+will force new files to be always printed on a new page (this is the default).
+After
+.B \-
+new files will be put on the same page if there are still empty columns and
+the number of columns, the orientation or the number of copies didn't change.
+New files always start new columns.
+(Default
+.BR \- .)
+.IP "\f3\-mt\fP \f2n\fP"
+The top margin is
+.I n
+points.
+(Default
+.BR 63 .)
+.IP "\f3\-mb\fP \f2n\fP"
+The bottom margin is
+.I n
+points.
+(Default
+.BR 63 .)
+.IP "\f3\-ml\fP \f2n\fP"
+The left margin is
+.I n
+points.
+(Default
+.BR 59 .)
+.IP "\f3\-mr\fP \f2n\fP"
+The right margin is
+.I n
+points.
+(Default
+.BR 59 .)
+.IP "\f3\-mg\fP \f2n\fP"
+The inter-column gap is
+.I n
+points.
+(Default
+.BR 25 .)
+.IP "\f3\-t\fP [\f3+\fP|\f3\-\fP]"
+If the argument is
+.B +
+the name of the file being printed will be printed on each page.
+If the argument is
+.B \-
+the file name will not be printed.
+.B "\-t +"
+implies
+.BR "\-b +" .
+.IP "\f3\-T\fP \f2text\fP"
+Print
+.I text
+as title on each page.
+This implies
+.B "\-t \-"
+and
+.BR "\-b +" .
+This option can be switched off by specifying
+.B "\-t \-"
+or
+.BR "\-t +" .
+(Default no title.)
+.IP "\f3\-F\fP \f2font\fP"
+Set the title font to
+.IR font .
+(Default
+.BR Helvetica .)
+.IP "\f3\-P\fP \f2n\fP"
+Set the title point size to
+.IR n .
+(Default
+.BR 12 .)
+.IP "\f3\-B\fP \f2n\fP"
+Draw borders around each page.
+The number
+.I n
+specifies how to draw borders.
+.I N
+can have any of the following values or-ed in:
+.RS
+.IP 1
+Draw a line along the left of the page.
+.IP 2
+Draw a line along the bottom of the page.
+.IP 4
+Draw a line along the right of the page.
+.IP 8
+Draw a line along the top of the page.
+.IP 16
+Draw a line between columns.
+This line does not connect to the lines along the top or bottom.
+.IP 32
+Draw a connecting line between the line between columns and the
+line along the top.
+.IP 64
+Draw a connecting line between the line between columns and the
+line along the bottom.
+.PP
+When
+.I n
+is 0, no border lines are drawn.
+(Default no bordering lines.)
+.RE
+.IP "\f3\-w\fP \f2n\fP"
+Tab stops are set every
+.I n
+spaces.
+Set the width of the TAB character.
+(Default
+.BR 8 .)
+.IP "\f3\-1\fP"
+Sets up options to print in one column in portrait mode with the
+.B Courier
+font, so that you get 66 lines on a page.
+Equivalent to specifying the options
+.B
+\&\-c 1 \-f Courier \-p 9 \-v 0 \-r p \-l 0 \-mt 63 \-mb 63 \-ml 59 \-mr 59\c
+\&.
+.br
+This is the default.
+.IP "\f3\-2\fP"
+Sets up options to print in two columns in landscape mode with the
+.B Courier
+font, so that you get two 66-line columns on a page.
+Equivalent to specifying the options
+.B
+\&\-c 2 \-f Courier \-p 6 \-v 0 \-r l \-l 0 \-mt 63 \-mb 63 \-ml 59 \-mr 59 \-mg 25\c
+\&.
+Together with the
+.B \-1
+option, this is probably the most useful option.
+.PP
+The name
+.B \-
+means standard input.
+.SH BUGS
+Too many options.
+.PP
+There is no way to specify where the title will be placed.
+.PP
+If the font being used is not a constant width font and there are other
+characters than just tabs and spaces in front of a tab, the next character
+may not align properly.

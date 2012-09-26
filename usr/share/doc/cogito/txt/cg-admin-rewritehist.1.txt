@@ -1,0 +1,187 @@
+cg-admin-rewritehist(1)
+=======================
+
+NAME
+----
+cg-admin-rewritehist - rewrite revision history
+
+SYNOPSIS
+--------
+cg-admin-rewritehist [-d TEMPDIR] [-r STARTREV]... [-k KEEPREV]... [FILTERS] DESTBRANCH
+
+DESCRIPTION
+-----------
+Lets you rewrite GIT revision history by creating a new branch from
+your current branch by applying custom filters on each revision.
+Those filters can modify each tree (e.g. removing a file or running
+a perl rewrite on all files) or information about each commit.
+Otherwise, all information (including original commit times or merge
+information) will be preserved.
+
+The command takes the new branch name as a mandatory argument and
+the filters as optional arguments. If you specify no filters, the
+commits will be recommitted without any changes, which would normally
+have no effect and result with the new branch pointing to the same
+branch as your current branch. (Nevertheless, this may be useful in
+the future for compensating for some Git bugs or such, therefore
+such a usage is permitted.)
+
+WARNING! The rewritten history will have different ids for all the
+objects and will not converge with the original branch. You will not
+be able to easily push and distribute the rewritten branch. Please do
+not use this command if you do not know the full implications, and
+avoid using it anyway - do not do what a simple single commit on top
+of the current version would fix.
+
+Always verify that the rewritten version is correct before disposing
+the original branch.
+
+OPTIONS
+-------
+
+--
+-d TEMPDIR::
+	When applying a tree filter, the command needs to temporary
+	checkout the tree to some directory, which may consume
+	considerable space in case of large projects. By default it
+	does this in the '.git rewrite/' directory but you can override
+	that choice by this parameter.
+
+-r STARTREV::
+	Normally, the command will rewrite the entire history. If you
+	pass this argument, though, this will be the first commit it
+	will rewrite and keep the previous commits intact.
+
+-k KEEPREV::
+	If you pass this argument, this commit and all of its
+	predecessors are kept intact.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-admin-rewritehist[1].
+--
+
+
+Filters
+~~~~~~~
+The filters are applied in the order as listed below. The COMMAND
+argument is always evaluated in shell using the 'eval' command.
+The $GIT_COMMIT environment variable is permanently set to contain
+the id of the commit being rewritten. The author/committer environment
+variables are set before the first filter is run.
+
+A 'map' function is available that takes an "original sha1 id" argument
+and outputs a "rewritten sha1 id" if the commit has been already
+rewritten, fails otherwise; the 'map' function can return several
+ids on separate lines if your commit filter emitted multiple commits
+(see below).
+
+--env-filter COMMAND::
+	This is the filter for modifying the environment in which
+	the commit will be performed. Specifically, you might want
+	to rewrite the author/committer name/email/time environment
+	variables (see gitlink:cg-commit[1] for details). Do not forget to
+	re-export the variables.
+
+--tree-filter COMMAND::
+	This is the filter for rewriting the tree and its contents.
+	The COMMAND argument is evaluated in shell with the working
+	directory set to the root of the checked out tree. The new tree
+	is then used as-is (new files are auto-added, disappeared files
+	are auto-removed - .gitignore files nor any other ignore rules
+	HAVE NO EFFECT!).
+
+--index-filter COMMAND::
+	This is the filter for rewriting the Git's directory index.
+	It is similar to the tree filter but does not check out the
+	tree, which makes it much faster. However, you must use the
+	lowlevel Git index manipulation commands to do your work.
+
+--parent-filter COMMAND::
+	This is the filter for rewriting the commit's parent list.
+	It will receive the parent string on stdin and shall output
+	the new parent string on stdout. The parent string is in
+	format accepted by `git commit-tree`: empty for initial
+	commit, "-p parent" for a normal commit and "-p parent1
+	-p parent2 -p parent3 ..." for a merge commit.
+
+--msg-filter COMMAND::
+	This is the filter for rewriting the commit messages.
+	The COMMAND argument is evaluated in shell with the original
+	commit message on standard input; its standard output is
+	is used as the new commit message.
+
+--commit-filter COMMAND::
+	If this filter is passed, it will be called instead of the
+	`git commit-tree` command, with those arguments:
+
+		TREE_ID [-p PARENT_COMMIT_ID]...
+
+	and the log message on stdin. The commit id is expected on
+	stdout. As a special extension, the commit filter may emit
+	multiple commit ids; in that case, all of them will be used
+	as parents instead of the original commit in further commits.
+
+EXAMPLE USAGE
+-------------
+Suppose you want to remove a file (containing confidential information
+or copyright violation) from all commits:
+
+	cg-admin-rewritehist --tree-filter 'rm filename' newbranch
+
+A significantly faster version:
+
+	cg-admin-rewritehist --index-filter 'git update-index --remove filename' newbranch
+
+Now, you will get the rewritten history saved in the branch 'newbranch'
+(your current branch is left untouched).
+
+To "etch-graft" a commit to the revision history (set a commit to be
+the parent of the current initial commit and propagate that):
+
+	cg-admin-rewritehist --parent-filter sed\ 's/^$/-p graftcommitid/' newbranch
+
+(if the parent string is empty - therefore we are dealing with the
+initial commit - add graftcommit as a parent). Note that this assumes
+history with a single root (that is, no cg-merge -j happened). If this
+is not the case, use:
+
+	cg-admin-rewritehist --parent-filter 'cat; [ "$GIT_COMMIT" = "COMMIT" ] && echo "-p GRAFTCOMMIT"' newbranch
+
+To remove commits authored by "Darl McBribe" from the history:
+
+	cg-admin-rewritehist --commit-filter 'if [ "$GIT_AUTHOR_NAME" = "Darl McBribe" ]; then shift; while [ -n "$1" ]; do shift; echo "$1"; shift; done; else git commit-tree "$@"; fi' newbranch
+
+(the shift magic first throws away the tree id and then the -p
+parameters). Note that this handles merges properly! In case Darl
+committed a merge between P1 and P2, it will be propagated properly
+and all children of the merge will become merge commits with P1,P2
+as their parents instead of the merge commit.
+
+To restrict rewriting to only part of the history, use -r or -k or both.
+Consider this history:
+
+	     D--E--F--G--H
+	    /     /
+	A--B-----C
+
+To rewrite only commits F,G,H, use:
+
+	cg-admin-rewritehist -r F ...
+
+To rewrite commits E,F,G,H, use one of these:
+
+	cg-admin-rewritehist -r E -k C ...
+	cg-admin-rewritehist -k D -k C ...
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2006
+
+SEE ALSO
+--------
+cg-admin-rewritehist is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

@@ -1,0 +1,1089 @@
+<html xmlns:cf="http://docbook.sourceforge.net/xmlns/chunkfast/1.0">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Points, Rectangles and Regions</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.69.0">
+<link rel="start" href="index.html" title="GDK Reference Manual">
+<link rel="up" href="reference.html" title="API Reference">
+<link rel="prev" href="GdkScreen.html" title="GdkScreen">
+<link rel="next" href="gdk-Graphics-Contexts.html" title="Graphics Contexts">
+<meta name="generator" content="GTK-Doc V1.3 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="reference" href="reference.html" title="API Reference">
+<link rel="index" href="ix01.html" title="Index">
+<link rel="index" href="ix02.html" title="Index of deprecated symbols">
+<link rel="index" href="ix03.html" title="Index of new symbols in 2.2">
+<link rel="index" href="ix04.html" title="Index of new symbols in 2.4">
+<link rel="index" href="ix05.html" title="Index of new symbols in 2.6">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2"><tr valign="middle">
+<td><a accesskey="p" href="GdkScreen.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="reference.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">GDK Reference Manual</th>
+<td><a accesskey="n" href="gdk-Graphics-Contexts.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry" lang="en">
+<a name="gdk-Points-Rectangles-and-Regions"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle">Points, Rectangles and Regions</span></h2>
+<p>Points, Rectangles and Regions &#8212; Simple graphical data types</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+#include &lt;gdk/gdk.h&gt;
+
+
+            <a href="gdk-Points-Rectangles-and-Regions.html#GdkPoint">GdkPoint</a>;
+
+            <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a>;
+gboolean    <a href="gdk-Points-Rectangles-and-Regions.html#gdk-rectangle-intersect">gdk_rectangle_intersect</a>         (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src2,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *dest);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-rectangle-union">gdk_rectangle_union</a>             (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src2,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *dest);
+
+            <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>;
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-new">gdk_region_new</a>                  (void);
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-polygon">gdk_region_polygon</a>              (<a href="gdk-Points-Rectangles-and-Regions.html#GdkPoint">GdkPoint</a> *points,
+                                             gint npoints,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkFillRule">GdkFillRule</a> fill_rule);
+enum        <a href="gdk-Points-Rectangles-and-Regions.html#GdkFillRule">GdkFillRule</a>;
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-copy">gdk_region_copy</a>                 (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region);
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-rectangle">gdk_region_rectangle</a>            (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rectangle);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-destroy">gdk_region_destroy</a>              (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region);
+
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-get-clipbox">gdk_region_get_clipbox</a>          (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rectangle);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-get-rectangles">gdk_region_get_rectangles</a>       (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> **rectangles,
+                                             gint *n_rectangles);
+gboolean    <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-empty">gdk_region_empty</a>                (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region);
+gboolean    <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-equal">gdk_region_equal</a>                (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region2);
+gboolean    <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-point-in">gdk_region_point_in</a>             (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             int x,
+                                             int y);
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkOverlapType">GdkOverlapType</a> <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-rect-in">gdk_region_rect_in</a>           (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rect);
+enum        <a href="gdk-Points-Rectangles-and-Regions.html#GdkOverlapType">GdkOverlapType</a>;
+
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-offset">gdk_region_offset</a>               (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             gint dx,
+                                             gint dy);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-shrink">gdk_region_shrink</a>               (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             gint dx,
+                                             gint dy);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-union-with-rect">gdk_region_union_with_rect</a>      (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rect);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-intersect">gdk_region_intersect</a>            (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-union">gdk_region_union</a>                (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-subtract">gdk_region_subtract</a>             (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-xor">gdk_region_xor</a>                  (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);
+
+            <a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan">GdkSpan</a>;
+void        (<a href="gdk-Points-Rectangles-and-Regions.html#GdkSpanFunc">*GdkSpanFunc</a>)                  (<a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan">GdkSpan</a> *span,
+                                             gpointer data);
+void        <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-spans-intersect-foreach">gdk_region_spans_intersect_foreach</a>
+                                            (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan">GdkSpan</a> *spans,
+                                             int n_spans,
+                                             gboolean sorted,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkSpanFunc">GdkSpanFunc</a> function,
+                                             gpointer data);
+
+
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3010169"></a><h2>Description</h2>
+<p>
+GDK provides the <a href="gdk-Points-Rectangles-and-Regions.html#GdkPoint"><span class="type">GdkPoint</span></a>, <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>, <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a> and <a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan"><span class="type">GdkSpan</span></a> data types
+for representing pixels and sets of pixels on the screen.
+</p>
+<p>
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkPoint"><span class="type">GdkPoint</span></a> is a simple structure containing an x and y coordinate of a point.
+</p>
+<p>
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a> is a structure holding the position and size of a rectangle.
+The intersection of two rectangles can be computed with
+<a href="gdk-Points-Rectangles-and-Regions.html#gdk-rectangle-intersect"><code class="function">gdk_rectangle_intersect()</code></a>. To find the union of two rectangles use
+<a href="gdk-Points-Rectangles-and-Regions.html#gdk-rectangle-union"><code class="function">gdk_rectangle_union()</code></a>.
+</p>
+<p>
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a> is an opaque data type holding a set of arbitrary pixels, and is
+usually used for clipping graphical operations (see <a href="gdk-Graphics-Contexts.html#gdk-gc-set-clip-region"><code class="function">gdk_gc_set_clip_region()</code></a>).
+</p>
+<p>
+<a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan"><span class="type">GdkSpan</span></a> is a structure holding a spanline. A spanline is a horizontal line that
+is one pixel wide. It is mainly used when rasterizing other graphics primitives.
+It can be intersected to regions by using <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-spans-intersect-foreach"><code class="function">gdk_region_spans_intersect_foreach()</code></a>.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3010311"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id3010316"></a><h3>
+<a name="GdkPoint"></a>GdkPoint</h3>
+<a class="indexterm" name="id3010327"></a><pre class="programlisting">typedef struct {
+  gint x;
+  gint y;
+} GdkPoint;
+</pre>
+<p>
+Defines the x and y coordinates of a point.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>x</code></em>;</span></td>
+<td>the x coordinate of the point.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>y</code></em>;</span></td>
+<td>the y coordinate of the point.
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3010388"></a><h3>
+<a name="GdkRectangle"></a>GdkRectangle</h3>
+<a class="indexterm" name="id3010398"></a><pre class="programlisting">typedef struct {
+  gint x;
+  gint y;
+  gint width;
+  gint height;
+} GdkRectangle;
+</pre>
+<p>
+Defines the position and size of a rectangle.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>x</code></em>;</span></td>
+<td>the x coordinate of the left edge of the rectangle.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>y</code></em>;</span></td>
+<td>the y coordinate of the top of the rectangle.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>width</code></em>;</span></td>
+<td>the width of the rectangle.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>height</code></em>;</span></td>
+<td>the height of the rectangle.
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3010502"></a><h3>
+<a name="gdk-rectangle-intersect"></a>gdk_rectangle_intersect ()</h3>
+<a class="indexterm" name="id3010513"></a><pre class="programlisting">gboolean    gdk_rectangle_intersect         (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src2,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *dest);</pre>
+<p>
+Calculates the intersection of two rectangles.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>src1</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>src2</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dest</code></em>&#160;:</span></td>
+<td>the intersection of <em class="parameter"><code>src1</code></em> and <em class="parameter"><code>src2</code></em>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">TRUE</code> if the rectangles intersect.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3010647"></a><h3>
+<a name="gdk-rectangle-union"></a>gdk_rectangle_union ()</h3>
+<a class="indexterm" name="id3010658"></a><pre class="programlisting">void        gdk_rectangle_union             (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *src2,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *dest);</pre>
+<p>
+Calculates the union of two rectangles.
+The union of rectangles <em class="parameter"><code>src1</code></em> and <em class="parameter"><code>src2</code></em> is the smallest rectangle which
+includes both <em class="parameter"><code>src1</code></em> and <em class="parameter"><code>src2</code></em> within it.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>src1</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>src2</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dest</code></em>&#160;:</span></td>
+<td>the union of <em class="parameter"><code>src1</code></em> and <em class="parameter"><code>src2</code></em>.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3010802"></a><h3>
+<a name="GdkRegion"></a>GdkRegion</h3>
+<a class="indexterm" name="id3010812"></a><pre class="programlisting">typedef struct _GdkRegion GdkRegion;</pre>
+<p>
+A GdkRegion represents a set of pixels on the screen.
+The only user-visible field of the structure is the user_data member, which
+can be used to attach arbitrary data to the <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3010838"></a><h3>
+<a name="gdk-region-new"></a>gdk_region_new ()</h3>
+<a class="indexterm" name="id3010849"></a><pre class="programlisting"><a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  gdk_region_new                  (void);</pre>
+<p>
+Creates a new empty <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>a new empty <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+
+
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3010901"></a><h3>
+<a name="gdk-region-polygon"></a>gdk_region_polygon ()</h3>
+<a class="indexterm" name="id3010912"></a><pre class="programlisting"><a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  gdk_region_polygon              (<a href="gdk-Points-Rectangles-and-Regions.html#GdkPoint">GdkPoint</a> *points,
+                                             gint npoints,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkFillRule">GdkFillRule</a> fill_rule);</pre>
+<p>
+Creates a new <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a> using the polygon defined by a number of points.
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>points</code></em>&#160;:</span></td>
+<td>an array of <a href="gdk-Points-Rectangles-and-Regions.html#GdkPoint"><span class="type">GdkPoint</span></a> structs.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>npoints</code></em>&#160;:</span></td>
+<td>the number of elements in the <em class="parameter"><code>points</code></em> array.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>fill_rule</code></em>&#160;:</span></td>
+<td>specifies which pixels are included in the region when the polygon
+overlaps itself.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>a new <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a> based on the given polygon.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011044"></a><h3>
+<a name="GdkFillRule"></a>enum GdkFillRule</h3>
+<a class="indexterm" name="id3011054"></a><pre class="programlisting">typedef enum
+{
+  GDK_EVEN_ODD_RULE,
+  GDK_WINDING_RULE
+} GdkFillRule;
+</pre>
+<p>
+The method for determining which pixels are included in a region, when
+creating a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a> from a polygon.
+The fill rule is only relevant for polygons which overlap themselves.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_EVEN_ODD_RULE</code></span></td>
+<td>areas which are overlapped an odd number of times are
+included in the region, while areas overlapped an even number of times are not.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_WINDING_RULE</code></span></td>
+<td>overlapping areas are always included.
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011117"></a><h3>
+<a name="gdk-region-copy"></a>gdk_region_copy ()</h3>
+<a class="indexterm" name="id3011128"></a><pre class="programlisting"><a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  gdk_region_copy                 (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region);</pre>
+<p>
+Copies <em class="parameter"><code>region</code></em>, creating an identical new region.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new region identical to <em class="parameter"><code>region</code></em>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011208"></a><h3>
+<a name="gdk-region-rectangle"></a>gdk_region_rectangle ()</h3>
+<a class="indexterm" name="id3011218"></a><pre class="programlisting"><a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a>*  gdk_region_rectangle            (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rectangle);</pre>
+<p>
+Creates a new region containing the area <em class="parameter"><code>rectangle</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>rectangle</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> a new region
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011293"></a><h3>
+<a name="gdk-region-destroy"></a>gdk_region_destroy ()</h3>
+<a class="indexterm" name="id3011304"></a><pre class="programlisting">void        gdk_region_destroy              (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region);</pre>
+<p>
+Destroys a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+
+
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011366"></a><h3>
+<a name="gdk-region-get-clipbox"></a>gdk_region_get_clipbox ()</h3>
+<a class="indexterm" name="id3011377"></a><pre class="programlisting">void        gdk_region_get_clipbox          (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rectangle);</pre>
+<p>
+Returns the smallest rectangle which includes the entire <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>rectangle</code></em>&#160;:</span></td>
+<td>returns the smallest rectangle which includes all of <em class="parameter"><code>region</code></em>.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011468"></a><h3>
+<a name="gdk-region-get-rectangles"></a>gdk_region_get_rectangles ()</h3>
+<a class="indexterm" name="id3011480"></a><pre class="programlisting">void        gdk_region_get_rectangles       (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> **rectangles,
+                                             gint *n_rectangles);</pre>
+<p>
+Obtains the area covered by the region as a list of rectangles.
+The array returned in <em class="parameter"><code>rectangles</code></em> must be freed with <code class="function">g_free()</code>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>rectangles</code></em>&#160;:</span></td>
+<td> return location for an array of rectangles
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>n_rectangles</code></em>&#160;:</span></td>
+<td> length of returned array
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011599"></a><h3>
+<a name="gdk-region-empty"></a>gdk_region_empty ()</h3>
+<a class="indexterm" name="id3011609"></a><pre class="programlisting">gboolean    gdk_region_empty                (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region);</pre>
+<p>
+Returns <code class="literal">TRUE</code> if the <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a> is empty.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">TRUE</code> if <em class="parameter"><code>region</code></em> is empty.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011698"></a><h3>
+<a name="gdk-region-equal"></a>gdk_region_equal ()</h3>
+<a class="indexterm" name="id3011709"></a><pre class="programlisting">gboolean    gdk_region_equal                (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region2);</pre>
+<p>
+Returns <code class="literal">TRUE</code> if the two regions are the same.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region1</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region2</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">TRUE</code> if <em class="parameter"><code>region1</code></em> and <em class="parameter"><code>region2</code></em> are equal.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011825"></a><h3>
+<a name="gdk-region-point-in"></a>gdk_region_point_in ()</h3>
+<a class="indexterm" name="id3011836"></a><pre class="programlisting">gboolean    gdk_region_point_in             (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             int x,
+                                             int y);</pre>
+<p>
+Returns <code class="literal">TRUE</code> if a point is in a region.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>x</code></em>&#160;:</span></td>
+<td>the x coordinate of a point.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>y</code></em>&#160;:</span></td>
+<td>the y coordinate of a point.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">TRUE</code> if the point is in <em class="parameter"><code>region</code></em>.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3011960"></a><h3>
+<a name="gdk-region-rect-in"></a>gdk_region_rect_in ()</h3>
+<a class="indexterm" name="id3011970"></a><pre class="programlisting"><a href="gdk-Points-Rectangles-and-Regions.html#GdkOverlapType">GdkOverlapType</a> gdk_region_rect_in           (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rect);</pre>
+<p>
+Tests whether a rectangle is within a region.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>rect</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+<code class="literal">GDK_OVERLAP_RECTANGLE_IN</code>, <code class="literal">GDK_OVERLAP_RECTANGLE_OUT</code>, or
+<code class="literal">GDK_OVERLAP_RECTANGLE_PART</code>, depending on whether the rectangle is inside,
+outside, or partly inside the <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>, respectively.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012091"></a><h3>
+<a name="GdkOverlapType"></a>enum GdkOverlapType</h3>
+<a class="indexterm" name="id3012101"></a><pre class="programlisting">typedef enum
+{
+  GDK_OVERLAP_RECTANGLE_IN,
+  GDK_OVERLAP_RECTANGLE_OUT,
+  GDK_OVERLAP_RECTANGLE_PART
+} GdkOverlapType;
+</pre>
+<p>
+Specifies the possible values returned by <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-rect-in"><code class="function">gdk_region_rect_in()</code></a>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_OVERLAP_RECTANGLE_IN</code></span></td>
+<td>if the rectangle is inside the <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_OVERLAP_RECTANGLE_OUT</code></span></td>
+<td>if the rectangle is outside the <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><code class="literal">GDK_OVERLAP_RECTANGLE_PART</code></span></td>
+<td>if the rectangle is partly inside the <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012203"></a><h3>
+<a name="gdk-region-offset"></a>gdk_region_offset ()</h3>
+<a class="indexterm" name="id3012214"></a><pre class="programlisting">void        gdk_region_offset               (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             gint dx,
+                                             gint dy);</pre>
+<p>
+Moves a region the specified distance.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dx</code></em>&#160;:</span></td>
+<td>the distance to move the region horizontally.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dy</code></em>&#160;:</span></td>
+<td>the distance to move the region vertically.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012312"></a><h3>
+<a name="gdk-region-shrink"></a>gdk_region_shrink ()</h3>
+<a class="indexterm" name="id3012324"></a><pre class="programlisting">void        gdk_region_shrink               (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             gint dx,
+                                             gint dy);</pre>
+<p>
+Resizes a region by the specified amount.
+Positive values shrink the region. Negative values expand it.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dx</code></em>&#160;:</span></td>
+<td>the number of pixels to shrink the region horizontally.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>dy</code></em>&#160;:</span></td>
+<td>the number of pixels to shrink the region vertically.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012423"></a><h3>
+<a name="gdk-region-union-with-rect"></a>gdk_region_union_with_rect ()</h3>
+<a class="indexterm" name="id3012434"></a><pre class="programlisting">void        gdk_region_union_with_rect      (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle">GdkRectangle</a> *rect);</pre>
+<p>
+Sets the area of <em class="parameter"><code>region</code></em> to the union of the areas of <em class="parameter"><code>region</code></em> and
+<em class="parameter"><code>rect</code></em>. The resulting area is the set of pixels contained in
+either <em class="parameter"><code>region</code></em> or <em class="parameter"><code>rect</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>rect</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRectangle"><span class="type">GdkRectangle</span></a>.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012551"></a><h3>
+<a name="gdk-region-intersect"></a>gdk_region_intersect ()</h3>
+<a class="indexterm" name="id3012562"></a><pre class="programlisting">void        gdk_region_intersect            (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);</pre>
+<p>
+Sets the area of <em class="parameter"><code>source1</code></em> to the intersection of the areas of <em class="parameter"><code>source1</code></em>
+and <em class="parameter"><code>source2</code></em>. The resulting area is the set of pixels contained in
+both <em class="parameter"><code>source1</code></em> and <em class="parameter"><code>source2</code></em>.</p>
+<p>
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source1</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source2</code></em>&#160;:</span></td>
+<td> another <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012680"></a><h3>
+<a name="gdk-region-union"></a>gdk_region_union ()</h3>
+<a class="indexterm" name="id3012690"></a><pre class="programlisting">void        gdk_region_union                (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);</pre>
+<p>
+Sets the area of <em class="parameter"><code>source1</code></em> to the union of the areas of <em class="parameter"><code>source1</code></em> and
+<em class="parameter"><code>source2</code></em>. The resulting area is the set of pixels contained in
+either <em class="parameter"><code>source1</code></em> or <em class="parameter"><code>source2</code></em>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source1</code></em>&#160;:</span></td>
+<td>  a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source2</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a> 
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012807"></a><h3>
+<a name="gdk-region-subtract"></a>gdk_region_subtract ()</h3>
+<a class="indexterm" name="id3012818"></a><pre class="programlisting">void        gdk_region_subtract             (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);</pre>
+<p>
+Subtracts the area of <em class="parameter"><code>source2</code></em> from the area <em class="parameter"><code>source1</code></em>. The resulting
+area is the set of pixels contained in <em class="parameter"><code>source1</code></em> but not in <em class="parameter"><code>source2</code></em>.</p>
+<p>
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source1</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source2</code></em>&#160;:</span></td>
+<td> another <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3012929"></a><h3>
+<a name="gdk-region-xor"></a>gdk_region_xor ()</h3>
+<a class="indexterm" name="id3012940"></a><pre class="programlisting">void        gdk_region_xor                  (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source1,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *source2);</pre>
+<p>
+Sets the area of <em class="parameter"><code>source1</code></em> to the exclusive-OR of the areas of <em class="parameter"><code>source1</code></em>
+and <em class="parameter"><code>source2</code></em>. The resulting area is the set of pixels contained in one
+or the other of the two sources but not in both.</p>
+<p>
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source1</code></em>&#160;:</span></td>
+<td> a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>source2</code></em>&#160;:</span></td>
+<td> another <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3013046"></a><h3>
+<a name="GdkSpan"></a>GdkSpan</h3>
+<a class="indexterm" name="id3013056"></a><pre class="programlisting">typedef struct {
+  gint x;
+  gint y;
+  gint width;
+} GdkSpan;
+</pre>
+<p>
+A GdkSpan represents a horizontal line of pixels starting
+at the pixel with coordinates <em class="parameter"><code>x</code></em>, <em class="parameter"><code>y</code></em> and ending before <em class="parameter"><code>x</code></em> + <em class="parameter"><code>width</code></em>, <em class="parameter"><code>y</code></em>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>x</code></em>;</span></td>
+<td>x coordinate of the first pixel.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>y</code></em>;</span></td>
+<td>y coordinate of the first pixel.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term">gint&#160;<em class="structfield"><code>width</code></em>;</span></td>
+<td>number of pixels in the span.
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3013167"></a><h3>
+<a name="GdkSpanFunc"></a>GdkSpanFunc ()</h3>
+<a class="indexterm" name="id3013177"></a><pre class="programlisting">void        (*GdkSpanFunc)                  (<a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan">GdkSpan</a> *span,
+                                             gpointer data);</pre>
+<p>
+This defines the type of the function passed to 
+<a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-spans-intersect-foreach"><code class="function">gdk_region_spans_intersect_foreach()</code></a>. 
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>span</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan"><span class="type">GdkSpan</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td>the user data passed to <a href="gdk-Points-Rectangles-and-Regions.html#gdk-region-spans-intersect-foreach"><code class="function">gdk_region_spans_intersect_foreach()</code></a>.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3013277"></a><h3>
+<a name="gdk-region-spans-intersect-foreach"></a>gdk_region_spans_intersect_foreach ()</h3>
+<a class="indexterm" name="id3013288"></a><pre class="programlisting">void        gdk_region_spans_intersect_foreach
+                                            (<a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion">GdkRegion</a> *region,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkSpan">GdkSpan</a> *spans,
+                                             int n_spans,
+                                             gboolean sorted,
+                                             <a href="gdk-Points-Rectangles-and-Regions.html#GdkSpanFunc">GdkSpanFunc</a> function,
+                                             gpointer data);</pre>
+<p>
+Calls a function on each span in the intersection of <em class="parameter"><code>region</code></em> and
+<em class="parameter"><code>spans</code></em>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>region</code></em>&#160;:</span></td>
+<td>a <a href="gdk-Points-Rectangles-and-Regions.html#GdkRegion"><span class="type">GdkRegion</span></a>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>spans</code></em>&#160;:</span></td>
+<td>an array of <span class="type">GdkSpans</span>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>n_spans</code></em>&#160;:</span></td>
+<td>the length of <em class="parameter"><code>spans</code></em>.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sorted</code></em>&#160;:</span></td>
+<td>
+<code class="literal">TRUE</code> if <em class="parameter"><code>spans</code></em> is sorted wrt. the y coordinate.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>function</code></em>&#160;:</span></td>
+<td>function to call on each span in the intersection.
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>data</code></em>&#160;:</span></td>
+<td>data to pass to <em class="parameter"><code>function</code></em>.
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+<table class="navigation" width="100%" summary="Navigation footer" cellpadding="2" cellspacing="0"><tr valign="middle">
+<td align="left"><a accesskey="p" href="GdkScreen.html"><b>&lt;&lt;&#160;GdkScreen</b></a></td>
+<td align="right"><a accesskey="n" href="gdk-Graphics-Contexts.html"><b>Graphics Contexts&#160;&gt;&gt;</b></a></td>
+</tr></table>
+</body>
+</html>

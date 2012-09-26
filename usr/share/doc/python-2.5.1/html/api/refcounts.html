@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="types.html" />
+<link rel="prev" href="objects.html" />
+<link rel="parent" href="objects.html" />
+<link rel="next" href="refcountDetails.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.2.1 Reference Counts </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.2 Objects, types and"
+  href="objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1.2 Objects, types and"
+  href="objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.2.1.1 reference Count Details"
+  href="refcountDetails.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="objects.html">1.2 Objects, Types and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="objects.html">1.2 Objects, Types and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="refcountDetails.html">1.2.1.1 Reference Count Details</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION003210000000000000000"></a><a name="refcounts"></a>
+<br>
+1.2.1 Reference Counts 
+</h2>
+
+<p>
+The reference count is important because today's computers have a 
+finite (and often severely limited) memory size; it counts how many 
+different places there are that have a reference to an object.  Such a 
+place could be another object, or a global (or static) C variable, or 
+a local variable in some C function.  When an object's reference count 
+becomes zero, the object is deallocated.  If it contains references to 
+other objects, their reference count is decremented.  Those other 
+objects may be deallocated in turn, if this decrement makes their 
+reference count become zero, and so on.  (There's an obvious problem 
+with objects that reference each other here; for now, the solution is 
+``don't do that.'')
+
+<p>
+Reference counts are always manipulated explicitly.  The normal way is 
+to use the macro <tt class="cfunction">Py_INCREF()</tt><a id='l2h-10' xml:id='l2h-10'></a> to
+increment an object's reference count by one, and
+<tt class="cfunction">Py_DECREF()</tt><a id='l2h-11' xml:id='l2h-11'></a> to decrement it by  
+one.  The <tt class="cfunction">Py_DECREF()</tt> macro is considerably more complex
+than the incref one, since it must check whether the reference count
+becomes zero and then cause the object's deallocator to be called.
+The deallocator is a function pointer contained in the object's type
+structure.  The type-specific deallocator takes care of decrementing
+the reference counts for other objects contained in the object if this
+is a compound object type, such as a list, as well as performing any
+additional finalization that's needed.  There's no chance that the
+reference count can overflow; at least as many bits are used to hold
+the reference count as there are distinct memory locations in virtual
+memory (assuming <code>sizeof(long) &gt;= sizeof(char*)</code>).  Thus, the
+reference count increment is a simple operation.
+
+<p>
+It is not necessary to increment an object's reference count for every 
+local variable that contains a pointer to an object.  In theory, the 
+object's reference count goes up by one when the variable is made to 
+point to it and it goes down by one when the variable goes out of 
+scope.  However, these two cancel each other out, so at the end the 
+reference count hasn't changed.  The only real reason to use the 
+reference count is to prevent the object from being deallocated as 
+long as our variable is pointing to it.  If we know that there is at 
+least one other reference to the object that lives at least as long as 
+our variable, there is no need to increment the reference count 
+temporarily.  An important situation where this arises is in objects 
+that are passed as arguments to C functions in an extension module 
+that are called from Python; the call mechanism guarantees to hold a 
+reference to every argument for the duration of the call.
+
+<p>
+However, a common pitfall is to extract an object from a list and
+hold on to it for a while without incrementing its reference count.
+Some other operation might conceivably remove the object from the
+list, decrementing its reference count and possible deallocating it.
+The real danger is that innocent-looking operations may invoke
+arbitrary Python code which could do this; there is a code path which
+allows control to flow back to the user from a <tt class="cfunction">Py_DECREF()</tt>,
+so almost any operation is potentially dangerous.
+
+<p>
+A safe approach is to always use the generic operations (functions 
+whose name begins with "<tt class="samp">PyObject_</tt>", "<tt class="samp">PyNumber_</tt>",
+"<tt class="samp">PySequence_</tt>" or "<tt class="samp">PyMapping_</tt>").  These operations always
+increment the reference count of the object they return.  This leaves
+the caller with the responsibility to call
+<tt class="cfunction">Py_DECREF()</tt> when they are done with the result; this soon
+becomes second nature.
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="refcountDetails.html">1.2.1.1 Reference Count Details</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.2 Objects, types and"
+  href="objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1.2 Objects, types and"
+  href="objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.2.1.1 reference Count Details"
+  href="refcountDetails.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="objects.html">1.2 Objects, Types and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="objects.html">1.2 Objects, Types and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="refcountDetails.html">1.2.1.1 Reference Count Details</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

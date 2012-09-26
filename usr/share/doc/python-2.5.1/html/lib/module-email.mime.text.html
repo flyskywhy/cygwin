@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-email.header.html" />
+<link rel="prev" href="module-email.generator.html" />
+<link rel="parent" href="module-email.html" />
+<link rel="next" href="module-email.header.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.1.4 Creating email and MIME objects from scratch</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.3 generating MIME documents"
+  href="module-email.generator.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.5 internationalized headers"
+  href="module-email.header.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.generator.html">7.1.3 Generating MIME documents</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.header.html">7.1.5 Internationalized headers</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009140000000000000000">
+7.1.4 Creating email and MIME objects from scratch</a>
+</h2>
+<a name="module-email.mime"></a><a name="module-email.mime.base"></a><a name="module-email.mime.nonmultipart"></a><a name="module-email.mime.multipart"></a><a name="module-email.mime.audio"></a><a name="module-email.mime.image"></a><a name="module-email.mime.message"></a><a name="module-email.mime.text"></a>Ordinarily, you get a message object structure by passing a file or
+some text to a parser, which parses the text and returns the root
+message object.  However you can also build a complete message
+structure from scratch, or even individual <tt class="class">Message</tt> objects by
+hand.  In fact, you can also take an existing structure and add new
+<tt class="class">Message</tt> objects, move them around, etc.  This makes a very
+convenient interface for slicing-and-dicing MIME messages.
+
+<p>
+You can create a new object structure by creating <tt class="class">Message</tt> instances,
+adding attachments and all the appropriate headers manually.  For MIME
+messages though, the <tt class="module">email</tt> package provides some convenient
+subclasses to make things easier.
+
+<p>
+Here are the classes:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1262' xml:id='l2h-1262' class="class">MIMEBase</tt></b>(</nobr></td>
+  <td><var>_maintype, _subtype, **_params</var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.base</tt>
+
+<p>
+This is the base class for all the MIME-specific subclasses of
+<tt class="class">Message</tt>.  Ordinarily you won't create instances specifically
+of <tt class="class">MIMEBase</tt>, although you could.  <tt class="class">MIMEBase</tt> is provided
+primarily as a convenient base class for more specific MIME-aware
+subclasses.
+
+<p>
+<var>_maintype</var> is the <span class="mailheader">Content-Type:</span> major type
+(e.g. <span class="mimetype">text</span> or <span class="mimetype">image</span>), and <var>_subtype</var> is the
+<span class="mailheader">Content-Type:</span> minor type 
+(e.g. <span class="mimetype">plain</span> or <span class="mimetype">gif</span>).  <var>_params</var> is a parameter
+key/value dictionary and is passed directly to
+<tt class="method">Message.add_header()</tt>.
+
+<p>
+The <tt class="class">MIMEBase</tt> class always adds a <span class="mailheader">Content-Type:</span> header
+(based on <var>_maintype</var>, <var>_subtype</var>, and <var>_params</var>), and a
+<span class="mailheader">MIME-Version:</span> header (always set to <code>1.0</code>).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1263' xml:id='l2h-1263' class="class">MIMENonMultipart</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.nonmultipart</tt>
+
+<p>
+A subclass of <tt class="class">MIMEBase</tt>, this is an intermediate base class for
+MIME messages that are not <span class="mimetype">multipart</span>.  The primary purpose
+of this class is to prevent the use of the <tt class="method">attach()</tt> method,
+which only makes sense for <span class="mimetype">multipart</span> messages.  If
+<tt class="method">attach()</tt> is called, a <tt class="exception">MultipartConversionError</tt>
+exception is raised.
+
+<p>
+
+<span class="versionnote">New in version 2.2.2.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1264' xml:id='l2h-1264' class="class">MIMEMultipart</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>subtype</var><big>[</big><var>,
+    boundary</var><big>[</big><var>, _subparts</var><big>[</big><var>, _params</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.multipart</tt>
+
+<p>
+A subclass of <tt class="class">MIMEBase</tt>, this is an intermediate base class for
+MIME messages that are <span class="mimetype">multipart</span>.  Optional <var>_subtype</var>
+defaults to <span class="mimetype">mixed</span>, but can be used to specify the subtype
+of the message.  A <span class="mailheader">Content-Type:</span> header of
+<span class="mimetype">multipart/</span><var>_subtype</var> will be added to the message
+object.  A <span class="mailheader">MIME-Version:</span> header will also be added.
+
+<p>
+Optional <var>boundary</var> is the multipart boundary string.  When
+<code>None</code> (the default), the boundary is calculated when needed.
+
+<p>
+<var>_subparts</var> is a sequence of initial subparts for the payload.  It
+must be possible to convert this sequence to a list.  You can always
+attach new subparts to the message by using the
+<tt class="method">Message.attach()</tt> method.
+
+<p>
+Additional parameters for the <span class="mailheader">Content-Type:</span> header are
+taken from the keyword arguments, or passed into the <var>_params</var>
+argument, which is a keyword dictionary.
+
+<p>
+
+<span class="versionnote">New in version 2.2.2.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1265' xml:id='l2h-1265' class="class">MIMEApplication</tt></b>(</nobr></td>
+  <td><var>_data</var><big>[</big><var>, _subtype</var><big>[</big><var>,
+    _encoder</var><big>[</big><var>, **_params</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.application</tt>
+
+<p>
+A subclass of <tt class="class">MIMENonMultipart</tt>, the <tt class="class">MIMEApplication</tt> class is
+used to represent MIME message objects of major type <span class="mimetype">application</span>.
+<var>_data</var> is a string containing the raw byte data.  Optional <var>_subtype</var>
+specifies the MIME subtype and defaults to <span class="mimetype">octet-stream</span>.  
+
+<p>
+Optional <var>_encoder</var> is a callable (i.e. function) which will
+perform the actual encoding of the data for transport.  This
+callable takes one argument, which is the <tt class="class">MIMEApplication</tt> instance.
+It should use <tt class="method">get_payload()</tt> and <tt class="method">set_payload()</tt> to
+change the payload to encoded form.  It should also add any
+<span class="mailheader">Content-Transfer-Encoding:</span> or other headers to the message
+object as necessary.  The default encoding is base64.  See the
+<tt class="module"><a href="module-email.encoders.html">email.encoders</a></tt> module for a list of the built-in encoders.
+
+<p>
+<var>_params</var> are passed straight through to the base class constructor.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1266' xml:id='l2h-1266' class="class">MIMEAudio</tt></b>(</nobr></td>
+  <td><var>_audiodata</var><big>[</big><var>, _subtype</var><big>[</big><var>,
+    _encoder</var><big>[</big><var>, **_params</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.audio</tt>
+
+<p>
+A subclass of <tt class="class">MIMENonMultipart</tt>, the <tt class="class">MIMEAudio</tt> class
+is used to create MIME message objects of major type <span class="mimetype">audio</span>.
+<var>_audiodata</var> is a string containing the raw audio data.  If this
+data can be decoded by the standard Python module <tt class="module"><a href="module-sndhdr.html">sndhdr</a></tt>,
+then the subtype will be automatically included in the
+<span class="mailheader">Content-Type:</span> header.  Otherwise you can explicitly specify the
+audio subtype via the <var>_subtype</var> parameter.  If the minor type could
+not be guessed and <var>_subtype</var> was not given, then <tt class="exception">TypeError</tt>
+is raised.
+
+<p>
+Optional <var>_encoder</var> is a callable (i.e. function) which will
+perform the actual encoding of the audio data for transport.  This
+callable takes one argument, which is the <tt class="class">MIMEAudio</tt> instance.
+It should use <tt class="method">get_payload()</tt> and <tt class="method">set_payload()</tt> to
+change the payload to encoded form.  It should also add any
+<span class="mailheader">Content-Transfer-Encoding:</span> or other headers to the message
+object as necessary.  The default encoding is base64.  See the
+<tt class="module"><a href="module-email.encoders.html">email.encoders</a></tt> module for a list of the built-in encoders.
+
+<p>
+<var>_params</var> are passed straight through to the base class constructor.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1267' xml:id='l2h-1267' class="class">MIMEImage</tt></b>(</nobr></td>
+  <td><var>_imagedata</var><big>[</big><var>, _subtype</var><big>[</big><var>,
+    _encoder</var><big>[</big><var>, **_params</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.image</tt>
+
+<p>
+A subclass of <tt class="class">MIMENonMultipart</tt>, the <tt class="class">MIMEImage</tt> class is
+used to create MIME message objects of major type <span class="mimetype">image</span>.
+<var>_imagedata</var> is a string containing the raw image data.  If this
+data can be decoded by the standard Python module <tt class="module"><a href="module-imghdr.html">imghdr</a></tt>,
+then the subtype will be automatically included in the
+<span class="mailheader">Content-Type:</span> header.  Otherwise you can explicitly specify the
+image subtype via the <var>_subtype</var> parameter.  If the minor type could
+not be guessed and <var>_subtype</var> was not given, then <tt class="exception">TypeError</tt>
+is raised.
+
+<p>
+Optional <var>_encoder</var> is a callable (i.e. function) which will
+perform the actual encoding of the image data for transport.  This
+callable takes one argument, which is the <tt class="class">MIMEImage</tt> instance.
+It should use <tt class="method">get_payload()</tt> and <tt class="method">set_payload()</tt> to
+change the payload to encoded form.  It should also add any
+<span class="mailheader">Content-Transfer-Encoding:</span> or other headers to the message
+object as necessary.  The default encoding is base64.  See the
+<tt class="module"><a href="module-email.encoders.html">email.encoders</a></tt> module for a list of the built-in encoders.
+
+<p>
+<var>_params</var> are passed straight through to the <tt class="class">MIMEBase</tt>
+constructor.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1268' xml:id='l2h-1268' class="class">MIMEMessage</tt></b>(</nobr></td>
+  <td><var>_msg</var><big>[</big><var>, _subtype</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.message</tt>
+
+<p>
+A subclass of <tt class="class">MIMENonMultipart</tt>, the <tt class="class">MIMEMessage</tt> class
+is used to create MIME objects of main type <span class="mimetype">message</span>.
+<var>_msg</var> is used as the payload, and must be an instance of class
+<tt class="class">Message</tt> (or a subclass thereof), otherwise a
+<tt class="exception">TypeError</tt> is raised.
+
+<p>
+Optional <var>_subtype</var> sets the subtype of the message; it defaults
+to <span class="mimetype">rfc822</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1269' xml:id='l2h-1269' class="class">MIMEText</tt></b>(</nobr></td>
+  <td><var>_text</var><big>[</big><var>, _subtype</var><big>[</big><var>, _charset</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Module: <tt class="module">email.mime.text</tt>
+
+<p>
+A subclass of <tt class="class">MIMENonMultipart</tt>, the <tt class="class">MIMEText</tt> class is
+used to create MIME objects of major type <span class="mimetype">text</span>.
+<var>_text</var> is the string for the payload.  <var>_subtype</var> is the
+minor type and defaults to <span class="mimetype">plain</span>.  <var>_charset</var> is the
+character set of the text and is passed as a parameter to the
+<tt class="class">MIMENonMultipart</tt> constructor; it defaults to <code>us-ascii</code>.  No
+guessing or encoding is performed on the text data.
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+The previously deprecated <var>_encoding</var> argument has
+been removed.  Encoding happens implicitly based on the <var>_charset</var>
+argument.</span>
+
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.3 generating MIME documents"
+  href="module-email.generator.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.5 internationalized headers"
+  href="module-email.header.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.generator.html">7.1.3 Generating MIME documents</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.header.html">7.1.5 Internationalized headers</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

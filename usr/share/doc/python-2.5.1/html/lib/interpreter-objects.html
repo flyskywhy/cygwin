@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="console-objects.html" />
+<link rel="prev" href="module-code.html" />
+<link rel="parent" href="module-code.html" />
+<link rel="next" href="console-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>27.1.1 Interactive Interpreter Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="27.1 code  "
+  href="module-code.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="27.1 code  "
+  href="module-code.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="27.1.2 interactive Console Objects"
+  href="console-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-code.html">27.1 code  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-code.html">27.1 code  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="console-objects.html">27.1.2 Interactive Console Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0029110000000000000000"></a><a name="interpreter-objects"></a>
+<br>
+27.1.1 Interactive Interpreter Objects
+            
+</h2>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5317' xml:id='l2h-5317' class="method">runsource</tt></b>(</nobr></td>
+  <td><var>source</var><big>[</big><var>, filename</var><big>[</big><var>, symbol</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Compile and run some source in the interpreter.
+Arguments are the same as for <tt class="function">compile_command()</tt>; the
+default for <var>filename</var> is <code>'&lt;input&gt;'</code>, and for
+<var>symbol</var> is <code>'single'</code>.  One several things can happen:
+
+<p>
+
+<ul>
+<li>The input is incorrect; <tt class="function">compile_command()</tt> raised an
+exception (<tt class="exception">SyntaxError</tt> or <tt class="exception">OverflowError</tt>).  A
+syntax traceback will be printed by calling the
+<tt class="method">showsyntaxerror()</tt> method.  <tt class="method">runsource()</tt> returns
+<code>False</code>.
+
+<p>
+</li>
+<li>The input is incomplete, and more input is required;
+<tt class="function">compile_command()</tt> returned <code>None</code>.
+<tt class="method">runsource()</tt> returns <code>True</code>.
+
+<p>
+</li>
+<li>The input is complete; <tt class="function">compile_command()</tt> returned a code
+object.  The code is executed by calling the <tt class="method">runcode()</tt> (which
+also handles run-time exceptions, except for <tt class="exception">SystemExit</tt>).
+<tt class="method">runsource()</tt> returns <code>False</code>.
+</li>
+</ul>
+
+<p>
+The return value can be used to decide whether to use
+<code>sys.ps1</code> or <code>sys.ps2</code> to prompt the next line.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5318' xml:id='l2h-5318' class="method">runcode</tt></b>(</nobr></td>
+  <td><var>code</var>)</td></tr></table></dt>
+<dd>
+Execute a code object.
+When an exception occurs, <tt class="method">showtraceback()</tt> is called to
+display a traceback.  All exceptions are caught except
+<tt class="exception">SystemExit</tt>, which is allowed to propagate.
+
+<p>
+A note about <tt class="exception">KeyboardInterrupt</tt>: this exception may occur
+elsewhere in this code, and may not always be caught.  The caller
+should be prepared to deal with it.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5319' xml:id='l2h-5319' class="method">showsyntaxerror</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>filename</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Display the syntax error that just occurred.  This does not display
+a stack trace because there isn't one for syntax errors.
+If <var>filename</var> is given, it is stuffed into the exception instead
+of the default filename provided by Python's parser, because it
+always uses <code>'&lt;string&gt;'</code> when reading from a string.
+The output is written by the <tt class="method">write()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5320' xml:id='l2h-5320' class="method">showtraceback</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Display the exception that just occurred.  We remove the first stack
+item because it is within the interpreter object implementation.
+The output is written by the <tt class="method">write()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5321' xml:id='l2h-5321' class="method">write</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Write a string to the standard error stream (<code>sys.stderr</code>).
+Derived classes should override this to provide the appropriate output
+handling as needed.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="27.1 code  "
+  href="module-code.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="27.1 code  "
+  href="module-code.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="27.1.2 interactive Console Objects"
+  href="console-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-code.html">27.1 code  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-code.html">27.1 code  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="console-objects.html">27.1.2 Interactive Console Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

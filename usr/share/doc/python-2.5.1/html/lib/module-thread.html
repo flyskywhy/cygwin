@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-threading.html" />
+<link rel="prev" href="module-select.html" />
+<link rel="parent" href="someos.html" />
+<link rel="next" href="module-threading.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>15.2 thread -- Multiple threads of control</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.1.1 polling Objects"
+  href="poll-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15. optional Operating System"
+  href="someos.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.3 threading  "
+  href="module-threading.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="poll-objects.html">15.1.1 Polling Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="someos.html">15. Optional Operating System</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-threading.html">15.3 threading  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0017200000000000000000">
+15.2 <tt class="module">thread</tt> --
+         Multiple threads of control</a>
+</h1>
+
+<p>
+<a name="module-thread"></a>
+
+<p>
+This module provides low-level primitives for working with multiple
+threads (a.k.a. <i class="dfn">light-weight processes</i> or <i class="dfn">tasks</i>) -- multiple
+threads of control sharing their global data space.  For
+synchronization, simple locks (a.k.a. <i class="dfn">mutexes</i> or <i class="dfn">binary
+semaphores</i>) are provided.
+<a id='l2h-3417' xml:id='l2h-3417'></a>
+
+<p>
+The module is optional.  It is supported on Windows, Linux, SGI
+IRIX, Solaris 2.x, as well as on systems that have a POSIX thread
+(a.k.a. ``pthread'') implementation.  For systems lacking the <tt class="module">thread</tt>
+module, the <tt class="module"><a href="module-dummythread.html">dummy_thread</a></tt> module is available.
+It duplicates this module's interface and can be
+used as a drop-in replacement.
+<a id='l2h-3418' xml:id='l2h-3418'></a>
+<a id='l2h-3404' xml:id='l2h-3404'></a>
+<p>
+It defines the following constant and functions:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-3405' xml:id='l2h-3405' class="exception">error</tt></b></dt>
+<dd>
+Raised on thread-specific errors.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3406' xml:id='l2h-3406'>LockType</tt></b></dt>
+<dd>
+This is the type of lock objects.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3407' xml:id='l2h-3407' class="function">start_new_thread</tt></b>(</nobr></td>
+  <td><var>function, args</var><big>[</big><var>, kwargs</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Start a new thread and return its identifier.  The thread executes the function
+<var>function</var> with the argument list <var>args</var> (which must be a tuple).  The
+optional <var>kwargs</var> argument specifies a dictionary of keyword arguments.
+When the function returns, the thread silently exits.  When the function
+terminates with an unhandled exception, a stack trace is printed and
+then the thread exits (but other threads continue to run).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3408' xml:id='l2h-3408' class="function">interrupt_main</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Raise a <tt class="exception">KeyboardInterrupt</tt> exception in the main thread.  A subthread
+can use this function to interrupt the main thread.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3409' xml:id='l2h-3409' class="function">exit</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Raise the <tt class="exception">SystemExit</tt> exception.  When not caught, this
+will cause the thread to exit silently.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3410' xml:id='l2h-3410' class="function">allocate_lock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a new lock object.  Methods of locks are described below.  The
+lock is initially unlocked.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3411' xml:id='l2h-3411' class="function">get_ident</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the `thread identifier' of the current thread.  This is a
+nonzero integer.  Its value has no direct meaning; it is intended as a
+magic cookie to be used e.g. to index a dictionary of thread-specific
+data.  Thread identifiers may be recycled when a thread exits and
+another thread is created.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3412' xml:id='l2h-3412' class="function">stack_size</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>size</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return the thread stack size used when creating new threads.  The
+optional <var>size</var> argument specifies the stack size to be used for
+subsequently created threads, and must be 0 (use platform or
+configured default) or a positive integer value of at least 32,768 (32kB).
+If changing the thread stack size is unsupported, a <tt class="exception">ThreadError</tt>
+is raised.  If the specified stack size is invalid, a <tt class="exception">ValueError</tt>
+is raised and the stack size is unmodified.  32kB is currently the minimum
+supported stack size value to guarantee sufficient stack space for the
+interpreter itself.  Note that some platforms may have particular
+restrictions on values for the stack size, such as requiring a minimum
+stack size &gt; 32kB or requiring allocation in multiples of the system
+memory page size - platform documentation should be referred to for
+more information (4kB pages are common; using multiples of 4096 for
+the stack size is the suggested approach in the absence of more
+specific information).
+Availability: Windows, systems with POSIX threads.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+Lock objects have the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3413' xml:id='l2h-3413' class="method">acquire</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>waitflag</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Without the optional argument, this method acquires the lock
+unconditionally, if necessary waiting until it is released by another
+thread (only one thread at a time can acquire a lock -- that's their
+reason for existence).  If the integer
+<var>waitflag</var> argument is present, the action depends on its
+value: if it is zero, the lock is only acquired if it can be acquired
+immediately without waiting, while if it is nonzero, the lock is
+acquired unconditionally as before.  The
+return value is <code>True</code> if the lock is acquired successfully,
+<code>False</code> if not.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3414' xml:id='l2h-3414' class="method">release</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Releases the lock.  The lock must have been acquired earlier, but not
+necessarily by the same thread.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3415' xml:id='l2h-3415' class="method">locked</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the status of the lock: <code>True</code> if it has been acquired by
+some thread, <code>False</code> if not.
+</dl>
+
+<p>
+In addition to these methods, lock objects can also be used via the
+<tt class="keyword">with</tt> statement, e.g.:
+
+<p>
+<div class="verbatim"><pre>
+from __future__ import with_statement
+import thread
+
+a_lock = thread.allocate_lock()
+
+with a_lock:
+    print "a_lock is locked while this executes"
+</pre></div>
+
+<p>
+<strong>Caveats:</strong>
+
+<p>
+
+<ul>
+<li>Threads interact strangely with interrupts: the
+<tt class="exception">KeyboardInterrupt</tt> exception will be received by an
+arbitrary thread.  (When the <tt class="module"><a href="module-signal.html">signal</a></tt><a id='l2h-3419' xml:id='l2h-3419'></a>
+module is available, interrupts always go to the main thread.)
+
+<p>
+</li>
+<li>Calling <tt class="function">sys.exit()</tt> or raising the <tt class="exception">SystemExit</tt>
+exception is equivalent to calling <tt class="function">exit()</tt>.
+
+<p>
+</li>
+<li>Not all built-in functions that may block waiting for I/O allow other
+threads to run.  (The most popular ones (<tt class="function">time.sleep()</tt>,
+<tt class="method"><var>file</var>.read()</tt>, <tt class="function">select.select()</tt>) work as
+expected.)
+
+<p>
+</li>
+<li>It is not possible to interrupt the <tt class="method">acquire()</tt> method on a lock
+-- the <tt class="exception">KeyboardInterrupt</tt> exception will happen after the
+lock has been acquired.
+
+<p>
+</li>
+<li>When the main thread exits, it is system defined whether the other
+threads survive.  On SGI IRIX using the native thread implementation,
+they survive.  On most other systems, they are killed without
+executing <tt class="keyword">try</tt> ... <tt class="keyword">finally</tt> clauses or executing
+object destructors.
+<a id='l2h-3416' xml:id='l2h-3416'></a>
+<p>
+</li>
+<li>When the main thread exits, it does not do any of its usual cleanup
+(except that <tt class="keyword">try</tt> ... <tt class="keyword">finally</tt> clauses are honored),
+and the standard I/O files are not flushed.
+
+<p>
+</li>
+</ul>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.1.1 polling Objects"
+  href="poll-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15. optional Operating System"
+  href="someos.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.3 threading  "
+  href="module-threading.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="poll-objects.html">15.1.1 Polling Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="someos.html">15. Optional Operating System</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-threading.html">15.3 threading  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

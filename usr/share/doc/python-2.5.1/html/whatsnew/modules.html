@@ -1,0 +1,1308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ports.html" />
+<link rel="prev" href="other-lang.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="ports.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13 New, Improved, and Removed Modules</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="12 other Language Changes"
+  href="other-lang.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14 build and C"
+  href="ports.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="other-lang.html">12 Other Language Changes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ports.html">14 Build and C</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="modules.html#SECTION0001410000000000000000">13.1 The ctypes package</a>
+<li><a href="modules.html#SECTION0001420000000000000000">13.2 The ElementTree package</a>
+<li><a href="modules.html#SECTION0001430000000000000000">13.3 The hashlib package</a>
+<li><a href="modules.html#SECTION0001440000000000000000">13.4 The sqlite3 package</a>
+<li><a href="modules.html#SECTION0001450000000000000000">13.5 The wsgiref package</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION0001400000000000000000"></a><a name="modules"></a>
+<br>
+13 New, Improved, and Removed Modules
+</h1>
+
+<p>
+The standard library received many enhancements and bug fixes in
+Python 2.5.  Here's a partial list of the most notable changes, sorted
+alphabetically by module name. Consult the <span class="file">Misc/NEWS</span> file in
+the source tree for a more complete list of changes, or look through
+the SVN logs for all the details.
+
+<p>
+
+<ul>
+<li>The <tt class="module">audioop</tt> module now supports the a-LAW encoding,
+and the code for u-LAW encoding has been improved.  (Contributed by
+Lars Immisch.)
+
+<p>
+</li>
+<li>The <tt class="module">codecs</tt> module gained support for incremental
+codecs.  The <tt class="function">codec.lookup()</tt> function now
+returns a <tt class="class">CodecInfo</tt> instance instead of a tuple.
+<tt class="class">CodecInfo</tt> instances behave like a 4-tuple to preserve backward
+compatibility but also have the attributes <tt class="member">encode</tt>,
+<tt class="member">decode</tt>, <tt class="member">incrementalencoder</tt>, <tt class="member">incrementaldecoder</tt>,
+<tt class="member">streamwriter</tt>, and <tt class="member">streamreader</tt>.  Incremental codecs 
+can receive input and produce output in multiple chunks; the output is
+the same as if the entire input was fed to the non-incremental codec.
+See the <tt class="module">codecs</tt> module documentation for details.
+(Designed and implemented by Walter Dörwald.)
+
+<p>
+</li>
+<li>The <tt class="module">collections</tt> module gained a new type,
+<tt class="class">defaultdict</tt>, that subclasses the standard <tt class="class">dict</tt>
+type.  The new type mostly behaves like a dictionary but constructs a
+default value when a key isn't present, automatically adding it to the
+dictionary for the requested key value.
+
+<p>
+The first argument to <tt class="class">defaultdict</tt>'s constructor is a factory
+function that gets called whenever a key is requested but not found.
+This factory function receives no arguments, so you can use built-in
+type constructors such as <tt class="function">list()</tt> or <tt class="function">int()</tt>.  For
+example, 
+you can make an index of words based on their initial letter like this:
+
+<p>
+<div class="verbatim"><pre>
+words = """Nel mezzo del cammin di nostra vita
+mi ritrovai per una selva oscura
+che la diritta via era smarrita""".lower().split()
+
+index = defaultdict(list)
+
+for w in words:
+    init_letter = w[0]
+    index[init_letter].append(w)
+</pre></div>
+
+<p>
+Printing <code>index</code> results in the following output:
+
+<p>
+<div class="verbatim"><pre>
+defaultdict(&lt;type 'list'&gt;, {'c': ['cammin', 'che'], 'e': ['era'], 
+        'd': ['del', 'di', 'diritta'], 'm': ['mezzo', 'mi'], 
+        'l': ['la'], 'o': ['oscura'], 'n': ['nel', 'nostra'], 
+        'p': ['per'], 's': ['selva', 'smarrita'], 
+        'r': ['ritrovai'], 'u': ['una'], 'v': ['vita', 'via']}
+</pre></div>
+
+<p>
+(Contributed by Guido van&nbsp;Rossum.)
+
+<p>
+</li>
+<li>The <tt class="class">deque</tt> double-ended queue type supplied by the
+<tt class="module">collections</tt> module now has a <tt class="method">remove(<var>value</var>)</tt>
+method that removes the first occurrence of <var>value</var> in the queue,
+raising <tt class="exception">ValueError</tt> if the value isn't found.
+(Contributed by Raymond Hettinger.)
+
+<p>
+</li>
+<li>New module: The <tt class="module">contextlib</tt> module contains helper functions for use 
+with the new '<tt class="keyword">with</tt>' statement.  See
+section&nbsp;<a href="pep-343.html#module-contextlib">8.2</a> for more about this module.
+
+<p>
+</li>
+<li>New module: The <tt class="module">cProfile</tt> module is a C implementation of 
+the existing <tt class="module">profile</tt> module that has much lower overhead.
+The module's interface is the same as <tt class="module">profile</tt>: you run
+<code>cProfile.run('main()')</code> to profile a function, can save profile
+data to a file, etc.  It's not yet known if the Hotshot profiler,
+which is also written in C but doesn't match the <tt class="module">profile</tt>
+module's interface, will continue to be maintained in future versions
+of Python.  (Contributed by Armin Rigo.)
+
+<p>
+Also, the <tt class="module">pstats</tt> module for analyzing the data measured by
+the profiler now supports directing the output to any file object
+by supplying a <var>stream</var> argument to the <tt class="class">Stats</tt> constructor.
+(Contributed by Skip Montanaro.)
+
+<p>
+</li>
+<li>The <tt class="module">csv</tt> module, which parses files in
+comma-separated value format, received several enhancements and a
+number of bugfixes.  You can now set the maximum size in bytes of a
+field by calling the <tt class="method">csv.field_size_limit(<var>new_limit</var>)</tt>
+function; omitting the <var>new_limit</var> argument will return the
+currently-set limit.  The <tt class="class">reader</tt> class now has a
+<tt class="member">line_num</tt> attribute that counts the number of physical lines
+read from the source; records can span multiple physical lines, so
+<tt class="member">line_num</tt> is not the same as the number of records read.
+
+<p>
+The CSV parser is now stricter about multi-line quoted
+fields. Previously, if a line ended within a quoted field without a
+terminating newline character, a newline would be inserted into the
+returned field. This behavior caused problems when reading files that
+contained carriage return characters within fields, so the code was
+changed to return the field without inserting newlines. As a
+consequence, if newlines embedded within fields are important, the
+input should be split into lines in a manner that preserves the
+newline characters.
+
+<p>
+(Contributed by Skip Montanaro and Andrew McNamara.)
+
+<p>
+</li>
+<li>The <tt class="class">datetime</tt> class in the <tt class="module">datetime</tt> 
+module now has a <tt class="method">strptime(<var>string</var>, <var>format</var>)</tt> 
+method for parsing date strings, contributed by Josh Spoerri.
+It uses the same format characters as <tt class="function">time.strptime()</tt> and
+<tt class="function">time.strftime()</tt>:
+
+<p>
+<div class="verbatim"><pre>
+from datetime import datetime
+
+ts = datetime.strptime('10:13:15 2006-03-07',
+                       '%H:%M:%S %Y-%m-%d')
+</pre></div>
+
+<p>
+</li>
+<li>The <tt class="method">SequenceMatcher.get_matching_blocks()</tt> method
+in the <tt class="module">difflib</tt> module now guarantees to return a minimal list
+of blocks describing matching subsequences.  Previously, the algorithm would
+occasionally break a block of matching elements into two list entries.
+(Enhancement by Tim Peters.)
+
+<p>
+</li>
+<li>The <tt class="module">doctest</tt> module gained a <code>SKIP</code> option that
+keeps an example from being executed at all.  This is intended for
+code snippets that are usage examples intended for the reader and
+aren't actually test cases.
+
+<p>
+An <var>encoding</var> parameter was added to the <tt class="function">testfile()</tt>
+function and the <tt class="class">DocFileSuite</tt> class to specify the file's
+encoding.  This makes it easier to use non-ASCII characters in 
+tests contained within a docstring.  (Contributed by Bjorn Tillenius.)
+
+<p>
+</li>
+<li>The <tt class="module">email</tt> package has been updated to version 4.0.
+(Contributed by Barry Warsaw.)
+
+<p>
+</li>
+<li>The <tt class="module">fileinput</tt> module was made more flexible.
+Unicode filenames are now supported, and a <var>mode</var> parameter that
+defaults to <code>"r"</code> was added to the
+<tt class="function">input()</tt> function to allow opening files in binary or
+universal-newline mode.  Another new parameter, <var>openhook</var>,
+lets you use a function other than <tt class="function">open()</tt> 
+to open the input files.  Once you're iterating over 
+the set of files, the <tt class="class">FileInput</tt> object's new
+<tt class="method">fileno()</tt> returns the file descriptor for the currently opened file.
+(Contributed by Georg Brandl.)
+
+<p>
+</li>
+<li>In the <tt class="module">gc</tt> module, the new <tt class="function">get_count()</tt> function
+returns a 3-tuple containing the current collection counts for the
+three GC generations.  This is accounting information for the garbage
+collector; when these counts reach a specified threshold, a garbage
+collection sweep will be made.  The existing <tt class="function">gc.collect()</tt>
+function now takes an optional <var>generation</var> argument of 0, 1, or 2
+to specify which generation to collect.
+(Contributed by Barry Warsaw.)
+
+<p>
+</li>
+<li>The <tt class="function">nsmallest()</tt> and 
+<tt class="function">nlargest()</tt> functions in the <tt class="module">heapq</tt> module 
+now support a <code>key</code> keyword parameter similar to the one
+provided by the <tt class="function">min()</tt>/<tt class="function">max()</tt> functions
+and the <tt class="method">sort()</tt> methods.  For example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import heapq
+&gt;&gt;&gt; L = ["short", 'medium', 'longest', 'longer still']
+&gt;&gt;&gt; heapq.nsmallest(2, L)  # Return two lowest elements, lexicographically
+['longer still', 'longest']
+&gt;&gt;&gt; heapq.nsmallest(2, L, key=len)   # Return two shortest elements
+['short', 'medium']
+</pre></div>
+
+<p>
+(Contributed by Raymond Hettinger.)
+
+<p>
+</li>
+<li>The <tt class="function">itertools.islice()</tt> function now accepts
+<code>None</code> for the start and step arguments.  This makes it more
+compatible with the attributes of slice objects, so that you can now write
+the following:
+
+<p>
+<div class="verbatim"><pre>
+s = slice(5)     # Create slice object
+itertools.islice(iterable, s.start, s.stop, s.step)
+</pre></div>
+
+<p>
+(Contributed by Raymond Hettinger.)
+
+<p>
+</li>
+<li>The <tt class="function">format()</tt> function in the <tt class="module">locale</tt> module
+has been modified and two new functions were added,
+<tt class="function">format_string()</tt> and <tt class="function">currency()</tt>.
+
+<p>
+The <tt class="function">format()</tt> function's <var>val</var> parameter could
+previously be a string as long as no more than one %char specifier
+appeared; now the parameter must be exactly one %char specifier with
+no surrounding text.  An optional <var>monetary</var> parameter was also
+added which, if <code>True</code>, will use the locale's rules for
+formatting currency in placing a separator between groups of three
+digits.
+
+<p>
+To format strings with multiple %char specifiers, use the new
+<tt class="function">format_string()</tt> function that works like <tt class="function">format()</tt>
+but also supports mixing %char specifiers with
+arbitrary text.
+
+<p>
+A new <tt class="function">currency()</tt> function was also added that formats a
+number according to the current locale's settings.
+
+<p>
+(Contributed by Georg Brandl.)
+
+<p>
+</li>
+<li>The <tt class="module">mailbox</tt> module underwent a massive rewrite to add
+the capability to modify mailboxes in addition to reading them.  A new
+set of classes that include <tt class="class">mbox</tt>, <tt class="class">MH</tt>, and
+<tt class="class">Maildir</tt> are used to read mailboxes, and have an
+<tt class="method">add(<var>message</var>)</tt> method to add messages,
+<tt class="method">remove(<var>key</var>)</tt> to remove messages, and
+<tt class="method">lock()</tt>/<tt class="method">unlock()</tt> to lock/unlock the mailbox.  The
+following example converts a maildir-format mailbox into an mbox-format one:
+
+<p>
+<div class="verbatim"><pre>
+import mailbox
+
+# 'factory=None' uses email.Message.Message as the class representing
+# individual messages.
+src = mailbox.Maildir('maildir', factory=None)
+dest = mailbox.mbox('/tmp/mbox')
+
+for msg in src:
+    dest.add(msg)
+</pre></div>
+
+<p>
+(Contributed by Gregory K. Johnson.  Funding was provided by Google's
+2005 Summer of Code.)
+
+<p>
+</li>
+<li>New module: the <tt class="module">msilib</tt> module allows creating
+Microsoft Installer <span class="file">.msi</span> files and CAB files.  Some support
+for reading the <span class="file">.msi</span> database is also included.
+(Contributed by Martin von&nbsp;Löwis.)
+
+<p>
+</li>
+<li>The <tt class="module">nis</tt> module now supports accessing domains other
+than the system default domain by supplying a <var>domain</var> argument to
+the <tt class="function">nis.match()</tt> and <tt class="function">nis.maps()</tt> functions.
+(Contributed by Ben Bell.)
+
+<p>
+</li>
+<li>The <tt class="module">operator</tt> module's <tt class="function">itemgetter()</tt> 
+and <tt class="function">attrgetter()</tt> functions now support multiple fields.  
+A call such as <code>operator.attrgetter('a', 'b')</code>
+will return a function 
+that retrieves the <tt class="member">a</tt> and <tt class="member">b</tt> attributes.  Combining 
+this new feature with the <tt class="method">sort()</tt> method's <code>key</code> parameter 
+lets you easily sort lists using multiple fields.
+(Contributed by Raymond Hettinger.)
+
+<p>
+</li>
+<li>The <tt class="module">optparse</tt> module was updated to version 1.5.1 of the
+Optik library.  The <tt class="class">OptionParser</tt> class gained an
+<tt class="member">epilog</tt> attribute, a string that will be printed after the
+help message, and a <tt class="method">destroy()</tt> method to break reference
+cycles created by the object. (Contributed by Greg Ward.)
+
+<p>
+</li>
+<li>The <tt class="module">os</tt> module underwent several changes.  The
+<tt class="member">stat_float_times</tt> variable now defaults to true, meaning that
+<tt class="function">os.stat()</tt> will now return time values as floats.  (This
+doesn't necessarily mean that <tt class="function">os.stat()</tt> will return times
+that are precise to fractions of a second; not all systems support
+such precision.)
+
+<p>
+Constants named <tt class="member">os.SEEK_SET</tt>, <tt class="member">os.SEEK_CUR</tt>, and
+<tt class="member">os.SEEK_END</tt> have been added; these are the parameters to the
+<tt class="function">os.lseek()</tt> function.  Two new constants for locking are
+<tt class="member">os.O_SHLOCK</tt> and <tt class="member">os.O_EXLOCK</tt>.
+
+<p>
+Two new functions, <tt class="function">wait3()</tt> and <tt class="function">wait4()</tt>, were
+added.  They're similar the <tt class="function">waitpid()</tt> function which waits
+for a child process to exit and returns a tuple of the process ID and
+its exit status, but <tt class="function">wait3()</tt> and <tt class="function">wait4()</tt> return
+additional information.  <tt class="function">wait3()</tt> doesn't take a process ID
+as input, so it waits for any child process to exit and returns a
+3-tuple of <var>process-id</var>, <var>exit-status</var>, <var>resource-usage</var>
+as returned from the <tt class="function">resource.getrusage()</tt> function.
+<tt class="function">wait4(<var>pid</var>)</tt> does take a process ID.
+(Contributed by Chad J. Schroeder.)
+
+<p>
+On FreeBSD, the <tt class="function">os.stat()</tt> function now returns 
+times with nanosecond resolution, and the returned object
+now has <tt class="member">st_gen</tt> and <tt class="member">st_birthtime</tt>.
+The <tt class="member">st_flags</tt> member is also available, if the platform supports it.
+(Contributed by Antti Louko and  Diego Pettenò.)
+
+<p>
+</li>
+<li>The Python debugger provided by the <tt class="module">pdb</tt> module
+can now store lists of commands to execute when a breakpoint is
+reached and execution stops.  Once breakpoint #1 has been created,
+enter "<tt class="samp">commands 1</tt>" and enter a series of commands to be executed,
+finishing the list with "<tt class="samp">end</tt>".  The command list can include
+commands that resume execution, such as "<tt class="samp">continue</tt>" or
+"<tt class="samp">next</tt>".  (Contributed by Grégoire Dooms.)
+
+<p>
+</li>
+<li>The <tt class="module">pickle</tt> and <tt class="module">cPickle</tt> modules no
+longer accept a return value of <code>None</code> from the
+<tt class="method">__reduce__()</tt> method; the method must return a tuple of
+arguments instead.  The ability to return <code>None</code> was deprecated
+in Python 2.4, so this completes the removal of the feature.
+
+<p>
+</li>
+<li>The <tt class="module">pkgutil</tt> module, containing various utility
+functions for finding packages, was enhanced to support PEP 302's
+import hooks and now also works for packages stored in ZIP-format archives.
+(Contributed by Phillip J. Eby.)
+
+<p>
+</li>
+<li>The pybench benchmark suite by Marc-André&nbsp;Lemburg is now
+included in the <span class="file">Tools/pybench</span> directory.  The pybench suite is
+an improvement on the commonly used <span class="file">pystone.py</span> program because
+pybench provides a more detailed measurement of the interpreter's
+speed.  It times particular operations such as function calls,
+tuple slicing, method lookups, and numeric operations, instead of
+performing many different operations and reducing the result to a
+single number as <span class="file">pystone.py</span> does.
+
+<p>
+</li>
+<li>The <tt class="module">pyexpat</tt> module now uses version 2.0 of the Expat parser.
+(Contributed by Trent Mick.)
+
+<p>
+</li>
+<li>The <tt class="class">Queue</tt> class provided by the <tt class="module">Queue</tt> module
+gained two new methods.  <tt class="method">join()</tt> blocks until all items in
+the queue have been retrieved and all processing work on the items 
+have been completed.  Worker threads call the other new method, 
+<tt class="method">task_done()</tt>, to signal that processing for an item has been
+completed.  (Contributed by Raymond Hettinger.)
+
+<p>
+</li>
+<li>The old <tt class="module">regex</tt> and <tt class="module">regsub</tt> modules, which have been 
+deprecated ever since Python 2.0, have finally been deleted.  
+Other deleted modules: <tt class="module">statcache</tt>, <tt class="module">tzparse</tt>,
+<tt class="module">whrandom</tt>.
+
+<p>
+</li>
+<li>Also deleted: the <span class="file">lib-old</span> directory,
+which includes ancient modules such as <tt class="module">dircmp</tt> and
+<tt class="module">ni</tt>, was removed.  <span class="file">lib-old</span> wasn't on the default
+<code>sys.path</code>, so unless your programs explicitly added the directory to 
+<code>sys.path</code>, this removal shouldn't affect your code.
+
+<p>
+</li>
+<li>The <tt class="module">rlcompleter</tt> module is no longer 
+dependent on importing the <tt class="module">readline</tt> module and
+therefore now works on non-<span class="Unix">Unix</span> platforms.
+(Patch from Robert Kiendl.)
+
+<p>
+</li>
+<li>The <tt class="module">SimpleXMLRPCServer</tt> and <tt class="module">DocXMLRPCServer</tt> 
+classes now have a <tt class="member">rpc_paths</tt> attribute that constrains
+XML-RPC operations to a limited set of URL paths; the default is
+to allow only <code>'/'</code> and <code>'/RPC2'</code>.  Setting 
+<tt class="member">rpc_paths</tt> to <code>None</code> or an empty tuple disables 
+this path checking.
+
+<p>
+</li>
+<li>The <tt class="module">socket</tt> module now supports <tt class="constant">AF_NETLINK</tt>
+sockets on Linux, thanks to a patch from Philippe Biondi.  
+Netlink sockets are a Linux-specific mechanism for communications
+between a user-space process and kernel code; an introductory 
+article about them is at <a class="url" href="http://www.linuxjournal.com/article/7356">http://www.linuxjournal.com/article/7356</a>.
+In Python code, netlink addresses are represented as a tuple of 2 integers, 
+<code>(<var>pid</var>, <var>group_mask</var>)</code>.
+
+<p>
+Two new methods on socket objects, <tt class="method">recv_into(<var>buffer</var>)</tt> and
+<tt class="method">recvfrom_into(<var>buffer</var>)</tt>, store the received data in an object 
+that supports the buffer protocol instead of returning the data as a
+string.  This means you can put the data directly into an array or a
+memory-mapped file.
+
+<p>
+Socket objects also gained <tt class="method">getfamily()</tt>, <tt class="method">gettype()</tt>,
+and <tt class="method">getproto()</tt> accessor methods to retrieve the family, type,
+and protocol values for the socket.
+
+<p>
+</li>
+<li>New module: the <tt class="module">spwd</tt> module provides functions for
+accessing the shadow password database on systems that support 
+shadow passwords.
+
+<p>
+</li>
+<li>The <tt class="module">struct</tt> is now faster because it 
+compiles format strings into <tt class="class">Struct</tt> objects
+with <tt class="method">pack()</tt> and <tt class="method">unpack()</tt> methods.  This is similar
+to how the <tt class="module">re</tt> module lets you create compiled regular
+expression objects.  You can still use the module-level 
+<tt class="function">pack()</tt> and <tt class="function">unpack()</tt> functions; they'll create 
+<tt class="class">Struct</tt> objects and cache them.  Or you can use 
+<tt class="class">Struct</tt> instances directly:
+
+<p>
+<div class="verbatim"><pre>
+s = struct.Struct('ih3s')
+
+data = s.pack(1972, 187, 'abc')
+year, number, name = s.unpack(data)
+</pre></div>
+
+<p>
+You can also pack and unpack data to and from buffer objects directly
+using the <tt class="method">pack_into(<var>buffer</var>, <var>offset</var>, <var>v1</var>,
+<var>v2</var>, ...)</tt> and <tt class="method">unpack_from(<var>buffer</var>, <var>offset</var>)</tt>
+methods.  This lets you store data directly into an array or a
+memory-mapped file.
+
+<p>
+(<tt class="class">Struct</tt> objects were implemented by Bob Ippolito at the
+NeedForSpeed sprint.  Support for buffer objects was added by Martin
+Blais, also at the NeedForSpeed sprint.)
+
+<p>
+</li>
+<li>The Python developers switched from CVS to Subversion during the 2.5
+development process.  Information about the exact build version is
+available as the <code>sys.subversion</code> variable, a 3-tuple of
+<code>(<var>interpreter-name</var>, <var>branch-name</var>,
+<var>revision-range</var>)</code>.  For example, at the time of writing my copy
+of 2.5 was reporting <code>('CPython', 'trunk', '45313:45315')</code>.
+
+<p>
+This information is also available to C extensions via the 
+<tt class="cfunction">Py_GetBuildInfo()</tt> function that returns a 
+string of build information like this:
+<code>"trunk:45355:45356M, Apr 13 2006, 07:42:19"</code>.  
+(Contributed by Barry Warsaw.)
+
+<p>
+</li>
+<li>Another new function, <tt class="function">sys._current_frames()</tt>, returns
+the current stack frames for all running threads as a dictionary
+mapping thread identifiers to the topmost stack frame currently active
+in that thread at the time the function is called.  (Contributed by
+Tim Peters.)
+
+<p>
+</li>
+<li>The <tt class="class">TarFile</tt> class in the <tt class="module">tarfile</tt> module now has
+an <tt class="method">extractall()</tt> method that extracts all members from the
+archive into the current working directory.  It's also possible to set
+a different directory as the extraction target, and to unpack only a
+subset of the archive's members.
+
+<p>
+The compression used for a tarfile opened in stream mode can now be
+autodetected using the mode <code>'r|*'</code>.
+(Contributed by Lars Gustäbel.)
+
+<p>
+</li>
+<li>The <tt class="module">threading</tt> module now lets you set the stack size
+used when new threads are created. The
+<tt class="function">stack_size(<big>[</big><var>size</var><big>]</big>)</tt> function returns the
+currently configured stack size, and supplying the optional <var>size</var>
+parameter sets a new value.  Not all platforms support changing the
+stack size, but Windows, POSIX threading, and OS/2 all do.
+(Contributed by Andrew MacIntyre.)
+
+<p>
+</li>
+<li>The <tt class="module">unicodedata</tt> module has been updated to use version 4.1.0
+of the Unicode character database.  Version 3.2.0 is required 
+by some specifications, so it's still available as 
+<tt class="member">unicodedata.ucd_3_2_0</tt>.
+
+<p>
+</li>
+<li>New module: the  <tt class="module">uuid</tt> module generates 
+universally unique identifiers (UUIDs) according to <a class="rfc" id='rfcref-2386' xml:id='rfcref-2386'
+href="http://www.faqs.org/rfcs/rfc4122.html">RFC 4122</a>.  The
+RFC defines several different UUID versions that are generated from a
+starting string, from system properties, or purely randomly.  This
+module contains a <tt class="class">UUID</tt> class and 
+functions named <tt class="function">uuid1()</tt>,
+<tt class="function">uuid3()</tt>, <tt class="function">uuid4()</tt>,  and 
+<tt class="function">uuid5()</tt> to generate different versions of UUID.  (Version 2 UUIDs 
+are not specified in <a class="rfc" id='rfcref-2388' xml:id='rfcref-2388'
+href="http://www.faqs.org/rfcs/rfc4122.html">RFC 4122</a> and are not supported by this module.)
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import uuid
+&gt;&gt;&gt; # make a UUID based on the host ID and current time
+&gt;&gt;&gt; uuid.uuid1()
+UUID('a8098c1a-f86e-11da-bd1a-00112444be1e')
+
+&gt;&gt;&gt; # make a UUID using an MD5 hash of a namespace UUID and a name
+&gt;&gt;&gt; uuid.uuid3(uuid.NAMESPACE_DNS, 'python.org')
+UUID('6fa459ea-ee8a-3ca4-894e-db77e160355e')
+
+&gt;&gt;&gt; # make a random UUID
+&gt;&gt;&gt; uuid.uuid4()
+UUID('16fd2706-8baf-433b-82eb-8c7fada847da')
+
+&gt;&gt;&gt; # make a UUID using a SHA-1 hash of a namespace UUID and a name
+&gt;&gt;&gt; uuid.uuid5(uuid.NAMESPACE_DNS, 'python.org')
+UUID('886313e1-3b8a-5372-9b90-0c9aee199e5d')
+</pre></div>
+
+<p>
+(Contributed by Ka-Ping Yee.)
+
+<p>
+</li>
+<li>The <tt class="module">weakref</tt> module's <tt class="class">WeakKeyDictionary</tt> and
+<tt class="class">WeakValueDictionary</tt> types gained new methods for iterating
+over the weak references contained in the dictionary. 
+<tt class="method">iterkeyrefs()</tt> and <tt class="method">keyrefs()</tt> methods were
+added to <tt class="class">WeakKeyDictionary</tt>, and
+<tt class="method">itervaluerefs()</tt> and <tt class="method">valuerefs()</tt> were added to
+<tt class="class">WeakValueDictionary</tt>.  (Contributed by Fred L.&nbsp;Drake, Jr.)
+
+<p>
+</li>
+<li>The <tt class="module">webbrowser</tt> module received a number of
+enhancements.
+It's now usable as a script with <code>python -m webbrowser</code>, taking a
+URL as the argument; there are a number of switches 
+to control the behaviour (<b class="programopt">-n</b> for a new browser window, 
+<b class="programopt">-t</b> for a new tab).  New module-level functions,
+<tt class="function">open_new()</tt> and <tt class="function">open_new_tab()</tt>, were added 
+to support this.  The module's <tt class="function">open()</tt> function supports an
+additional feature, an <var>autoraise</var> parameter that signals whether
+to raise the open window when possible. A number of additional
+browsers were added to the supported list such as Firefox, Opera,
+Konqueror, and elinks.  (Contributed by Oleg Broytmann and Georg
+Brandl.)
+
+<p>
+</li>
+<li>The <tt class="module">xmlrpclib</tt> module now supports returning 
+      <tt class="class">datetime</tt> objects for the XML-RPC date type.  Supply 
+      <code>use_datetime=True</code> to the <tt class="function">loads()</tt> function
+      or the <tt class="class">Unmarshaller</tt> class to enable this feature.
+      (Contributed by Skip Montanaro.)
+
+<p>
+</li>
+<li>The <tt class="module">zipfile</tt> module now supports the ZIP64 version of the 
+format, meaning that a .zip archive can now be larger than 4&nbsp;GiB and
+can contain individual files larger than 4&nbsp;GiB.  (Contributed by
+Ronald Oussoren.)
+
+<p>
+</li>
+<li>The <tt class="module">zlib</tt> module's <tt class="class">Compress</tt> and <tt class="class">Decompress</tt>
+objects now support a <tt class="method">copy()</tt> method that makes a copy of the 
+object's internal state and returns a new 
+<tt class="class">Compress</tt> or <tt class="class">Decompress</tt> object. 
+(Contributed by Chris AtLee.)
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<h2><a name="SECTION0001410000000000000000"></a><a name="module-ctypes"></a>
+<br>
+13.1 The ctypes package
+</h2>
+
+<p>
+The <tt class="module">ctypes</tt> package, written by Thomas Heller, has been added 
+to the standard library.  <tt class="module">ctypes</tt> lets you call arbitrary functions 
+in shared libraries or DLLs.  Long-time users may remember the <tt class="module">dl</tt> module, which 
+provides functions for loading shared libraries and calling functions in them.  The <tt class="module">ctypes</tt> package is much fancier.
+
+<p>
+To load a shared library or DLL, you must create an instance of the 
+<tt class="class">CDLL</tt> class and provide the name or path of the shared library
+or DLL.  Once that's done, you can call arbitrary functions
+by accessing them as attributes of the <tt class="class">CDLL</tt> object.  
+
+<p>
+<div class="verbatim"><pre>
+import ctypes
+
+libc = ctypes.CDLL('libc.so.6')
+result = libc.printf("Line of output\n")
+</pre></div>
+
+<p>
+Type constructors for the various C types are provided: <tt class="function">c_int</tt>,
+<tt class="function">c_float</tt>, <tt class="function">c_double</tt>, <tt class="function">c_char_p</tt> (equivalent to <tt class="ctype">char *</tt>), and so forth.  Unlike Python's types, the C versions are all mutable; you can assign to their <tt class="member">value</tt> attribute
+to change the wrapped value.  Python integers and strings will be automatically
+converted to the corresponding C types, but for other types you 
+must call the correct type constructor.  (And I mean <em>must</em>; 
+getting it wrong will often result in the interpreter crashing 
+with a segmentation fault.)
+
+<p>
+You shouldn't use <tt class="function">c_char_p</tt> with a Python string when the C function will be modifying the memory area, because Python strings are 
+supposed to be immutable; breaking this rule will cause puzzling bugs.  When you need a modifiable memory area,
+use <tt class="function">create_string_buffer()</tt>:
+
+<p>
+<div class="verbatim"><pre>
+s = "this is a string"
+buf = ctypes.create_string_buffer(s)
+libc.strfry(buf)
+</pre></div>
+
+<p>
+C functions are assumed to return integers, but you can set
+the <tt class="member">restype</tt> attribute of the function object to 
+change this:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; libc.atof('2.71828')
+-1783957616
+&gt;&gt;&gt; libc.atof.restype = ctypes.c_double
+&gt;&gt;&gt; libc.atof('2.71828')
+2.71828
+</pre></div>
+
+<p>
+<tt class="module">ctypes</tt> also provides a wrapper for Python's C API 
+as the <code>ctypes.pythonapi</code> object.  This object does <em>not</em> 
+release the global interpreter lock before calling a function, because the lock must be held when calling into the interpreter's code.  
+There's a <tt class="class">py_object()</tt> type constructor that will create a 
+<tt class="ctype">PyObject *</tt> pointer.  A simple usage:
+
+<p>
+<div class="verbatim"><pre>
+import ctypes
+
+d = {}
+ctypes.pythonapi.PyObject_SetItem(ctypes.py_object(d),
+          ctypes.py_object("abc"),  ctypes.py_object(1))
+# d is now {'abc', 1}.
+</pre></div>
+
+<p>
+Don't forget to use <tt class="class">py_object()</tt>; if it's omitted you end 
+up with a segmentation fault.
+
+<p>
+<tt class="module">ctypes</tt> has been around for a while, but people still write 
+and distribution hand-coded extension modules because you can't rely on <tt class="module">ctypes</tt> being present.
+Perhaps developers will begin to write 
+Python wrappers atop a library accessed through <tt class="module">ctypes</tt> instead
+of extension modules, now that <tt class="module">ctypes</tt> is included with core Python.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://starship.python.net/crew/theller/ctypes/"
+        class="url">http://starship.python.net/crew/theller/ctypes/</a></dt>
+    <dd>The ctypes web page, with a tutorial, reference, and FAQ.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="../lib/module-ctypes.html"
+        class="url">../lib/module-ctypes.html</a></dt>
+    <dd>The documentation 
+for the <tt class="module">ctypes</tt> module.</dd>
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<h2><a name="SECTION0001420000000000000000"></a><a name="module-etree"></a>
+<br>
+13.2 The ElementTree package
+</h2>
+
+<p>
+A subset of Fredrik Lundh's ElementTree library for processing XML has
+been added to the standard library as <tt class="module">xml.etree</tt>.  The
+available modules are
+<tt class="module">ElementTree</tt>, <tt class="module">ElementPath</tt>, and
+<tt class="module">ElementInclude</tt> from ElementTree 1.2.6.   
+The <tt class="module">cElementTree</tt> accelerator module is also included. 
+
+<p>
+The rest of this section will provide a brief overview of using
+ElementTree.  Full documentation for ElementTree is available at
+<a class="url" href="http://effbot.org/zone/element-index.htm">http://effbot.org/zone/element-index.htm</a>.
+
+<p>
+ElementTree represents an XML document as a tree of element nodes.
+The text content of the document is stored as the <tt class="member">.text</tt>
+and <tt class="member">.tail</tt> attributes of 
+(This is one of the major differences between ElementTree and 
+the Document Object Model; in the DOM there are many different
+types of node, including <tt class="class">TextNode</tt>.)
+
+<p>
+The most commonly used parsing function is <tt class="function">parse()</tt>, that
+takes either a string (assumed to contain a filename) or a file-like
+object and returns an <tt class="class">ElementTree</tt> instance:
+
+<p>
+<div class="verbatim"><pre>
+from xml.etree import ElementTree as ET
+
+tree = ET.parse('ex-1.xml')
+
+feed = urllib.urlopen(
+          'http://planet.python.org/rss10.xml')
+tree = ET.parse(feed)
+</pre></div>
+
+<p>
+Once you have an <tt class="class">ElementTree</tt> instance, you
+can call its <tt class="method">getroot()</tt> method to get the root <tt class="class">Element</tt> node.
+
+<p>
+There's also an <tt class="function">XML()</tt> function that takes a string literal
+and returns an <tt class="class">Element</tt> node (not an <tt class="class">ElementTree</tt>).  
+This function provides a tidy way to incorporate XML fragments,
+approaching the convenience of an XML literal:
+
+<p>
+<div class="verbatim"><pre>
+svg = ET.XML("""&lt;svg width="10px" version="1.0"&gt;
+             &lt;/svg&gt;""")
+svg.set('height', '320px')
+svg.append(elem1)
+</pre></div>
+
+<p>
+Each XML element supports some dictionary-like and some list-like
+access methods.  Dictionary-like operations are used to access attribute
+values, and list-like operations are used to access child nodes.
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Operation</th>
+      <th class="left"  >Result</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><code>elem[n]</code></td>
+        <td class="left"  >Returns n'th child element.</td></tr>
+    <tr><td class="center" valign="baseline"><code>elem[m:n]</code></td>
+        <td class="left"  >Returns list of m'th through n'th child elements.</td></tr>
+    <tr><td class="center" valign="baseline"><code>len(elem)</code></td>
+        <td class="left"  >Returns number of child elements.</td></tr>
+    <tr><td class="center" valign="baseline"><code>list(elem)</code></td>
+        <td class="left"  >Returns list of child elements.</td></tr>
+    <tr><td class="center" valign="baseline"><code>elem.append(elem2)</code></td>
+        <td class="left"  >Adds <var>elem2</var> as a child.</td></tr>
+    <tr><td class="center" valign="baseline"><code>elem.insert(index, elem2)</code></td>
+        <td class="left"  >Inserts <var>elem2</var> at the specified location.</td></tr>
+    <tr><td class="center" valign="baseline"><code>del elem[n]</code></td>
+        <td class="left"  >Deletes n'th child element.</td></tr>
+    <tr><td class="center" valign="baseline"><code>elem.keys()</code></td>
+        <td class="left"  >Returns list of attribute names.</td></tr>
+    <tr><td class="center" valign="baseline"><code>elem.get(name)</code></td>
+        <td class="left"  >Returns value of attribute <var>name</var>.</td></tr>
+    <tr><td class="center" valign="baseline"><code>elem.set(name, value)</code></td>
+        <td class="left"  >Sets new value for attribute <var>name</var>.</td></tr>
+    <tr><td class="center" valign="baseline"><code>elem.attrib</code></td>
+        <td class="left"  >Retrieves the dictionary containing attributes.</td></tr>
+    <tr><td class="center" valign="baseline"><code>del elem.attrib[name]</code></td>
+        <td class="left"  >Deletes attribute <var>name</var>.</td></tr></tbody>
+</table></div>
+
+<p>
+Comments and processing instructions are also represented as
+<tt class="class">Element</tt> nodes.  To check if a node is a comment or processing
+instructions:
+
+<p>
+<div class="verbatim"><pre>
+if elem.tag is ET.Comment:
+    ...
+elif elem.tag is ET.ProcessingInstruction:
+    ...
+</pre></div>
+
+<p>
+To generate XML output, you should call the
+<tt class="method">ElementTree.write()</tt> method.  Like <tt class="function">parse()</tt>,
+it can take either a string or a file-like object:
+
+<p>
+<div class="verbatim"><pre>
+# Encoding is US-ASCII
+tree.write('output.xml')
+
+# Encoding is UTF-8
+f = open('output.xml', 'w')
+tree.write(f, encoding='utf-8')
+</pre></div>
+
+<p>
+(Caution: the default encoding used for output is ASCII.  For general
+XML work, where an element's name may contain arbitrary Unicode
+characters, ASCII isn't a very useful encoding because it will raise
+an exception if an element's name contains any characters with values
+greater than 127.  Therefore, it's best to specify a different
+encoding such as UTF-8 that can handle any Unicode character.)
+
+<p>
+This section is only a partial description of the ElementTree interfaces.
+Please read the package's official documentation for more details.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://effbot.org/zone/element-index.htm"
+        class="url">http://effbot.org/zone/element-index.htm</a></dt>
+    <dd>Official documentation for ElementTree.</dd>
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<h2><a name="SECTION0001430000000000000000"></a><a name="module-hashlib"></a>
+<br>
+13.3 The hashlib package
+</h2>
+
+<p>
+A new <tt class="module">hashlib</tt> module, written by Gregory P. Smith, 
+has been added to replace the
+<tt class="module">md5</tt> and <tt class="module">sha</tt> modules.  <tt class="module">hashlib</tt> adds support
+for additional secure hashes (SHA-224, SHA-256, SHA-384, and SHA-512).
+When available, the module uses OpenSSL for fast platform optimized
+implementations of algorithms.  
+
+<p>
+The old <tt class="module">md5</tt> and <tt class="module">sha</tt> modules still exist as wrappers
+around hashlib to preserve backwards compatibility.  The new module's
+interface is very close to that of the old modules, but not identical.
+The most significant difference is that the constructor functions
+for creating new hashing objects are named differently.
+
+<p>
+<div class="verbatim"><pre>
+# Old versions
+h = md5.md5()   
+h = md5.new()   
+
+# New version 
+h = hashlib.md5()
+
+# Old versions
+h = sha.sha()   
+h = sha.new()   
+
+# New version 
+h = hashlib.sha1()
+
+# Hash that weren't previously available
+h = hashlib.sha224()
+h = hashlib.sha256()
+h = hashlib.sha384()
+h = hashlib.sha512()
+
+# Alternative form
+h = hashlib.new('md5')          # Provide algorithm as a string
+</pre></div>
+
+<p>
+Once a hash object has been created, its methods are the same as before:
+<tt class="method">update(<var>string</var>)</tt> hashes the specified string into the 
+current digest state, <tt class="method">digest()</tt> and <tt class="method">hexdigest()</tt>
+return the digest value as a binary string or a string of hex digits,
+and <tt class="method">copy()</tt> returns a new hashing object with the same digest state.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="../lib/module-hashlib.html"
+        class="url">../lib/module-hashlib.html</a></dt>
+    <dd>The documentation 
+for the <tt class="module">hashlib</tt> module.</dd>
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<h2><a name="SECTION0001440000000000000000"></a><a name="module-sqlite"></a>
+<br>
+13.4 The sqlite3 package
+</h2>
+
+<p>
+The pysqlite module (<a class="url" href="http://www.pysqlite.org">http://www.pysqlite.org</a>), a wrapper for the
+SQLite embedded database, has been added to the standard library under
+the package name <tt class="module">sqlite3</tt>.  
+
+<p>
+SQLite is a C library that provides a lightweight disk-based database
+that doesn't require a separate server process and allows accessing
+the database using a nonstandard variant of the SQL query language.
+Some applications can use SQLite for internal data storage.  It's also
+possible to prototype an application using SQLite and then port the
+code to a larger database such as PostgreSQL or Oracle.
+
+<p>
+pysqlite was written by Gerhard Häring and provides a SQL interface
+compliant with the DB-API 2.0 specification described by
+<a class="rfc" id='rfcref-2394' xml:id='rfcref-2394'
+href="http://www.python.org/peps/pep-0249.html">PEP 249</a>. 
+
+<p>
+If you're compiling the Python source yourself, note that the source
+tree doesn't include the SQLite code, only the wrapper module.
+You'll need to have the SQLite libraries and headers installed before
+compiling Python, and the build process will compile the module when
+the necessary headers are available.
+
+<p>
+To use the module, you must first create a <tt class="class">Connection</tt> object
+that represents the database.  Here the data will be stored in the 
+<span class="file">/tmp/example</span> file:
+
+<p>
+<div class="verbatim"><pre>
+conn = sqlite3.connect('/tmp/example')
+</pre></div>
+
+<p>
+You can also supply the special name "<tt class="samp">:memory:</tt>" to create
+a database in RAM.
+
+<p>
+Once you have a <tt class="class">Connection</tt>, you can create a <tt class="class">Cursor</tt> 
+object and call its <tt class="method">execute()</tt> method to perform SQL commands:
+
+<p>
+<div class="verbatim"><pre>
+c = conn.cursor()
+
+# Create table
+c.execute('''create table stocks
+(date text, trans text, symbol text,
+ qty real, price real)''')
+
+# Insert a row of data
+c.execute("""insert into stocks
+          values ('2006-01-05','BUY','RHAT',100,35.14)""")
+</pre></div>    
+
+<p>
+Usually your SQL operations will need to use values from Python
+variables.  You shouldn't assemble your query using Python's string
+operations because doing so is insecure; it makes your program
+vulnerable to an SQL injection attack.  
+
+<p>
+Instead, use the DB-API's parameter substitution.  Put "<tt class="samp">?</tt>" as a
+placeholder wherever you want to use a value, and then provide a tuple
+of values as the second argument to the cursor's <tt class="method">execute()</tt>
+method.  (Other database modules may use a different placeholder,
+such as "<tt class="samp">%s</tt>" or "<tt class="samp">:1</tt>".) For example:
+
+<p>
+<div class="verbatim"><pre>    
+# Never do this -- insecure!
+symbol = 'IBM'
+c.execute("... where symbol = '%s'" % symbol)
+
+# Do this instead
+t = (symbol,)
+c.execute('select * from stocks where symbol=?', t)
+
+# Larger example
+for t in (('2006-03-28', 'BUY', 'IBM', 1000, 45.00),
+          ('2006-04-05', 'BUY', 'MSOFT', 1000, 72.00),
+          ('2006-04-06', 'SELL', 'IBM', 500, 53.00),
+         ):
+    c.execute('insert into stocks values (?,?,?,?,?)', t)
+</pre></div>
+
+<p>
+To retrieve data after executing a SELECT statement, you can either 
+treat the cursor as an iterator, call the cursor's <tt class="method">fetchone()</tt>
+method to retrieve a single matching row, 
+or call <tt class="method">fetchall()</tt> to get a list of the matching rows.
+
+<p>
+This example uses the iterator form:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; c = conn.cursor()
+&gt;&gt;&gt; c.execute('select * from stocks order by price')
+&gt;&gt;&gt; for row in c:
+...    print row
+...
+(u'2006-01-05', u'BUY', u'RHAT', 100, 35.140000000000001)
+(u'2006-03-28', u'BUY', u'IBM', 1000, 45.0)
+(u'2006-04-06', u'SELL', u'IBM', 500, 53.0)
+(u'2006-04-05', u'BUY', u'MSOFT', 1000, 72.0)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+For more information about the SQL dialect supported by SQLite, see 
+<a class="url" href="http://www.sqlite.org">http://www.sqlite.org</a>.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.pysqlite.org"
+        class="url">http://www.pysqlite.org</a></dt>
+    <dd>The pysqlite web page.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.sqlite.org"
+        class="url">http://www.sqlite.org</a></dt>
+    <dd>The SQLite web page; the documentation describes the syntax and the
+available data types for the supported SQL dialect.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="../lib/module-sqlite3.html"
+        class="url">../lib/module-sqlite3.html</a></dt>
+    <dd>The documentation 
+for the <tt class="module">sqlite3</tt> module.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0249.html"
+        title="Database api Specification 2.0"
+        >PEP 249, <em>Database API Specification 2.0</em></a>
+    <dd>PEP written by
+Marc-André Lemburg.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<h2><a name="SECTION0001450000000000000000"></a><a name="module-wsgiref"></a>
+<br>
+13.5 The wsgiref package
+</h2>
+
+<p>
+The Web Server Gateway Interface (WSGI) v1.0 defines a standard
+interface between web servers and Python web applications and is
+described in <a class="rfc" id='rfcref-2397' xml:id='rfcref-2397'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.  The <tt class="module">wsgiref</tt> package is a reference
+implementation of the WSGI specification.
+
+<p>
+The package includes a basic HTTP server that will run a WSGI
+application; this server is useful for debugging but isn't intended for 
+production use.  Setting up a server takes only a few lines of code:
+
+<p>
+<div class="verbatim"><pre>
+from wsgiref import simple_server
+
+wsgi_app = ...
+
+host = ''
+port = 8000
+httpd = simple_server.make_server(host, port, wsgi_app)
+httpd.serve_forever()
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.wsgi.org"
+        class="url">http://www.wsgi.org</a></dt>
+    <dd>A central web site for WSGI-related resources.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0333.html"
+        title="Python web Server gateway Interface v1.0"
+        >PEP 333, <em>Python Web Server Gateway Interface v1.0</em></a>
+    <dd>PEP written by
+Phillip J. Eby.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="12 other Language Changes"
+  href="other-lang.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14 build and C"
+  href="ports.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="other-lang.html">12 Other Language Changes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ports.html">14 Build and C</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

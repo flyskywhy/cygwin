@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node150.html" />
+<link rel="prev" href="node148.html" />
+<link rel="parent" href="module-email.parser.html" />
+<link rel="next" href="node150.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.1.2.2 Parser class API</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.2.1 feedparser API"
+  href="node148.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1.2 parsing email messages"
+  href="module-email.parser.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.2.3 additional notes"
+  href="node150.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node148.html">7.1.2.1 FeedParser API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.parser.html">7.1.2 Parsing email messages</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node150.html">7.1.2.3 Additional notes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION009122000000000000000">
+7.1.2.2 Parser class API</a>
+</h3>
+
+<p>
+The <tt class="class">Parser</tt> class, imported from the <tt class="module">email.parser</tt> module,
+provides an API that can be used to parse a message when the complete contents
+of the message are available in a string or file.  The
+<tt class="module">email.parser</tt> module also provides a second class, called
+<tt class="class">HeaderParser</tt> which can be used if you're only interested in
+the headers of the message. <tt class="class">HeaderParser</tt> can be much faster in
+these situations, since it does not attempt to parse the message body,
+instead setting the payload to the raw body as a string.
+<tt class="class">HeaderParser</tt> has the same API as the <tt class="class">Parser</tt> class.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1243' xml:id='l2h-1243' class="class">Parser</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>_class</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+The constructor for the <tt class="class">Parser</tt> class takes an optional
+argument <var>_class</var>.  This must be a callable factory (such as a
+function or a class), and it is used whenever a sub-message object
+needs to be created.  It defaults to <tt class="class">Message</tt> (see
+<tt class="module"><a href="module-email.message.html">email.message</a></tt>).  The factory will be called without
+arguments.
+
+<p>
+The optional <var>strict</var> flag is ignored.  <div class="versionnote"><b>Deprecated since release 2.4.</b>
+Because the
+<tt class="class">Parser</tt> class is a backward compatible API wrapper around the
+new-in-Python 2.4 <tt class="class">FeedParser</tt>, <em>all</em> parsing is effectively
+non-strict.  You should simply stop passing a <var>strict</var> flag to the
+<tt class="class">Parser</tt> constructor.</div><p></p>
+
+<p>
+
+<span class="versionnote">Changed in version 2.2.2:
+The <var>strict</var> flag was added.</span>
+
+<span class="versionnote">Changed in version 2.4:
+The <var>strict</var> flag was deprecated.</span>
+
+</dl>
+
+<p>
+The other public <tt class="class">Parser</tt> methods are:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1244' xml:id='l2h-1244' class="method">parse</tt></b>(</nobr></td>
+  <td><var>fp</var><big>[</big><var>, headersonly</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Read all the data from the file-like object <var>fp</var>, parse the
+resulting text, and return the root message object.  <var>fp</var> must
+support both the <tt class="method">readline()</tt> and the <tt class="method">read()</tt> methods
+on file-like objects.
+
+<p>
+The text contained in <var>fp</var> must be formatted as a block of <a class="rfc" id='rfcref-99255' xml:id='rfcref-99255'
+href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>
+style headers and header continuation lines, optionally preceded by a
+envelope header.  The header block is terminated either by the
+end of the data or by a blank line.  Following the header block is the
+body of the message (which may contain MIME-encoded subparts).
+
+<p>
+Optional <var>headersonly</var> is as with the <tt class="method">parse()</tt> method.
+
+<p>
+
+<span class="versionnote">Changed in version 2.2.2:
+The <var>headersonly</var> flag was added.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1245' xml:id='l2h-1245' class="method">parsestr</tt></b>(</nobr></td>
+  <td><var>text</var><big>[</big><var>, headersonly</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Similar to the <tt class="method">parse()</tt> method, except it takes a string
+object instead of a file-like object.  Calling this method on a string
+is exactly equivalent to wrapping <var>text</var> in a <tt class="class">StringIO</tt>
+instance first and calling <tt class="method">parse()</tt>.
+
+<p>
+Optional <var>headersonly</var> is a flag specifying whether to stop
+parsing after reading the headers or not.  The default is <code>False</code>,
+meaning it parses the entire contents of the file.
+
+<p>
+
+<span class="versionnote">Changed in version 2.2.2:
+The <var>headersonly</var> flag was added.</span>
+
+</dl>
+
+<p>
+Since creating a message object structure from a string or a file
+object is such a common task, two functions are provided as a
+convenience.  They are available in the top-level <tt class="module">email</tt>
+package namespace.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1246' xml:id='l2h-1246' class="function">message_from_string</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, _class</var><big>[</big><var>, strict</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a message object structure from a string.  This is exactly
+equivalent to <code>Parser().parsestr(s)</code>.  Optional <var>_class</var> and
+<var>strict</var> are interpreted as with the <tt class="class">Parser</tt> class constructor.
+
+<p>
+
+<span class="versionnote">Changed in version 2.2.2:
+The <var>strict</var> flag was added.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1247' xml:id='l2h-1247' class="function">message_from_file</tt></b>(</nobr></td>
+  <td><var>fp</var><big>[</big><var>, _class</var><big>[</big><var>, strict</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a message object structure tree from an open file object.  This
+is exactly equivalent to <code>Parser().parse(fp)</code>.  Optional
+<var>_class</var> and <var>strict</var> are interpreted as with the
+<tt class="class">Parser</tt> class constructor.
+
+<p>
+
+<span class="versionnote">Changed in version 2.2.2:
+The <var>strict</var> flag was added.</span>
+
+</dl>
+
+<p>
+Here's an example of how you might use this at an interactive Python
+prompt:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import email
+&gt;&gt;&gt; msg = email.message_from_string(myString)
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.2.1 feedparser API"
+  href="node148.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1.2 parsing email messages"
+  href="module-email.parser.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.2.3 additional notes"
+  href="node150.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node148.html">7.1.2.1 FeedParser API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.parser.html">7.1.2 Parsing email messages</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node150.html">7.1.2.3 Additional notes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

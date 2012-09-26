@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-copy.html" />
+<link rel="prev" href="module-types.html" />
+<link rel="parent" href="datatypes.html" />
+<link rel="next" href="module-copy.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.16 new -- Creation of runtime internal objects</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.15 types  "
+  href="module-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.17 copy  "
+  href="module-copy.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-types.html">5.15 types  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-copy.html">5.17 copy  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0071600000000000000000">
+5.16 <tt class="module">new</tt> --
+         Creation of runtime internal objects</a>
+</h1>
+
+<p>
+<a name="module-new"></a>
+
+<p>
+The <tt class="module">new</tt> module allows an interface to the interpreter object
+creation functions. This is for use primarily in marshal-type functions,
+when a new object needs to be created ``magically'' and not by using the
+regular creation functions. This module provides a low-level interface
+to the interpreter, so care must be exercised when using this module.
+It is possible to supply non-sensical arguments which crash the
+interpreter when the object is used.
+
+<p>
+The <tt class="module">new</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-887' xml:id='l2h-887' class="function">instance</tt></b>(</nobr></td>
+  <td><var>class</var><big>[</big><var>, dict</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This function creates an instance of <var>class</var> with dictionary
+<var>dict</var> without calling the <tt class="method">__init__()</tt> constructor.  If
+<var>dict</var> is omitted or <code>None</code>, a new, empty dictionary is
+created for the new instance.  Note that there are no guarantees that
+the object will be in a consistent state.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-888' xml:id='l2h-888' class="function">instancemethod</tt></b>(</nobr></td>
+  <td><var>function, instance, class</var>)</td></tr></table></dt>
+<dd>
+This function will return a method object, bound to <var>instance</var>, or
+unbound if <var>instance</var> is <code>None</code>.  <var>function</var> must be
+callable.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-889' xml:id='l2h-889' class="function">function</tt></b>(</nobr></td>
+  <td><var>code, globals</var><big>[</big><var>, name</var><big>[</big><var>,
+                           argdefs</var><big>[</big><var>, closure</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns a (Python) function with the given code and globals. If
+<var>name</var> is given, it must be a string or <code>None</code>.  If it is a
+string, the function will have the given name, otherwise the function
+name will be taken from <code><var>code</var>.co_name</code>.  If
+<var>argdefs</var> is given, it must be a tuple and will be used to
+determine the default values of parameters.  If <var>closure</var> is given,
+it must be <code>None</code> or a tuple of cell objects containing objects
+to bind to the names in <code><var>code</var>.co_freevars</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-890' xml:id='l2h-890' class="function">code</tt></b>(</nobr></td>
+  <td><var>argcount, nlocals, stacksize, flags, codestring,
+                       constants, names, varnames, filename, name, firstlineno,
+                       lnotab</var>)</td></tr></table></dt>
+<dd>
+This function is an interface to the <tt class="cfunction">PyCode_New()</tt> C
+function.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-891' xml:id='l2h-891' class="function">module</tt></b>(</nobr></td>
+  <td><var>name[, doc]</var>)</td></tr></table></dt>
+<dd>
+This function returns a new module object with name <var>name</var>.
+<var>name</var> must be a string.
+The optional <var>doc</var> argument can have any type.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-892' xml:id='l2h-892' class="function">classobj</tt></b>(</nobr></td>
+  <td><var>name, baseclasses, dict</var>)</td></tr></table></dt>
+<dd>
+This function returns a new class object, with name <var>name</var>, derived
+from <var>baseclasses</var> (which should be a tuple of classes) and with
+namespace <var>dict</var>.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.15 types  "
+  href="module-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.17 copy  "
+  href="module-copy.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-types.html">5.15 types  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-copy.html">5.17 copy  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

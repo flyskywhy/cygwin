@@ -1,0 +1,174 @@
+building and installation process for monotone
+==============================================
+
+1. prerequisites: 
+
+  * hardware prerequisites:
+
+    - g++ consumes a lot of memory building monotone, due to
+      monotone's liberal use of C++ features. it may be possible to
+      build on a system with 128mb of memory, but not pleasant. we are
+      working on making this situation better.
+
+  * software prerequisites:
+
+    - autoconf.
+    - automake.
+    - gettext.
+    - a supported C++ compiler: g++ 3.2 or later.
+    - boost 1.33.0 or later: either an installed copy or an extracted
+      tarball of its unbuilt sources somewhere in the file system are
+      supported.
+    - zlib 1.1.4 or later.
+    - libiconv if the iconv() function is missing.
+
+        on debian: 
+
+           apt-get install autoconf
+           apt-get install automake
+           apt-get install gettext
+           apt-get install libboost-dev
+           apt-get install libz-dev
+           apt-get install g++
+
+        on fedora: 
+
+           yum install autoconf
+           yum install automake
+           yum install gettext
+           yum install boost-devel 
+           yum install zlib-devel
+           yum install gcc-c++
+
+        on Windows (incomplete):
+
+           libiconv (http://gnuwin32.sourceforge.net/packages/libiconv.htm)
+
+        on other systems:
+
+           check your system package repository, you may need to 
+           build some of these from source. if your package repository
+           does not contain the libraries, see:
+
+                http://gcc.gnu.org/      for g++
+                http://www.boost.org/    for boost
+
+1.1 using boost in the build process:
+
+  monotone uses the boost libraries in multiple parts of its code.
+  fortunately, it only uses the so-called header-only libraries: these
+  can be used very easily from other projects, as there is no need to
+  build them by hand prior usage.
+
+  therefore you can use an installed version of boost if shipped with your
+  distribution but, if you do not want to mess with the Boost.Build build
+  system (which is hard to deal with for beginners), you can simply use an
+  extracted copy of the boost sources.  the two procedures are detailed
+  below:
+
+  * if your system already has the boost development libraries installed,
+    you must tell the compiler where to find them.  their location will
+    usually be somewhere under /usr/include.  try the following command:
+
+      ls -d /usr/include/boost*
+
+    if the command shows a single directory named 'boost', you do not have
+    to take any extra steps.  configure will automatically find the
+    necessary files.  instead, if the command shows a directory name of the
+    form boost_1_33_1, boost-1.33.1 or similar, you will have to pass that
+    to the configure script.  do so as follows:
+
+      ./configure CPPFLAGS="-I/usr/include/boost-1.33.1"
+
+    if no directories are shown, look for prebuilt boost packages for your
+    system and install them.  if there aren't any, resort to the procedure
+    described in the following point.
+
+  * if you do not have boost already installed, and you cannot easily
+    install it from prebuilt packages, fetch a copy of the boost sources
+    from their site (see previous section) and unpack them somewhere in
+    your system -- for example, your home directory.  once done, tell the
+    configure script where the files are:
+
+      ./configure CPPFLAGS="-I${HOME}/boost-1.33.1"
+
+  it is important to note that, once monotone is built, you can get rid of
+  all the boost sources or boost development packages from your system.
+  the required header-only libraries will have been built into the final
+  binary, which will not rely on any binary boost library.  in some sense,
+  you can think of it as static linkage.
+
+2. configuring monotone:
+
+  * if there is no ./configure script in your source tree you'll need
+    to create one before proceeding to the next step. one of the 
+    following auto* commands should work:
+
+        $ aclocal-1.9 && autoreconf --install
+        $ AUTOMAKE=automake-1.9 ACLOCAL=aclocal-1.9 autoreconf --install
+
+    If this fails early, check that you have gettext packages installed.
+
+  * type "./configure" for a basic configuration of monotone.  several
+    configuration options are available; type "configure --help" for a
+    list of all of them. some special options are shown here:
+
+     --enable-ipv6[=auto|no|yes]
+
+       specify whether IPv6 support has to be enabled or disabled.  the
+       default is to try automatic detection (auto) and use the guessed
+       results.  however, you can force IPv6 detection by saying 'yes'
+       or completely disable it using 'no'.
+
+     --disable-nls
+
+       build a version of monotone without support for local message
+       catalogs. you might like to do this if you do not have a
+       working installation of GNU gettext.
+
+     --disable-large-file
+
+       this will disable large file support from the builtin sqlite, to
+       achieve maximum binary compatibility with old systems.
+
+     --enable-pch
+
+       this will enable precompiled headers, which should improve compile
+       time. some versions of gcc have problems with this option, so
+       try disabling it if you run into trouble.
+
+3. building monotone
+
+  * type "make". this should produce a mtn binary in your current
+    directory. if not, please send a build log to 
+    monotone-devel@nongnu.org with a description of the failure.
+
+4. testing monotone
+
+  * there is a "make check" target which you can try, if you'd like to
+    confirm monotone's functionality on your system.
+    Do not run "make check" as root (Unix)!  Doing so will cause the
+    failure of some of the tests!
+    Also, make sure your testing process has enough memory.  Experience
+    has shown that some tests may fail "mysteriously" when there is too
+    little memory.  A possible hint is that 128MB was too little on
+    FreeBSD 6 on x86 while 256MB was enough.
+
+    You might also like to try fetching monotone's sources from our
+    monotone server. this process will transfer the complete development
+    history (about 40 megabytes) to your database, and you will then
+    be free to share it with others or make changes and submit them to
+    us:
+
+        mtn --db=mt.mtn db init
+
+        mtn --db=mt.mtn pull monotone.ca "net.venge.monotone*"
+
+        mtn --db=mt.mtn --branch=net.venge.monotone checkout monotone-sources
+
+5. upgrading
+
+  * if you have an existing monotone installation, you may need to
+    perform some additional steps to migrate your data to the newest
+    version; see the file UPGRADE for details.
+

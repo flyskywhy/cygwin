@@ -1,0 +1,267 @@
+This is an alpha testing release of GNU Libtool.  To get the latest
+CVS version of this package, do:
+
+  export CVS_RSH=ssh
+  cvs -z3 -d :pserver:anonymous@cvs.sv.gnu.org:/sources/libtool co libtool
+  cd libtool
+  ./bootstrap
+
+The `bootstrap' script sets up the source directory for you to hack. To
+use it, you need a recent (maybe yet to be released) version of both
+Autoconf and Automake.
+
+If you have any suggestions or bug reports, or you wish to port
+libtool to a new platform, please send electronic mail to the libtool
+mailing list <libtool@gnu.org> or bug reports to <bug-libtool@gnu.org>.
+Don't forget to mention the version of libtool that you are currently
+using (by typing `libtool --version').
+
+================================================================
+= Administrivia
+
+* If you incorporate a change from somebody on the net:
+  If it is a large change, you must make sure they have signed the
+  appropriate paperwork, and be sure to add their name and email
+  address to THANKS
+
+* If a change fixes a test, mention the test in the ChangeLog entry.
+
+* If somebody reports a new bug, mention his name in the ChangeLog entry
+  and in the test case you write.
+
+* The correct response to most actual bugs is to write a new test case
+  which demonstrates the bug.  Then fix the bug, re-run the test suite,
+  and check everything in.
+
+* Some files in the libtool package are not owned by libtool.  These
+  files should never be edited here.  These files are:
+	COPYING
+	INSTALL
+	config/
+	    + config.guess
+	    + config.sub
+	    + depcomp
+	    + install-sh
+	    + mdate-sh
+	    + missing
+	    + texinfo.tex
+	doc/
+	    + fdl.texi
+	libltdl/
+	    + COPYING.LIB
+	    + config.guess
+	    + config.sub
+	    + install-sh
+	    + missing
+
+* Changes other than bug fixes must be mentioned in NEWS
+
+================================================================
+= Test suite
+
+* Use "make check" liberally, on as many platforms as you can.  Use as
+  many compilers and linkers you can.
+
+
+================================================================
+= Release procedure
+
+* If you are a libtool maintainer, but have not yet registered your
+  gpg public key and (preferred) email address with the FSF, send an
+  email, preferably GPG-signed, to <ftp-upload@gnu.org> that includes
+  the following:
+
+    (a) name of package(s) that you are the maintainer for, and your
+        preferred email address.
+
+    (b) an ASCII armored copy of your GnuPG key, as an attachment.
+	("gpg --export -a YOUR_KEY_ID > mykey.asc" should give you
+	this.)
+
+  When you have received acknowledgement of your message, the proper GPG
+  keys will be registered on ftp-upload.gnu.org and only then will you be
+  authorized to upload files to the FSF ftp machines.
+
+* Update the version number in configure.ac and libltdl/configure.ac.
+  See http://www.gnu.org/software/libtool/contribute.html for details of
+  the numbering scheme.
+
+* Update NEWS, ChangeLog.
+
+* Run ./bootstrap.
+
+* Run ./configure and then make.  Do not reuse an existing build tree,
+  remove an old config.status file if present.
+
+* Run `make fetch', which will fetch new versions of the files that are
+  maintained outside of libtool.
+
+* Run ./commit.
+
+* Run `make cvs-dist' which will build a release tarball (with `make
+  distcheck'), tag the tree with release-$(VERSION) and generate the
+  gpg signature files.
+
+* Make sure you have a copy of xdelta installed, and a copy of the previous
+  release tarball in the build directory.
+
+* Run 'make LASTRELEASE=min.maj[.mic[alpha]] deltas' to create both diff
+  and xdelta files between the previous release tarball and the new with
+  detached gpg signature files and clear signed directive files.
+
+* Upload release tarball, diff file and xdelta file, plus their associated
+  detached gpg signature files and clear signed directive files to
+  ftp-upload.gnu.org.  If the upload is destined for ftp.gnu.org, then the
+  files should be placed in the /incoming/ftp directory.  If the upload is
+  an alpha release destined for alpha.gnu.org, then the files should be
+  placed in the /incoming/alpha directory.
+
+* Send announcement to libtool@gnu.org and autotools-announce@gnu.org,
+  if not an alpha send to info-gnu@gnu.org as well.
+
+* Update version number in configure.ac and libltdl/configure.ac to next alpha
+  number.  See http://www.gnu.org/software/libtool/contribute.html for details
+  of the numbering scheme.
+
+* Update NEWS, ChangeLog.
+
+* Run ./commit.
+
+* Update the webpages, libtool.html will need to indicate the latest
+  release number and the news page should get a HTMLified copy of your
+  release announcement.
+
+* If not an alpha, replace manual.html with the new one
+  (generate with gendocs.sh (see
+  http://www.gnu.org/prep/maintain/maintain.html).
+
+================================================================
+= Alpha release note template
+
+To: libtool@gnu.org, autotools-announce@gnu.org
+Subject: GNU Libtool @VERSION@ released (alpha release).
+
+The Libtool Team is pleased to announce alpha release @VERSION@ of GNU
+Libtool.
+
+GNU Libtool hides the complexity of using shared libraries behind a
+consistent, portable interface. GNU Libtool ships with GNU libltdl,
+which hides the complexity of loading dynamic runtime libraries
+(modules) behind a consistent, portable interface.
+
+Here are the compressed sources:
+
+  ftp://alpha.gnu.org/gnu/libtool/libtool-@VERSION@.tar.gz
+
+Here are the xdeltas and diffs against libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@:
+
+  ftp://alpha.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz
+  ftp://alpha.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta
+
+Here are the gpg detached signatures:
+
+  ftp://alpha.gnu.org/gnu/libtool/libtool-@VERSION@.tar.gz.sig
+  ftp://alpha.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz.sig
+  ftp://alpha.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta.sig
+
+Here are the MD5 and SHA1 checksums:
+
+  @MD5SUM@ libtool-@VERSION@.tar.gz
+  @MD5SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz
+  @MD5SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta
+  @SHA1SUM@ libtool-@VERSION@.tar.gz
+  @SHA1SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz
+  @SHA1SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta
+
+This release has @SUMMARY_OF_IMPROVEMENTS_SINCE_LAST_RELEASE_ON_THIS_BRANCH@.
+
+This release was bootstrapped with @BOOTSTRAP_TOOLS_WITH_VERSIONS@,
+but is useable with @COMPATIBLE_AUTOTOOL_VERSIONS@ in your own
+projects.
+
+Alternatively, you can fetch the unbootstrapped sourcecode from
+anonymous cvs by using the following commands:
+
+  $ export CVS_RSH=ssh
+  $ cvs -z3 -d :pserver:anonymous@cvs.sv.gnu.org:/sources/libtool \
+  co -r @CVS_RELEASE_TAG@ libtool
+
+You will then need to have recent (possibly as yet unreleased) versions
+of Automake and Autoconf installed to bootstrap the checked out
+sources yourself.
+
+New in @VERSION@: @RELEASE_DATE@
+
+  @EXCERPT_FROM_NEWS_FILE@
+
+Please report bugs to <bug-libtool@gnu.org>.
+
+================================================================
+= Full release note template
+
+To: info-gnu@gnu.org
+Cc: libtool@gnu.org, autotools-announce@gnu.org
+Subject: GNU Libtool @VERSION@ released.
+
+The Libtool Team is pleased to announce the release of GNU Libtool
+@VERSION@.
+
+GNU Libtool hides the complexity of using shared libraries behind a
+consistent, portable interface. GNU Libtool ships with GNU libltdl,
+which hides the comlexity of loading dynamic runtime libraries
+(modules) behind a consistent, portable interface.
+
+This release has @SUMMARY_OF_IMPROVEMENTS_SINCE_LAST_RELEASE_ON_THIS_BRANCH@.
+
+New in @VERSION@: @RELEASE_DATE@
+
+  @EXCERPT_FROM_NEWS_FILE@
+
+libtool-@VERSION@ is available now from ftp.gnu.org, along with
+diffs and xdeltas against libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@
+that are also available from ftp.gnu.org.  Please
+use a mirror to reduce stress on the main gnu machine:
+
+  http://www.gnu.org/order/ftp.html
+
+Here are the compressed sources:
+
+  ftp://ftp.gnu.org/gnu/libtool/libtool-@VERSION@.tar.gz
+
+Here are the xdeltas and diffs against libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@:
+
+  ftp://ftp.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz
+  ftp://ftp.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta
+
+Here are the gpg detached signatures:
+
+  ftp://ftp.gnu.org/gnu/libtool/libtool-@VERSION@.tar.gz.sig
+  ftp://ftp.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz.sig
+  ftp://ftp.gnu.org/gnu/libtool/libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta.sig
+
+Here are the MD5 and SHA1 checksums:
+
+  @MD5SUM@ libtool-@VERSION@.tar.gz
+  @MD5SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz
+  @MD5SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta
+  @SHA1SUM@ libtool-@VERSION@.tar.gz
+  @SHA1SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.diff.gz
+  @SHA1SUM@ libtool-@PREV_RELEASE_VERSION_ON_THIS_BRANCH@-@VERSION@.xdelta
+
+This release was bootstrapped with @BOOTSTRAP_TOOLS_WITH_VERSIONS@,
+but is useable with @COMPATIBLE_AUTOTOOL_VERSIONS@ in your own
+projects.
+
+Alternatively, you can fetch the unbootstrapped sourcecode from
+anonymous cvs by using the following commands (just hit return when
+you are prompted for the password):
+
+  $ export CVS_RSH=ssh
+  $ cvs -z3 -d :pserver:anonymous@cvs.sv.gnu.org:/sources/libtool \
+  co -r @CVS_RELEASE_TAG@ libtool
+
+You will then need to have the latest release versions of Automake
+(@AUTOMAKE_VERSION@) and Autoconf (@AUTOCONF_VERSION@) installed to
+bootstrap the checked out sources yourself.
+
+Please report bugs to <bug-libtool@gnu.org>.

@@ -1,0 +1,100 @@
+popt
+---------------------------------------------
+A library for parsing command line parameters
+
+Runtime requirements:
+  cygwin-1.3.5 or newer
+
+Build requirements:
+  cygwin-1.3.5 or newer
+  gcc-2.95.3-5 or newer
+  binutils-20011002-1 or newer
+
+Canonical homepage:
+  <none> ewt@redhat.com
+
+Canonical download:
+  ftp://ftp.rpm.org/pub/rpm/dist/rpm-4.0.x/
+
+---------------------------------------------
+
+Build instructions:
+  unpack popt-1.6.4-X-src.tar.bz2
+    if you use setup to install this src package, it will be unpacked
+    under /usr/src automatically
+  ./popt-1.6.4-X.sh all
+
+This will create:
+  /usr/src/popt-1.6.4-X.tar.bz2
+  /usr/src/libpopt0-1.6.4-X.tar.bz2
+  /usr/src/popt-1.6.4-X-src.tar.bz2
+
+---------------------------------------------
+
+Files included in libpopt0-1.6.4-X:
+
+  /usr/bin/cygpopt-0.dll
+
+Files included in popt-1.6.4-X:
+
+  /usr/include/popt.h
+  /usr/lib/libpopt.a
+  /usr/lib/libpopt.dll.a
+  /usr/lib/libpopt.la
+  /usr/man/man3/popt.3
+  /usr/doc/Cygwin/popt-1.6.4.README
+  /usr/doc/popt-1.6.4/README
+  /usr/doc/popt-1.6.4/COPYING
+  /usr/doc/popt-1.6.4/CHANGES
+
+---------------------------------------------
+
+NOTES:
+
+This is specifically NOT linked to gettext (cygintl.dll) 
+-- to minimize external runtime dependencies of programs 
+that use this library.
+
+-------- 1.6.4-4 ----------
+Update to extend the previous bugfix to exec function 
+handling. Thanks to Nicholas Wourms.
+
+-------- 1.6.4-3 ----------
+Update to incorporate a bugfix with alias handling.  Split into
+two separate packages: libpopt0 (DLL only) and popt.
+
+-------- 1.6.4-2 ----------
+relibtoolize and build shared lib as well as static lib.  
+This means that packages which depend on popt will pick
+up a runtime dependence on cygpopt-0.dll the next time
+they are built, unless 'gcc -static' is used.
+
+The shared library auto-exports two variables:
+  struct poptOptions poptHelpOptions[]
+  struct poptOptions poptAliasOptions[]
+These are terrible variables for auto-import into client programs:
+as arrays of structs, there are all sorts of possibilities for 
+running into the limitations of auto-import (see 'info ld' and 
+search for 'auto-import').  Fortunately, these two variables are
+only used by client programs in a specific manner: by invoking
+the macros
+  POPT_AUTOALIAS
+  POPT_AUTOHELP
+In each macro, the "problem" variable is referenced such that
+auto-import works properly.  However, if you ever receive the 
+following message while building a client program:
+  "variable poptHelpOptions can't be auto-imported. Please read the
+  documentation for ld's `enable-auto-import' for details."
+then the chances are you are using poptHelpOptions (or poptAliasOptions)
+in a way that you should not.  poptHelpOptions and poptAliasOptions 
+are ONLY supposed to be referenced via the macros listed above.
+
+-------- 1.6.4-1 ----------
+update to 1.6.4 release
+
+-------- 1.6.2-1 ----------
+initial release
+
+---------------------------------------------
+
+Cygwin port maintained by: Charles Wilson <cwilson@ece.gatech.edu>

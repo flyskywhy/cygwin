@@ -1,0 +1,86 @@
+        Here is a small howto about installing LablGtk2 on Win32
+
+Binary installation
+
+0) Both MSVC and mingw versions of ocaml 3.09 should work.
+
+1) Install the gtk2 libraries and dependencies. You can find them
+   in a single zip file gtk-2.6.8-win32-dlls.zip at
+     http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html
+   The corresponding bin directory must be in your path, and other
+   directories should not be moved relatively to bin.
+
+2) Install lablgtk2 binaries and scripts inside the OCaml distribution
+     bin/lablgtk2.bat             -> bin
+     lib/stublibs/dlllablgtk2.dll -> lib/stublibs
+     lib/lablgtk2                 -> lib/lablgtk2
+
+3) Go to the lib/lablgtk2 directory and execute
+        ocaml build.ml
+   This will compile the ocaml part of the library (the C part is
+   already compiled.)
+   It may fail on the native code version (using ocamlopt) if the
+   assembler is not on your path.  Look in the Objective Caml windows
+   documentation for what is needed, and check that you have a working
+   installation by compiling and linking a trivial program.
+   Note also that the autodection for mingw is not fool-proof
+   (lablgtk2 has to be installed directly under the ocaml library), so
+   if the OCaml port annouced by build.ml is not the right one, you
+   should specify it by hand inside build.ml.
+
+   You must repeat this compilation step every time you upgrade OCaml.
+
+4) Test in examples
+     lablgtk2.bat testgtk.ml
+
+   See also the "Windows port" section of the main LablGtk2 README for
+   important remarks on threads on Windows.
+
+5) For custom linking or native code, you need to use the export
+   libraries in the above DLL package. There is not default place to
+   put them, so you should specify that at link time:
+     ocamlopt -ccopt "/link /libpath:/home/garrigue/gtk-2.6.8/lib"
+       -I +lablgtk2 lablgtk.cmxa gtkInit.cmx testgtk.ml -o testgtk.exe
+   or, on Mingw
+     ocamlopt -ccopt "-L/home/garrigue/gtk-2.6.8/lib" -I +lablgtk2 \
+        lablgtk.cmxa gtkInit.cmx testgtk.ml -o testgtk.exe
+   Again, if this fails you must make sure that your ocamlopt really works,
+   and that all paths are correctly specified.
+
+
+Full compilation (for the brave)
+
+0) You will need either the MSVC or mingw version of ocaml 3.07 or more,
+and cygwin development tools. If you use mingw, check your 
+installation by trying to compile a hello world C program with
+    gcc -mno-cygwin  -mms-bitfields main.c
+ 
+1)  Install Gtk 2: use the precompiled binaries available at 
+
+http://www.gimp.org/~tml/gimp/win32/downloads.html
+     Do NOT even try to compile it yourself from scratch.
+
+You need to install :
+ -libiconv
+ -libintl
+ -gettext-dev
+ -glib-2.2.1 runtime+dvel
+ -pkgconfig
+ -zlib libpng libjpeg libtiff freetype runtime+devel
+ -gtk+-2.2.1 runtime+dev
+ -atk-1.03  runtime+dev
+ -pango-1.2.1 runtime+dev
+ 
+Unzip all these in the base directory (something like X:\cygwin\ )
+
+Try to compile a small hello-gtk.c (see the tutorial page on 
+http://www.gtk.org) before going further.
+
+3) If you are using mingw, "./configure" should succeed. (Well not for me...)
+For MSVC, copy config.make.nt to config.make, and edit it to set GTKROOT.
+
+4) Simply do "make" and "make opt" for the native version.
+
+5) Install ("make install") and test.
+
+$Id: README.win32,v 1.7 2005/10/28 02:02:48 garrigue Exp $

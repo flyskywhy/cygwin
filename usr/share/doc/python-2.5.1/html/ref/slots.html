@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="descriptor-invocation.html" />
+<link rel="parent" href="attribute-access.html" />
+<link rel="next" href="metaclasses.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.4.2.4 __slots__</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.2.3 invoking Descriptors"
+  href="descriptor-invocation.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4.2 customizing attribute access"
+  href="attribute-access.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.3 customizing class creation"
+  href="metaclasses.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="descriptor-invocation.html">3.4.2.3 Invoking Descriptors</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="attribute-access.html">3.4.2 Customizing attribute access</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="metaclasses.html">3.4.3 Customizing class creation</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION005424000000000000000"></a><a name="slots"></a>
+<br>
+3.4.2.4 __slots__
+</h3>
+
+<p>
+By default, instances of both old and new-style classes have a dictionary
+for attribute storage.  This wastes space for objects having very few instance
+variables.  The space consumption can become acute when creating large numbers
+of instances.
+
+<p>
+The default can be overridden by defining <var>__slots__</var> in a new-style class
+definition.  The <var>__slots__</var> declaration takes a sequence of instance
+variables and reserves just enough space in each instance to hold a value
+for each variable.  Space is saved because <var>__dict__</var> is not created for
+each instance.
+
+<p>
+<dl><dt><b><tt id='l2h-222' xml:id='l2h-222'>__slots__</tt></b></dt>
+<dd>
+This class variable can be assigned a string, iterable, or sequence of strings
+with variable names used by instances.  If defined in a new-style class,
+<var>__slots__</var> reserves space for the declared variables
+and prevents the automatic creation of <var>__dict__</var> and <var>__weakref__</var>
+for each instance.
+
+<span class="versionnote">New in version 2.2.</span>
+                     
+</dd></dl>
+
+<p>
+Notes on using <var>__slots__</var>
+
+<p>
+
+<ul>
+<li>Without a <var>__dict__</var> variable, instances cannot be assigned new
+variables not listed in the <var>__slots__</var> definition.  Attempts to assign
+to an unlisted variable name raises <tt class="exception">AttributeError</tt>. If dynamic
+assignment of new variables is desired, then add <code>'__dict__'</code> to the
+sequence of strings in the <var>__slots__</var> declaration.                                     
+
+<span class="versionnote">Changed in version 2.3:
+Previously, adding <code>'__dict__'</code> to the <var>__slots__</var>
+declaration would not enable the assignment of new attributes not
+specifically listed in the sequence of instance variable names.</span>
+
+<p>
+</li>
+<li>Without a <var>__weakref__</var> variable for each instance, classes
+defining <var>__slots__</var> do not support weak references to its instances.
+If weak reference support is needed, then add <code>'__weakref__'</code> to the
+sequence of strings in the <var>__slots__</var> declaration.                    
+
+<span class="versionnote">Changed in version 2.3:
+Previously, adding <code>'__weakref__'</code> to the <var>__slots__</var>
+declaration would not enable support for weak references.</span>
+
+<p>
+</li>
+<li><var>__slots__</var> are implemented at the class level by creating
+descriptors (<a href="descriptors.html#descriptors">3.4.2</a>) for each variable name.  As a result,
+class attributes cannot be used to set default values for instance
+variables defined by <var>__slots__</var>; otherwise, the class attribute would
+overwrite the descriptor assignment. 
+
+<p>
+</li>
+<li>If a class defines a slot also defined in a base class, the instance
+variable defined by the base class slot is inaccessible (except by retrieving
+its descriptor directly from the base class). This renders the meaning of the
+program undefined.  In the future, a check may be added to prevent this.
+
+<p>
+</li>
+<li>The action of a <var>__slots__</var> declaration is limited to the class
+where it is defined.  As a result, subclasses will have a <var>__dict__</var>
+unless they also define  <var>__slots__</var>.                     
+
+<p>
+</li>
+<li><var>__slots__</var> do not work for classes derived from ``variable-length''
+built-in types such as <tt class="class">long</tt>, <tt class="class">str</tt> and <tt class="class">tuple</tt>. 
+
+<p>
+</li>
+<li>Any non-string iterable may be assigned to <var>__slots__</var>.
+Mappings may also be used; however, in the future, special meaning may
+be assigned to the values corresponding to each key.                      
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.2.3 invoking Descriptors"
+  href="descriptor-invocation.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4.2 customizing attribute access"
+  href="attribute-access.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.3 customizing class creation"
+  href="metaclasses.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="descriptor-invocation.html">3.4.2.3 Invoking Descriptors</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="attribute-access.html">3.4.2 Customizing attribute access</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="metaclasses.html">3.4.3 Customizing class creation</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

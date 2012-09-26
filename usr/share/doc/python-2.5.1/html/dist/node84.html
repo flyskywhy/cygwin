@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-distutils.command.register.html" />
+<link rel="parent" href="api-reference.html" />
+<link rel="next" href="modindex.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.47 Creating a new Distutils command</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.46 distutils.command.register  "
+  href="module-distutils.command.register.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="Module Index"
+  href="modindex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.command.register.html">11.46 distutils.command.register  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="modindex.html">Module Index</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00114700000000000000000">
+11.47 Creating a new Distutils command</a>
+</h1>
+
+<p>
+This section outlines the steps to create a new Distutils command.
+
+<p>
+A new command lives in a module in the <tt class="module">distutils.command</tt>
+package. There is a sample template in that directory called 
+<span class="file">command_template</span>. Copy this file to a new module with the
+same name as the new command you're implementing. This module should
+implement a class with the same name as the module (and the command).
+So, for instance, to create the command <code>peel_banana</code> (so that users
+can run "<tt class="samp">setup.py peel_banana</tt>"), you'd copy <span class="file">command_template</span> 
+to <span class="file">distutils/command/peel_banana.py</span>, then edit it so that it's
+implementing the class <tt class="class">peel_banana</tt>, a subclass of 
+<tt class="class">distutils.cmd.Command</tt>.
+
+<p>
+Subclasses of <tt class="class">Command</tt> must define the following methods.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-150' xml:id='l2h-150' class="method">initialize_options()</tt></b>(</nobr></td>
+  <td><var>S</var>)</td></tr></table></dt>
+<dd>et default values for all the options that this command
+supports.  Note that these defaults may be overridden by other
+commands, by the setup script, by config files, or by the
+command-line.  Thus, this is not the place to code dependencies
+between options; generally, <tt class="method">initialize_options()</tt> implementations
+are just a bunch of "<tt class="samp">self.foo = None</tt>" assignments.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-151' xml:id='l2h-151' class="method">finalize_options</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Set final values for all the options that this command supports.
+This is always called as late as possible, ie.  after any option
+assignments from the command-line or from other commands have been
+done.  Thus, this is the place to to code option dependencies: if
+<var>foo</var> depends on <var>bar</var>, then it is safe to set <var>foo</var> from 
+<var>bar</var> as long as <var>foo</var> still has the same value it was assigned in
+<tt class="method">initialize_options()</tt>.
+</dl>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-152' xml:id='l2h-152' class="method">run</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A command's raison d'etre: carry out the action it exists to
+perform, controlled by the options initialized in
+<tt class="method">initialize_options()</tt>, customized by other commands, the setup
+script, the command-line, and config files, and finalized in
+<tt class="method">finalize_options()</tt>.  All terminal output and filesystem
+interaction should be done by <tt class="method">run()</tt>.
+</dl>
+
+<p>
+<var>sub_commands</var> formalizes the notion of a ``family'' of commands,
+eg. <code>install</code> as the parent with sub-commands <code>install_lib</code>,
+<code>install_headers</code>, etc.  The parent of a family of commands
+defines <var>sub_commands</var> as a class attribute; it's a list of
+2-tuples "<tt class="samp">(command_name, predicate)</tt>", with <var>command_name</var> a string
+and <var>predicate</var> an unbound method, a string or None.
+<var>predicate</var> is a method of the parent command that
+determines whether the corresponding command is applicable in the
+current situation.  (Eg. we <code>install_headers</code> is only applicable if
+we have any C header files to install.)  If <var>predicate</var> is None,
+that command is always applicable.
+
+<p>
+<var>sub_commands</var> is usually defined at the *end* of a class, because
+predicates can be unbound methods, so they must already have been
+defined.  The canonical example is the <code class="du-command">install</code> command.
+
+<p>
+ 
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.46 distutils.command.register  "
+  href="module-distutils.command.register.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="Module Index"
+  href="modindex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.command.register.html">11.46 distutils.command.register  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="modindex.html">Module Index</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

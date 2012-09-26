@@ -1,0 +1,47 @@
+Doxygen allows you to put $\mbox{\LaTeX}$ formulas in the output (this works only for the HTML and $\mbox{\LaTeX}$ output, not for the RTF nor for the man page output). To be able to include formulas (as images) in the HTML documentation, you will also need to have the following tools installed \begin{itemize}
+\item {\tt latex:} the $\mbox{\LaTeX}$ compiler, needed to parse the formulas. To test I have used the teTeX 1.0 distribution. \item {\tt dvips:} a tool to convert DVI files to PostScript files I have used version 5.92b from Radical Eye software for testing. \item {\tt gs:} the GhostScript interpreter for converting PostScript files to bitmaps. I have used Aladdin GhostScript 8.0 for testing. \end{itemize}
+
+
+There are three ways to include formulas in the documentation. \begin{enumerate}
+\item Using in-text formulas that appear in the running text. These formulas should be put between a pair of $\backslash$f\$ commands, so 
+
+\footnotesize\begin{verbatim}
+  The distance between \f$(x_1,y_1)\f$ and \f$(x_2,y_2)\f$ is 
+  \f$\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\f$.
+\end{verbatim}
+\normalsize
+ results in:
+
+The distance between $(x_1,y_1)$ and $(x_2,y_2)$ is $\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}$. \par
+ \item Unnumbered displayed formulas that are centered on a separate line. These formulas should be put between $\backslash$f\mbox{[} and $\backslash$f\mbox{]} commands. An example: 
+
+\footnotesize\begin{verbatim}
+  \f[
+    |I_2|=\left| \int_{0}^T \psi(t) 
+             \left\{ 
+                u(a,t)-
+                \int_{\gamma(t)}^a 
+                \frac{d\theta}{k(\theta,t)}
+                \int_{a}^\theta c(\xi)u_t(\xi,t)\,d\xi
+             \right\} dt
+          \right|
+  \f]
+\end{verbatim}
+\normalsize
+ results in: \[ |I_2|=\left| \int_{0}^T \psi(t) \left\{ u(a,t)- \int_{\gamma(t)}^a \frac{d\theta}{k(\theta,t)} \int_{a}^\theta c(\xi)u_t(\xi,t)\,d\xi \right\} dt \right| \] \item Formulas or other latex elements that are not in a math environment can be specified using $\backslash$f\{environment\}, where {\tt environment} is the name of the $\mbox{\LaTeX}$ environment, the corresponding end command is $\backslash$f\}. Here is an example for an equation array 
+
+\footnotesize\begin{verbatim}
+   \f{eqnarray*}{
+        g &=& \frac{Gm_2}{r^2} \\ 
+          &=& \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\,
+              \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\ 
+          &=& 9.82066032\,\mbox{m/s}^2
+   \f}
+\end{verbatim}
+\normalsize
+ which results in: \begin{eqnarray*} g &=& \frac{Gm_2}{r^2} \\ &=& \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\, \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\ &=& 9.82066032\,\mbox{m/s}^2 \end{eqnarray*} \end{enumerate}
+For the first two commands one should make sure formulas contain valid commands in $\mbox{\LaTeX}$'s math-mode. For the third command the section should contain valid command for the specific environment.
+
+\begin{Desc}
+\item[Warning:]Currently, doxygen is not very fault tolerant in recovering from typos in formulas. It may be necessary to remove the file {\tt formula.repository} that is written to the html directory to get rid of an incorrect formula.\end{Desc}
+ 

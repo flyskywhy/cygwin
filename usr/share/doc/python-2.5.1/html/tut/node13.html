@@ -1,0 +1,635 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="tut.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="tut.html" title='Python Tutorial' />
+<link rel='contents' href='node2.html' title="Contents" />
+<link rel='index' href='node19.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node14.html" />
+<link rel="prev" href="node12.html" />
+<link rel="parent" href="tut.html" />
+<link rel="next" href="node14.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11. Brief Tour of the Standard Library - Part II</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10. brief Tour of"
+  href="node12.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python Tutorial"
+  href="tut.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12. what Now?"
+  href="node14.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Tutorial</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="node2.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="node19.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node12.html">10. Brief Tour of</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="tut.html">Python Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node14.html">12. What Now?</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node13.html#SECTION0013100000000000000000">11.1 Output Formatting</a>
+<li><a href="node13.html#SECTION0013200000000000000000">11.2 Templating</a>
+<li><a href="node13.html#SECTION0013300000000000000000">11.3 Working with Binary Data Record Layouts</a>
+<li><a href="node13.html#SECTION0013400000000000000000">11.4 Multi-threading</a>
+<li><a href="node13.html#SECTION0013500000000000000000">11.5 Logging</a>
+<li><a href="node13.html#SECTION0013600000000000000000">11.6 Weak References</a>
+<li><a href="node13.html#SECTION0013700000000000000000">11.7 Tools for Working with Lists</a>
+<li><a href="node13.html#SECTION0013800000000000000000">11.8 Decimal Floating Point Arithmetic</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION0013000000000000000000"></a><a name="briefTourTwo"></a>
+<br>
+11. Brief Tour of the Standard Library - Part II
+</h1>
+
+<p>
+This second tour covers more advanced modules that support professional
+programming needs.  These modules rarely occur in small scripts.
+
+<p>
+
+<h1><a name="SECTION0013100000000000000000"></a><a name="output-formatting"></a>
+<br>
+11.1 Output Formatting
+</h1>
+
+<p>
+The <a class="ulink" href="../lib/module-repr.html"
+  ><tt class="module">repr</tt></a> module provides a
+version of <tt class="function">repr()</tt> customized for abbreviated displays of large
+or deeply nested containers:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; import repr   
+    &gt;&gt;&gt; repr.repr(set('supercalifragilisticexpialidocious'))
+    "set(['a', 'c', 'd', 'e', 'f', 'g', ...])"
+</pre></div>
+
+<p>
+The <a class="ulink" href="../lib/module-pprint.html"
+  ><tt class="module">pprint</tt></a> module offers
+more sophisticated control over printing both built-in and user defined
+objects in a way that is readable by the interpreter.  When the result
+is longer than one line, the ``pretty printer'' adds line breaks and
+indentation to more clearly reveal data structure:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; import pprint
+    &gt;&gt;&gt; t = [[[['black', 'cyan'], 'white', ['green', 'red']], [['magenta',
+    ...     'yellow'], 'blue']]]
+    ...
+    &gt;&gt;&gt; pprint.pprint(t, width=30)
+    [[[['black', 'cyan'],
+       'white',
+       ['green', 'red']],
+      [['magenta', 'yellow'],
+       'blue']]]
+</pre></div>
+
+<p>
+The <a class="ulink" href="../lib/module-textwrap.html"
+  ><tt class="module">textwrap</tt></a> module
+formats paragraphs of text to fit a given screen width:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; import textwrap
+    &gt;&gt;&gt; doc = """The wrap() method is just like fill() except that it returns
+    ... a list of strings instead of one big string with newlines to separate
+    ... the wrapped lines."""
+    ...
+    &gt;&gt;&gt; print textwrap.fill(doc, width=40)
+    The wrap() method is just like fill()
+    except that it returns a list of strings
+    instead of one big string with newlines
+    to separate the wrapped lines.
+</pre></div>
+
+<p>
+The <a class="ulink" href="../lib/module-locale.html"
+  ><tt class="module">locale</tt></a> module accesses
+a database of culture specific data formats.  The grouping attribute
+of locale's format function provides a direct way of formatting numbers
+with group separators:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; import locale
+    &gt;&gt;&gt; locale.setlocale(locale.LC_ALL, 'English_United States.1252')
+    'English_United States.1252'
+    &gt;&gt;&gt; conv = locale.localeconv()          # get a mapping of conventions
+    &gt;&gt;&gt; x = 1234567.8
+    &gt;&gt;&gt; locale.format("%d", x, grouping=True)
+    '1,234,567'
+    &gt;&gt;&gt; locale.format("%s%.*f", (conv['currency_symbol'],
+    ...	      conv['frac_digits'], x), grouping=True)
+    '$1,234,567.80'
+</pre></div>
+
+<p>
+
+<h1><a name="SECTION0013200000000000000000"></a><a name="templating"></a>
+<br>
+11.2 Templating
+</h1>
+
+<p>
+The <a class="ulink" href="../lib/module-string.html"
+  ><tt class="module">string</tt></a> module includes a
+versatile <tt class="class">Template</tt> class with a simplified syntax suitable for
+editing by end-users.  This allows users to customize their applications
+without having to alter the application.
+
+<p>
+The format uses placeholder names formed by "<tt class="samp">$</tt>" with valid Python
+identifiers (alphanumeric characters and underscores).  Surrounding the
+placeholder with braces allows it to be followed by more alphanumeric letters
+with no intervening spaces.  Writing "<tt class="samp">$$</tt>" creates a single escaped
+"<tt class="samp">$</tt>":
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from string import Template
+&gt;&gt;&gt; t = Template('${village}folk send $$10 to $cause.')
+&gt;&gt;&gt; t.substitute(village='Nottingham', cause='the ditch fund')
+'Nottinghamfolk send $10 to the ditch fund.'
+</pre></div>
+
+<p>
+The <tt class="method">substitute</tt> method raises a <tt class="exception">KeyError</tt> when a
+placeholder is not supplied in a dictionary or a keyword argument. For
+mail-merge style applications, user supplied data may be incomplete and the
+<tt class="method">safe_substitute</tt> method may be more appropriate -- it will leave
+placeholders unchanged if data is missing:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; t = Template('Return the $item to $owner.')
+&gt;&gt;&gt; d = dict(item='unladen swallow')
+&gt;&gt;&gt; t.substitute(d)
+Traceback (most recent call last):
+  . . .
+KeyError: 'owner'
+&gt;&gt;&gt; t.safe_substitute(d)
+'Return the unladen swallow to $owner.'
+</pre></div>
+
+<p>
+Template subclasses can specify a custom delimiter.  For example, a batch
+renaming utility for a photo browser may elect to use percent signs for
+placeholders such as the current date, image sequence number, or file format:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import time, os.path
+&gt;&gt;&gt; photofiles = ['img_1074.jpg', 'img_1076.jpg', 'img_1077.jpg']
+&gt;&gt;&gt; class BatchRename(Template):
+...     delimiter = '%'
+&gt;&gt;&gt; fmt = raw_input('Enter rename style (%d-date %n-seqnum %f-format):  ')
+Enter rename style (%d-date %n-seqnum %f-format):  Ashley_%n%f
+
+&gt;&gt;&gt; t = BatchRename(fmt)
+&gt;&gt;&gt; date = time.strftime('%d%b%y')
+&gt;&gt;&gt; for i, filename in enumerate(photofiles):
+...     base, ext = os.path.splitext(filename)
+...     newname = t.substitute(d=date, n=i, f=ext)
+...     print '%s --&gt; %s' % (filename, newname)
+
+img_1074.jpg --&gt; Ashley_0.jpg
+img_1076.jpg --&gt; Ashley_1.jpg
+img_1077.jpg --&gt; Ashley_2.jpg
+</pre></div>
+
+<p>
+Another application for templating is separating program logic from the
+details of multiple output formats.  This makes it possible to substitute
+custom templates for XML files, plain text reports, and HTML web reports.
+
+<p>
+
+<h1><a name="SECTION0013300000000000000000"></a><a name="binary-formats"></a>
+<br>
+11.3 Working with Binary Data Record Layouts
+</h1>
+
+<p>
+The <a class="ulink" href="../lib/module-struct.html"
+  ><tt class="module">struct</tt></a> module provides
+<tt class="function">pack()</tt> and <tt class="function">unpack()</tt> functions for working with
+variable length binary record formats.  The following example shows how
+to loop through header information in a ZIP file (with pack codes
+<code>"H"</code> and <code>"L"</code> representing two and four byte unsigned
+numbers respectively):
+
+<p>
+<div class="verbatim"><pre>
+    import struct
+
+    data = open('myfile.zip', 'rb').read()
+    start = 0
+    for i in range(3):                      # show the first 3 file headers
+        start += 14
+        fields = struct.unpack('LLLHH', data[start:start+16])
+        crc32, comp_size, uncomp_size, filenamesize, extra_size = fields
+
+        start += 16
+        filename = data[start:start+filenamesize]
+        start += filenamesize
+        extra = data[start:start+extra_size]
+        print filename, hex(crc32), comp_size, uncomp_size
+
+        start += extra_size + comp_size     # skip to the next header
+</pre></div>
+
+<p>
+
+<h1><a name="SECTION0013400000000000000000"></a><a name="multi-threading"></a>
+<br>
+11.4 Multi-threading
+</h1>
+
+<p>
+Threading is a technique for decoupling tasks which are not sequentially
+dependent.  Threads can be used to improve the responsiveness of
+applications that accept user input while other tasks run in the
+background.  A related use case is running I/O in parallel with
+computations in another thread.
+
+<p>
+The following code shows how the high level
+<a class="ulink" href="../lib/module-threading.html"
+  ><tt class="module">threading</tt></a> module can run
+tasks in background while the main program continues to run:
+
+<p>
+<div class="verbatim"><pre>
+    import threading, zipfile
+
+    class AsyncZip(threading.Thread):
+        def __init__(self, infile, outfile):
+            threading.Thread.__init__(self)        
+            self.infile = infile
+            self.outfile = outfile
+        def run(self):
+            f = zipfile.ZipFile(self.outfile, 'w', zipfile.ZIP_DEFLATED)
+            f.write(self.infile)
+            f.close()
+            print 'Finished background zip of: ', self.infile
+
+    background = AsyncZip('mydata.txt', 'myarchive.zip')
+    background.start()
+    print 'The main program continues to run in foreground.'
+    
+    background.join()    # Wait for the background task to finish
+    print 'Main program waited until background was done.'
+</pre></div>
+
+<p>
+The principal challenge of multi-threaded applications is coordinating
+threads that share data or other resources.  To that end, the threading
+module provides a number of synchronization primitives including locks,
+events, condition variables, and semaphores.
+
+<p>
+While those tools are powerful, minor design errors can result in
+problems that are difficult to reproduce.  So, the preferred approach
+to task coordination is to concentrate all access to a resource
+in a single thread and then use the
+<a class="ulink" href="../lib/module-Queue.html"
+  ><tt class="module">Queue</tt></a> module to feed that
+thread with requests from other threads.  Applications using
+<tt class="class">Queue</tt> objects for inter-thread communication and coordination
+are easier to design, more readable, and more reliable.
+
+<p>
+
+<h1><a name="SECTION0013500000000000000000"></a><a name="logging"></a>
+<br>
+11.5 Logging
+</h1>
+
+<p>
+The <a class="ulink" href="../lib/module-logging.html"
+  ><tt class="module">logging</tt></a> module offers
+a full featured and flexible logging system.  At its simplest, log
+messages are sent to a file or to <code>sys.stderr</code>:
+
+<p>
+<div class="verbatim"><pre>
+    import logging
+    logging.debug('Debugging information')
+    logging.info('Informational message')
+    logging.warning('Warning:config file %s not found', 'server.conf')
+    logging.error('Error occurred')
+    logging.critical('Critical error -- shutting down')
+</pre></div>
+
+<p>
+This produces the following output: 
+
+<p>
+<div class="verbatim"><pre>
+    WARNING:root:Warning:config file server.conf not found
+    ERROR:root:Error occurred
+    CRITICAL:root:Critical error -- shutting down
+</pre></div>
+
+<p>
+By default, informational and debugging messages are suppressed and the
+output is sent to standard error.  Other output options include routing
+messages through email, datagrams, sockets, or to an HTTP Server.  New
+filters can select different routing based on message priority:
+<tt class="constant">DEBUG</tt>, <tt class="constant">INFO</tt>, <tt class="constant">WARNING</tt>, <tt class="constant">ERROR</tt>,
+and <tt class="constant">CRITICAL</tt>.
+
+<p>
+The logging system can be configured directly from Python or can be
+loaded from a user editable configuration file for customized logging
+without altering the application.
+
+<p>
+
+<h1><a name="SECTION0013600000000000000000"></a><a name="weak-references"></a>
+<br>
+11.6 Weak References
+</h1>
+
+<p>
+Python does automatic memory management (reference counting for most
+objects and garbage collection to eliminate cycles).  The memory is
+freed shortly after the last reference to it has been eliminated.
+
+<p>
+This approach works fine for most applications but occasionally there
+is a need to track objects only as long as they are being used by
+something else.  Unfortunately, just tracking them creates a reference
+that makes them permanent.  The
+<a class="ulink" href="../lib/module-weakref.html"
+  ><tt class="module">weakref</tt></a> module provides
+tools for tracking objects without creating a reference.  When the
+object is no longer needed, it is automatically removed from a weakref
+table and a callback is triggered for weakref objects.  Typical
+applications include caching objects that are expensive to create:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; import weakref, gc
+    &gt;&gt;&gt; class A:
+    ...     def __init__(self, value):
+    ...             self.value = value
+    ...     def __repr__(self):
+    ...             return str(self.value)
+    ...
+    &gt;&gt;&gt; a = A(10)                   # create a reference
+    &gt;&gt;&gt; d = weakref.WeakValueDictionary()
+    &gt;&gt;&gt; d['primary'] = a            # does not create a reference
+    &gt;&gt;&gt; d['primary']                # fetch the object if it is still alive
+    10
+    &gt;&gt;&gt; del a                       # remove the one reference
+    &gt;&gt;&gt; gc.collect()                # run garbage collection right away
+    0
+    &gt;&gt;&gt; d['primary']                # entry was automatically removed
+    Traceback (most recent call last):
+      File "&lt;pyshell#108&gt;", line 1, in -toplevel-
+        d['primary']                # entry was automatically removed
+      File "C:/PY24/lib/weakref.py", line 46, in __getitem__
+        o = self.data[key]()
+    KeyError: 'primary'
+</pre></div>
+
+<p>
+
+<h1><a name="SECTION0013700000000000000000"></a><a name="list-tools"></a>
+<br>
+11.7 Tools for Working with Lists
+</h1>
+
+<p>
+Many data structure needs can be met with the built-in list type.
+However, sometimes there is a need for alternative implementations
+with different performance trade-offs.
+
+<p>
+The <a class="ulink" href="../lib/module-array.html"
+  ><tt class="module">array</tt></a> module provides an
+<tt class="class">array()</tt> object that is like a list that stores only homogenous
+data and stores it more compactly.  The following example shows an array
+of numbers stored as two byte unsigned binary numbers (typecode
+<code>"H"</code>) rather than the usual 16 bytes per entry for regular lists
+of python int objects:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; from array import array
+    &gt;&gt;&gt; a = array('H', [4000, 10, 700, 22222])
+    &gt;&gt;&gt; sum(a)
+    26932
+    &gt;&gt;&gt; a[1:3]
+    array('H', [10, 700])
+</pre></div>
+
+<p>
+The <a class="ulink" href="../lib/module-collections.html"
+  ><tt class="module">collections</tt></a> module
+provides a <tt class="class">deque()</tt> object that is like a list with faster
+appends and pops from the left side but slower lookups in the middle.
+These objects are well suited for implementing queues and breadth first
+tree searches:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; from collections import deque
+    &gt;&gt;&gt; d = deque(["task1", "task2", "task3"])
+    &gt;&gt;&gt; d.append("task4")
+    &gt;&gt;&gt; print "Handling", d.popleft()
+    Handling task1
+
+    unsearched = deque([starting_node])
+    def breadth_first_search(unsearched):
+        node = unsearched.popleft()
+        for m in gen_moves(node):
+            if is_goal(m):
+                return m
+            unsearched.append(m)
+</pre></div>
+
+<p>
+In addition to alternative list implementations, the library also offers
+other tools such as the <a class="ulink" href="../lib/module-bisect.html"
+  ><tt class="module">bisect</tt></a>
+module with functions for manipulating sorted lists:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; import bisect
+    &gt;&gt;&gt; scores = [(100, 'perl'), (200, 'tcl'), (400, 'lua'), (500, 'python')]
+    &gt;&gt;&gt; bisect.insort(scores, (300, 'ruby'))
+    &gt;&gt;&gt; scores
+    [(100, 'perl'), (200, 'tcl'), (300, 'ruby'), (400, 'lua'), (500, 'python')]
+</pre></div>
+
+<p>
+The <a class="ulink" href="../lib/module-heapq.html"
+  ><tt class="module">heapq</tt></a> module provides
+functions for implementing heaps based on regular lists.  The lowest
+valued entry is always kept at position zero.  This is useful for
+applications which repeatedly access the smallest element but do not
+want to run a full list sort:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; from heapq import heapify, heappop, heappush
+    &gt;&gt;&gt; data = [1, 3, 5, 7, 9, 2, 4, 6, 8, 0]
+    &gt;&gt;&gt; heapify(data)                      # rearrange the list into heap order
+    &gt;&gt;&gt; heappush(data, -5)                 # add a new entry
+    &gt;&gt;&gt; [heappop(data) for i in range(3)]  # fetch the three smallest entries
+    [-5, 0, 1]
+</pre></div>
+
+<p>
+
+<h1><a name="SECTION0013800000000000000000"></a><a name="decimal-fp"></a>
+<br>
+11.8 Decimal Floating Point Arithmetic
+</h1>
+
+<p>
+The <a class="ulink" href="../lib/module-decimal.html"
+  ><tt class="module">decimal</tt></a> module offers a
+<tt class="class">Decimal</tt> datatype for decimal floating point arithmetic.  Compared to
+the built-in <tt class="class">float</tt> implementation of binary floating point, the new
+class is especially helpful for financial applications and other uses which
+require exact decimal representation, control over precision, control over
+rounding to meet legal or regulatory requirements, tracking of significant
+decimal places, or for applications where the user expects the results to
+match calculations done by hand.
+
+<p>
+For example, calculating a 5% tax on a 70 cent phone charge gives
+different results in decimal floating point and binary floating point.
+The difference becomes significant if the results are rounded to the
+nearest cent:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from decimal import *       
+&gt;&gt;&gt; Decimal('0.70') * Decimal('1.05')
+Decimal("0.7350")
+&gt;&gt;&gt; .70 * 1.05
+0.73499999999999999
+</pre></div>
+
+<p>
+The <tt class="class">Decimal</tt> result keeps a trailing zero, automatically inferring four
+place significance from multiplicands with two place significance.  Decimal reproduces
+mathematics as done by hand and avoids issues that can arise when binary
+floating point cannot exactly represent decimal quantities.
+
+<p>
+Exact representation enables the <tt class="class">Decimal</tt> class to perform
+modulo calculations and equality tests that are unsuitable for binary
+floating point:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; Decimal('1.00') % Decimal('.10')
+Decimal("0.00")
+&gt;&gt;&gt; 1.00 % 0.10
+0.09999999999999995
+       
+&gt;&gt;&gt; sum([Decimal('0.1')]*10) == Decimal('1.0')
+True
+&gt;&gt;&gt; sum([0.1]*10) == 1.0
+False
+</pre></div>
+
+<p>
+The <tt class="module">decimal</tt> module provides arithmetic with as much precision as
+needed:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; getcontext().prec = 36
+&gt;&gt;&gt; Decimal(1) / Decimal(7)
+Decimal("0.142857142857142857142857142857142857")
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10. brief Tour of"
+  href="node12.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python Tutorial"
+  href="tut.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="12. what Now?"
+  href="node14.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Tutorial</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="node2.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="node19.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node12.html">10. Brief Tour of</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="tut.html">Python Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node14.html">12. What Now?</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,184 @@
+cg-log(1)
+=========
+
+NAME
+----
+cg-log - show the list of changes
+
+SYNOPSIS
+--------
+cg-log [-D DATE] [-r FROM_ID[..TO_ID]] [-d] [-s | --summary] [OTHER_OPTIONS] [FILE]...
+
+DESCRIPTION
+-----------
+Display log of changes on a given branch, within a given range of commits,
+and/or concerning given set of files. The log can be further filtered to
+e.g. only changes touching a given string or done by a given user. Several
+output formats are available.
+
+The output will automatically be displayed in a pager unless it is piped to
+a program.
+
+OPTIONS
+-------
+
+--
+	Arguments not interpreted as options will be interpreted as filenames;
+	cg-log then displays only changes in those files.
+
+-c::
+	Colorize the output. You can customize the colors using the
+	$CG_COLORS environment variable (see below).
+
+-d::
+	Accompany each commit with a diff against previous commit.
+	Turns off '-f'.
+
+--diffcore ARGS::
+	Pass the given diffcore arguments the called Git diff command.
+	See e.g. git diff-tree(1) documentation for the list of possible
+	arguments; '-R', '-B', and '-C' might be of particular interest
+	('-M' is sometimes passed automatically, but not always). This
+	is mostly only relevant in conjunction with the '-d' option.
+
+-f::
+	List affected files. (No effect when passed along '-s'.)
+	Turns off '-d'.
+
+-r FROM_ID[..TO_ID]::
+	Limit the log information to a set of revisions using either
+	'-r FROM_ID[..TO_ID]' or '-r FROM_ID -r TO_ID'. In both cases the
+	option expects IDs which resolve to commits and will include the
+	specified IDs. If 'TO_ID' is omitted all commits from 'FROM_ID'
+	to the initial commit is shown. If no revisions is specified,
+	the log information starting from 'HEAD' will be shown.
+
+-D DATE::
+	Limit the log information to revisions newer than given DATE,
+	and on second time further restrain it to revisions older than
+	given date. Therefore, '-D "2 days ago" -D "yesterday"' will
+	show all the commits from the day before yesterday.
+
+-m::
+	End the log listing at the merge base of the -r arguments
+	(defaulting to HEAD and origin).
+
+-M, --merges::
+	Display merge commits in the log.
+
+-R, --no-renames::
+	This flag is currently no-op. gitlink:cg-log[1] will not follow file history
+	across renames.
+
+-s::
+	Show the log entries one per line. The entry summary contains
+	information about the commit date, the author, the first line
+	of the commit log and the commit ID. Long author names and commit
+	IDs are trimmed and marked with an ending tilde (~).
+
+--summary::
+	Generate the changes summary, listing the commit titles grouped
+	by their author. This is also known as a "shortlog", suitable
+	e.g. for contribution summaries of announcements.
+
+-S, --pickaxe STRING::
+	List only commits with changes concerning STRING (also known as
+	pick-axe). In other words, only commits where the parent contains
+	STRING and the child does not contain it at the same place in
+	a file or vice versa are shown. The STRING may contain any
+	special characters or even newlines (but you might need to quote
+	it properly when calling gitlink:cg-log[1] from a shell). It is matched
+	verbatim.
+
+-u USERNAME::
+	List only commits where author or committer contains 'USERNAME'.
+	The search for 'USERNAME' is case-insensitive.
+
+-v::
+	By default, only the 'commit' and 'author' headers are shown. This
+	makes gitlink:cg-log[1] show even the other commit headers - 'tree', 'parent',
+	and 'committer'.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-log[1].
+--
+
+
+ENVIRONMENT VARIABLES
+---------------------
+PAGER::
+	The pager to display log information in, defaults to `less`.
+
+PAGER_FLAGS::
+	Flags to pass to the pager.
+
+CG_COLORS::
+	Colon-separated list of 'name=color' pairs, where name is
+	one of logcommit, logheader, logauthor, logcommitter,
+	logfilemod, logfileadd, logfiledel, logfileren, logsignoff,
+	logsumauthor, logsumtrim, logsumcommit, logsumdate, default,
+	and value is an ECMA-48 SGR sequence (see e.g. console_codes(4)).
+	You can also customize the diff colors; see gitlink:cg-diff[1] documentation
+	for the appropriate color names.
+
+CG_COLORS_AUTO::
+	Even if -c was passed or specified in ~/.cgrc, if this option
+	is set, use colors only when the output is a terminal and it
+	supports colors.
+
+CG_LESS::
+	This is what the $LESS environment variable value will be set
+	to before invoking $PAGER. It defaults to $LESS concatenated
+	with the `R` and `S` flags to allow displaying of colorized output
+	and to avoid long lines from wrapping when using `-s`.
+
+CONFIGURATION VARIABLES
+-----------------------
+The following GIT configuration file variables are recognized:
+
+log.usecolor::
+	If enabled, colorify the output like with -c if the output
+	is a terminal.
+
+EXAMPLE USAGE
+-------------
+To show a log of changes between two releases tagged as 'releasetag-0.9'
+and 'releasetag-0.10' do:
+
+	$ cg-log -r releasetag-0.9..releasetag-0.10
+
+Similarily, to see which commits are in branch A but not in branch B,
+
+	$ cg-log -r B..A
+
+(meaning "all the commits which newly appear along the way from B to A").
+
+If you see a dubious "if (current->uid = 0)" test in a file and wonder
+about its genesis, you can run
+
+	$ cg-log -d -S "if (current->uid = 0)" filename
+
+to show the commits adding, removing or modifying that string, together
+with the relevant patches (you can obviously refrain from limiting
+the pick-axe to a particular file, but it will make it significantly
+slower).
+
+NOTES
+-----
+The ':' is equivalent to '..' in revisions range specification (to make
+things more comfortable to SVN users). See cogito(7) for more details
+about revision specification.
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005.
+Copyright (C) David Woodhouse, 2005.
+
+SEE ALSO
+--------
+cg-log is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

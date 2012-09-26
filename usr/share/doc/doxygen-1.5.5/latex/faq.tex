@@ -1,0 +1,230 @@
+\begin{enumerate}
+\item {\bf How to get information on the index page in HTML?} 
+
+You should use the $\backslash$mainpage command inside a comment block like this: 
+
+\footnotesize\begin{verbatim}
+/*! \mainpage My Personal Index Page
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation
+ *
+ * \subsection step1 Step 1: Opening the box
+ *  
+ * etc...
+ */
+\end{verbatim}
+\normalsize
+
+
+\item {\bf Help, some/all of the members of my class / file / namespace are not documented?}
+
+Check the following: \begin{enumerate}
+\item Is your class / file / namespace documented? If not, it will not be extracted from the sources unless {\tt EXTRACT\_\-ALL} is set to {\tt YES} in the config file. \item Are the members private? If so, you must set {\tt EXTRACT\_\-PRIVATE} to {\tt YES} to make them appear in the documentation. \item Is there a function macro in your class that does not end with a semicolon (e.g. MY\_\-MACRO())? If so then you have to instruct doxygen's preprocessor to remove it.
+
+This typically boils down to the following settings in the config file:
+
+
+
+\footnotesize\begin{verbatim}
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = MY_MACRO()=
+      \end{verbatim}
+\normalsize
+
+
+Please read the \hyperlink{preprocessing}{preprocessing} section of the manual for more information. \end{enumerate}
+
+
+\item {\bf When I set EXTRACT\_\-ALL to NO none of my functions are shown in the documentation.}
+
+In order for global functions, variables, enums, typedefs, and defines to be documented you should document the file in which these commands are located using a comment block containing a $\backslash$file (or @file) command.
+
+Alternatively, you can put all members in a group (or module) using the $\backslash$ingroup command and then document the group using a comment block containing the $\backslash$defgroup command.
+
+For member functions or functions that are part of a namespace you should document either the class or namespace.
+
+\item {\bf How can I make doxygen ignore some code fragment?}
+
+The new and easiest way is to add one comment block with a \hyperlink{commands_cmdcond}{$\backslash$cond} command at the start and one comment block with a \hyperlink{commands_cmdendcond}{$\backslash$endcond} command at the end of the piece of code that should be ignored. This should be within the same file of course.
+
+But you can also use Doxygen's preprocessor for this: If you put 
+
+\footnotesize\begin{verbatim}
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+ /* code that must be skipped by Doxygen */
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+\end{verbatim}
+\normalsize
+ around the blocks that should be hidden and put: 
+
+\footnotesize\begin{verbatim}
+  PREDEFINED = DOXYGEN_SHOULD_SKIP_THIS
+\end{verbatim}
+\normalsize
+ in the config file then all blocks should be skipped by Doxygen as long as {\tt PREPROCESSING = YES}.
+
+\item {\bf How can I change what is after the {\tt \#include} in the class documentation?}
+
+In most cases you can use STRIP\_\-FROM\_\-INC\_\-PATH to strip a user defined part of a path.
+
+You can also document your class as follows
+
+
+
+\footnotesize\begin{verbatim}
+/*! \class MyClassName include.h path/include.h
+ *
+ *  Docs for MyClassName
+ */
+\end{verbatim}
+\normalsize
+
+
+To make doxygen put \par
+\par
+ {\tt  \#include $<$path/include.h$>$ }
+
+in the documentation of the class MyClassName regardless of the name of the actual header file in which the definition of MyClassName is contained.
+
+If you want doxygen to show that the include file should be included using quotes instead of angle brackets you should type: 
+
+\footnotesize\begin{verbatim}
+/*! \class MyClassName myhdr.h "path/myhdr.h"
+ *
+ *  Docs for MyClassName
+ */
+\end{verbatim}
+\normalsize
+
+
+\item {\bf How can I use tag files in combination with compressed HTML?}
+
+If you want to refer from one compressed HTML file {\tt a.chm} to another compressed HTML file called {\tt b.chm}, the link in {\tt a.chm} must have the following format: 
+
+\footnotesize\begin{verbatim}
+<a href="b.chm::/file.html">
+\end{verbatim}
+\normalsize
+ Unfortunately this only works if both compressed HTML files are in the same directory.
+
+As a result you must rename the generated {\tt index.chm} files for all projects into something unique and put all {\tt .chm} files in one directory.
+
+Suppose you have a project {\em a\/} referring to a project {\em b\/} using tag file {\tt b.tag}, then you could rename the {\tt index.chm} for project {\em a\/} into {\tt a.chm} and the {\tt index.chm} for project {\em b\/} into {\tt b.chm}. In the configuration file for project {\em a\/} you write: 
+
+\footnotesize\begin{verbatim}
+TAGFILES = b.tag=b.chm::
+\end{verbatim}
+\normalsize
+ or you can use {\tt installdox} to set the links as follows: 
+
+\footnotesize\begin{verbatim}
+installdox -lb.tag@b.chm::
+\end{verbatim}
+\normalsize
+
+
+\item {\bf I don't like the quick index that is put above each HTML page, what do I do?}
+
+You can disable the index by setting DISABLE\_\-INDEX to YES. Then you can put in your own header file by writing your own header and feed that to HTML\_\-HEADER.
+
+\item {\bf The overall HTML output looks different, while I only wanted to use my own html header file}
+
+You probably forgot to include the stylesheet {\tt doxygen.css} that doxygen generates. You can include this by putting 
+
+\footnotesize\begin{verbatim}
+<LINK HREF="doxygen.css" REL="stylesheet" TYPE="text/css">
+\end{verbatim}
+\normalsize
+ in the HEAD section of the HTML page.
+
+\item {\bf Why does doxygen use Qt?}
+
+The most important reason is to have a platform abstraction for most Unices and Windows by means of the QFile, QFileInfo, QDir, QDate, QTime and QIODevice classes. Another reason is for the nice and bug free utility classes, like QList, QDict, QString, QArray, QTextStream, QRegExp, QXML etc.
+
+The GUI front-end doxywizard uses Qt for... well... the GUI!
+
+\item {\bf How can I exclude all test directories from my directory tree?}
+
+Simply put an exclude pattern like this in the configuration file:
+
+
+
+\footnotesize\begin{verbatim}
+EXCLUDE_PATTERNS = */test/*
+\end{verbatim}
+\normalsize
+
+
+\item {\bf Doxygen automatically generates a link to the class MyClass somewhere in the running text. How do I prevent that at a certain place?}
+
+Put a \% in front of the class name. Like this: \%MyClass. Doxygen will then remove the \% and keep the word unlinked.
+
+\item {\bf My favourite programming language is X. Can I still use doxygen?}
+
+No, not as such; doxygen needs to understand the structure of what it reads. If you don't mind spending some time on it, there are several options:\begin{itemize}
+\item If the grammar of X is close to C or C++, then it is probably not too hard to tweak src/scanner.l a bit so the language is supported. This is done for all other languages directly supported by doxygen (i.e. Java, IDL, C\#, PHP).\item If the grammar of X is somewhat different than you can write an input filter that translates X into something similar enough to C/C++ for doxygen to understand (this approach is taken for VB, Object Pascal, and Javascript, see \href{http://www.stack.nl/~dimitri/doxygen/download.html#helpers}{\tt http://www.stack.nl/$\sim$dimitri/doxygen/download.html\#helpers}).\item If the grammar is completely different one could write a parser for X and write a backend that produces a similar syntax tree as is done by src/scanner.l (and also by src/tagreader.cpp while reading tag files).\end{itemize}
+
+
+\item {\bf Help! I get the cryptic message \char`\"{}input buffer overflow, can't enlarge buffer because scanner uses REJECT\char`\"{}}
+
+This error happens when doxygen's lexical scanner has a rule that matches more than 256K of input characters in one go. I've seen this happening on a very large generated file ($>$256K lines), where the built-in preprocessor converted it into an empty file (with $>$256K of newlines). Another case where this might happen is if you have lines in your code with more than 256K characters.
+
+If you have run into such a case and want me to fix it, you should send me a code fragment that triggers the message. To work around the problem, put some line-breaks into your file, split it up into smaller parts, or exclude it from the input using EXCLUDE.
+
+\item {\bf When running make in the latex dir I get \char`\"{}TeX capacity exceeded\char`\"{}. Now what?}
+
+You can edit the texmf.cfg file to increase the default values of the various buffers and then run \char`\"{}texconfig init\char`\"{}.
+
+\item {\bf Why are dependencies via STL classes not shown in the dot graphs?}
+
+Doxygen is unware of the STL classes, unless the option BUILTIN\_\-STL\_\-SUPPORT is turned on.
+
+\item {\bf I have problems getting the search engine to work with PHP5 and/or windows}
+
+Please read \href{searchengine.html}{\tt this} for hints on where to look.
+
+\item {\bf Can I configure doxygen from the command line?}
+
+Not via command line options, but doxygen can read from {\tt stdin}, so you can pipe things through it. Here's an example how to override an option in a configuration file from the command line (assuming a unix environment):
+
+
+
+\footnotesize\begin{verbatim}
+( cat Doxyfile ; echo "PROJECT_NUMBER=1.0" ) | doxygen -
+\end{verbatim}
+\normalsize
+
+
+If multiple options with the same name are specified then doxygen will use the last one. To append to an existing option you can use the += operator.
+
+\item {\bf How did doxygen get its name?}
+
+Doxygen got its name from playing with the words documentation and generator.
+
+
+
+\footnotesize\begin{verbatim}
+documentation -> docs -> dox
+generator -> gen
+\end{verbatim}
+\normalsize
+
+
+At the time I was looking into lex and yacc, where a lot of things start with \char`\"{}yy\char`\"{}, so the \char`\"{}y\char`\"{} slipped in and made things pronounceable (the proper pronouncement is Docs-ee-gen, so with a long \char`\"{}e\char`\"{}).
+
+\item {\bf What was the reason to develop doxygen?}
+
+I once wrote a GUI widget based on the Qt library (it is still available at \href{http://qdbttabular.sourceforge.net/}{\tt http://qdbttabular.sourceforge.net/} and maintained by Sven Meyer). Qt had nicely generated documentation (using an internal tool which they didn't want to release) and I wrote similar docs by hand. This was a nightmare to maintain, so I wanted a similar tool. I looked at Doc++ but that just wasn't good enough (it didn't support signals and slots and did not have the Qt look and feel I had grown to like), so I started to write my own tool...
+
+\end{enumerate}
+
+
+ 

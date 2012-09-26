@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-incomplete-types.html" />
+<link rel="prev" href="ctypes-pointers.html" />
+<link rel="parent" href="ctypes-ctypes-tutorial.html" />
+<link rel="next" href="ctypes-incomplete-types.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.1.15 Type conversions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.14 Pointers"
+  href="ctypes-pointers.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.16 incomplete Types"
+  href="ctypes-incomplete-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-pointers.html">14.14.1.14 Pointers</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-incomplete-types.html">14.14.1.16 Incomplete Types</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION001614115000000000000000"></a><a name="ctypes-type-conversions"></a>
+<br>
+14.14.1.15 Type conversions
+</h3>
+
+<p>
+Usually, ctypes does strict type checking.  This means, if you have
+<code>POINTER(c_int)</code> in the <tt class="member">argtypes</tt> list of a function or as the
+type of a member field in a structure definition, only instances of
+exactly the same type are accepted.  There are some exceptions to this
+rule, where ctypes accepts other objects.  For example, you can pass
+compatible array instances instead of pointer types.  So, for
+<code>POINTER(c_int)</code>, ctypes accepts an array of c_int:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; class Bar(Structure):
+...     _fields_ = [("count", c_int), ("values", POINTER(c_int))]
+...
+&gt;&gt;&gt; bar = Bar()
+&gt;&gt;&gt; bar.values = (c_int * 3)(1, 2, 3)
+&gt;&gt;&gt; bar.count = 3
+&gt;&gt;&gt; for i in range(bar.count):
+...     print bar.values[i]
+...
+1
+2
+3
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+To set a POINTER type field to <code>NULL</code>, you can assign <code>None</code>:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; bar.values = None
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+XXX list other conversions...
+
+<p>
+Sometimes you have instances of incompatible types.  In <code>C</code>, you can
+cast one type into another type.  <code>ctypes</code> provides a <code>cast</code>
+function which can be used in the same way.  The <code>Bar</code> structure
+defined above accepts <code>POINTER(c_int)</code> pointers or <tt class="class">c_int</tt> arrays
+for its <code>values</code> field, but not instances of other types:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; bar.values = (c_byte * 4)()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+TypeError: incompatible types, c_byte_Array_4 instance instead of LP_c_long instance
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+For these cases, the <code>cast</code> function is handy.
+
+<p>
+The <code>cast</code> function can be used to cast a ctypes instance into a
+pointer to a different ctypes data type.  <code>cast</code> takes two
+parameters, a ctypes object that is or can be converted to a pointer
+of some kind, and a ctypes pointer type.  It returns an instance of
+the second argument, which references the same memory block as the
+first argument:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; a = (c_byte * 4)()
+&gt;&gt;&gt; cast(a, POINTER(c_int))
+&lt;ctypes.LP_c_long object at ...&gt;
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+So, <code>cast</code> can be used to assign to the <code>values</code> field of <code>Bar</code>
+the structure:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; bar = Bar()
+&gt;&gt;&gt; bar.values = cast((c_byte * 4)(), POINTER(c_int))
+&gt;&gt;&gt; print bar.values[0]
+0
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.14 Pointers"
+  href="ctypes-pointers.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.16 incomplete Types"
+  href="ctypes-incomplete-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-pointers.html">14.14.1.14 Pointers</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-incomplete-types.html">14.14.1.16 Incomplete Types</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

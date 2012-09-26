@@ -1,0 +1,125 @@
+Apache HTTPD 2.2.6
+------------------------------------------
+The Apache HTTP Server Project is an effort to develop and maintain an
+open-source HTTP server for modern operating systems including UNIX and Windows
+NT.  The goal of this project is to provide a secure, efficient and extensible
+server that provides HTTP services in sync with the current HTTP standards.
+The Apache HTTP Server is a project of the Apache Software Foundation.
+
+Runtime requirements:
+  cygwin
+  libapr1
+  libaprutil1
+  zlib
+  openssl
+
+Build requirements:
+  (basic development packages)
+  apr
+  apr-util
+  zlib
+  openssl-devel
+  
+
+Canonical homepage:
+  http://httpd.apache.org/
+
+Canonical download:
+  http://httpd.apache.org/download.cgi
+
+------------------------------------
+
+IMPORTANT Usage Notes for the package:
+
+* Changes from 2.0.x to 2.2.x
+
+  Existing version 2.0 config files are MOSTLY compatible with 2.2, but WILL
+  require at least one change: Several modules have changed name, so the
+  LoadModule statements will need updating.  The easiest way to do this is to
+  replace the existing LoadModule statements with the ones in
+  /etc/apache2/original/httpd.conf.
+
+  Apache 2.2 has a significantly redesigned default configuration: it has been
+  greatly simplified by removing all but the most essential configuration
+  settings.  A set of example configuration settings for more advanced
+  features is present in the /etc/apache2/extra/ directory.  Furthermore, the
+  naming scheme of the pristine default configuration files has changed:
+  Instead of /etc/apache2/httpd-std.conf, there is now
+  /etc/apache2/original/httpd.conf, and similarly for other files.
+
+  
+* cygserver dependency
+  
+  Apache 2 makes use of IPC functions which are supported on Cygwin via
+  cygserver.  This means you MUST ensure both of the following are true,
+  to make the server run:
+    
+    1) The CYGWIN environment variable must contain "server".
+
+    2) The cygserver daemon must be running.
+       Run the command "cygserver-config" for interactive setup.
+
+
+* Distributed template files and their active versions
+  
+  The active document root and cgi-bin directories are:
+    * /srv/www/htdocs
+    * /srv/www/cgi-bin
+
+  The distributed example versions of these are placed at:
+    * /usr/share/apache2/htdocs
+    * /usr/share/apache2/cgi-bin
+  
+  The examples are copied to the active location only if the active version
+  is missing, so your local content will be unaffected by package upgrades,
+  but you can check the location under /usr/share should you desire to refer
+  to the templates.
+
+  The situation for configuration files is similar:
+    Active directory:   /etc/apache2
+    Template directory: /etc/apache2/original
+
+  The template directory is updated by package upgrades - you should diff it
+  against your active configuration files from time to time, to see if there
+  are any upstream changes you would like to adopt.
+
+
+* "2" suffixation
+  
+  The executables installed by this package are suffixed with the
+  character "2".  This is done to permit the parallel installation of
+  Apache 1.3.x and Apache 2.x on the same machine.
+
+
+* Installation as a Windows service
+
+  Example cygrunsrv command line:
+
+  $ cygrunsrv -I httpd2 -d "CYGWIN httpd2" -p /usr/sbin/httpd2 \
+      -a "-DNO_DETACH" -y cygserver -e "CYGWIN=server" -s TERM -o
+
+
+------------------------------------
+
+Build instructions:
+  unpack apache2-2.2.6-1-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  ./apache2-2.2.6-1.sh all
+
+Or use './apache2-2.2.6-1.sh prep' to get a patched source directory
+
+-------------------------------------------
+
+Port Notes:
+
+Patches:
+Various miscellaneous buildsystem changes (httpd bug #33627)
+Changes to build a seperate core shared library
+Change the default pid file to httpd2.pid
+
+A "2" was added to the names of many files, to avoid conflicting with the
+same-named files from Apache 1.3.
+
+Cygwin port maintained by: Max Bowsher <maxb1@ukf.net>

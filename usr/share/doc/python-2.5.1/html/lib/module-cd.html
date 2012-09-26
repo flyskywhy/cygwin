@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-fl.html" />
+<link rel="prev" href="module-al-constants.html" />
+<link rel="parent" href="sgi.html" />
+<link rel="next" href="player-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>34.3 cd -- CD-ROM access on SGI systems</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="34.2 al  "
+  href="module-al-constants.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="34. sgi IRIX Specific"
+  href="sgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="34.3.1 player Objects"
+  href="player-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-al-constants.html">34.2 AL  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sgi.html">34. SGI IRIX Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="player-objects.html">34.3.1 Player Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0036300000000000000000">
+34.3 <tt class="module">cd</tt> --
+         CD-ROM access on SGI systems</a>
+</h1>
+
+<p>
+<a name="module-cd"></a>  
+<p class="availability">Availability: <span
+ class="platform">IRIX</span>.</p>
+
+<p>
+This module provides an interface to the Silicon Graphics CD library.
+It is available only on Silicon Graphics systems.
+
+<p>
+The way the library works is as follows.  A program opens the CD-ROM
+device with <tt class="function">open()</tt> and creates a parser to parse the data
+from the CD with <tt class="function">createparser()</tt>.  The object returned by
+<tt class="function">open()</tt> can be used to read data from the CD, but also to get
+status information for the CD-ROM device, and to get information about
+the CD, such as the table of contents.  Data from the CD is passed to
+the parser, which parses the frames, and calls any callback
+functions that have previously been added.
+
+<p>
+An audio CD is divided into <i class="dfn">tracks</i> or <i class="dfn">programs</i> (the terms
+are used interchangeably).  Tracks can be subdivided into
+<i class="dfn">indices</i>.  An audio CD contains a <i class="dfn">table of contents</i> which
+gives the starts of the tracks on the CD.  Index 0 is usually the
+pause before the start of a track.  The start of the track as given by
+the table of contents is normally the start of index 1.
+
+<p>
+Positions on a CD can be represented in two ways.  Either a frame
+number or a tuple of three values, minutes, seconds and frames.  Most
+functions use the latter representation.  Positions can be both
+relative to the beginning of the CD, and to the beginning of the
+track.
+
+<p>
+Module <tt class="module">cd</tt> defines the following functions and constants:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5578' xml:id='l2h-5578' class="function">createparser</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Create and return an opaque parser object.  The methods of the parser
+object are described below.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5579' xml:id='l2h-5579' class="function">msftoframe</tt></b>(</nobr></td>
+  <td><var>minutes, seconds, frames</var>)</td></tr></table></dt>
+<dd>
+Converts a <code>(<var>minutes</var>, <var>seconds</var>, <var>frames</var>)</code> triple
+representing time in absolute time code into the corresponding CD
+frame number.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5580' xml:id='l2h-5580' class="function">open</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>device</var><big>[</big><var>, mode</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open the CD-ROM device.  The return value is an opaque player object;
+methods of the player object are described below.  The device is the
+name of the SCSI device file, e.g. <code>'/dev/scsi/sc0d4l0'</code>, or
+<code>None</code>.  If omitted or <code>None</code>, the hardware inventory is
+consulted to locate a CD-ROM drive.  The <var>mode</var>, if not omitted,
+should be the string <code>'r'</code>.
+</dl>
+
+<p>
+The module defines the following variables:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-5581' xml:id='l2h-5581' class="exception">error</tt></b></dt>
+<dd>
+Exception raised on various errors.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5582' xml:id='l2h-5582'>DATASIZE</tt></b></dt>
+<dd>
+The size of one frame's worth of audio data.  This is the size of the
+audio data as passed to the callback of type <code>audio</code>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5583' xml:id='l2h-5583'>BLOCKSIZE</tt></b></dt>
+<dd>
+The size of one uninterpreted frame of audio data.
+</dd></dl>
+
+<p>
+The following variables are states as returned by
+<tt class="function">getstatus()</tt>:
+
+<p>
+<dl><dt><b><tt id='l2h-5584' xml:id='l2h-5584'>READY</tt></b></dt>
+<dd>
+The drive is ready for operation loaded with an audio CD.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5585' xml:id='l2h-5585'>NODISC</tt></b></dt>
+<dd>
+The drive does not have a CD loaded.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5586' xml:id='l2h-5586'>CDROM</tt></b></dt>
+<dd>
+The drive is loaded with a CD-ROM.  Subsequent play or read operations
+will return I/O errors.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5587' xml:id='l2h-5587'>ERROR</tt></b></dt>
+<dd>
+An error occurred while trying to read the disc or its table of
+contents.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5588' xml:id='l2h-5588'>PLAYING</tt></b></dt>
+<dd>
+The drive is in CD player mode playing an audio CD through its audio
+jacks.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5589' xml:id='l2h-5589'>PAUSED</tt></b></dt>
+<dd>
+The drive is in CD layer mode with play paused.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5590' xml:id='l2h-5590'>STILL</tt></b></dt>
+<dd>
+The equivalent of <tt class="constant">PAUSED</tt> on older (non 3301) model Toshiba
+CD-ROM drives.  Such drives have never been shipped by SGI.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5591' xml:id='l2h-5591'>audio</tt></b></dt>
+<dd>
+<dt><b><tt id='l2h-5592' xml:id='l2h-5592'>pnum</tt></b></dt><dd>
+<dt><b><tt id='l2h-5593' xml:id='l2h-5593'>index</tt></b></dt><dd>
+<dt><b><tt id='l2h-5594' xml:id='l2h-5594'>ptime</tt></b></dt><dd>
+<dt><b><tt id='l2h-5595' xml:id='l2h-5595'>atime</tt></b></dt><dd>
+<dt><b><tt id='l2h-5596' xml:id='l2h-5596'>catalog</tt></b></dt><dd>
+<dt><b><tt id='l2h-5597' xml:id='l2h-5597'>ident</tt></b></dt><dd>
+<dt><b><tt id='l2h-5598' xml:id='l2h-5598'>control</tt></b></dt><dd>
+Integer constants describing the various types of parser callbacks
+that can be set by the <tt class="method">addcallback()</tt> method of CD parser
+objects (see below).
+</dd></dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="player-objects.html">34.3.1 Player Objects</a>
+<li><a href="cd-parser-objects.html">34.3.2 Parser Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="34.2 al  "
+  href="module-al-constants.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="34. sgi IRIX Specific"
+  href="sgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="34.3.1 player Objects"
+  href="player-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-al-constants.html">34.2 AL  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sgi.html">34. SGI IRIX Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="player-objects.html">34.3.1 Player Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

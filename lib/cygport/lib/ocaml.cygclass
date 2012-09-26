@@ -1,0 +1,53 @@
+################################################################################
+#
+# ocaml.cygclass - functions for installing O'Caml packages
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: ocaml.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+check_prog_req ocaml
+
+OCAML=$(type -p ocaml)
+OCAMLC=$(type -p ocamlc.opt)
+OCAMLDOC=$(type -p ocamldoc.opt)
+OCAMLLEX=$(type -p ocamllex.opt)
+OCAMLMKLIB=$(type -p ocamlmklib)
+OCAMLMKTOP=$(type -p ocamlmktop)
+OCAMLOPT=$(type -p ocamlopt.opt)
+
+OCAML_LIBDIR=$(${OCAMLC} -where)
+OCAML_INCLUDEDIR=${OCAML_LIBDIR}/caml
+OCAML_SITEDIR=${OCAML_LIBDIR}
+OCAML_STUBDIR=${OCAML_LIBDIR}/stublibs
+
+LIBCAMLRUN="-L${OCAML_LIBDIR} -lcamlrun"
+
+ocaml_install() {
+	dodir ${OCAML_STUBDIR}
+	export OCAMLFIND_DESTDIR="${D}${OCAML_LIBDIR}"
+	export OCAMLFIND_LDCONF=ignore
+	cyginstall "${@}"
+}
+
+src_install() {
+	cd ${B}
+	ocaml_install
+}

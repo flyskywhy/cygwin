@@ -1,0 +1,709 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="unicodeMethodsAndSlots.html" />
+<link rel="prev" href="unicodeObjects.html" />
+<link rel="parent" href="unicodeObjects.html" />
+<link rel="next" href="unicodeMethodsAndSlots.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3.2.1 Built-in Codecs </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.2 unicode Objects"
+  href="unicodeObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.2 unicode Objects"
+  href="unicodeObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.2.2 methods and Slot"
+  href="unicodeMethodsAndSlots.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="unicodeObjects.html">7.3.2 Unicode Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="unicodeObjects.html">7.3.2 Unicode Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="unicodeMethodsAndSlots.html">7.3.2.2 Methods and Slot</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION009321000000000000000"></a><a name="builtinCodecs"></a>
+<br>
+7.3.2.1 Built-in Codecs 
+</h3>
+
+<p>
+Python provides a set of builtin codecs which are written in C
+for speed. All of these codecs are directly usable via the
+following functions.
+
+<p>
+Many of the following APIs take two arguments encoding and
+errors. These parameters encoding and errors have the same semantics
+as the ones of the builtin unicode() Unicode object constructor.
+
+<p>
+Setting encoding to <tt class="constant">NULL</tt> causes the default encoding to be used
+which is ASCII.  The file system calls should use
+<tt class="cdata">Py_FileSystemDefaultEncoding</tt> as the encoding for file
+names. This variable should be treated as read-only: On some systems,
+it will be a pointer to a static string, on others, it will change at
+run-time (such as when the application invokes setlocale).
+
+<p>
+Error handling is set by errors which may also be set to <tt class="constant">NULL</tt>
+meaning to use the default handling defined for the codec.  Default
+error handling for all builtin codecs is ``strict''
+(<tt class="exception">ValueError</tt> is raised).
+
+<p>
+The codecs all use a similar interface.  Only deviation from the
+following generic ones are documented for simplicity.
+
+<p>
+These are the generic codec APIs:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-517' xml:id='l2h-517' class="cfunction">PyUnicode_Decode</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>encoding</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the encoded
+  string <var>s</var>.  <var>encoding</var> and <var>errors</var> have the same
+  meaning as the parameters of the same name in the
+  <tt class="function">unicode()</tt> builtin function.  The codec to be used is
+  looked up using the Python codec registry.  Return <tt class="constant">NULL</tt> if an
+  exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-518' xml:id='l2h-518' class="cfunction">PyUnicode_Encode</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>encoding</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size and return
+  a Python string object.  <var>encoding</var> and <var>errors</var> have the
+  same meaning as the parameters of the same name in the Unicode
+  <tt class="method">encode()</tt> method.  The codec to be used is looked up using
+  the Python codec registry.  Return <tt class="constant">NULL</tt> if an exception was
+  raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-519' xml:id='l2h-519' class="cfunction">PyUnicode_AsEncodedString</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>,
+                                               const char *<var>encoding</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode object and return the result as Python string
+  object. <var>encoding</var> and <var>errors</var> have the same meaning as the
+  parameters of the same name in the Unicode <tt class="method">encode()</tt> method.
+  The codec to be used is looked up using the Python codec registry.
+  Return <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+These are the UTF-8 codec APIs:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-520' xml:id='l2h-520' class="cfunction">PyUnicode_DecodeUTF8</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the UTF-8
+  encoded string <var>s</var>. Return <tt class="constant">NULL</tt> if an exception was raised
+  by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-521' xml:id='l2h-521' class="cfunction">PyUnicode_DecodeUTF8Stateful</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>,
+                                               Py_ssize_t *<var>consumed</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  If <var>consumed</var> is <tt class="constant">NULL</tt>, behave like <tt class="cfunction">PyUnicode_DecodeUTF8()</tt>.
+  If <var>consumed</var> is not <tt class="constant">NULL</tt>, trailing incomplete UTF-8 byte sequences
+  will not be treated as an error. Those bytes will not be decoded and the
+  number of bytes that have been decoded will be stored in <var>consumed</var>.
+  
+<span class="versionnote">New in version 2.4.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-522' xml:id='l2h-522' class="cfunction">PyUnicode_EncodeUTF8</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size using UTF-8
+  and return a Python string object.  Return <tt class="constant">NULL</tt> if an exception
+  was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-523' xml:id='l2h-523' class="cfunction">PyUnicode_AsUTF8String</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode objects using UTF-8 and return the result as
+  Python string object.  Error handling is ``strict''.  Return
+  <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+These are the UTF-16 codec APIs:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-524' xml:id='l2h-524' class="cfunction">PyUnicode_DecodeUTF16</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>,
+                                               int *<var>byteorder</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Decode <var>length</var> bytes from a UTF-16 encoded buffer string and
+  return the corresponding Unicode object.  <var>errors</var> (if
+  non-<tt class="constant">NULL</tt>) defines the error handling. It defaults to ``strict''.
+
+<p>
+If <var>byteorder</var> is non-<tt class="constant">NULL</tt>, the decoder starts decoding using
+  the given byte order:
+
+<p>
+<div class="verbatim"><pre>
+   *byteorder == -1: little endian
+   *byteorder == 0:  native order
+   *byteorder == 1:  big endian
+</pre></div>
+
+<p>
+and then switches according to all byte order marks (BOM) it finds
+  in the input data.  BOMs are not copied into the resulting Unicode
+  string.  After completion, <var>*byteorder</var> is set to the current
+  byte order at the end of input data.
+
+<p>
+If <var>byteorder</var> is <tt class="constant">NULL</tt>, the codec starts in native order mode.
+
+<p>
+Return <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-525' xml:id='l2h-525' class="cfunction">PyUnicode_DecodeUTF16Stateful</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>,
+                                               int *<var>byteorder</var>,
+                                               Py_ssize_t *<var>consumed</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  If <var>consumed</var> is <tt class="constant">NULL</tt>, behave like
+  <tt class="cfunction">PyUnicode_DecodeUTF16()</tt>. If <var>consumed</var> is not <tt class="constant">NULL</tt>,
+  <tt class="cfunction">PyUnicode_DecodeUTF16Stateful()</tt> will not treat trailing incomplete
+  UTF-16 byte sequences (such as an odd number of bytes or a split surrogate pair)
+  as an error. Those bytes will not be decoded and the number of bytes that
+  have been decoded will be stored in <var>consumed</var>.
+  
+<span class="versionnote">New in version 2.4.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-526' xml:id='l2h-526' class="cfunction">PyUnicode_EncodeUTF16</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>,
+                                               int <var>byteorder</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a Python string object holding the UTF-16 encoded value of
+  the Unicode data in <var>s</var>.  If <var>byteorder</var> is not <code>0</code>,
+  output is written according to the following byte order:
+
+<p>
+<div class="verbatim"><pre>
+   byteorder == -1: little endian
+   byteorder == 0:  native byte order (writes a BOM mark)
+   byteorder == 1:  big endian
+</pre></div>
+
+<p>
+If byteorder is <code>0</code>, the output string will always start with
+  the Unicode BOM mark (U+FEFF). In the other two modes, no BOM mark
+  is prepended.
+
+<p>
+If <var>Py_UNICODE_WIDE</var> is defined, a single <tt class="ctype">Py_UNICODE</tt>
+  value may get represented as a surrogate pair. If it is not
+  defined, each <tt class="ctype">Py_UNICODE</tt> values is interpreted as an
+  UCS-2 character.
+
+<p>
+Return <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-527' xml:id='l2h-527' class="cfunction">PyUnicode_AsUTF16String</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a Python string using the UTF-16 encoding in native byte
+  order. The string always starts with a BOM mark.  Error handling is
+  ``strict''.  Return <tt class="constant">NULL</tt> if an exception was raised by the
+  codec.
+</dd></dl>
+
+<p>
+These are the ``Unicode Escape'' codec APIs:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-528' xml:id='l2h-528' class="cfunction">PyUnicode_DecodeUnicodeEscape</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the
+  Unicode-Escape encoded string <var>s</var>.  Return <tt class="constant">NULL</tt> if an
+  exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-529' xml:id='l2h-529' class="cfunction">PyUnicode_EncodeUnicodeEscape</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size using
+  Unicode-Escape and return a Python string object.  Return <tt class="constant">NULL</tt>
+  if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-530' xml:id='l2h-530' class="cfunction">PyUnicode_AsUnicodeEscapeString</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode objects using Unicode-Escape and return the
+  result as Python string object.  Error handling is ``strict''.
+  Return <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+These are the ``Raw Unicode Escape'' codec APIs:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-531' xml:id='l2h-531' class="cfunction">PyUnicode_DecodeRawUnicodeEscape</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the
+  Raw-Unicode-Escape encoded string <var>s</var>.  Return <tt class="constant">NULL</tt> if an
+  exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-532' xml:id='l2h-532' class="cfunction">PyUnicode_EncodeRawUnicodeEscape</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size using
+  Raw-Unicode-Escape and return a Python string object.  Return
+  <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-533' xml:id='l2h-533' class="cfunction">PyUnicode_AsRawUnicodeEscapeString</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode objects using Raw-Unicode-Escape and return the
+  result as Python string object. Error handling is ``strict''.
+  Return <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+These are the Latin-1 codec APIs:
+Latin-1 corresponds to the first 256 Unicode ordinals and only these
+are accepted by the codecs during encoding.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-534' xml:id='l2h-534' class="cfunction">PyUnicode_DecodeLatin1</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                                     Py_ssize_t <var>size</var>,
+                                                     const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the Latin-1
+  encoded string <var>s</var>.  Return <tt class="constant">NULL</tt> if an exception was raised
+  by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-535' xml:id='l2h-535' class="cfunction">PyUnicode_EncodeLatin1</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                                     Py_ssize_t <var>size</var>,
+                                                     const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size using
+  Latin-1 and return a Python string object.  Return <tt class="constant">NULL</tt> if an
+  exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-536' xml:id='l2h-536' class="cfunction">PyUnicode_AsLatin1String</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode objects using Latin-1 and return the result as
+  Python string object.  Error handling is ``strict''.  Return
+  <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+These are the ASCII codec APIs.  Only 7-bit ASCII data is
+accepted. All other codes generate errors.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-537' xml:id='l2h-537' class="cfunction">PyUnicode_DecodeASCII</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                                    Py_ssize_t <var>size</var>,
+                                                    const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the
+  ASCII encoded string <var>s</var>.  Return <tt class="constant">NULL</tt> if an exception
+  was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-538' xml:id='l2h-538' class="cfunction">PyUnicode_EncodeASCII</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                                    Py_ssize_t <var>size</var>,
+                                                    const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size using
+  ASCII and return a Python string object.  Return <tt class="constant">NULL</tt> if an
+  exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-539' xml:id='l2h-539' class="cfunction">PyUnicode_AsASCIIString</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode objects using ASCII and return the result as
+  Python string object.  Error handling is ``strict''.  Return
+  <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+These are the mapping codec APIs:
+
+<p>
+This codec is special in that it can be used to implement many
+different codecs (and this is in fact what was done to obtain most of
+the standard codecs included in the <tt class="module">encodings</tt> package). The
+codec uses mapping to encode and decode characters.
+
+<p>
+Decoding mappings must map single string characters to single Unicode
+characters, integers (which are then interpreted as Unicode ordinals)
+or None (meaning "undefined mapping" and causing an error).
+
+<p>
+Encoding mappings must map single Unicode characters to single string
+characters, integers (which are then interpreted as Latin-1 ordinals)
+or None (meaning "undefined mapping" and causing an error).
+
+<p>
+The mapping objects provided must only support the __getitem__ mapping
+interface.
+
+<p>
+If a character lookup fails with a LookupError, the character is
+copied as-is meaning that its ordinal value will be interpreted as
+Unicode or Latin-1 ordinal resp. Because of this, mappings only need
+to contain those mappings which map characters to different code
+points.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-540' xml:id='l2h-540' class="cfunction">PyUnicode_DecodeCharmap</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               PyObject *<var>mapping</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the encoded
+  string <var>s</var> using the given <var>mapping</var> object.  Return
+  <tt class="constant">NULL</tt> if an exception was raised by the codec. If <var>mapping</var> is <tt class="constant">NULL</tt>
+  latin-1 decoding will be done. Else it can be a dictionary mapping byte or a
+  unicode string, which is treated as a lookup table. Byte values greater
+  that the length of the string and U+FFFE "characters" are treated as
+  "undefined mapping".
+  
+<span class="versionnote">Changed in version 2.4:
+Allowed unicode string as mapping argument.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-541' xml:id='l2h-541' class="cfunction">PyUnicode_EncodeCharmap</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               PyObject *<var>mapping</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size using the
+  given <var>mapping</var> object and return a Python string object.
+  Return <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-542' xml:id='l2h-542' class="cfunction">PyUnicode_AsCharmapString</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>,
+                                                        PyObject *<var>mapping</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode objects using the given <var>mapping</var> object and
+  return the result as Python string object.  Error handling is
+  ``strict''.  Return <tt class="constant">NULL</tt> if an exception was raised by the
+  codec.
+</dd></dl>
+
+<p>
+The following codec API is special in that maps Unicode to Unicode.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-543' xml:id='l2h-543' class="cfunction">PyUnicode_TranslateCharmap</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               PyObject *<var>table</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Translate a <tt class="ctype">Py_UNICODE</tt> buffer of the given length by
+  applying a character mapping <var>table</var> to it and return the
+  resulting Unicode object.  Return <tt class="constant">NULL</tt> when an exception was
+  raised by the codec.
+
+<p>
+The <var>mapping</var> table must map Unicode ordinal integers to Unicode
+  ordinal integers or None (causing deletion of the character).
+
+<p>
+Mapping tables need only provide the <tt class="method">__getitem__()</tt>
+  interface; dictionaries and sequences work well.  Unmapped character
+  ordinals (ones which cause a <tt class="exception">LookupError</tt>) are left
+  untouched and are copied as-is.
+</dd></dl>
+
+<p>
+These are the MBCS codec APIs. They are currently only available on
+Windows and use the Win32 MBCS converters to implement the
+conversions.  Note that MBCS (or DBCS) is a class of encodings, not
+just one.  The target encoding is defined by the user settings on the
+machine running the codec.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-544' xml:id='l2h-544' class="cfunction">PyUnicode_DecodeMBCS</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a Unicode object by decoding <var>size</var> bytes of the MBCS
+  encoded string <var>s</var>.  Return <tt class="constant">NULL</tt> if an exception was
+  raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-545' xml:id='l2h-545' class="cfunction">PyUnicode_DecodeMBCSStateful</tt></b>(</nobr></td><td>const char *<var>s</var>,
+                                               int <var>size</var>,
+                                               const char *<var>errors</var>,
+                                               int *<var>consumed</var>)</td></tr></table></dt>
+<dd>
+  If <var>consumed</var> is <tt class="constant">NULL</tt>, behave like
+  <tt class="cfunction">PyUnicode_DecodeMBCS()</tt>. If <var>consumed</var> is not <tt class="constant">NULL</tt>,
+  <tt class="cfunction">PyUnicode_DecodeMBCSStateful()</tt> will not decode trailing lead
+  byte and the number of bytes that have been decoded will be stored in
+  <var>consumed</var>.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-546' xml:id='l2h-546' class="cfunction">PyUnicode_EncodeMBCS</tt></b>(</nobr></td><td>const Py_UNICODE *<var>s</var>,
+                                               Py_ssize_t <var>size</var>,
+                                               const char *<var>errors</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode the <tt class="ctype">Py_UNICODE</tt> buffer of the given size using MBCS
+  and return a Python string object.  Return <tt class="constant">NULL</tt> if an exception
+  was raised by the codec.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-547' xml:id='l2h-547' class="cfunction">PyUnicode_AsMBCSString</tt></b>(</nobr></td><td>PyObject *<var>unicode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Encode a Unicode objects using MBCS and return the result as
+  Python string object.  Error handling is ``strict''.  Return
+  <tt class="constant">NULL</tt> if an exception was raised by the codec.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.2 unicode Objects"
+  href="unicodeObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.2 unicode Objects"
+  href="unicodeObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.2.2 methods and Slot"
+  href="unicodeMethodsAndSlots.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="unicodeObjects.html">7.3.2 Unicode Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="unicodeObjects.html">7.3.2 Unicode Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="unicodeMethodsAndSlots.html">7.3.2.2 Methods and Slot</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

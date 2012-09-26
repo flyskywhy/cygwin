@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+#
+# Cat file(s) by filename from given tree or revision
+# Copyright (c) John Ellson, 2005
+#
+# Cat a file of a given filename in a given revision (or in the current
+# one) to stdout.
+#
+# OPTIONS
+# -------
+# -r TREE_ID:: Look for file in the given revision or tree
+#	ID of the revision or tree where to look for the file, instead of
+#	HEAD.
+
+# Testsuite: TODO
+
+# The tale of birth:
+# Initiated from a request from:		    erg@research.att.com
+#   for an equivalent to "cvs co -p <filename>"
+# Question posted with really bad initial solution: ellson@research.att.com
+# Suggestions offered by:			    Johannes.Schindelin@gmx.de
+#						    rene.scharfe@lsrfire.ath.cx
+# This solution based on posting from:		    torvalds@osdl.org
+# Polish and test by:				    ellson@research.att.com
+
+USAGE="cg-admin-cat [-r TREE_ID] FILE..."
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+rev=HEAD
+while optparse; do
+	if optparse -r=; then
+		rev="$OPTARG"
+	else
+		optfail
+	fi
+done
+
+[ ${#ARGS[*]} -ge 1 ] || usage
+
+id=$(cg-object-id -t "$rev") || exit 1
+
+git ls-tree "$id" "${ARGS[@]}" |
+	while read -r mode type sha name
+	do
+		case "$type" in
+		blob)
+			git cat-file blob "$sha"
+			;;
+		tree)
+			git ls-tree "$sha"
+			;;
+		*)
+			exit 1
+			;;
+		esac
+	done

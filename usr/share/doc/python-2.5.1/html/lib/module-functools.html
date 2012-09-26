@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-operator.html" />
+<link rel="prev" href="module-itertools.html" />
+<link rel="parent" href="numeric.html" />
+<link rel="next" href="partial-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.6 functools -- Higher order functions and operations on callable objects.</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.5.3 Recipes"
+  href="itertools-recipes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. numeric and Mathematical"
+  href="numeric.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.6.1 partial Objects"
+  href="partial-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="itertools-recipes.html">6.5.3 Recipes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="numeric.html">6. Numeric and Mathematical</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="partial-objects.html">6.6.1 partial Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008600000000000000000">
+6.6 <tt class="module">functools</tt> --
+         Higher order functions and operations on callable objects.</a>
+</h1>
+
+<p>
+<a name="module-functools"></a>		
+<p>
+
+<p>
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+The <tt class="module">functools</tt> module is for higher-order functions: functions
+that act on or return other functions. In general, any callable object can
+be treated as a function for the purposes of this module.
+
+<p>
+The <tt class="module">functools</tt> module defines the following function:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1075' xml:id='l2h-1075' class="function">partial</tt></b>(</nobr></td>
+  <td><var>func</var><big>[</big><var>,*args</var><big>]</big><var></var><big>[</big><var>, **keywords</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a new <tt class="class">partial</tt> object which when called will behave like
+<var>func</var> called with the positional arguments <var>args</var> and keyword
+arguments <var>keywords</var>. If more arguments are supplied to the call, they
+are appended to <var>args</var>. If additional keyword arguments are supplied,
+they extend and override <var>keywords</var>. Roughly equivalent to:
+  <div class="verbatim"><pre>
+        def partial(func, *args, **keywords):
+            def newfunc(*fargs, **fkeywords):
+                newkeywords = keywords.copy()
+                newkeywords.update(fkeywords)
+                return func(*(args + fargs), **newkeywords)
+            newfunc.func = func
+            newfunc.args = args
+            newfunc.keywords = keywords
+            return newfunc
+</pre></div>
+
+<p>
+The <tt class="function">partial</tt> is used for partial function application which
+``freezes'' some portion of a function's arguments and/or keywords
+resulting in a new object with a simplified signature.  For example,
+<tt class="function">partial</tt> can be used to create a callable that behaves like
+the <tt class="function">int</tt> function where the <var>base</var> argument defaults to
+two:
+  <div class="verbatim"><pre>
+        &gt;&gt;&gt; basetwo = partial(int, base=2)
+        &gt;&gt;&gt; basetwo.__doc__ = 'Convert base 2 string to an int.'
+        &gt;&gt;&gt; basetwo('10010')
+        18
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1076' xml:id='l2h-1076' class="function">update_wrapper</tt></b>(</nobr></td>
+  <td><var>wrapper, wrapped</var><big>[</big><var>, assigned</var><big>]</big><var></var><big>[</big><var>, updated</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Update a <var>wrapper</var> function to look like the <var>wrapped</var> function.
+The optional arguments are tuples to specify which attributes of the original
+function are assigned directly to the matching attributes on the wrapper
+function and which attributes of the wrapper function are updated with
+the corresponding attributes from the original function. The default
+values for these arguments are the module level constants
+<var>WRAPPER_ASSIGNMENTS</var> (which assigns to the wrapper function's
+<var>__name__</var>, <var>__module__</var> and <var>__doc__</var>, the documentation string)
+and <var>WRAPPER_UPDATES</var> (which updates the wrapper function's <var>__dict__</var>,
+i.e. the instance dictionary).
+
+<p>
+The main intended use for this function is in decorator functions
+which wrap the decorated function and return the wrapper. If the
+wrapper function is not updated, the metadata of the returned function
+will reflect the wrapper definition rather than the original function
+definition, which is typically less than helpful.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1077' xml:id='l2h-1077' class="function">wraps</tt></b>(</nobr></td>
+  <td><var>wrapped</var><big>[</big><var>, assigned</var><big>]</big><var></var><big>[</big><var>, updated</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a convenience function for invoking
+<code>partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)</code>
+as a function decorator when defining a wrapper function. For example:
+  <div class="verbatim"><pre>
+        &gt;&gt;&gt; def my_decorator(f):
+        ...     @wraps(f)
+        ...     def wrapper(*args, **kwds):
+        ...         print 'Calling decorated function'
+        ...         return f(*args, **kwds)
+        ...     return wrapper
+        ...
+        &gt;&gt;&gt; @my_decorator
+        ... def example():
+	...     """Docstring"""
+        ...     print 'Called example function'
+        ...
+        &gt;&gt;&gt; example()
+        Calling decorated function
+        Called example function
+        &gt;&gt;&gt; example.__name__
+        'example'
+	&gt;&gt;&gt; example.__doc__
+	'Docstring'
+</pre></div>
+Without the use of this decorator factory, the name of the example
+function would have been <code>'wrapper'</code>, and the docstring of the
+original <tt class="function">example()</tt> would have been lost.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="partial-objects.html">6.6.1 <tt class="class">partial</tt> Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.5.3 Recipes"
+  href="itertools-recipes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. numeric and Mathematical"
+  href="numeric.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.6.1 partial Objects"
+  href="partial-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="itertools-recipes.html">6.5.3 Recipes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="numeric.html">6. Numeric and Mathematical</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="partial-objects.html">6.6.1 partial Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

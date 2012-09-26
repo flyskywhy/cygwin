@@ -1,0 +1,601 @@
+#!/bin/sh
+#
+# Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+#
+
+GUILT_VERSION="0.27"
+GUILT_NAME="Mind Games"
+
+# If the first argument is one of the below, display the man page instead of
+# the rather silly and mostly useless usage string
+case $1 in
+	-h|--h|--he|--hel|--help)
+	shift
+	exec "guilt-help" "$@"
+	exit
+	;;
+	-V|--ver|--versi|--versio|--version)
+	echo "Guilt version $GUILT_VERSION"
+	exit
+	;;
+esac
+
+# we change directories ourselves
+SUBDIRECTORY_OK=1
+
+. git-sh-setup
+
+#
+# Git version check
+#
+gitver=`git --version | cut -d' ' -f3`
+case "$gitver" in
+	1.5.*)	;; # git-config
+	*)	die "Unsupported version of git ($gitver)" ;;
+esac
+
+#
+# Shell library
+#
+
+# echo -e is a bashism, fallback to /bin/echo if the builtin does not supports it
+echo()
+{
+	/bin/echo "$@"
+}
+
+noerr()
+{
+	"$@" 2>/dev/null
+}
+
+silent()
+{
+	"$@" >/dev/null 2>/dev/null
+}
+
+########
+
+guilt_commands()
+{
+	find "`dirname $0`" -maxdepth 1 -name "guilt-*" -type f -perm /111 | sed -e "s/.*\\/`basename $0`-//"
+}
+
+if [ "`basename $0`" = "guilt" ]; then
+	# being run as standalone
+
+	# by default, we shouldn't fail
+	cmd=
+
+	if [ $# -ne 0 ]; then
+		# take first arg, and try to execute it
+
+		arg="$1"
+		dir=`dirname $0`
+
+		if [ -x "$dir/guilt-$arg" ]; then
+			cmd=$arg
+		else
+			# might be a short handed
+			for command in $(guilt_commands); do
+				case $command in
+				$arg*)
+					if [ -x "$dir/guilt-$command" ]; then
+						cmd=$command
+					fi
+					;;
+				esac
+			done
+		fi
+		if [ -n "$cmd" ]; then
+			shift
+			exec "$dir/guilt-$cmd" "$@"
+
+			# this is not reached because of the exec
+			die "Exec failed! Something is terribly wrong!"
+		else
+			echo "Command $arg not found" >&2
+			echo "" >&2
+		fi
+	fi
+
+	# no args passed or invalid command entered, just output help summary
+
+	echo "Guilt v$GUILT_VERSION"
+	echo ""
+	echo "Pick a command:"
+	guilt_commands | sort | column | column -t | sed -e 's/^/\t/'
+
+	echo ""
+	echo "Example:"
+	echo -e "\tguilt-push"
+	echo "or"
+	echo -e "\tguilt push"
+
+	# now, let's exit
+	exit 1
+fi
+
+########
+
+#
+# Library goodies
+#
+
+# usage: valid_patchname <patchname>
+valid_patchname()
+{
+	case "$1" in
+		/*|./*|../*|*/./*|*/../*|*/.|*/..|*/)
+			return 1;;
+		*)
+			return 0;;
+	esac
+}
+
+get_branch()
+{
+	git-symbolic-ref HEAD | sed -e 's,^refs/heads/,,'
+}
+
+verify_branch()
+{
+	[ ! -d "$GIT_DIR/patches" ] &&
+		echo "Patches directory doesn't exist, try guilt-init" >&2 &&
+		return 1
+	[ ! -d "$GIT_DIR/patches/$branch" ] &&
+		echo "Branch $branch is not initialized, try guilt-init" >&2 &&
+		return 1
+	[ ! -f "$GIT_DIR/patches/$branch/series" ] &&
+		echo "Branch $branch does not have a series file" >&2 &&
+		return 1
+	[ ! -f "$GIT_DIR/patches/$branch/status" ] &&
+		echo "Branch $branch does not have a status file" >&2 &&
+		return 1
+	[ -f "$GIT_DIR/patches/$branch/applied" ] &&
+		echo "Warning: Branch $branch has 'applied' file - guilt is not compatible with stgit" >&2 &&
+		return 1
+
+	return 0
+}
+
+get_top()
+{
+	tail -1 "$GUILT_DIR/$branch/status" | cut -d: -f 2-
+}
+
+get_prev()
+{
+	if [ `wc -l < "$GUILT_DIR/$branch/status"` -gt 1 ]; then
+		tail -n 2 "$GUILT_DIR/$branch/status" | head -n 1
+	fi
+}
+
+get_series()
+{
+	# ignore all lines matching:
+	#	- empty lines
+	#	- whitespace only
+	#	- optional whitespace followed by '#' followed by more
+	#	  optional whitespace
+	grep -ve '^[[:space:]]*\(#.*\)*$' "$series"
+}
+
+# usage: do_make_header <hash>
+do_make_header()
+{
+	# we should try to work with commit objects only
+	if [ `git-cat-file -t "$1"` != "commit" ]; then
+		echo "Hash $1 is not a commit object" >&2
+		echo "Aborting..." >&2
+		exit 2
+	fi
+
+	git-cat-file -p "$1" | awk '
+		BEGIN{headers=1; firstline=1}
+		/^author / && headers {
+			sub(/^author +/, "");
+			sub(/ [0-9]* [+-]*[0-9][0-9]*$/, "");
+			author=$0
+		}
+		!headers {
+			print
+			if (firstline) {
+				firstline = 0;
+				print "\nFrom: " author;
+			}
+		}
+		/^$/ && headers { headers = 0 }
+	'
+}
+
+# usage: do_get_patch patchfile
+do_get_patch()
+{
+	cat "$1" | awk '
+BEGIN{}
+/^(diff|---)/,/END{}/
+'
+}
+
+# usage: do_get_header patchfile
+do_get_header()
+{
+	# The complexity arises from the fact that we want to ignore the
+	# From line and the empty line after it if it exists
+
+	# 2nd line skips the From line
+	# 3rd line skips the empty line right after a From line
+	# 4th line terminates execution when we encounter the diff
+	cat "$1" | awk '
+BEGIN{skip=0}
+/^Subject:/ && (NR==1){print substr($0, 10); next}
+/^From:/{skip=1; next}
+/^[ \t\f\n\r\v]*$/ && (skip==1){skip=0; next}
+/^(diff|---)/{exit}
+{print $0}
+END{}
+'
+}
+
+# usage: do_get_full_header patchfile
+do_get_full_header()
+{
+	# 2nd line checks for the begining of a patch
+	# 3rd line outputs the line if it didn't get pruned by the above rules
+	cat "$1" | awk '
+BEGIN{}
+/^(diff|---)/{exit}
+{print $0}
+END{}
+'
+}
+
+# usage: assert_head_check
+assert_head_check()
+{
+	if ! head_check "`tail -1 < "$applied" | cut -d: -f 1`"; then
+		die "aborting..."
+	fi
+}
+
+# usage: head_check <expected hash>
+head_check()
+{
+	# make sure we're not doing funky things to commits that don't
+	# belong to us
+	# if the expected hash is empty, just return
+	[ -z "$1" ] && return 0
+
+	if [ "`git show-ref -s "refs/heads/$branch"`" != "$1" ]; then
+		echo "Expected HEAD commit $1" >&2
+		echo "                 got `cat "$GIT_DIR/refs/heads/$branch"`" >&2
+		return 1
+	fi
+	return 0
+}
+
+# usage: series_insert_patch <patchname>
+series_insert_patch()
+{
+	awk -v top="`get_top`" -v new="$1" \
+		'BEGIN{if (top == "") print new;}
+		{
+			print $0;
+			if (top != "" && top == $0) print new;
+		}' "$series" > "$series.tmp"
+	mv "$series.tmp" "$series"
+}
+
+# usage: series_remove_patch <patchname>
+series_remove_patch()
+{
+	grep -v "^$1\$" < "$series" > "$series.tmp"
+	mv "$series.tmp" "$series"
+}
+
+# usage: series_rename_patch <oldname> <newname>
+series_rename_patch()
+{
+	awk -v old="$1" -v new="$2" \
+		'{ if ($0 == old) print new; else print $0 }' \
+		"$series" > "$series.tmp"
+
+	mv "$series.tmp" "$series"
+}
+
+# Beware! This is one of the few (only?) places where we modify the applied
+# file directly
+#
+# usage: applied_rename_patch <oldname> <newname>
+applied_rename_patch()
+{
+	awk -v old="$1" -v new="$2" \
+			'BEGIN{FS=":"}
+			{ if ($1 ~ /^[0-9a-f]*$/ && length($1) == 40 && substr($0, 42) == old)
+				print substr($0, 0, 41) new;
+			else
+				print;
+			}' "$applied" > "$applied.tmp"
+
+	mv "$applied.tmp" "$applied"
+}
+
+# usage: pop_many_patches <commitish> <number of patches>
+pop_many_patches()
+{
+	assert_head_check
+
+	(
+		cd "$TOP_DIR"
+
+		git-reset --hard "$1" > /dev/null
+		head -n "-$2" < "$applied" > "$applied.tmp"
+		mv "$applied.tmp" "$applied"
+	)
+
+	# update references to top, bottom, and base
+	update_stack_tags
+}
+
+# usage: pop_all_patches
+pop_all_patches()
+{
+	pop_many_patches \
+		`head -1 "$applied" | cut -d: -f1`^ \
+		`wc -l < "$applied"`
+}
+
+# usage: update_stack_tags
+update_stack_tags()
+{
+	# bail if autotagging is not enabled
+	if [ $autotag -eq 0 ]; then
+		return 0
+	fi
+
+	if [ -s "$applied" ]; then
+		# there are patches applied, therefore we must get the top,
+		# bottom and base hashes, and update the tags
+
+		mkdir -p `dirname "$GIT_DIR/refs/tags/${branch}_top"`
+		git-rev-parse HEAD > "$GIT_DIR/refs/tags/${branch}_top"
+		head -1 < $applied | cut -d: -f1 > "$GIT_DIR/refs/tags/${branch}_bottom"
+		git-rev-parse $(head -1 < $applied | cut -d: -f1)^ > "$GIT_DIR/refs/tags/${branch}_base"
+	else
+		# there are no patches applied, therefore we must remove the
+		# tags to old top, bottom, and base
+
+		rm -f "$GIT_DIR/refs/tags/${branch}_top"
+		rm -f "$GIT_DIR/refs/tags/${branch}_bottom"
+		rm -f "$GIT_DIR/refs/tags/${branch}_base"
+	fi
+}
+
+# usage: push_patch patchname [bail_action]
+push_patch()
+{
+	__push_patch_bail=0
+
+	(
+		p="$GUILT_DIR/$branch/$1"
+		pname="$1"
+		bail_action="$2"
+		reject="--reject"
+
+		assert_head_check
+		cd "$TOP_DIR"
+
+		# apply the patch if and only if there is something to apply
+		if [ `git-apply --numstat "$p" | wc -l` -gt 0 ]; then
+			if [ "$bail_action" = abort ]; then
+				reject=""
+			fi
+			git-apply -C$guilt_push_diff_context --index \
+				$reject "$p" > /dev/null 2> /tmp/guilt.log.$$
+			__push_patch_bail=$?
+
+			if [ $__push_patch_bail -ne 0 ]; then
+				cat /tmp/guilt.log.$$ >&2
+				if [ "$bail_action" = "abort" ]; then
+					rm -f /tmp/guilt.log.$$ /tmp/guilt.msg.$$
+					return $__push_patch_bail
+				fi
+			fi
+		fi
+
+		# grab a commit message out of the patch
+		do_get_header "$p" > /tmp/guilt.msg.$$
+
+		# make a default commit message if patch doesn't contain one
+		[ ! -s /tmp/guilt.msg.$$ ] && echo "patch $pname" > /tmp/guilt.msg.$$
+
+		# extract a From line from the patch header, and set
+		# GIT_AUTHOR_{NAME,EMAIL}
+		author_str=`sed -n -e '/^From:/ { s/^From: //; p; q }; /^(diff|---)/ q' "$p"`
+		if [ ! -z "$author_str" ]; then
+			GIT_AUTHOR_NAME=`echo $author_str | sed -e 's/ *<.*$//'`
+			export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-" "}"
+                        export GIT_AUTHOR_EMAIL="`echo $author_str | sed -e 's/[^<]*//'`"
+		fi
+		export GIT_AUTHOR_DATE="`stat -c %y "$p"`"
+		export GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
+
+		# commit
+		treeish=`git-write-tree`
+		commitish=`git-commit-tree $treeish -p HEAD < /tmp/guilt.msg.$$`
+		echo $commitish > $GIT_DIR/`git-symbolic-ref HEAD`
+
+		# mark patch as applied
+		echo "$commitish:$pname" >> $applied
+	)
+
+	# sub-shell funky-ness
+	__push_patch_bail=$?
+
+	# update references to top, bottom, and base of the stack
+	update_stack_tags
+
+	rm -f /tmp/guilt.msg.$$ /tmp/guilt.log.$$
+	return $__push_patch_bail
+}
+
+# usage: must_commit_first
+must_commit_first()
+{
+	[ `git-diff-files | wc -l` -eq 0 ]
+	return $?
+}
+
+# usage: fold_patch patchname
+fold_patch()
+{
+	set -- "$1" "`get_top`"
+
+	assert_head_check
+
+	push_patch "$1"
+
+	__refresh_patch "$2" HEAD^^ 2 "" ""
+
+	series_remove_patch "$1"
+}
+
+# usage: refresh_patch patchname gengitdiff incldiffstat
+refresh_patch()
+{
+	__refresh_patch "$1" HEAD^ 1 "$2" "$3"
+}
+
+# usage: __refresh_patch patchname commitish number_of_commits gengitdiff
+#			 incldiffstat
+__refresh_patch()
+{
+	assert_head_check
+
+	(
+		cd "$TOP_DIR"
+		p="$GUILT_DIR/$branch/$1"
+
+		git-diff-files --name-only | (while read n; do git-update-index "$n" ; done)
+
+		# get the patch header
+		do_get_full_header "$p" > /tmp/guilt.diff.$$
+
+		[ ! -z "$4" ] && diffopts="-C -M --find-copies-harder"
+		
+		if [ ! -z "$5" ]; then
+			(
+				echo "---"
+				git-diff --stat $diffopts "$2"
+				echo ""
+			) >> /tmp/guilt.diff.$$
+		fi
+
+		# get the new patch
+		git-diff $diffopts "$2" >> /tmp/guilt.diff.$$
+
+		# move the new patch in
+		mv "$p" "$p~"
+		mv /tmp/guilt.diff.$$ $p
+	)
+
+	# drop the currently applied patch, pop_many_patches does it's own
+	# cd $TOP_DIR
+	pop_many_patches "$2" "$3"
+
+	# push_patch does it's own cd $TOP_DIR
+	push_patch "$1"
+}
+
+# usage: munge_hash_range <hash range>
+#
+# this means:
+#	<hash>			- one commit
+#	<hash>..		- hash until head (excludes hash, includes head)
+#	..<hash>		- until hash (includes hash)
+#	<hash1>..<hash2>	- from hash to hash (inclusive)
+#
+# The output of this function is suitable to be passed to git-rev-list
+munge_hash_range()
+{
+	case "$1" in
+		*..*..*|*\ *)
+			# double .. or space is illegal
+			return 1;;
+		..*)
+			# e.g., "..v0.10"
+			echo ${1#..};;
+		*..)
+			# e.g., "v0.19.."
+			echo ${1%..}..HEAD;;
+		*..*)
+			# e.g., "v0.19-rc1..v0.19"
+			echo ${1%%..*}..${1#*..};;
+		?*)
+			# e.g., "v0.19"
+			echo $1^..$1;;
+		*)  # empty
+			return 1;;
+	esac
+	return 0
+}
+
+# usage: guilt_hook <hook name> <args....>
+guilt_hook()
+{
+	__hookname="$1"
+	[ ! -x "$GIT_DIR/hooks/guilt/$__hookname" ] && return 0
+
+	shift
+
+	"$GIT_DIR/hooks/guilt/$__hookname" "$@"
+	return $?
+}
+
+#
+# Some constants
+#
+
+# used for: git-apply -C <val>
+guilt_push_diff_context=1
+
+#
+# Parse any part of .git/config that belongs to us
+#
+
+# autotag?
+autotag=`git-config guilt.autotag`
+[ -z "$autotag" ] && autotag=1
+
+#
+# The following gets run every time this file is source'd
+#
+
+TOP_DIR=`git-rev-parse --show-cdup`
+if [ -z "$TOP_DIR" ]; then
+	TOP_DIR="./"
+fi
+
+GUILT_DIR="$GIT_DIR/patches"
+
+branch=`get_branch`
+
+# most of the time we want to verify that the repo's branch has been
+# initialized, but every once in a blue moon (e.g., we want to run guilt-init),
+# we must avoid the checks
+if [ -z "$DO_NOT_CHECK_BRANCH_EXISTENCE" ]; then
+	verify_branch || exit 1
+fi
+
+# very useful files
+series="$GUILT_DIR/$branch/series"
+applied="$GUILT_DIR/$branch/status"
+
+# determine an editor to use for anything interactive (fall back to vi)
+editor="vi"
+[ ! -z "$EDITOR" ] && editor="$EDITOR"
+
+# determine a pager to use for anything interactive (fall back to more)
+pager="more"
+[ ! -z "$PAGER" ] && pager="$PAGER"

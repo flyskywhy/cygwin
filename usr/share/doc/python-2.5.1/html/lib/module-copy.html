@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-pprint.html" />
+<link rel="prev" href="module-new.html" />
+<link rel="parent" href="datatypes.html" />
+<link rel="next" href="module-pprint.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.17 copy -- Shallow and deep copy operations</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.16 new  "
+  href="module-new.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.18 pprint  "
+  href="module-pprint.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-new.html">5.16 new  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-pprint.html">5.18 pprint  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0071700000000000000000">
+5.17 <tt class="module">copy</tt> --
+         Shallow and deep copy operations</a>
+</h1>
+
+<p>
+<a name="module-copy"></a>
+
+<p>
+This module provides generic (shallow and deep) copying operations.
+<a id='l2h-895' xml:id='l2h-895'></a>
+<p>
+Interface summary:
+
+<p>
+<div class="verbatim"><pre>
+import copy
+
+x = copy.copy(y)        # make a shallow copy of y
+x = copy.deepcopy(y)    # make a deep copy of y
+</pre></div>
+For module specific errors, <tt class="exception">copy.error</tt> is raised.
+
+<p>
+The difference between shallow and deep copying is only relevant for
+compound objects (objects that contain other objects, like lists or
+class instances):
+
+<p>
+
+<ul>
+<li>A <em>shallow copy</em> constructs a new compound object and then (to the
+extent possible) inserts <em>references</em> into it to the objects found
+in the original.
+
+<p>
+</li>
+<li>A <em>deep copy</em> constructs a new compound object and then,
+recursively, inserts <em>copies</em> into it of the objects found in the
+original.
+
+<p>
+</li>
+</ul>
+
+<p>
+Two problems often exist with deep copy operations that don't exist
+with shallow copy operations:
+
+<p>
+
+<ul>
+<li>Recursive objects (compound objects that, directly or indirectly,
+contain a reference to themselves) may cause a recursive loop.
+
+<p>
+</li>
+<li>Because deep copy copies <em>everything</em> it may copy too much,
+e.g., administrative data structures that should be shared even
+between copies.
+
+<p>
+</li>
+</ul>
+
+<p>
+The <tt class="function">deepcopy()</tt> function avoids these problems by:
+
+<p>
+
+<ul>
+<li>keeping a ``memo'' dictionary of objects already copied during the current
+copying pass; and
+
+<p>
+</li>
+<li>letting user-defined classes override the copying operation or the
+set of components copied.
+
+<p>
+</li>
+</ul>
+
+<p>
+This module does not copy types like module, method,
+stack trace, stack frame, file, socket, window, array, or any similar
+types.  It does ``copy'' functions and classes (shallow and deeply),
+by returning the original object unchanged; this is compatible with
+the way these are treated by the <tt class="module">pickle</tt> module.
+
+<span class="versionnote">Changed in version 2.5:
+Added copying functions.</span>
+
+<p>
+Classes can use the same interfaces to control copying that they use
+to control pickling.  See the description of module
+<tt class="module"><a href="module-pickle.html">pickle</a></tt><a id='l2h-898' xml:id='l2h-898'></a> for information on these
+methods.  The <tt class="module">copy</tt> module does not use the
+<tt class="module"><a href="module-copyreg.html">copy_reg</a></tt> registration module.
+
+<p>
+In order for a class to define its own copy implementation, it can
+define special methods <tt class="method">__copy__()</tt> and
+<tt class="method">__deepcopy__()</tt>.  The former is called to implement the
+shallow copy operation; no additional arguments are passed.  The
+latter is called to implement the deep copy operation; it is passed
+one argument, the memo dictionary.  If the <tt class="method">__deepcopy__()</tt>
+implementation needs to make a deep copy of a component, it should
+call the <tt class="function">deepcopy()</tt> function with the component as first
+argument and the memo dictionary as second argument.
+<a id='l2h-897' xml:id='l2h-897'></a>
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-pickle.html">pickle</a></tt>:</b>
+    <dd>Discussion of the special methods used to
+support object state retrieval and restoration.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.16 new  "
+  href="module-new.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.18 pprint  "
+  href="module-pprint.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-new.html">5.16 new  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-pprint.html">5.18 pprint  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

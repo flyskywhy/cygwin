@@ -1,0 +1,189 @@
+################################################################################
+#
+# docbook.cygclass - functions for packaging DocBook SGML/XML and DSSSL/XSL
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: docbook.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+my_pn=${PN%%[0-9]*}
+my_p=${my_pn}-${PV}
+
+dtd_type=${my_pn#docbook-}
+
+SGML_CATALOG=/etc/sgml/catalog
+XML_CATALOG=/etc/xml/catalog
+
+case ${dtd_type} in
+	dsssl)		DOCBOOK_DIR=/usr/share/sgml/docbook/dsssl ;;
+	xsl)		DOCBOOK_DIR=/usr/share/xml/docbook/xsl ;;
+	sgml|xml*)	DOCBOOK_DIR=/usr/share/${dtd_type%-*}/docbook/${dtd_type}-${PV} ;;
+	*)			error "docbook: Unknown DTD type: ${dtd_type}"
+esac
+
+
+DESCRIPTION="DocBook ${dtd_type} DTD, version ${PN}"
+HOMEPAGE="http://www.oasis-open.org/docbook/"
+
+SRC_DIR=.
+
+case "${dtd_type}-${PV}" in
+	sgml-[12].*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/docbk${PV//.}.zip"
+		;;
+	sgml-3.[01]*|sgml-4.[01]*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/docbk${PV//.}.zip"
+		PATCH_URI="mirror://portage/app-text/${my_pn}-dtd/files/${my_pn}-dtd-${PV}-catalog.diff"
+		;;
+	sgml-4.[234]*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/docbook-${PV}.zip"
+		PATCH_URI="mirror://portage/app-text/${my_pn}-dtd/files/${my_pn}-dtd-${PV}-catalog.diff"
+		;;
+	sgml-4*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/docbook-${PV}.zip"
+		;;
+	xml-4.[01]*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/docbkx${PV//.}.zip"
+		;;
+	xml-4.*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/docbook-xml-${PV}.zip"
+		;;
+	xml-simple-1.*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/docbook-simple-${PV}.zip"
+		;;
+	xml-simple-4.*)
+		SRC_URI="http://www.oasis-open.org/docbook/${dtd_type//-//}/${PV}/simple${PV//.}.zip"
+		;;
+	dsssl-1.*|xsl-1.*)
+		DESCRIPTION="DocBook ${dtd_type} stylesheets"
+		HOMEPAGE="http://docbook.sourceforge.net/"
+		SRC_URI="mirror://sourceforge/docbook/${my_p}.tar.bz2"
+		SRC_DIR="${my_p}"
+		;;
+	*)	error "docbook: unknown DTD version: ${dtd_type} ${PV}" ;;
+esac
+
+docbook_install() {
+	insinto ${DOCBOOK_DIR}
+
+	case ${dtd_type} in
+		dsssl)
+			dobin bin/*.pl
+			doman bin/*.1
+			cp -r {common,dtds,frames,html,images,lib,olink,print}/ ${D}${DOCBOOK_DIR}/
+			rm -f $(find ${D}${DOCBOOK_DIR}/ -name ChangeLog -o -name XREF -o -name catalog)
+			doins VERSION catalog
+			;;
+		sgml)
+			doins *.cat *.dcl *.dtd *.mod
+			;;
+		xml)
+			doins *.cat *.dtd *.mod
+			insinto ${DOCBOOK_DIR}/ent
+			doins ent/*.ent
+			;;
+		xml-simple)
+			doins *.css *.dtd *.mod
+			;;
+		xsl)
+			doins VERSION
+			cp -r {common,eclipse,fo,highlighting,html*}/ ${D}${DOCBOOK_DIR}/
+			cp -r {images,javahelp,lib,manpages,profiling}/ ${D}${DOCBOOK_DIR}/
+			cp -r {roundtrip,slides,template,website,xhtml}/ ${D}${DOCBOOK_DIR}/
+			;;
+	esac
+}
+
+docbook_sgml_postinst() {
+	case ${dtd_type} in
+		dsssl) mycat="catalog" ;;
+		sgml) mycat="docbook.cat" ;;
+	esac
+
+	dodir /etc/postinstall
+
+	cat >> ${D}/etc/postinstall/${PN}.sh <<-_EOF
+		mkdir -p /etc/sgml
+		install-catalog --add ${SGML_CATALOG} ${DOCBOOK_DIR}/${mycat}
+
+		_EOF
+}
+
+docbook_sgml_prerm() {
+	case ${dtd_type} in
+		dsssl) mycat="catalog" ;;
+		sgml) mycat="docbook.cat" ;;
+	esac
+
+	dodir /etc/preremove
+
+	cat >> ${D}/etc/preremove/${PN}.sh <<-_EOF
+		install-catalog --remove ${SGML_CATALOG} ${DOCBOOK_DIR}/${mycat}
+
+		_EOF
+}
+
+docbook_xml_postinst() {
+	dodir /etc/postinstall
+
+	cat >> ${D}/etc/postinstall/${PN}.sh <<-_EOF
+		mkdir -p ${XML_CATALOG%/*}
+		rm -f ${XML_CATALOG%/*}/docbook
+		build-docbook-catalog
+
+		_EOF
+}
+
+docbook_xml_prerm() {
+	dodir /etc/preremove
+
+	cat >> ${D}/etc/preremove/${PN}.sh <<-_EOF
+		rm -f ${XML_CATALOG%/*}/docbook
+		rm -f ${DOCBOOK_DIR}/docbookx.dtd
+		build-docbook-catalog
+
+		_EOF
+}
+
+src_compile() {
+	:
+}
+
+src_install() {
+	cd ${S}
+	docbook_install
+
+	case ${dtd_type} in
+		dsssl|sgml)
+			docbook_sgml_postinst
+			docbook_sgml_prerm
+			;;
+		xml)
+			docbook_sgml_postinst
+			docbook_sgml_prerm
+			docbook_xml_postinst
+			docbook_xml_prerm
+			;;
+		xsl)
+			docbook_xml_postinst
+			docbook_xml_prerm
+			;;
+	esac
+}

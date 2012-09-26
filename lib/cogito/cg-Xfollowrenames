@@ -1,0 +1,261 @@
+#!/usr/bin/env perl
+#
+# git rev-list | git diff-tree --stdin following renames
+# Copyright (c) Petr Baudis, 2006
+# Uses bits of git-annotate.perl by Ryan Anderson.
+#
+# This script will efficiently show output as of the
+#
+#	git rev-list --remove-empty ARGS -- FILE... |
+#	git diff-tree -M -r -m --stdin --pretty=raw ARGS
+#
+# pipeline, except that it follows renames of individual files listed
+# in the FILE... set.
+#
+# Usage:
+#
+#	cg-Xfollowrenames revlistargs -- difftreeargs -- revs -- files
+
+# Testsuite: TODO
+
+# TODO: BROKEN - if a file is removed (that is, added) on one branch,
+# we will stop watching for the renames on all the other branches. We need
+# to separate the heads and pipes.
+
+# TODO: Does not work on multiple files properly yet - most probably
+# (I didn't test it!). We want git rev-list to stop traversing the history
+# when _any_ file disappears while now it probably stops traversing when
+# _all_ files disappear.
+
+use warnings;
+use strict;
+
+$| = 1;
+
+our (@revlist_args, @difftree_args, @revs, @files);
+
+{ # Load arguments
+	my @argp = (\@revlist_args, \@difftree_args, \@revs, \@files);
+	my $argi = 0;
+	for my $arg (@ARGV) {
+		if ($arg eq '--' and $argi < $#argp) {
+			$argi++;
+			next;
+		}
+		push(@{$argp[$argi]}, $arg);
+	}
+}
+
+
+# The heads we watch (sorted by commit time)
+our @heads;
+# Each head is: {
+#	# Persistent for the whole line of development:
+#	pipe => $pipe,
+#	files => \@files, # to watch for
+#
+#	id => $sha1, # useful actually only for debugging
+#	time => $timestamp,
+#	str => $prettyoutput,
+#	parents => \@sha1s,
+#
+#	# When the commit is processed, spawn these extra heads:
+#	recurse => {$sha1id => \@files, ...},
+# }
+
+# To avoid printing duplicate commits
+# FIXME: Currently, we will not handle merge commits properly since
+# we hit them multiple times.
+our %commits;
+
+
+sub open_pipe($@) {
+	my ($stdin, @execlist) = @_;
+
+	my $pid = open my $kid, "-|";
+	defined $pid or die "Cannot fork: $!";
+
+	unless ($pid) {
+		if (defined $stdin) {
+			open STDIN, "<&", $stdin or die "Cannot dup(): $!";
+		}
+		exec @execlist;
+		die "Cannot exec @execlist: $!";
+	}
+
+	return $kid;
+}
+
+sub revlist($@) {
+	my ($rev, @files) = @_;
+	open_pipe(undef, "git rev-list", "--remove-empty",
+	                 @revlist_args, $rev, "--", @files)
+		or die "Failed to exec git rev-list: $!";
+}
+
+sub difftree($) {
+	my ($revlist) = @_;
+	open_pipe($revlist, "git diff-tree", "-r", "-m", "--stdin", "-M",
+	                    "--pretty=raw", @difftree_args)
+		or die "Failed to exec git diff-tree: $!";
+}
+
+sub revdiffpipe($@) {
+	my ($rev, @files) = @_;
+	my $pipe = difftree(revlist($rev, @files));
+}
+
+
+sub read_commit($$) {
+	my ($head, $tolerant) = @_;
+	my $pipe = $head->{'pipe'};
+	my $against;
+	my @oldset = @{$head->{'files'}};
+	my @newset;
+	my $rename;
+
+	# Load header
+	while (my $line = <$pipe>) {
+		$head->{'str'} .= $line;
+		chomp $line;
+		$line eq '' and goto header_loaded;
+
+		if ($line =~ /^diff-tree (\S+) \(from (root|\S+)\)/) {
+			$head->{'id'} = $1;
+			if (not $tolerant and $commits{$1}++) {
+				close $pipe;
+				return undef;
+			}
+			# The 'root' case is harmless since there'll be no renames.
+			$against = $2;
+		} elsif ($line =~ /^parent (\S+)/) {
+			push (@{$head->{'parents'}}, $1);
+		} elsif ($line =~ /^committer .*?> (\d+)/) {
+			$head->{'time'} = $1;
+		}
+	}
+	return undef;
+header_loaded:
+
+	# Load message
+	while (my $line = <$pipe>) {
+		$head->{'str'} .= $line;
+		chomp $line;
+		$line eq '' and goto message_loaded;
+	}
+	return undef;
+message_loaded:
+
+	# Load delta
+	# Note that we must interpret the patch we are seeing _reverse_.
+	while (my $line = <$pipe>) {
+		$head->{'str'} .= $line;
+		chomp $line;
+		$line eq '' and goto delta_loaded;
+
+		$line =~ /^:/ or return undef;
+		my ($info, $newfile, $oldfile) = split("\t", $line);
+		if ($info =~ /[RC]\d*$/) {
+			# Behold, a rename!
+			# (Or a copy, it's all the same for us.)
+			my $i;
+			for ($i = 0; $i <= $#oldset; $i++) {
+				$oldfile eq $oldset[$i] or next;
+				$rename = 1;
+				splice(@oldset, $i, 1);
+				push(@newset, $newfile);
+				last;
+			}
+			# In case of multiple candidates, follow
+			# all of them:
+			# (TODO: This might be a policy decision
+			# best left on the user.)
+			if ($i > $#oldset and grep { $oldfile eq $_ } @newset) {
+				$rename = 1;
+				push(@newset, $newfile);
+			}
+		} elsif ($info =~ /A$/) {
+			# Not weeding out deleted files (the patch is reversed
+			# so they appear as added to us) might cause bizarre
+			# results when following multiple files since
+			# git rev-list weeds them out too (probably?).
+			#print STDERR "grepping - @oldset, @{$head->{files}} > MINUS $newfile <\n";
+			@oldset = grep { $newfile ne $_ } @oldset;
+			@{$head->{'files'}} = grep { $newfile ne $_ } @{$head->{'files'}};
+			#print STDERR "post-grepping - @oldset, @{$head->{files}} <\n";
+		}
+	}
+	$head->{'str'} .= "\n";
+delta_loaded:
+
+	if ($rename) {
+		$head->{'recurse'}->{$against} = [@newset, @oldset];
+	}
+	return 1;
+}
+
+sub load_commit($) {
+	my ($head) = @_;
+	$head->{'time'} = undef;
+	$head->{'str'} = '';
+	$head->{'parents'} = ();
+
+	read_commit($head, 0) or return undef;
+
+	# In case there was a merge, the commit will be multiple times
+	# here, each time with a different delta section. Read them all.
+	for (1 .. $#{$head->{'parents'}}) { # stupid vim syntax highlighting
+		read_commit($head, 1) or return undef;
+	}
+
+	# Cut the last \n. We don't want it for the last commit.
+	substr($head->{'str'}, -1, 1, '');
+
+	return 1;
+}
+
+
+# Add head at the proper position
+sub add_head($) {
+	my ($head) = @_;
+	my $i;
+	for ($i = 0; $i <= $#heads; $i++) {
+		last if ($head->{'time'} > $heads[$i]->{'time'})
+	}
+	splice(@heads, $i, 0, $head);
+}
+
+# Create new head
+sub init_head($@) {
+	my ($rev, @files) = @_;
+	my $head = { files => \@files, 'pipe' => revdiffpipe($rev, @files) };
+	load_commit($head) or return;
+	add_head($head);
+}
+
+
+
+{ # Seed the heads list
+	for my $rev (@revs) {
+		init_head($rev, @files);
+	}
+}
+
+# Process the heads
+{
+	my $first = 1;
+	while (@heads) {
+		my $head = shift(@heads);
+
+		print "\n" unless $first; $first = 0;
+		print $head->{'str'};
+
+		foreach my $parent (keys %{$head->{'recurse'}}) {
+			init_head($parent, @{$head->{'recurse'}->{$parent}});
+		}
+		$head->{'recurse'} = undef;
+
+		load_commit($head) or next;
+		add_head($head);
+	}
+}

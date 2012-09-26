@@ -1,0 +1,56 @@
+################################################################################
+#
+# bzr.cygclass - functions for building packages from BZR checkouts
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: bzr.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+_USE_bzr_FETCH=1
+
+if ! defined BZR_URI
+then
+	error "BZR_URI must be defined"
+fi
+
+BZR_MODULE=${BZR_MODULE:-${ORIG_PN:-${PN}}}
+
+bzr_tarball="${BZR_MODULE}-bzr-${PV}.tar.bz2"
+
+SRC_URI="${bzr_tarball} "
+SRC_DIR="${BZR_MODULE}"
+
+bzr_fetch() {
+	local bzr_branch
+
+	check_prog_req bzr
+
+	if defined BZR_BRANCH
+	then
+		bzr_branch="-r ${BZR_BRANCH}"
+	fi
+
+	# T likely doesn't exist at this point, so create it first
+	mkdir -p ${T}
+	cd ${T}
+	verbose bzr branch ${BZR_URI} ${BZR_MODULE} ${bzr_branch}
+
+	tar jcf ${top}/${bzr_tarball} --exclude=.bzr --exclude=.bzrignore --exclude=.rsyncexclude ${BZR_MODULE}
+}

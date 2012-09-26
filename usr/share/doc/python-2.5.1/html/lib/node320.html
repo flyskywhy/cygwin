@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node321.html" />
+<link rel="prev" href="pickle-inst.html" />
+<link rel="parent" href="pickle-protocol.html" />
+<link rel="next" href="node321.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.1.5.2 Pickling and unpickling extension types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.5.1 pickling and unpickling"
+  href="pickle-inst.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1.5 the pickle protocol"
+  href="pickle-protocol.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.1.5.3 pickling and unpickling"
+  href="node321.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pickle-inst.html">13.1.5.1 Pickling and unpickling</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="pickle-protocol.html">13.1.5 The pickle protocol</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node321.html">13.1.5.3 Pickling and unpickling</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0015152000000000000000">
+13.1.5.2 Pickling and unpickling extension types</a>
+</h3>
+
+<p>
+When the <tt class="class">Pickler</tt> encounters an object of a type it knows
+nothing about -- such as an extension type -- it looks in two places
+for a hint of how to pickle it.  One alternative is for the object to
+implement a <tt class="method">__reduce__()</tt> method.  If provided, at pickling
+time <tt class="method">__reduce__()</tt> will be called with no arguments, and it
+must return either a string or a tuple.
+
+<p>
+If a string is returned, it names a global variable whose contents are
+pickled as normal.  The string returned by <tt class="method">__reduce__</tt> should
+be the object's local name relative to its module; the pickle module
+searches the module namespace to determine the object's module.
+
+<p>
+When a tuple is returned, it must be between two and five elements
+long. Optional elements can either be omitted, or <code>None</code> can be provided 
+as their value.  The semantics of each element are:
+
+<p>
+
+<ul>
+<li>A callable object that will be called to create the initial
+version of the object.  The next element of the tuple will provide
+arguments for this callable, and later elements provide additional
+state information that will subsequently be used to fully reconstruct
+the pickled data.
+
+<p>
+In the unpickling environment this object must be either a class, a
+callable registered as a ``safe constructor'' (see below), or it must
+have an attribute <tt class="member">__safe_for_unpickling__</tt> with a true value.
+Otherwise, an <tt class="exception">UnpicklingError</tt> will be raised in the
+unpickling environment.  Note that as usual, the callable itself is
+pickled by name.
+
+<p>
+</li>
+<li>A tuple of arguments for the callable object.
+
+<span class="versionnote">Changed in version 2.5:
+Formerly, this argument could also be <code>None</code>.</span>
+
+<p>
+</li>
+<li>Optionally, the object's state, which will be passed to
+      the object's <tt class="method">__setstate__()</tt> method as described in
+      section&nbsp;<a href="pickle-inst.html#pickle-inst">13.1.5</a>.  If the object has no
+      <tt class="method">__setstate__()</tt> method, then, as above, the value must
+      be a dictionary and it will be added to the object's
+      <tt class="member">__dict__</tt>.
+
+<p>
+</li>
+<li>Optionally, an iterator (and not a sequence) yielding successive
+list items.  These list items will be pickled, and appended to the
+object using either <code>obj.append(<var>item</var>)</code> or
+<code>obj.extend(<var>list_of_items</var>)</code>.  This is primarily used for
+list subclasses, but may be used by other classes as long as they have
+<tt class="method">append()</tt> and <tt class="method">extend()</tt> methods with the appropriate
+signature.  (Whether <tt class="method">append()</tt> or <tt class="method">extend()</tt> is used
+depends on which pickle protocol version is used as well as the number
+of items to append, so both must be supported.)
+
+<p>
+</li>
+<li>Optionally, an iterator (not a sequence)
+yielding successive dictionary items, which should be tuples of the
+form <code>(<var>key</var>, <var>value</var>)</code>.  These items will be pickled
+and stored to the object using <code>obj[<var>key</var>] = <var>value</var></code>.
+This is primarily used for dictionary subclasses, but may be used by
+other classes as long as they implement <tt class="method">__setitem__</tt>.
+
+<p>
+</li>
+</ul>
+
+<p>
+It is sometimes useful to know the protocol version when implementing
+<tt class="method">__reduce__</tt>.  This can be done by implementing a method named
+<tt class="method">__reduce_ex__</tt> instead of <tt class="method">__reduce__</tt>.
+<tt class="method">__reduce_ex__</tt>, when it exists, is called in preference over
+<tt class="method">__reduce__</tt> (you may still provide <tt class="method">__reduce__</tt> for
+backwards compatibility).  The <tt class="method">__reduce_ex__</tt> method will be
+called with a single integer argument, the protocol version.
+
+<p>
+The <tt class="class">object</tt> class implements both <tt class="method">__reduce__</tt> and
+<tt class="method">__reduce_ex__</tt>; however, if a subclass overrides
+<tt class="method">__reduce__</tt> but not <tt class="method">__reduce_ex__</tt>, the
+<tt class="method">__reduce_ex__</tt> implementation detects this and calls
+<tt class="method">__reduce__</tt>.
+
+<p>
+An alternative to implementing a <tt class="method">__reduce__()</tt> method on the
+object to be pickled, is to register the callable with the
+<tt class="module"><a href="module-copyreg.html">copy_reg</a></tt> module.  This module provides a way
+for programs to register ``reduction functions'' and constructors for
+user-defined types.   Reduction functions have the same semantics and
+interface as the <tt class="method">__reduce__()</tt> method described above, except
+that they are called with a single argument, the object to be pickled.
+
+<p>
+The registered constructor is deemed a ``safe constructor'' for purposes
+of unpickling as described above.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.5.1 pickling and unpickling"
+  href="pickle-inst.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1.5 the pickle protocol"
+  href="pickle-protocol.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.1.5.3 pickling and unpickling"
+  href="node321.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pickle-inst.html">13.1.5.1 Pickling and unpickling</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="pickle-protocol.html">13.1.5 The pickle protocol</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node321.html">13.1.5.3 Pickling and unpickling</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

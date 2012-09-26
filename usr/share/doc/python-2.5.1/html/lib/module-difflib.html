@@ -1,0 +1,537 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-StringIO.html" />
+<link rel="prev" href="module-struct.html" />
+<link rel="parent" href="strings.html" />
+<link rel="next" href="sequence-matcher.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.4 difflib -- Helpers for computing deltas</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.3.1 struct Objects"
+  href="struct-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.4.1 sequencematcher Objects"
+  href="sequence-matcher.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="struct-objects.html">4.3.1 Struct Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sequence-matcher.html">4.4.1 SequenceMatcher Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006400000000000000000">
+4.4 <tt class="module">difflib</tt> --
+         Helpers for computing deltas</a>
+</h1>
+
+<p>
+<a name="module-difflib"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.1.</span>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-455' xml:id='l2h-455' class="class">SequenceMatcher</tt></b>
+<dd>
+  This is a flexible class for comparing pairs of sequences of any
+  type, so long as the sequence elements are hashable.  The basic
+  algorithm predates, and is a little fancier than, an algorithm
+  published in the late 1980's by Ratcliff and Obershelp under the
+  hyperbolic name ``gestalt pattern matching.''  The idea is to find
+  the longest contiguous matching subsequence that contains no
+  ``junk'' elements (the Ratcliff and Obershelp algorithm doesn't
+  address junk).  The same idea is then applied recursively to the
+  pieces of the sequences to the left and to the right of the matching
+  subsequence.  This does not yield minimal edit sequences, but does
+  tend to yield matches that ``look right'' to people.
+
+<p>
+<strong>Timing:</strong> The basic Ratcliff-Obershelp algorithm is cubic
+  time in the worst case and quadratic time in the expected case.
+  <tt class="class">SequenceMatcher</tt> is quadratic time for the worst case and has
+  expected-case behavior dependent in a complicated way on how many
+  elements the sequences have in common; best case time is linear.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-456' xml:id='l2h-456' class="class">Differ</tt></b>
+<dd>
+  This is a class for comparing sequences of lines of text, and
+  producing human-readable differences or deltas.  Differ uses
+  <tt class="class">SequenceMatcher</tt> both to compare sequences of lines, and to
+  compare sequences of characters within similar (near-matching)
+  lines.
+
+<p>
+Each line of a <tt class="class">Differ</tt> delta begins with a two-letter code:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Code</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><code>'- '</code></td>
+        <td class="left"  >line unique to sequence 1</td></tr>
+    <tr><td class="left"   valign="baseline"><code>'+ '</code></td>
+        <td class="left"  >line unique to sequence 2</td></tr>
+    <tr><td class="left"   valign="baseline"><code>'  '</code></td>
+        <td class="left"  >line common to both sequences</td></tr>
+    <tr><td class="left"   valign="baseline"><code>'? '</code></td>
+        <td class="left"  >line not present in either input sequence</td></tr></tbody>
+</table></div>
+
+<p>
+Lines beginning with `<code>?&nbsp;</code>' attempt to guide the eye to
+  intraline differences, and were not present in either input
+  sequence. These lines can be confusing if the sequences contain tab
+  characters.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-457' xml:id='l2h-457' class="class">HtmlDiff</tt></b>
+<dd>
+
+<p>
+This class can be used to create an HTML table (or a complete HTML file
+  containing the table) showing a side by side, line by line comparison
+  of text with inter-line and intra-line change highlights.  The table can
+  be generated in either full or contextual difference mode.
+
+<p>
+The constructor for this class is:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-458' xml:id='l2h-458' class="function">__init__</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>tabsize</var><big>]</big><var></var><big>[</big><var>,
+    wrapcolumn</var><big>]</big><var></var><big>[</big><var>, linejunk</var><big>]</big><var></var><big>[</big><var>, charjunk</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Initializes instance of <tt class="class">HtmlDiff</tt>.
+
+<p>
+<var>tabsize</var> is an optional keyword argument to specify tab stop spacing
+    and defaults to <code>8</code>.
+
+<p>
+<var>wrapcolumn</var> is an optional keyword to specify column number where
+    lines are broken and wrapped, defaults to <code>None</code> where lines are not
+    wrapped.
+
+<p>
+<var>linejunk</var> and <var>charjunk</var> are optional keyword arguments passed
+    into <code>ndiff()</code> (used by <tt class="class">HtmlDiff</tt> to generate the
+    side by side HTML differences).  See <code>ndiff()</code> documentation for
+    argument default values and descriptions.
+
+<p>
+</dl>
+
+<p>
+The following methods are public:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-459' xml:id='l2h-459' class="function">make_file</tt></b>(</nobr></td>
+  <td><var>fromlines, tolines
+    </var><big>[</big><var>, fromdesc</var><big>]</big><var></var><big>[</big><var>, todesc</var><big>]</big><var></var><big>[</big><var>, context</var><big>]</big><var></var><big>[</big><var>,
+    numlines</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+    Compares <var>fromlines</var> and <var>tolines</var> (lists of strings) and returns
+    a string which is a complete HTML file containing a table showing line by
+    line differences with inter-line and intra-line changes highlighted.
+
+<p>
+<var>fromdesc</var> and <var>todesc</var> are optional keyword arguments to specify
+    from/to file column header strings (both default to an empty string).
+
+<p>
+<var>context</var> and <var>numlines</var> are both optional keyword arguments.
+    Set <var>context</var> to <code>True</code> when contextual differences are to be
+    shown, else the default is <code>False</code> to show the full files.
+    <var>numlines</var> defaults to <code>5</code>.  When <var>context</var> is <code>True</code>
+    <var>numlines</var> controls the number of context lines which surround the
+    difference highlights.  When <var>context</var> is <code>False</code> <var>numlines</var>
+    controls the number of lines which are shown before a difference
+    highlight when using the "next" hyperlinks (setting to zero would cause
+    the "next" hyperlinks to place the next difference highlight at the top of
+    the browser without any leading context).
+  </dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-460' xml:id='l2h-460' class="function">make_table</tt></b>(</nobr></td>
+  <td><var>fromlines, tolines
+    </var><big>[</big><var>, fromdesc</var><big>]</big><var></var><big>[</big><var>, todesc</var><big>]</big><var></var><big>[</big><var>, context</var><big>]</big><var></var><big>[</big><var>,
+    numlines</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+    Compares <var>fromlines</var> and <var>tolines</var> (lists of strings) and returns
+    a string which is a complete HTML table showing line by line differences
+    with inter-line and intra-line changes highlighted.
+
+<p>
+The arguments for this method are the same as those for the
+    <tt class="method">make_file()</tt> method.
+  </dl>
+
+<p>
+<span class="file">Tools/scripts/diff.py</span> is a command-line front-end to this class
+  and contains a good example of its use.
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-461' xml:id='l2h-461' class="function">context_diff</tt></b>(</nobr></td>
+  <td><var>a, b</var><big>[</big><var>, fromfile</var><big>]</big><var></var><big>[</big><var>,
+    tofile</var><big>]</big><var></var><big>[</big><var>, fromfiledate</var><big>]</big><var></var><big>[</big><var>, tofiledate</var><big>]</big><var></var><big>[</big><var>,
+    n</var><big>]</big><var></var><big>[</big><var>, lineterm</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Compare <var>a</var> and <var>b</var> (lists of strings); return a
+  delta (a generator generating the delta lines) in context diff
+  format.
+
+<p>
+Context diffs are a compact way of showing just the lines that have
+  changed plus a few lines of context.  The changes are shown in a
+  before/after style.  The number of context lines is set by <var>n</var>
+  which defaults to three.
+
+<p>
+By default, the diff control lines (those with <code>***</code> or <code>---</code>)
+  are created with a trailing newline.  This is helpful so that inputs created
+  from <tt class="function">file.readlines()</tt> result in diffs that are suitable for use
+  with <tt class="function">file.writelines()</tt> since both the inputs and outputs have
+  trailing newlines.
+
+<p>
+For inputs that do not have trailing newlines, set the <var>lineterm</var>
+  argument to <code>""</code> so that the output will be uniformly newline free.
+
+<p>
+The context diff format normally has a header for filenames and
+  modification times.  Any or all of these may be specified using strings for
+  <var>fromfile</var>, <var>tofile</var>, <var>fromfiledate</var>, and <var>tofiledate</var>.
+  The modification times are normally expressed in the format returned by
+  <tt class="function">time.ctime()</tt>.  If not specified, the strings default to blanks.
+
+<p>
+<span class="file">Tools/scripts/diff.py</span> is a command-line front-end for this
+  function.
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-462' xml:id='l2h-462' class="function">get_close_matches</tt></b>(</nobr></td>
+  <td><var>word, possibilities</var><big>[</big><var>,
+                 n</var><big>]</big><var></var><big>[</big><var>, cutoff</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return a list of the best ``good enough'' matches.  <var>word</var> is a
+  sequence for which close matches are desired (typically a string),
+  and <var>possibilities</var> is a list of sequences against which to
+  match <var>word</var> (typically a list of strings).
+
+<p>
+Optional argument <var>n</var> (default <code>3</code>) is the maximum number
+  of close matches to return; <var>n</var> must be greater than <code>0</code>.
+
+<p>
+Optional argument <var>cutoff</var> (default <code>0.6</code>) is a float in
+  the range [0, 1].  Possibilities that don't score at least that
+  similar to <var>word</var> are ignored.
+
+<p>
+The best (no more than <var>n</var>) matches among the possibilities are
+  returned in a list, sorted by similarity score, most similar first.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; get_close_matches('appel', ['ape', 'apple', 'peach', 'puppy'])
+['apple', 'ape']
+&gt;&gt;&gt; import keyword
+&gt;&gt;&gt; get_close_matches('wheel', keyword.kwlist)
+['while']
+&gt;&gt;&gt; get_close_matches('apple', keyword.kwlist)
+[]
+&gt;&gt;&gt; get_close_matches('accept', keyword.kwlist)
+['except']
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-463' xml:id='l2h-463' class="function">ndiff</tt></b>(</nobr></td>
+  <td><var>a, b</var><big>[</big><var>, linejunk</var><big>]</big><var></var><big>[</big><var>, charjunk</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Compare <var>a</var> and <var>b</var> (lists of strings); return a
+  <tt class="class">Differ</tt>-style delta (a generator generating the delta lines).
+
+<p>
+Optional keyword parameters <var>linejunk</var> and <var>charjunk</var> are
+  for filter functions (or <code>None</code>):
+
+<p>
+<var>linejunk</var>: A function that accepts a single string
+  argument, and returns true if the string is junk, or false if not.
+  The default is (<code>None</code>), starting with Python 2.3.  Before then,
+  the default was the module-level function
+  <tt class="function">IS_LINE_JUNK()</tt>, which filters out lines without visible
+  characters, except for at most one pound character ("<tt class="character">#</tt>").
+  As of Python 2.3, the underlying <tt class="class">SequenceMatcher</tt> class
+  does a dynamic analysis of which lines are so frequent as to
+  constitute noise, and this usually works better than the pre-2.3
+  default.
+
+<p>
+<var>charjunk</var>: A function that accepts a character (a string of
+  length 1), and returns if the character is junk, or false if not.
+  The default is module-level function <tt class="function">IS_CHARACTER_JUNK()</tt>,
+  which filters out whitespace characters (a blank or tab; note: bad
+  idea to include newline in this!).
+
+<p>
+<span class="file">Tools/scripts/ndiff.py</span> is a command-line front-end to this
+  function.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; diff = ndiff('one\ntwo\nthree\n'.splitlines(1),
+...              'ore\ntree\nemu\n'.splitlines(1))
+&gt;&gt;&gt; print ''.join(diff),
+- one
+?  ^
++ ore
+?  ^
+- two
+- three
+?  -
++ tree
++ emu
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-464' xml:id='l2h-464' class="function">restore</tt></b>(</nobr></td>
+  <td><var>sequence, which</var>)</td></tr></table></dt>
+<dd>
+  Return one of the two sequences that generated a delta.
+
+<p>
+Given a <var>sequence</var> produced by <tt class="method">Differ.compare()</tt> or
+  <tt class="function">ndiff()</tt>, extract lines originating from file 1 or 2
+  (parameter <var>which</var>), stripping off line prefixes.
+
+<p>
+Example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; diff = ndiff('one\ntwo\nthree\n'.splitlines(1),
+...              'ore\ntree\nemu\n'.splitlines(1))
+&gt;&gt;&gt; diff = list(diff) # materialize the generated delta into a list
+&gt;&gt;&gt; print ''.join(restore(diff, 1)),
+one
+two
+three
+&gt;&gt;&gt; print ''.join(restore(diff, 2)),
+ore
+tree
+emu
+</pre></div>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-465' xml:id='l2h-465' class="function">unified_diff</tt></b>(</nobr></td>
+  <td><var>a, b</var><big>[</big><var>, fromfile</var><big>]</big><var></var><big>[</big><var>,
+    tofile</var><big>]</big><var></var><big>[</big><var>, fromfiledate</var><big>]</big><var></var><big>[</big><var>, tofiledate</var><big>]</big><var></var><big>[</big><var>,
+    n</var><big>]</big><var></var><big>[</big><var>, lineterm</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Compare <var>a</var> and <var>b</var> (lists of strings); return a
+  delta (a generator generating the delta lines) in unified diff
+  format.
+
+<p>
+Unified diffs are a compact way of showing just the lines that have
+  changed plus a few lines of context.  The changes are shown in a
+  inline style (instead of separate before/after blocks).  The number
+  of context lines is set by <var>n</var> which defaults to three.
+
+<p>
+By default, the diff control lines (those with <code>---</code>, <code>+++</code>,
+  or <code>@@</code>) are created with a trailing newline.  This is helpful so
+  that inputs created from <tt class="function">file.readlines()</tt> result in diffs
+  that are suitable for use with <tt class="function">file.writelines()</tt> since both
+  the inputs and outputs have trailing newlines.
+
+<p>
+For inputs that do not have trailing newlines, set the <var>lineterm</var>
+  argument to <code>""</code> so that the output will be uniformly newline free.
+
+<p>
+The context diff format normally has a header for filenames and
+  modification times.  Any or all of these may be specified using strings for
+  <var>fromfile</var>, <var>tofile</var>, <var>fromfiledate</var>, and <var>tofiledate</var>.
+  The modification times are normally expressed in the format returned by
+  <tt class="function">time.ctime()</tt>.  If not specified, the strings default to blanks.
+
+<p>
+<span class="file">Tools/scripts/diff.py</span> is a command-line front-end for this
+  function.
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-466' xml:id='l2h-466' class="function">IS_LINE_JUNK</tt></b>(</nobr></td>
+  <td><var>line</var>)</td></tr></table></dt>
+<dd>
+  Return true for ignorable lines.  The line <var>line</var> is ignorable
+  if <var>line</var> is blank or contains a single "<tt class="character">#</tt>",
+  otherwise it is not ignorable.  Used as a default for parameter
+  <var>linejunk</var> in <tt class="function">ndiff()</tt> before Python 2.3.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-467' xml:id='l2h-467' class="function">IS_CHARACTER_JUNK</tt></b>(</nobr></td>
+  <td><var>ch</var>)</td></tr></table></dt>
+<dd>
+  Return true for ignorable characters.  The character <var>ch</var> is
+  ignorable if <var>ch</var> is a space or tab, otherwise it is not
+  ignorable.  Used as a default for parameter <var>charjunk</var> in
+  <tt class="function">ndiff()</tt>.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://www.ddj.com/documents/s=1103/ddj8807c/"
+        >Pattern Matching: The Gestalt Approach</a></em></dt>
+    <dd>Discussion of a
+            similar algorithm by John W. Ratcliff and D. E. Metzener.
+            This was published in
+            <em class="citetitle"><a
+ href="http://www.ddj.com/"
+ title="Dr. Dobb's Journal"
+ >Dr. Dobb's Journal</a></em> in
+            July, 1988.</dd>
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="sequence-matcher.html">4.4.1 SequenceMatcher Objects</a>
+<li><a href="sequencematcher-examples.html">4.4.2 SequenceMatcher Examples</a>
+<li><a href="differ-objects.html">4.4.3 Differ Objects</a>
+<li><a href="differ-examples.html">4.4.4 Differ Example</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.3.1 struct Objects"
+  href="struct-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.4.1 sequencematcher Objects"
+  href="sequence-matcher.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="struct-objects.html">4.3.1 Struct Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sequence-matcher.html">4.4.1 SequenceMatcher Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

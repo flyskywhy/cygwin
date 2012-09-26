@@ -1,0 +1,40 @@
+// Names Library interface in PIDL, 
+// CORBAservices p 3- 14, Naming Service V1.0 3/94 
+
+#include "name.h"
+
+interface LNameComponent {  // PIDL
+        exception NotSet{};
+        string get_id() 
+                raises(NotSet);
+        void set_id(in string i);
+        string get_kind() 
+                raises(NotSet);
+        void set_kind(in string k);
+        void destroy();
+};
+
+interface LName {  // PIDL
+        exception NoComponent{};
+        exception OverFlow{};
+        exception InvalidName{};                                
+        LName insert_component(in unsigned long i, 
+                                        in LNameComponent n) 
+                        raises(NoComponent, OverFlow);
+        LNameComponent get_component(in unsigned long i)
+                 raises(NoComponent);                           
+        LNameComponent delete_component(in unsigned long i)
+                 raises(NoComponent);                           
+        unsigned long num_components();
+        boolean equal(in LName ln);
+        boolean less_than(in LName ln);
+        CosNaming::Name to_idl_form()
+                        raises(InvalidName);                             
+        void from_idl_form(in CosNaming::Name n);
+        void destroy();
+};
+
+// This is C/C++
+// LName create_lname(); 
+// LNameComponent create_lname_component();
+

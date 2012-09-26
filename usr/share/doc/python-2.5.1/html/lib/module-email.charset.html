@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-email.encoders.html" />
+<link rel="prev" href="module-email.header.html" />
+<link rel="parent" href="module-email.html" />
+<link rel="next" href="module-email.encoders.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.1.6 Representing character sets</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.5 internationalized headers"
+  href="module-email.header.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.7 Encoders"
+  href="module-email.encoders.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.header.html">7.1.5 Internationalized headers</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.encoders.html">7.1.7 Encoders</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009160000000000000000">
+7.1.6 Representing character sets</a>
+</h2>
+<a name="module-email.charset"></a>
+
+<p>
+This module provides a class <tt class="class">Charset</tt> for representing
+character sets and character set conversions in email messages, as
+well as a character set registry and several convenience methods for
+manipulating this registry.  Instances of <tt class="class">Charset</tt> are used in
+several other modules within the <tt class="module">email</tt> package.
+
+<p>
+Import this class from the <tt class="module">email.charset</tt> module.
+
+<p>
+
+<span class="versionnote">New in version 2.2.2.</span>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1281' xml:id='l2h-1281' class="class">Charset</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>input_charset</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Map character sets to their email properties.
+
+<p>
+This class provides information about the requirements imposed on
+email for a specific character set.  It also provides convenience
+routines for converting between character sets, given the availability
+of the applicable codecs.  Given a character set, it will do its best
+to provide information on how to use that character set in an email
+message in an RFC-compliant way.
+
+<p>
+Certain character sets must be encoded with quoted-printable or base64
+when used in email headers or bodies.  Certain character sets must be
+converted outright, and are not allowed in email.
+
+<p>
+Optional <var>input_charset</var> is as described below; it is always
+coerced to lower case.  After being alias normalized it is also used
+as a lookup into the registry of character sets to find out the header
+encoding, body encoding, and output conversion codec to be used for
+the character set.  For example, if
+<var>input_charset</var> is <code>iso-8859-1</code>, then headers and bodies will
+be encoded using quoted-printable and no output conversion codec is
+necessary.  If <var>input_charset</var> is <code>euc-jp</code>, then headers will
+be encoded with base64, bodies will not be encoded, but output text
+will be converted from the <code>euc-jp</code> character set to the
+<code>iso-2022-jp</code> character set.
+</dl>
+
+<p>
+<tt class="class">Charset</tt> instances have the following data attributes:
+
+<p>
+<dl><dt><b><tt id='l2h-1282' xml:id='l2h-1282'>input_charset</tt></b></dt>
+<dd>
+The initial character set specified.  Common aliases are converted to
+their <em>official</em> email names (e.g. <code>latin_1</code> is converted to
+<code>iso-8859-1</code>).  Defaults to 7-bit <code>us-ascii</code>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1283' xml:id='l2h-1283'>header_encoding</tt></b></dt>
+<dd>
+If the character set must be encoded before it can be used in an
+email header, this attribute will be set to <code>Charset.QP</code> (for
+quoted-printable), <code>Charset.BASE64</code> (for base64 encoding), or
+<code>Charset.SHORTEST</code> for the shortest of QP or BASE64 encoding.
+Otherwise, it will be <code>None</code>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1284' xml:id='l2h-1284'>body_encoding</tt></b></dt>
+<dd>
+Same as <var>header_encoding</var>, but describes the encoding for the
+mail message's body, which indeed may be different than the header
+encoding.  <code>Charset.SHORTEST</code> is not allowed for
+<var>body_encoding</var>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1285' xml:id='l2h-1285'>output_charset</tt></b></dt>
+<dd>
+Some character sets must be converted before they can be used in
+email headers or bodies.  If the <var>input_charset</var> is one of
+them, this attribute will contain the name of the character set
+output will be converted to.  Otherwise, it will be <code>None</code>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1286' xml:id='l2h-1286'>input_codec</tt></b></dt>
+<dd>
+The name of the Python codec used to convert the <var>input_charset</var> to
+Unicode.  If no conversion codec is necessary, this attribute will be
+<code>None</code>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1287' xml:id='l2h-1287'>output_codec</tt></b></dt>
+<dd>
+The name of the Python codec used to convert Unicode to the
+<var>output_charset</var>.  If no conversion codec is necessary, this
+attribute will have the same value as the <var>input_codec</var>.
+</dd></dl>
+
+<p>
+<tt class="class">Charset</tt> instances also have the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1288' xml:id='l2h-1288' class="method">get_body_encoding</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the content transfer encoding used for body encoding.
+
+<p>
+This is either the string "<tt class="samp">quoted-printable</tt>" or "<tt class="samp">base64</tt>"depending on the encoding used, or it is a function, in which case you
+should call the function with a single argument, the Message object
+being encoded.  The function should then set the
+<span class="mailheader">Content-Transfer-Encoding:</span> header itself to whatever is
+appropriate.
+
+<p>
+Returns the string "<tt class="samp">quoted-printable</tt>" if
+<var>body_encoding</var> is <code>QP</code>, returns the string
+"<tt class="samp">base64</tt>" if <var>body_encoding</var> is <code>BASE64</code>, and returns the
+string "<tt class="samp">7bit</tt>" otherwise.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1289' xml:id='l2h-1289' class="method">convert</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Convert the string <var>s</var> from the <var>input_codec</var> to the
+<var>output_codec</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1290' xml:id='l2h-1290' class="method">to_splittable</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Convert a possibly multibyte string to a safely splittable format.
+<var>s</var> is the string to split.
+
+<p>
+Uses the <var>input_codec</var> to try and convert the string to Unicode,
+so it can be safely split on character boundaries (even for multibyte
+characters).
+
+<p>
+Returns the string as-is if it isn't known how to convert <var>s</var> to
+Unicode with the <var>input_charset</var>.
+
+<p>
+Characters that could not be converted to Unicode will be replaced
+with the Unicode replacement character "<tt class="character">U+FFFD</tt>".
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1291' xml:id='l2h-1291' class="method">from_splittable</tt></b>(</nobr></td>
+  <td><var>ustr</var><big>[</big><var>, to_output</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Convert a splittable string back into an encoded string.  <var>ustr</var>
+is a Unicode string to ``unsplit''.
+
+<p>
+This method uses the proper codec to try and convert the string from
+Unicode back into an encoded format.  Return the string as-is if it is
+not Unicode, or if it could not be converted from Unicode.
+
+<p>
+Characters that could not be converted from Unicode will be replaced
+with an appropriate character (usually "<tt class="character">?</tt>").
+
+<p>
+If <var>to_output</var> is <code>True</code> (the default), uses
+<var>output_codec</var> to convert to an 
+encoded format.  If <var>to_output</var> is <code>False</code>, it uses
+<var>input_codec</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1292' xml:id='l2h-1292' class="method">get_output_charset</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the output character set.
+
+<p>
+This is the <var>output_charset</var> attribute if that is not <code>None</code>,
+otherwise it is <var>input_charset</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1293' xml:id='l2h-1293' class="method">encoded_header_len</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the length of the encoded header string, properly calculating
+for quoted-printable or base64 encoding.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1294' xml:id='l2h-1294' class="method">header_encode</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, convert</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Header-encode the string <var>s</var>.
+
+<p>
+If <var>convert</var> is <code>True</code>, the string will be converted from the
+input charset to the output charset automatically.  This is not useful
+for multibyte character sets, which have line length issues (multibyte
+characters must be split on a character, not a byte boundary); use the
+higher-level <tt class="class">Header</tt> class to deal with these issues (see
+<tt class="module"><a href="module-email.header.html">email.header</a></tt>).  <var>convert</var> defaults to <code>False</code>.
+
+<p>
+The type of encoding (base64 or quoted-printable) will be based on
+the <var>header_encoding</var> attribute.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1295' xml:id='l2h-1295' class="method">body_encode</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, convert</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Body-encode the string <var>s</var>.
+
+<p>
+If <var>convert</var> is <code>True</code> (the default), the string will be
+converted from the input charset to output charset automatically.
+Unlike <tt class="method">header_encode()</tt>, there are no issues with byte
+boundaries and multibyte charsets in email bodies, so this is usually
+pretty safe.
+
+<p>
+The type of encoding (base64 or quoted-printable) will be based on
+the <var>body_encoding</var> attribute.
+</dl>
+
+<p>
+The <tt class="class">Charset</tt> class also provides a number of methods to support
+standard operations and built-in functions.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1296' xml:id='l2h-1296' class="method">__str__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns <var>input_charset</var> as a string coerced to lower case.
+<tt class="method">__repr__()</tt> is an alias for <tt class="method">__str__()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1297' xml:id='l2h-1297' class="method">__eq__</tt></b>(</nobr></td>
+  <td><var>other</var>)</td></tr></table></dt>
+<dd>
+This method allows you to compare two <tt class="class">Charset</tt> instances for equality.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1298' xml:id='l2h-1298' class="method">__ne__</tt></b>(</nobr></td>
+  <td><var>other</var>)</td></tr></table></dt>
+<dd>
+This method allows you to compare two <tt class="class">Charset</tt> instances for inequality.
+</dl>
+
+<p>
+The <tt class="module">email.charset</tt> module also provides the following
+functions for adding new entries to the global character set, alias,
+and codec registries:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1299' xml:id='l2h-1299' class="function">add_charset</tt></b>(</nobr></td>
+  <td><var>charset</var><big>[</big><var>, header_enc</var><big>[</big><var>,
+    body_enc</var><big>[</big><var>, output_charset</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Add character properties to the global registry.
+
+<p>
+<var>charset</var> is the input character set, and must be the canonical
+name of a character set.
+
+<p>
+Optional <var>header_enc</var> and <var>body_enc</var> is either
+<code>Charset.QP</code> for quoted-printable, <code>Charset.BASE64</code> for
+base64 encoding, <code>Charset.SHORTEST</code> for the shortest of
+quoted-printable or base64 encoding, or <code>None</code> for no encoding.
+<code>SHORTEST</code> is only valid for <var>header_enc</var>. The default is
+<code>None</code> for no encoding.
+
+<p>
+Optional <var>output_charset</var> is the character set that the output
+should be in.  Conversions will proceed from input charset, to
+Unicode, to the output charset when the method
+<tt class="method">Charset.convert()</tt> is called.  The default is to output in the
+same character set as the input.
+
+<p>
+Both <var>input_charset</var> and <var>output_charset</var> must have Unicode
+codec entries in the module's character set-to-codec mapping; use
+<tt class="function">add_codec()</tt> to add codecs the module does
+not know about.  See the <tt class="module"><a href="module-codecs.html">codecs</a></tt> module's documentation for
+more information.
+
+<p>
+The global character set registry is kept in the module global
+dictionary <code>CHARSETS</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1300' xml:id='l2h-1300' class="function">add_alias</tt></b>(</nobr></td>
+  <td><var>alias, canonical</var>)</td></tr></table></dt>
+<dd>
+Add a character set alias.  <var>alias</var> is the alias name,
+e.g. <code>latin-1</code>.  <var>canonical</var> is the character set's canonical
+name, e.g. <code>iso-8859-1</code>.
+
+<p>
+The global charset alias registry is kept in the module global
+dictionary <code>ALIASES</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1301' xml:id='l2h-1301' class="function">add_codec</tt></b>(</nobr></td>
+  <td><var>charset, codecname</var>)</td></tr></table></dt>
+<dd>
+Add a codec that map characters in the given character set to and from
+Unicode.
+
+<p>
+<var>charset</var> is the canonical name of a character set.
+<var>codecname</var> is the name of a Python codec, as appropriate for the
+second argument to the <tt class="function">unicode()</tt> built-in, or to the
+<tt class="method">encode()</tt> method of a Unicode string.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.5 internationalized headers"
+  href="module-email.header.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.7 Encoders"
+  href="module-email.encoders.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.header.html">7.1.5 Internationalized headers</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.encoders.html">7.1.7 Encoders</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

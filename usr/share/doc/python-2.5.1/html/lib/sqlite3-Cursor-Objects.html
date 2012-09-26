@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="sqlite3-Types.html" />
+<link rel="prev" href="sqlite3-Connection-Objects.html" />
+<link rel="parent" href="module-sqlite3.html" />
+<link rel="next" href="sqlite3-Types.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.13.3 Cursor Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.2 connection Objects"
+  href="sqlite3-Connection-Objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13 sqlite3  "
+  href="module-sqlite3.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.4 sqlite and Python"
+  href="sqlite3-Types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="sqlite3-Connection-Objects.html">13.13.2 Connection Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sqlite3.html">13.13 sqlite3  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sqlite3-Types.html">13.13.4 SQLite and Python</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00151330000000000000000"></a><a name="sqlite3-Cursor-Objects"></a>
+<br>
+13.13.3 Cursor Objects 
+</h2>
+
+<p>
+A <tt class="class">Cursor</tt> instance has the following attributes and methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2572' xml:id='l2h-2572' class="method">execute</tt></b>(</nobr></td>
+  <td><var>sql, </var><big>[</big><var>parameters</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Executes a SQL statement. The SQL statement may be parametrized (i. e.
+placeholders instead of SQL literals). The <tt class="module">sqlite3</tt> module supports two kinds of
+placeholders: question marks (qmark style) and named placeholders (named
+style).
+
+<p>
+This example shows how to use parameters with qmark style:
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+
+con = sqlite3.connect("mydb")
+
+cur = con.cursor()
+
+who = "Yeltsin"
+age = 72
+
+cur.execute("select name_last, age from people where name_last=? and age=?", (who, age))
+print cur.fetchone()
+</pre>
+<div class="footer">
+<a href="execute_1.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/execute_1.py</span>).</a>
+</div></div>
+
+<p>
+This example shows how to use the named style:
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+
+con = sqlite3.connect("mydb")
+
+cur = con.cursor()
+
+who = "Yeltsin"
+age = 72
+
+cur.execute("select name_last, age from people where name_last=:who and age=:age",
+    {"who": who, "age": age})
+print cur.fetchone()
+</pre>
+<div class="footer">
+<a href="execute_2.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/execute_2.py</span>).</a>
+</div></div>
+
+<p>
+<tt class="method">execute()</tt> will only execute a single SQL statement. If you try to
+    execute more than one statement with it, it will raise a Warning. Use
+    <tt class="method">executescript()</tt> if you want to execute multiple SQL statements with one
+    call.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2573' xml:id='l2h-2573' class="method">executemany</tt></b>(</nobr></td>
+  <td><var>sql, seq_of_parameters</var>)</td></tr></table></dt>
+<dd>
+Executes a SQL command against all parameter sequences or mappings found in the
+sequence <var>sql</var>. The <tt class="module">sqlite3</tt> module also allows
+using an iterator yielding parameters instead of a sequence.
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+
+class IterChars:
+    def __init__(self):
+        self.count = ord('a')
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.count &gt; ord('z'):
+            raise StopIteration
+        self.count += 1
+        return (chr(self.count - 1),) # this is a 1-tuple
+
+con = sqlite3.connect(":memory:")
+cur = con.cursor()
+cur.execute("create table characters(c)")
+
+theIter = IterChars()
+cur.executemany("insert into characters(c) values (?)", theIter)
+
+cur.execute("select c from characters")
+print cur.fetchall()
+</pre>
+<div class="footer">
+<a href="executemany_1.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/executemany_1.py</span>).</a>
+</div></div>
+
+<p>
+Here's a shorter example using a generator:
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+
+def char_generator():
+    import string
+    for c in string.letters[:26]:
+        yield (c,)
+
+con = sqlite3.connect(":memory:")
+cur = con.cursor()
+cur.execute("create table characters(c)")
+
+cur.executemany("insert into characters(c) values (?)", char_generator())
+
+cur.execute("select c from characters")
+print cur.fetchall()
+</pre>
+<div class="footer">
+<a href="executemany_2.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/executemany_2.py</span>).</a>
+</div></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2574' xml:id='l2h-2574' class="method">executescript</tt></b>(</nobr></td>
+  <td><var>sql_script</var>)</td></tr></table></dt>
+<dd>
+
+<p>
+This is a nonstandard convenience method for executing multiple SQL statements
+at once. It issues a COMMIT statement first, then executes the SQL script it
+gets as a parameter.
+
+<p>
+<var>sql_script</var> can be a bytestring or a Unicode string.
+
+<p>
+Example:
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+
+con = sqlite3.connect(":memory:")
+cur = con.cursor()
+cur.executescript("""
+    create table person(
+        firstname,
+        lastname,
+        age
+    );
+
+    create table book(
+        title,
+        author,
+        published
+    );
+
+    insert into book(title, author, published)
+    values (
+        'Dirk Gently''s Holistic Detective Agency',
+        'Douglas Adams',
+        1987
+    );
+    """)
+</pre>
+<div class="footer">
+<a href="executescript.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/executescript.py</span>).</a>
+</div></div>
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2575' xml:id='l2h-2575' class="member">rowcount</tt></b></dt>
+<dd>
+  Although the <tt class="class">Cursor</tt> class of the <tt class="module">sqlite3</tt> module implements this
+  attribute, the database engine's own support for the determination of "rows
+  affected"/"rows selected" is quirky.
+
+<p>
+For <code>SELECT</code> statements, <tt class="member">rowcount</tt> is always None because we cannot
+  determine the number of rows a query produced until all rows were fetched.
+
+<p>
+For <code>DELETE</code> statements, SQLite reports <tt class="member">rowcount</tt> as 0 if you make a
+  <code>DELETE FROM table</code> without any condition.
+
+<p>
+For <tt class="method">executemany</tt> statements, the number of modifications are summed
+  up into <tt class="member">rowcount</tt>.
+
+<p>
+As required by the Python DB API Spec, the <tt class="member">rowcount</tt> attribute "is -1
+  in case no executeXX() has been performed on the cursor or the rowcount
+  of the last operation is not determinable by the interface".
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.2 connection Objects"
+  href="sqlite3-Connection-Objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13 sqlite3  "
+  href="module-sqlite3.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.4 sqlite and Python"
+  href="sqlite3-Types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="sqlite3-Connection-Objects.html">13.13.2 Connection Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sqlite3.html">13.13 sqlite3  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sqlite3-Types.html">13.13.4 SQLite and Python</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

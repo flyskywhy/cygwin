@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="weakref-support.html" />
+<link rel="prev" href="node32.html" />
+<link rel="parent" href="dnt-type-methods.html" />
+<link rel="next" href="weakref-support.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.2.5 Abstract Protocol Support</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.4 object Comparison"
+  href="node32.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.6 weak Reference Support"
+  href="weakref-support.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node32.html">2.2.4 Object Comparison</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-support.html">2.2.6 Weak Reference Support</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004250000000000000000">
+2.2.5 Abstract Protocol Support</a>
+</h2>
+
+<p>
+Python supports a variety of <em>abstract</em> `protocols;' the specific
+interfaces provided to use these interfaces are documented in the
+<em class="citetitle"><a
+ href="../api/api.html"
+ title="Python/C API Reference Manual"
+ >Python/C API Reference Manual</a></em> in the
+chapter ``<a class="ulink" href="../api/abstract.html"
+  >Abstract Objects Layer</a>.''
+
+<p>
+A number of these abstract interfaces were defined early in the
+development of the Python implementation.  In particular, the number,
+mapping, and sequence protocols have been part of Python since the
+beginning.  Other protocols have been added over time.  For protocols
+which depend on several handler routines from the type implementation,
+the older protocols have been defined as optional blocks of handlers
+referenced by the type object.  For newer protocols there are
+additional slots in the main type object, with a flag bit being set to
+indicate that the slots are present and should be checked by the
+interpreter.  (The flag bit does not indicate that the slot values are
+non-<tt class="constant">NULL</tt>. The flag may be set to indicate the presence of a slot,
+but a slot may still be unfilled.)
+
+<p>
+<div class="verbatim"><pre>
+    PyNumberMethods   tp_as_number;
+    PySequenceMethods tp_as_sequence;
+    PyMappingMethods  tp_as_mapping;
+</pre></div>
+
+<p>
+If you wish your object to be able to act like a number, a sequence,
+or a mapping object, then you place the address of a structure that
+implements the C type <tt class="ctype">PyNumberMethods</tt>,
+<tt class="ctype">PySequenceMethods</tt>, or <tt class="ctype">PyMappingMethods</tt>, respectively.
+It is up to you to fill in this structure with appropriate values. You
+can find examples of the use of each of these in the <span class="file">Objects</span>
+directory of the Python source distribution.
+
+<p>
+<div class="verbatim"><pre>
+    hashfunc tp_hash;
+</pre></div>
+
+<p>
+This function, if you choose to provide it, should return a hash
+number for an instance of your data type. Here is a moderately
+pointless example:
+
+<p>
+<div class="verbatim"><pre>
+static long
+newdatatype_hash(newdatatypeobject *obj)
+{
+    long result;
+    result = obj-&gt;obj_UnderlyingDatatypePtr-&gt;size;
+    result = result * 3;
+    return result;
+}
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+    ternaryfunc tp_call;
+</pre></div>
+
+<p>
+This function is called when an instance of your data type is "called",
+for example, if <code>obj1</code> is an instance of your data type and the Python
+script contains <code>obj1('hello')</code>, the <tt class="member">tp_call</tt> handler is
+invoked.
+
+<p>
+This function takes three arguments:
+
+<p>
+
+<ol>
+<li><var>arg1</var> is the instance of the data type which is the subject of
+    the call. If the call is <code>obj1('hello')</code>, then <var>arg1</var> is
+    <code>obj1</code>.
+
+<p>
+</li>
+<li><var>arg2</var> is a tuple containing the arguments to the call.  You
+    can use <tt class="cfunction">PyArg_ParseTuple()</tt> to extract the arguments.
+
+<p>
+</li>
+<li><var>arg3</var> is a dictionary of keyword arguments that were passed.
+    If this is non-<tt class="constant">NULL</tt> and you support keyword arguments, use
+    <tt class="cfunction">PyArg_ParseTupleAndKeywords()</tt> to extract the
+    arguments.  If you do not want to support keyword arguments and
+    this is non-<tt class="constant">NULL</tt>, raise a <tt class="exception">TypeError</tt> with a message
+    saying that keyword arguments are not supported.
+</li>
+</ol>
+
+<p>
+Here is a desultory example of the implementation of the call function.
+
+<p>
+<div class="verbatim"><pre>
+/* Implement the call function.
+ *    obj1 is the instance receiving the call.
+ *    obj2 is a tuple containing the arguments to the call, in this
+ *         case 3 strings.
+ */
+static PyObject *
+newdatatype_call(newdatatypeobject *obj, PyObject *args, PyObject *other)
+{
+    PyObject *result;
+    char *arg1;
+    char *arg2;
+    char *arg3;
+
+    if (!PyArg_ParseTuple(args, "sss:call", &amp;arg1, &amp;arg2, &amp;arg3)) {
+        return NULL;
+    }
+    result = PyString_FromFormat(
+        "Returning -- value: [\%d] arg1: [\%s] arg2: [\%s] arg3: [\%s]\n",
+        obj-&gt;obj_UnderlyingDatatypePtr-&gt;size,
+        arg1, arg2, arg3);
+    printf("\%s", PyString_AS_STRING(result));
+    return result;
+}
+</pre></div>
+
+<p>
+XXX some fields need to be added here...
+
+<p>
+<div class="verbatim"><pre>
+    /* Added in release 2.2 */
+    /* Iterators */
+    getiterfunc tp_iter;
+    iternextfunc tp_iternext;
+</pre></div>
+
+<p>
+These functions provide support for the iterator protocol.  Any object
+which wishes to support iteration over its contents (which may be
+generated during iteration) must implement the <code>tp_iter</code>
+handler.  Objects which are returned by a <code>tp_iter</code> handler must
+implement both the <code>tp_iter</code> and <code>tp_iternext</code> handlers.
+Both handlers take exactly one parameter, the instance for which they
+are being called, and return a new reference.  In the case of an
+error, they should set an exception and return <tt class="constant">NULL</tt>.
+
+<p>
+For an object which represents an iterable collection, the
+<code>tp_iter</code> handler must return an iterator object.  The iterator
+object is responsible for maintaining the state of the iteration.  For
+collections which can support multiple iterators which do not
+interfere with each other (as lists and tuples do), a new iterator
+should be created and returned.  Objects which can only be iterated
+over once (usually due to side effects of iteration) should implement
+this handler by returning a new reference to themselves, and should
+also implement the <code>tp_iternext</code> handler.  File objects are an
+example of such an iterator.
+
+<p>
+Iterator objects should implement both handlers.  The <code>tp_iter</code>
+handler should return a new reference to the iterator (this is the
+same as the <code>tp_iter</code> handler for objects which can only be
+iterated over destructively).  The <code>tp_iternext</code> handler should
+return a new reference to the next object in the iteration if there is
+one.  If the iteration has reached the end, it may return <tt class="constant">NULL</tt>
+without setting an exception or it may set <tt class="exception">StopIteration</tt>;
+avoiding the exception can yield slightly better performance.  If an
+actual error occurs, it should set an exception and return <tt class="constant">NULL</tt>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.4 object Comparison"
+  href="node32.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.6 weak Reference Support"
+  href="weakref-support.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node32.html">2.2.4 Object Comparison</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-support.html">2.2.6 Weak Reference Support</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

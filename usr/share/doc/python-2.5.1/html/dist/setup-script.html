@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="setup-config.html" />
+<link rel="prev" href="intro.html" />
+<link rel="parent" href="dist.html" />
+<link rel="next" href="listing-packages.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2. Writing the Setup Script</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.4 distutils-specific terminology"
+  href="distutils-term.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Distributing python Modules"
+  href="dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1 listing whole packages"
+  href="listing-packages.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="distutils-term.html">1.4 Distutils-specific terminology</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dist.html">Distributing Python Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="listing-packages.html">2.1 Listing whole packages</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION002000000000000000000"></a>
+<a name="setup-script"></a>
+<br>
+2. Writing the Setup Script
+</h1>
+
+<p>
+The setup script is the centre of all activity in building,
+distributing, and installing modules using the Distutils.  The main
+purpose of the setup script is to describe your module distribution to
+the Distutils, so that the various commands that operate on your modules
+do the right thing.  As we saw in section&nbsp;<a href="simple-example.html#simple-example">1.2</a> above,
+the setup script consists mainly of a call to <tt class="function">setup()</tt>, and
+most information supplied to the Distutils by the module developer is
+supplied as keyword arguments to <tt class="function">setup()</tt>.
+
+<p>
+Here's a slightly more involved example, which we'll follow for the next
+couple of sections: the Distutils' own setup script.  (Keep in mind that
+although the Distutils are included with Python 1.6 and later, they also
+have an independent existence so that Python 1.5.2 users can use them to
+install other module distributions.  The Distutils' own setup script,
+shown here, is used to install the package into Python 1.5.2.)
+
+<p>
+<div class="verbatim"><pre>
+#!/usr/bin/env python
+
+from distutils.core import setup
+
+setup(name='Distutils',
+      version='1.0',
+      description='Python Distribution Utilities',
+      author='Greg Ward',
+      author_email='gward@python.net',
+      url='http://www.python.org/sigs/distutils-sig/',
+      packages=['distutils', 'distutils.command'],
+     )
+</pre></div>
+
+<p>
+There are only two differences between this and the trivial one-file
+distribution presented in section&nbsp;<a href="simple-example.html#simple-example">1.2</a>: more
+metadata, and the specification of pure Python modules by package,
+rather than by module.  This is important since the Distutils consist of
+a couple of dozen modules split into (so far) two packages; an explicit
+list of every module would be tedious to generate and difficult to
+maintain.  For more information on the additional meta-data, see
+section&nbsp;<a href="meta-data.html#meta-data">2.8</a>.
+
+<p>
+Note that any pathnames (files or directories) supplied in the setup
+script should be written using the <span class="Unix">Unix</span> convention, i.e.
+slash-separated.  The Distutils will take care of converting this
+platform-neutral representation into whatever is appropriate on your
+current platform before actually using the pathname.  This makes your
+setup script portable across operating systems, which of course is one
+of the major goals of the Distutils.  In this spirit, all pathnames in
+this document are slash-separated.  (Mac OS 9 programmers should keep in
+mind that the <em>absence</em> of a leading slash indicates a relative
+path, the opposite of the Mac OS convention with colons.)
+
+<p>
+This, of course, only applies to pathnames given to Distutils
+functions.  If you, for example, use standard Python functions such as
+<tt class="function">glob.glob()</tt> or <tt class="function">os.listdir()</tt> to specify files, you
+should be careful to write portable code instead of hardcoding path
+separators:
+
+<p>
+<div class="verbatim"><pre>
+    glob.glob(os.path.join('mydir', 'subdir', '*.html'))
+    os.listdir(os.path.join('mydir', 'subdir'))
+</pre></div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="listing-packages.html">2.1 Listing whole packages</a>
+<li><a href="listing-modules.html">2.2 Listing individual modules</a>
+<li><a href="describing-extensions.html">2.3 Describing extension modules</a>
+<ul>
+<li><a href="describing-extensions.html#SECTION002310000000000000000">2.3.1 Extension names and packages</a>
+<li><a href="describing-extensions.html#SECTION002320000000000000000">2.3.2 Extension source files</a>
+<li><a href="describing-extensions.html#SECTION002330000000000000000">2.3.3 Preprocessor options</a>
+<li><a href="describing-extensions.html#SECTION002340000000000000000">2.3.4 Library options</a>
+<li><a href="describing-extensions.html#SECTION002350000000000000000">2.3.5 Other options</a>
+</ul>
+<li><a href="node10.html">2.4 Relationships between Distributions and Packages</a>
+<li><a href="node11.html">2.5 Installing Scripts</a>
+<li><a href="node12.html">2.6 Installing Package Data</a>
+<li><a href="node13.html">2.7 Installing Additional Files</a>
+<li><a href="meta-data.html">2.8 Additional meta-data</a>
+<li><a href="node15.html">2.9 Debugging the setup script</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.4 distutils-specific terminology"
+  href="distutils-term.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Distributing python Modules"
+  href="dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1 listing whole packages"
+  href="listing-packages.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="distutils-term.html">1.4 Distutils-specific terminology</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dist.html">Distributing Python Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="listing-packages.html">2.1 Listing whole packages</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

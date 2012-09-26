@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-jpeg.html" />
+<link rel="prev" href="module-gl-constants.html" />
+<link rel="parent" href="sgi.html" />
+<link rel="next" href="module-jpeg.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>34.11 imgfile -- Support for SGI imglib files</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="34.10 gl  "
+  href="module-gl-constants.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="34. sgi IRIX Specific"
+  href="sgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="34.12 jpeg  "
+  href="module-jpeg.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-gl-constants.html">34.10 GL  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sgi.html">34. SGI IRIX Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-jpeg.html">34.12 jpeg  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00361100000000000000000">
+34.11 <tt class="module">imgfile</tt> --
+         Support for SGI imglib files</a>
+</h1>
+
+<p>
+<a name="module-imgfile"></a>  
+<p class="availability">Availability: <span
+ class="platform">IRIX</span>.</p>
+
+<p>
+The <tt class="module">imgfile</tt> module allows Python programs to access SGI imglib image
+files (also known as <span class="file">.rgb</span> files).  The module is far from
+complete, but is provided anyway since the functionality that there is
+enough in some cases.  Currently, colormap files are not supported.
+
+<p>
+The module defines the following variables and functions:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-5718' xml:id='l2h-5718' class="exception">error</tt></b></dt>
+<dd>
+This exception is raised on all errors, such as unsupported file type, etc.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5719' xml:id='l2h-5719' class="function">getsizes</tt></b>(</nobr></td>
+  <td><var>file</var>)</td></tr></table></dt>
+<dd>
+This function returns a tuple <code>(<var>x</var>, <var>y</var>, <var>z</var>)</code> where
+<var>x</var> and <var>y</var> are the size of the image in pixels and
+<var>z</var> is the number of
+bytes per pixel. Only 3 byte RGB pixels and 1 byte greyscale pixels
+are currently supported.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5720' xml:id='l2h-5720' class="function">read</tt></b>(</nobr></td>
+  <td><var>file</var>)</td></tr></table></dt>
+<dd>
+This function reads and decodes the image on the specified file, and
+returns it as a Python string. The string has either 1 byte greyscale
+pixels or 4 byte RGBA pixels. The bottom left pixel is the first in
+the string. This format is suitable to pass to <tt class="function">gl.lrectwrite()</tt>,
+for instance.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5721' xml:id='l2h-5721' class="function">readscaled</tt></b>(</nobr></td>
+  <td><var>file, x, y, filter</var><big>[</big><var>, blur</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This function is identical to read but it returns an image that is
+scaled to the given <var>x</var> and <var>y</var> sizes. If the <var>filter</var> and
+<var>blur</var> parameters are omitted scaling is done by
+simply dropping or duplicating pixels, so the result will be less than
+perfect, especially for computer-generated images.
+
+<p>
+Alternatively, you can specify a filter to use to smooth the image
+after scaling. The filter forms supported are <code>'impulse'</code>,
+<code>'box'</code>, <code>'triangle'</code>, <code>'quadratic'</code> and
+<code>'gaussian'</code>. If a filter is specified <var>blur</var> is an optional
+parameter specifying the blurriness of the filter. It defaults to <code>1.0</code>.
+
+<p>
+<tt class="function">readscaled()</tt> makes no attempt to keep the aspect ratio
+correct, so that is the users' responsibility.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5722' xml:id='l2h-5722' class="function">ttob</tt></b>(</nobr></td>
+  <td><var>flag</var>)</td></tr></table></dt>
+<dd>
+This function sets a global flag which defines whether the scan lines
+of the image are read or written from bottom to top (flag is zero,
+compatible with SGI GL) or from top to bottom(flag is one,
+compatible with X).  The default is zero.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5723' xml:id='l2h-5723' class="function">write</tt></b>(</nobr></td>
+  <td><var>file, data, x, y, z</var>)</td></tr></table></dt>
+<dd>
+This function writes the RGB or greyscale data in <var>data</var> to image
+file <var>file</var>. <var>x</var> and <var>y</var> give the size of the image,
+<var>z</var> is 1 for 1 byte greyscale images or 3 for RGB images (which are
+stored as 4 byte values of which only the lower three bytes are used).
+These are the formats returned by <tt class="function">gl.lrectread()</tt>.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="34.10 gl  "
+  href="module-gl-constants.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="34. sgi IRIX Specific"
+  href="sgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="34.12 jpeg  "
+  href="module-jpeg.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-gl-constants.html">34.10 GL  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sgi.html">34. SGI IRIX Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-jpeg.html">34.12 jpeg  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Changing Cygwin's Maximum Memory</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.61.2"><link rel="home" href="index.html" title="Cygwin User's Guide"><link rel="up" href="setup-net.html" title="Chapter 2. Setting Up Cygwin"><link rel="previous" href="setup-env.html" title="Environment Variables"><link rel="next" href="ntsec.html" title="NT security and usage of ntsec"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Changing Cygwin's Maximum Memory</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="setup-env.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Setting Up Cygwin</th><td width="20%" align="right"> <a accesskey="n" href="ntsec.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="setup-maxmem"></a>Changing Cygwin's Maximum Memory</h2></div></div><div></div></div><p>
+By default no Cygwin program can allocate more than 384 MB of memory 
+(program+data).  You should not need to change this default in most 
+circumstances.  However, if you need to use more real or virtual memory in 
+your machine you may add an entry in the either the 
+<tt class="literal">HKEY_LOCAL_MACHINE</tt> (to change the limit for all users) or 
+<tt class="literal">HKEY_CURRENT_USER</tt> (for just the current user) section of 
+the registry. 
+</p><p>
+Add the <tt class="literal">DWORD</tt> value <tt class="literal">heap_chunk_in_mb</tt> 
+and set it to the desired memory limit in decimal MB. It is preferred to do 
+this in Cygwin using the <b class="command">regtool</b> program included in the 
+Cygwin package.
+(For more information about <b class="command">regtool</b> or the other Cygwin 
+utilities, see <a href="using-utils.html" title="Cygwin Utilities">the section called &#8220;Cygwin Utilities&#8221;</a> or use each the
+<tt class="literal">--help</tt> option of each util.)  You should always be careful 
+when using <b class="command">regtool</b> since damaging your system registry can 
+result in an unusable system.  This example sets memory limit to 1024 MB:
+
+</p><pre class="screen">
+regtool -i set /HKLM/Software/Cygnus\ Solutions/Cygwin/heap_chunk_in_mb 1024
+regtool -v list /HKLM/Software/Cygnus\ Solutions/Cygwin
+</pre><p>
+</p><p>
+Exit all running Cygwin processes and restart them. Memory can be allocated up 
+to the size of the system swap space minus any the size of any running 
+processes. The system swap should be at least as large as the physically 
+installed RAM and can be modified under the System category of the 
+Control Panel.  
+</p><p>
+Here is a small program written by DJ Delorie that tests the 
+memory allocation limit on your system:
+
+</p><pre class="screen">
+main()
+{
+  unsigned int bit=0x40000000, sum=0;
+  char *x;
+  
+  while (bit &gt; 4096) 
+  {
+    x = malloc(bit);
+    if (x)
+    sum += bit;
+    bit &gt;&gt;= 1;
+  }
+  printf("%08x bytes (%.1fMb)\n", sum, sum/1024.0/1024.0);
+  return 0;
+}
+</pre><p>
+
+You can compile this program using:
+</p><pre class="screen">
+gcc max_memory.c -o max_memory.exe
+</pre><p>
+
+Run the program and it will output the maximum amount of allocatable memory.
+</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="setup-env.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="setup-net.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ntsec.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Environment Variables </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> NT security and usage of ntsec</td></tr></table></div></body></html>

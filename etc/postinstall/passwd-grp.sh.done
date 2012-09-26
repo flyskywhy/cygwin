@@ -1,0 +1,24 @@
+#!/bin/sh
+
+if [ ! -e /etc/passwd -a ! -L /etc/passwd ] ; then
+  /bin/mkpasswd -l -c > /etc/passwd
+  /bin/chmod 777 /etc/passwd
+fi
+
+if [ ! -e /etc/group -a ! -L /etc/group ] ; then
+  /bin/mkgroup -l -c > /etc/group
+  /bin/chmod 777 /etc/group
+fi
+
+cp -f /etc/passwd /tmp/passwd.mkpasswd && \
+( [ -w /etc/passwd ] || chmod --silent a+w /etc/passwd ; ) && \
+sed -e '/:S-1-1-0:/d' /tmp/passwd.mkpasswd > /etc/passwd && \
+chmod --silent --reference=/etc/group /etc/passwd
+rm -f /tmp/passwd.mkpasswd
+
+cp -f /etc/group /tmp/group.mkgroup && \
+( [ -w /etc/group ] || chmod --silent a+w /etc/group ; ) && \
+echo "root:S-1-5-32-544:0:" > /etc/group && \
+sed -e '/:S-1-1-0:/d' -e '/root:S-1-5-32-544:0:/d' /tmp/group.mkgroup >> /etc/group && \
+chmod --silent --reference=/etc/passwd /etc/group
+rm -f /tmp/group.mkgroup

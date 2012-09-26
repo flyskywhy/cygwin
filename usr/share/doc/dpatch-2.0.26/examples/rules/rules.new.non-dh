@@ -1,0 +1,45 @@
+#! /usr/bin/make -f
+# Sample dpatch rules file. Only example. Nothing else. :)
+# This one uses the new way with dpatch from dpatch 2.x
+# For this example see the 00list.new.non-dh file too!
+
+CFLAGS 		= -g
+ifneq (,$(findstring noopt,${DEB_BUILD_OPTIONS}))
+CFLAGS          += -O0
+else
+CFLAGS          += -O2
+endif
+
+build: patch
+# Note that the above targets ("build" and "patch") are both phony, and
+# as such will always be considered out-of-date. If you don't want build:
+# to be re-run each time, see sample.rules
+	test -e debian/control
+# Build your package here
+	touch build-stamp
+
+clean: clean1 unpatch
+clean1:
+	test -e debian/control && test xroot = x`whoami`
+	rm -rf debian/files* core debian/*substvars build
+# Clean it up
+
+binary-arch: build
+	test -e debian/control && test xroot = x`whoami`
+# Do everything you need to get a .deb out of it
+
+patch: patch-stamp
+patch-stamp:
+	dpatch --with-cpp apply-all
+	dpatch --with-cpp call-all -a=pkg-info >patch-stamp
+
+unpatch:
+	dpatch --with-cpp deapply-all
+	rm -rf patch-stamp debian/patched
+
+binary-indep: ;
+binary:	binary-indep binary-arch
+
+.PHONY: binary binary-arch binary-indep clean clean1 build patch unpatch
+
+# arch-tag: b7ec2cca-c71a-4df1-a306-6761643ffb27

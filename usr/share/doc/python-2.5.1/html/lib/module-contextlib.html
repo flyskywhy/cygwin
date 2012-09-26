@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-atexit.html" />
+<link rel="prev" href="module-warnings.html" />
+<link rel="parent" href="python.html" />
+<link rel="next" href="module-atexit.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>26.5 contextlib -- Utilities for with-statement contexts.</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.4.3 available Functions"
+  href="warning-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26. python Runtime Services"
+  href="python.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.6 atexit  "
+  href="module-atexit.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="warning-functions.html">26.4.3 Available Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="python.html">26. Python Runtime Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-atexit.html">26.6 atexit  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0028500000000000000000">
+26.5 <tt class="module">contextlib</tt> --
+         Utilities for <tt class="keyword">with</tt>-statement contexts.</a>
+</h1>
+
+<p>
+<a name="module-contextlib"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+This module provides utilities for common tasks involving the
+<tt class="keyword">with</tt> statement.
+
+<p>
+Functions provided:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5212' xml:id='l2h-5212' class="function">contextmanager</tt></b>(</nobr></td>
+  <td><var>func</var>)</td></tr></table></dt>
+<dd>
+This function is a decorator that can be used to define a factory
+function for <tt class="keyword">with</tt> statement context managers, without
+needing to create a class or separate <tt class="method">__enter__()</tt> and
+<tt class="method">__exit__()</tt> methods.
+
+<p>
+A simple example (this is not recommended as a real way of
+generating HTML!):
+
+<p>
+<div class="verbatim"><pre>
+from __future__ import with_statement
+from contextlib import contextmanager
+
+@contextmanager
+def tag(name):
+    print "&lt;%s&gt;" % name
+    yield
+    print "&lt;/%s&gt;" % name
+
+&gt;&gt;&gt; with tag("h1"):
+...    print "foo"
+...
+&lt;h1&gt;
+foo
+&lt;/h1&gt;
+</pre></div>
+
+<p>
+The function being decorated must return a generator-iterator when
+called. This iterator must yield exactly one value, which will be
+bound to the targets in the <tt class="keyword">with</tt> statement's <tt class="keyword">as</tt>
+clause, if any.
+
+<p>
+At the point where the generator yields, the block nested in the
+<tt class="keyword">with</tt> statement is executed.  The generator is then resumed
+after the block is exited.  If an unhandled exception occurs in the
+block, it is reraised inside the generator at the point where the yield
+occurred.  Thus, you can use a
+<tt class="keyword">try</tt>...<tt class="keyword">except</tt>...<tt class="keyword">finally</tt> statement to trap
+the error (if any), or ensure that some cleanup takes place. If an
+exception is trapped merely in order to log it or to perform some
+action (rather than to suppress it entirely), the generator must
+reraise that exception. Otherwise the generator context manager will
+indicate to the <tt class="keyword">with</tt> statement that the exception has been
+handled, and execution will resume with the statement immediately
+following the <tt class="keyword">with</tt> statement.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5213' xml:id='l2h-5213' class="function">nested</tt></b>(</nobr></td>
+  <td><var>mgr1</var><big>[</big><var>, mgr2</var><big>[</big><var>, ...</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Combine multiple context managers into a single nested context manager.
+
+<p>
+Code like this:
+
+<p>
+<div class="verbatim"><pre>
+from contextlib import nested
+
+with nested(A, B, C) as (X, Y, Z):
+    do_something()
+</pre></div>
+
+<p>
+is equivalent to this:
+
+<p>
+<div class="verbatim"><pre>
+with A as X:
+    with B as Y:
+        with C as Z:
+            do_something()
+</pre></div>
+
+<p>
+Note that if the <tt class="method">__exit__()</tt> method of one of the nested
+context managers indicates an exception should be suppressed, no
+exception information will be passed to any remaining outer context
+managers. Similarly, if the <tt class="method">__exit__()</tt> method of one of the
+nested managers raises an exception, any previous exception state will
+be lost; the new exception will be passed to the
+<tt class="method">__exit__()</tt> methods of any remaining outer context managers.
+In general, <tt class="method">__exit__()</tt> methods should avoid raising
+exceptions, and in particular they should not re-raise a
+passed-in exception.
+</dl>
+
+<p>
+<a name="context-closing"></a><dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5214' xml:id='l2h-5214' class="function">closing</tt></b>(</nobr></td>
+  <td><var>thing</var>)</td></tr></table></dt>
+<dd>
+Return a context manager that closes <var>thing</var> upon completion of
+the block.  This is basically equivalent to:
+
+<p>
+<div class="verbatim"><pre>
+from contextlib import contextmanager
+
+@contextmanager
+def closing(thing):
+    try:
+        yield thing
+    finally:
+        thing.close()
+</pre></div>
+
+<p>
+And lets you write code like this:
+<div class="verbatim"><pre>
+from __future__ import with_statement
+from contextlib import closing
+import codecs
+
+with closing(urllib.urlopen('http://www.python.org')) as page:
+    for line in page:
+        print line
+</pre></div>
+
+<p>
+without needing to explicitly close <code>page</code>.  Even if an error
+occurs, <code>page.close()</code> will be called when the <tt class="keyword">with</tt>
+block is exited.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0343.html"
+        title="The "with" statement"
+        >PEP 0343, <em>The "with" statement</em></a>
+    <dd>The specification, background, and examples for the
+          Python <tt class="keyword">with</tt> statement.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.4.3 available Functions"
+  href="warning-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26. python Runtime Services"
+  href="python.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.6 atexit  "
+  href="module-atexit.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="warning-functions.html">26.4.3 Available Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="python.html">26. Python Runtime Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-atexit.html">26.6 atexit  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

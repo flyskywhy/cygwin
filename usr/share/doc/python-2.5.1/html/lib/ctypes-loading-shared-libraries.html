@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-foreign-functions.html" />
+<link rel="prev" href="ctypes-finding-shared-libraries.html" />
+<link rel="parent" href="ctypes-ctypes-reference.html" />
+<link rel="next" href="ctypes-foreign-functions.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.2.2 Loading shared libraries</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.1 finding shared libraries"
+  href="ctypes-finding-shared-libraries.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.3 foreign functions"
+  href="ctypes-foreign-functions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-finding-shared-libraries.html">14.14.2.1 Finding shared libraries</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-foreign-functions.html">14.14.2.3 Foreign functions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00161422000000000000000"></a><a name="ctypes-loading-shared-libraries"></a>
+<br>
+14.14.2.2 Loading shared libraries
+</h3>
+
+<p>
+There are several ways to loaded shared libraries into the Python
+process.  One way is to instantiate one of the following classes:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3311' xml:id='l2h-3311' class="class">CDLL</tt></b>(</nobr></td>
+  <td><var>name, mode=DEFAULT_MODE, handle=None</var>)</td></tr></table></dt>
+<dd>
+Instances of this class represent loaded shared libraries.
+Functions in these libraries use the standard C calling
+convention, and are assumed to return <code>int</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3312' xml:id='l2h-3312' class="class">OleDLL</tt></b>(</nobr></td>
+  <td><var>name, mode=DEFAULT_MODE, handle=None</var>)</td></tr></table></dt>
+<dd>
+Windows only: Instances of this class represent loaded shared
+libraries, functions in these libraries use the <code>stdcall</code>
+calling convention, and are assumed to return the windows specific
+<tt class="class">HRESULT</tt> code.  <tt class="class">HRESULT</tt> values contain information
+specifying whether the function call failed or succeeded, together
+with additional error code.  If the return value signals a
+failure, an <tt class="class">WindowsError</tt> is automatically raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3313' xml:id='l2h-3313' class="class">WinDLL</tt></b>(</nobr></td>
+  <td><var>name, mode=DEFAULT_MODE, handle=None</var>)</td></tr></table></dt>
+<dd>
+Windows only: Instances of this class represent loaded shared
+libraries, functions in these libraries use the <code>stdcall</code>
+calling convention, and are assumed to return <code>int</code> by default.
+
+<p>
+On Windows CE only the standard calling convention is used, for
+convenience the <tt class="class">WinDLL</tt> and <tt class="class">OleDLL</tt> use the standard calling
+convention on this platform.
+</dl>
+
+<p>
+The Python GIL is released before calling any function exported by
+these libraries, and reaquired afterwards.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3314' xml:id='l2h-3314' class="class">PyDLL</tt></b>(</nobr></td>
+  <td><var>name, mode=DEFAULT_MODE, handle=None</var>)</td></tr></table></dt>
+<dd>
+Instances of this class behave like <tt class="class">CDLL</tt> instances, except
+that the Python GIL is <em>not</em> released during the function call,
+and after the function execution the Python error flag is checked.
+If the error flag is set, a Python exception is raised.
+
+<p>
+Thus, this is only useful to call Python C api functions directly.
+</dl>
+
+<p>
+All these classes can be instantiated by calling them with at least
+one argument, the pathname of the shared library.  If you have an
+existing handle to an already loaded shard library, it can be passed
+as the <code>handle</code> named parameter, otherwise the underlying platforms
+<code>dlopen</code> or <tt class="method">LoadLibrary</tt> function is used to load the library
+into the process, and to get a handle to it.
+
+<p>
+The <var>mode</var> parameter can be used to specify how the library is
+loaded.  For details, consult the <code>dlopen(3)</code> manpage, on Windows,
+<var>mode</var> is ignored.
+
+<p>
+<dl><dt><b><tt>RTLD_GLOBAL</tt></b></dt>
+<dd>
+Flag to use as <var>mode</var> parameter.  On platforms where this flag
+is not available, it is defined as the integer zero.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt>RTLD_LOCAL</tt></b></dt>
+<dd>
+Flag to use as <var>mode</var> parameter.  On platforms where this is not
+available, it is the same as <var>RTLD_GLOBAL</var>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt>DEFAULT_MODE</tt></b></dt>
+<dd>
+The default mode which is used to load shared libraries.  On OSX
+10.3, this is <var>RTLD_GLOBAL</var>, otherwise it is the same as
+<var>RTLD_LOCAL</var>.
+</dd></dl>
+
+<p>
+Instances of these classes have no public methods, however
+<tt class="method">__getattr__</tt> and <tt class="method">__getitem__</tt> have special behaviour: functions
+exported by the shared library can be accessed as attributes of by
+index.  Please note that both <tt class="method">__getattr__</tt> and <tt class="method">__getitem__</tt>
+cache their result, so calling them repeatedly returns the same object
+each time.
+
+<p>
+The following public attributes are available, their name starts with
+an underscore to not clash with exported function names:
+
+<p>
+<dl><dt><b><tt id='l2h-3315' xml:id='l2h-3315' class="member">_handle</tt></b></dt>
+<dd>
+The system handle used to access the library.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3316' xml:id='l2h-3316' class="member">_name</tt></b></dt>
+<dd>
+The name of the library passed in the contructor.
+</dl>
+
+<p>
+Shared libraries can also be loaded by using one of the prefabricated
+objects, which are instances of the <tt class="class">LibraryLoader</tt> class, either by
+calling the <tt class="method">LoadLibrary</tt> method, or by retrieving the library as
+attribute of the loader instance.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3317' xml:id='l2h-3317' class="class">LibraryLoader</tt></b>(</nobr></td>
+  <td><var>dlltype</var>)</td></tr></table></dt>
+<dd>
+Class which loads shared libraries.  <code>dlltype</code> should be one
+of the <tt class="class">CDLL</tt>, <tt class="class">PyDLL</tt>, <tt class="class">WinDLL</tt>, or <tt class="class">OleDLL</tt> types.
+
+<p>
+<tt class="method">__getattr__</tt> has special behaviour: It allows to load a shared
+library by accessing it as attribute of a library loader
+instance.  The result is cached, so repeated attribute accesses
+return the same library each time.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3318' xml:id='l2h-3318' class="method">LoadLibrary</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+Load a shared library into the process and return it.  This method
+always returns a new instance of the library.
+</dl>
+
+<p>
+These prefabricated library loaders are available:
+
+<p>
+<dl><dt><b><tt>cdll</tt></b></dt>
+<dd>
+Creates <tt class="class">CDLL</tt> instances.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt>windll</tt></b></dt>
+<dd>
+Windows only: Creates <tt class="class">WinDLL</tt> instances.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt>oledll</tt></b></dt>
+<dd>
+Windows only: Creates <tt class="class">OleDLL</tt> instances.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt>pydll</tt></b></dt>
+<dd>
+Creates <tt class="class">PyDLL</tt> instances.
+</dd></dl>
+
+<p>
+For accessing the C Python api directly, a ready-to-use Python shared
+library object is available:
+
+<p>
+<dl><dt><b><tt>pythonapi</tt></b></dt>
+<dd>
+An instance of <tt class="class">PyDLL</tt> that exposes Python C api functions as
+attributes.  Note that all these functions are assumed to return C
+<code>int</code>, which is of course not always the truth, so you have to
+assign the correct <tt class="member">restype</tt> attribute to use these functions.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.1 finding shared libraries"
+  href="ctypes-finding-shared-libraries.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.3 foreign functions"
+  href="ctypes-foreign-functions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-finding-shared-libraries.html">14.14.2.1 Finding shared libraries</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-foreign-functions.html">14.14.2.3 Foreign functions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

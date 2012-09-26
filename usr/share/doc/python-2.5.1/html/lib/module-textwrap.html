@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-codecs.html" />
+<link rel="prev" href="module-cStringIO.html" />
+<link rel="parent" href="strings.html" />
+<link rel="next" href="module-codecs.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.7 textwrap -- Text wrapping and filling</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.6 cstringio  "
+  href="module-cStringIO.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.8 codecs  "
+  href="module-codecs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-cStringIO.html">4.6 cStringIO  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-codecs.html">4.8 codecs  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006700000000000000000">
+4.7 <tt class="module">textwrap</tt> --
+         Text wrapping and filling</a>
+</h1>
+
+<p>
+<a name="module-textwrap"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+The <tt class="module">textwrap</tt> module provides two convenience functions,
+<tt class="function">wrap()</tt> and <tt class="function">fill()</tt>, as well as
+<tt class="class">TextWrapper</tt>, the class that does all the work, and a utility function 
+<tt class="function">dedent()</tt>.  If you're just wrapping or filling one or two 
+text strings, the convenience functions should be good enough; otherwise, 
+you should use an instance of <tt class="class">TextWrapper</tt> for efficiency.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-489' xml:id='l2h-489' class="function">wrap</tt></b>(</nobr></td>
+  <td><var>text</var><big>[</big><var>, width</var><big>[</big><var>, ...</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Wraps the single paragraph in <var>text</var> (a string) so every line is at
+most <var>width</var> characters long.  Returns a list of output lines,
+without final newlines.
+
+<p>
+Optional keyword arguments correspond to the instance attributes of
+<tt class="class">TextWrapper</tt>, documented below.  <var>width</var> defaults to
+<code>70</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-490' xml:id='l2h-490' class="function">fill</tt></b>(</nobr></td>
+  <td><var>text</var><big>[</big><var>, width</var><big>[</big><var>, ...</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Wraps the single paragraph in <var>text</var>, and returns a single string
+containing the wrapped paragraph.  <tt class="function">fill()</tt> is shorthand for
+<div class="verbatim"><pre>
+"\n".join(wrap(text, ...))
+</pre></div>
+
+<p>
+In particular, <tt class="function">fill()</tt> accepts exactly the same keyword
+arguments as <tt class="function">wrap()</tt>.
+</dl>
+
+<p>
+Both <tt class="function">wrap()</tt> and <tt class="function">fill()</tt> work by creating a
+<tt class="class">TextWrapper</tt> instance and calling a single method on it.  That
+instance is not reused, so for applications that wrap/fill many text
+strings, it will be more efficient for you to create your own
+<tt class="class">TextWrapper</tt> object.
+
+<p>
+An additional utility function, <tt class="function">dedent()</tt>, is provided to
+remove indentation from strings that have unwanted whitespace to the
+left of the text.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-491' xml:id='l2h-491' class="function">dedent</tt></b>(</nobr></td>
+  <td><var>text</var>)</td></tr></table></dt>
+<dd> 
+Remove any common leading whitespace from every line in <var>text</var>.
+
+<p>
+This can be used to make triple-quoted strings line up with the left
+edge of the display, while still presenting them in the source code
+in indented form.
+
+<p>
+Note that tabs and spaces are both treated as whitespace, but they are
+not equal: the lines <code>"  hello"</code> and <code>"\thello"</code>
+are considered to have no common leading whitespace.  (This behaviour is
+new in Python 2.5; older versions of this module incorrectly expanded
+tabs before searching for common leading whitespace.)
+
+<p>
+For example:
+<div class="verbatim"><pre>
+def test():
+    # end first line with \ to avoid the empty line!
+    s = '''\
+    hello
+      world
+    '''
+    print repr(s)          # prints '    hello\n      world\n    '
+    print repr(dedent(s))  # prints 'hello\n  world\n'
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-492' xml:id='l2h-492' class="class">TextWrapper</tt></b>(</nobr></td>
+  <td><var>...</var>)</td></tr></table></dt>
+<dd>
+The <tt class="class">TextWrapper</tt> constructor accepts a number of optional
+keyword arguments.  Each argument corresponds to one instance attribute,
+so for example
+<div class="verbatim"><pre>
+wrapper = TextWrapper(initial_indent="* ")
+</pre></div>
+is the same as
+<div class="verbatim"><pre>
+wrapper = TextWrapper()
+wrapper.initial_indent = "* "
+</pre></div>
+
+<p>
+You can re-use the same <tt class="class">TextWrapper</tt> object many times, and you
+can change any of its options through direct assignment to instance
+attributes between uses.
+</dl>
+
+<p>
+The <tt class="class">TextWrapper</tt> instance attributes (and keyword arguments to
+the constructor) are as follows:
+
+<p>
+<dl><dt><b><tt id='l2h-493' xml:id='l2h-493' class="member">width</tt></b></dt>
+<dd>
+(default: <code>70</code>) The maximum length of wrapped lines.  As long as
+there are no individual words in the input text longer than
+<tt class="member">width</tt>, <tt class="class">TextWrapper</tt> guarantees that no output line
+will be longer than <tt class="member">width</tt> characters.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-494' xml:id='l2h-494' class="member">expand_tabs</tt></b></dt>
+<dd>
+(default: <code>True</code>) If true, then all tab characters in <var>text</var>
+will be expanded to spaces using the <tt class="method">expandtabs()</tt> method of
+<var>text</var>.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-495' xml:id='l2h-495' class="member">replace_whitespace</tt></b></dt>
+<dd>
+(default: <code>True</code>) If true, each whitespace character (as defined
+by <code>string.whitespace</code>) remaining after tab expansion will be
+replaced by a single space.  <span class="note"><b class="label">Note:</b>
+If <tt class="member">expand_tabs</tt> is false
+and <tt class="member">replace_whitespace</tt> is true, each tab character will be
+replaced by a single space, which is <em>not</em> the same as tab
+expansion.</span>
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-496' xml:id='l2h-496' class="member">initial_indent</tt></b></dt>
+<dd>
+(default: <code>''</code>) String that will be prepended to the first line
+of wrapped output.  Counts towards the length of the first line.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-497' xml:id='l2h-497' class="member">subsequent_indent</tt></b></dt>
+<dd>
+(default: <code>''</code>) String that will be prepended to all lines of
+wrapped output except the first.  Counts towards the length of each
+line except the first.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-498' xml:id='l2h-498' class="member">fix_sentence_endings</tt></b></dt>
+<dd>
+(default: <code>False</code>) If true, <tt class="class">TextWrapper</tt> attempts to detect
+sentence endings and ensure that sentences are always separated by
+exactly two spaces.  This is generally desired for text in a monospaced
+font.  However, the sentence detection algorithm is imperfect: it
+assumes that a sentence ending consists of a lowercase letter followed
+by one of "<tt class="character">.</tt>",
+"<tt class="character">!</tt>", or "<tt class="character">?</tt>", possibly followed by one of
+"<tt class="character">"</tt>" or "<tt class="character">'</tt>", followed by a space.  One problem
+with this is algorithm is that it is unable to detect the difference
+between ``Dr.'' in
+
+<p>
+<div class="verbatim"><pre>
+[...] Dr. Frankenstein's monster [...]
+</pre></div>
+
+<p>
+and ``Spot.'' in
+
+<p>
+<div class="verbatim"><pre>
+[...] See Spot. See Spot run [...]
+</pre></div>
+
+<p>
+<tt class="member">fix_sentence_endings</tt> is false by default.
+
+<p>
+Since the sentence detection algorithm relies on
+<code>string.lowercase</code> for the definition of ``lowercase letter,''
+and a convention of using two spaces after a period to separate
+sentences on the same line, it is specific to English-language texts.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-499' xml:id='l2h-499' class="member">break_long_words</tt></b></dt>
+<dd>
+(default: <code>True</code>) If true, then words longer than
+<tt class="member">width</tt> will be broken in order to ensure that no lines are
+longer than <tt class="member">width</tt>.  If it is false, long words will not be
+broken, and some lines may be longer than <tt class="member">width</tt>.  (Long words
+will be put on a line by themselves, in order to minimize the amount
+by which <tt class="member">width</tt> is exceeded.)
+</dl>
+
+<p>
+<tt class="class">TextWrapper</tt> also provides two public methods, analogous to the
+module-level convenience functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-500' xml:id='l2h-500' class="method">wrap</tt></b>(</nobr></td>
+  <td><var>text</var>)</td></tr></table></dt>
+<dd>
+Wraps the single paragraph in <var>text</var> (a string) so every line is
+at most <tt class="member">width</tt> characters long.  All wrapping options are
+taken from instance attributes of the <tt class="class">TextWrapper</tt> instance.
+Returns a list of output lines, without final newlines.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-501' xml:id='l2h-501' class="method">fill</tt></b>(</nobr></td>
+  <td><var>text</var>)</td></tr></table></dt>
+<dd>
+Wraps the single paragraph in <var>text</var>, and returns a single string
+containing the wrapped paragraph.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.6 cstringio  "
+  href="module-cStringIO.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.8 codecs  "
+  href="module-codecs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-cStringIO.html">4.6 cStringIO  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-codecs.html">4.8 codecs  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

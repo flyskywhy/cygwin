@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node347.html" />
+<link rel="prev" href="node345.html" />
+<link rel="parent" href="sqlite3-Types.html" />
+<link rel="next" href="node347.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.13.4.2 Using adapters to store additional Python types in SQLite databases</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.4.1 Introduction"
+  href="node345.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13.4 sqlite and Python"
+  href="sqlite3-Types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.4.3 converting SQLite values"
+  href="node347.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node345.html">13.13.4.1 Introduction</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sqlite3-Types.html">13.13.4 SQLite and Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node347.html">13.13.4.3 Converting SQLite values</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node346.html#SECTION00151342100000000000000">13.13.4.2.1 Letting your object adapt itself</a>
+<li><a href="node346.html#SECTION00151342200000000000000">13.13.4.2.2 Registering an adapter callable</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h3><a name="SECTION00151342000000000000000">
+13.13.4.2 Using adapters to store additional Python types in SQLite databases</a>
+</h3>
+
+<p>
+As described before, SQLite supports only a limited set of types natively. To
+use other Python types with SQLite, you must <strong>adapt</strong> them to one of the sqlite3
+module's supported types for SQLite: one of NoneType, int, long, float,
+str, unicode, buffer.
+
+<p>
+The <tt class="module">sqlite3</tt> module uses Python object adaptation, as described in <a class="rfc" id='rfcref-101000' xml:id='rfcref-101000'
+href="http://www.python.org/peps/pep-0246.html">PEP 246</a> for this.  The protocol to use is <tt class="class">PrepareProtocol</tt>.
+
+<p>
+There are two ways to enable the <tt class="module">sqlite3</tt> module to adapt a custom Python type
+to one of the supported ones.
+
+<p>
+
+<h4><a name="SECTION00151342100000000000000">
+13.13.4.2.1 Letting your object adapt itself</a>
+</h4>
+
+<p>
+This is a good approach if you write the class yourself. Let's suppose you have
+a class like this:
+
+<p>
+<div class="verbatim"><pre>
+class Point(object):
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+</pre></div>
+
+<p>
+Now you want to store the point in a single SQLite column.  First you'll have to
+choose one of the supported types first to be used for representing the point.
+Let's just use str and separate the coordinates using a semicolon. Then you
+need to give your class a method <code>__conform__(self, protocol)</code> which must
+return the converted value. The parameter <var>protocol</var> will be
+<tt class="class">PrepareProtocol</tt>.
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+
+class Point(object):
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __conform__(self, protocol):
+        if protocol is sqlite3.PrepareProtocol:
+            return "%f;%f" % (self.x, self.y)
+
+con = sqlite3.connect(":memory:")
+cur = con.cursor()
+
+p = Point(4.0, -3.2)
+cur.execute("select ?", (p,))
+print cur.fetchone()[0]
+</pre>
+<div class="footer">
+<a href="adapter_point_1.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/adapter_point_1.py</span>).</a>
+</div></div>
+
+<p>
+
+<h4><a name="SECTION00151342200000000000000">
+13.13.4.2.2 Registering an adapter callable</a>
+</h4>
+
+<p>
+The other possibility is to create a function that converts the type to the
+string representation and register the function with <tt class="method">register_adapter</tt>.
+
+<p>
+<div class="note"><b class="label">Note:</b>
+The type/class to adapt must be a new-style class, i. e. it must have
+<tt class="class">object</tt> as one of its bases.
+</div>
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+
+class Point(object):
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+def adapt_point(point):
+    return "%f;%f" % (point.x, point.y)
+
+sqlite3.register_adapter(Point, adapt_point)
+
+con = sqlite3.connect(":memory:")
+cur = con.cursor()
+
+p = Point(4.0, -3.2)
+cur.execute("select ?", (p,))
+print cur.fetchone()[0]
+</pre>
+<div class="footer">
+<a href="adapter_point_2.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/adapter_point_2.py</span>).</a>
+</div></div>
+
+<p>
+The <tt class="module">sqlite3</tt> module has two default adapters for Python's built-in
+<tt class="class">datetime.date</tt> and <tt class="class">datetime.datetime</tt> types.  Now let's suppose
+we want to store <tt class="class">datetime.datetime</tt> objects not in ISO representation,
+but as a <span class="Unix">Unix</span> timestamp.
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+import datetime, time
+
+def adapt_datetime(ts):
+    return time.mktime(ts.timetuple())
+
+sqlite3.register_adapter(datetime.datetime, adapt_datetime)
+
+con = sqlite3.connect(":memory:")
+cur = con.cursor()
+
+now = datetime.datetime.now()
+cur.execute("select ?", (now,))
+print cur.fetchone()[0]
+</pre>
+<div class="footer">
+<a href="adapter_datetime.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/adapter_datetime.py</span>).</a>
+</div></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.4.1 Introduction"
+  href="node345.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13.4 sqlite and Python"
+  href="sqlite3-Types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.4.3 converting SQLite values"
+  href="node347.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node345.html">13.13.4.1 Introduction</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sqlite3-Types.html">13.13.4 SQLite and Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node347.html">13.13.4.3 Converting SQLite values</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

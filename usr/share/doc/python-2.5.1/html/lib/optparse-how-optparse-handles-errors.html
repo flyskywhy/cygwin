@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-putting-it-all-together.html" />
+<link rel="prev" href="optparse-printing-version-string.html" />
+<link rel="parent" href="optparse-tutorial.html" />
+<link rel="next" href="optparse-putting-it-all-together.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.2.8 How optparse handles errors</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.2.7 printing a version"
+  href="optparse-printing-version-string.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.2 Tutorial"
+  href="optparse-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.2.9 putting it all"
+  href="optparse-putting-it-all-together.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-printing-version-string.html">14.3.2.7 Printing a version</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-tutorial.html">14.3.2 Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-putting-it-all-together.html">14.3.2.9 Putting it all</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016328000000000000000"></a><a name="optparse-how-optparse-handles-errors"></a>
+<br>
+14.3.2.8 How <tt class="module">optparse</tt> handles errors
+</h3>
+
+<p>
+There are two broad classes of errors that <tt class="module">optparse</tt> has to worry about:
+programmer errors and user errors.  Programmer errors are usually
+erroneous calls to <code>parser.add_option()</code>, e.g. invalid option strings,
+unknown option attributes, missing option attributes, etc.  These are
+dealt with in the usual way: raise an exception (either
+<code>optparse.OptionError</code> or <code>TypeError</code>) and let the program crash.
+
+<p>
+Handling user errors is much more important, since they are guaranteed
+to happen no matter how stable your code is.  <tt class="module">optparse</tt> can automatically
+detect some user errors, such as bad option arguments (passing <code>"-n
+4x"</code> where <b class="programopt">-n</b> takes an integer argument), missing arguments
+(<code>"-n"</code> at the end of the command line, where <b class="programopt">-n</b> takes an argument
+of any type).  Also, you can call <code>parser.error()</code> to signal an
+application-defined error condition:
+<div class="verbatim"><pre>
+(options, args) = parser.parse_args()
+[...]
+if options.a and options.b:
+    parser.error("options -a and -b are mutually exclusive")
+</pre></div>
+
+<p>
+In either case, <tt class="module">optparse</tt> handles the error the same way: it prints the
+program's usage message and an error message to standard error and
+exits with error status 2.
+
+<p>
+Consider the first example above, where the user passes <code>"4x"</code> to an
+option that takes an integer:
+<div class="verbatim"><pre>
+$ /usr/bin/foo -n 4x
+usage: foo [options]
+
+foo: error: option -n: invalid integer value: '4x'
+</pre></div>
+
+<p>
+Or, where the user fails to pass a value at all:
+<div class="verbatim"><pre>
+$ /usr/bin/foo -n
+usage: foo [options]
+
+foo: error: -n option requires an argument
+</pre></div>
+
+<p>
+<tt class="module">optparse</tt>-generated error messages take care always to mention the option
+involved in the error; be sure to do the same when calling
+<code>parser.error()</code> from your application code.
+
+<p>
+If <tt class="module">optparse</tt>'s default error-handling behaviour does not suite your needs,
+you'll need to subclass OptionParser and override <code>exit()</code> and/or
+<tt class="method">error()</tt>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.2.7 printing a version"
+  href="optparse-printing-version-string.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.2 Tutorial"
+  href="optparse-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.2.9 putting it all"
+  href="optparse-putting-it-all-together.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-printing-version-string.html">14.3.2.7 Printing a version</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-tutorial.html">14.3.2 Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-putting-it-all-together.html">14.3.2.9 Putting it all</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

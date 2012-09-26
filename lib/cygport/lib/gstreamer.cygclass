@@ -1,0 +1,63 @@
+################################################################################
+#
+# gstreamer.cygclass - common functions for building GStreamer components
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: gstreamer.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+gst_component=${PN#gstreamer*-}
+ORIG_PN=${ORIG_PN:-gst-${gst_component}}
+
+HOMEPAGE="http://gstreamer.freedesktop.org/"
+SRC_URI="http://gstreamer.freedesktop.org/src/${ORIG_PN}/${ORIG_PN}-${PV}.tar.bz2"
+SRC_DIR=${ORIG_PN}-${PV}
+
+CVS_URI=":pserver:anoncvs@anoncvs.freedesktop.org:/cvs/gstreamer"
+
+DIFF_EXCLUDES="common m4 po autoregen.sh stamp-h.in"
+
+GST_PLUGINDIR="/usr/lib/gstreamer-${PV_MAJ_MIN}"
+
+gstreamer_cvs_checkout() {
+	check_prog_req cvs
+
+	if [ -z "${1}" ]
+	then
+		error "gstreamer_cvs_checkout requires the CVS module as an argument"
+	fi
+
+	cvs -d ${CVS_URI} co ${@}
+}
+
+gst_cvs_checkout() { gstreamer_cvs_checkout ${@} ; }
+gst_cvs_co() { gstreamer_cvs_checkout ${@} ; }
+
+gstreamer_autoreconf() {
+	# gstreamer packages require a custom autogen.sh
+	if [ ! -f autogen.sh ]
+	then
+    	error "Could not find autogen.sh"
+	fi
+
+	NOCONFIGURE=1 ./autogen.sh || error "autogen.sh failed"
+}
+
+gst_autoreconf() { gstreamer_autoreconf ; }

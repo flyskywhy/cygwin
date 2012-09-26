@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="typeiter.html" />
+<link rel="prev" href="comparisons.html" />
+<link rel="parent" href="types.html" />
+<link rel="next" href="bitstring-ops.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.4 Numeric Types -- int, float, long, complex </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.3 Comparisons"
+  href="comparisons.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. built-in Types"
+  href="types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.1 bit-string Operations on"
+  href="bitstring-ops.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="comparisons.html">3.3 Comparisons</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="types.html">3. Built-in Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="bitstring-ops.html">3.4.1 Bit-string Operations on</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION005400000000000000000"></a><a name="typesnumeric"></a>
+<br>
+3.4 Numeric Types --
+	    <tt class="class">int</tt>, <tt class="class">float</tt>, <tt class="class">long</tt>, <tt class="class">complex</tt>
+	    
+</h1>
+
+<p>
+There are four distinct numeric types: <i class="dfn">plain integers</i>,
+<i class="dfn">long integers</i>, 
+<i class="dfn">floating point numbers</i>, and <i class="dfn">complex numbers</i>.
+In addition, Booleans are a subtype of plain integers.
+Plain integers (also just called <i class="dfn">integers</i>)
+are implemented using <tt class="ctype">long</tt> in C, which gives them at least 32
+bits of precision (<code>sys.maxint</code> is always set to the maximum
+plain integer value for the current platform, the minimum value is 
+<code>-sys.maxint - 1</code>).  Long integers have unlimited precision.
+Floating point numbers are implemented using <tt class="ctype">double</tt> in C.
+All bets on their precision are off unless you happen to know the
+machine you are working with.
+<a id='l2h-176' xml:id='l2h-176'></a><a id='l2h-177' xml:id='l2h-177'></a><a id='l2h-178' xml:id='l2h-178'></a><a id='l2h-179' xml:id='l2h-179'></a><a id='l2h-180' xml:id='l2h-180'></a><a id='l2h-181' xml:id='l2h-181'></a><a id='l2h-182' xml:id='l2h-182'></a>
+<p>
+Complex numbers have a real and imaginary part, which are each
+implemented using <tt class="ctype">double</tt> in C.  To extract these parts from
+a complex number <var>z</var>, use <code><var>z</var>.real</code> and <code><var>z</var>.imag</code>.
+
+<p>
+Numbers are created by numeric literals or as the result of built-in
+functions and operators.  Unadorned integer literals (including hex
+and octal numbers) yield plain integers unless the value they denote
+is too large to be represented as a plain integer, in which case
+they yield a long integer.  Integer literals with an
+"<tt class="character">L</tt>" or "<tt class="character">l</tt>" suffix yield long integers
+("<tt class="character">L</tt>" is preferred because "<tt class="samp">1l</tt>" looks too much like
+eleven!).  Numeric literals containing a decimal point or an exponent
+sign yield floating point numbers.  Appending "<tt class="character">j</tt>" or
+"<tt class="character">J</tt>" to a numeric literal yields a complex number with a
+zero real part. A complex numeric literal is the sum of a real and
+an imaginary part.
+<a id='l2h-183' xml:id='l2h-183'></a><a id='l2h-184' xml:id='l2h-184'></a><a id='l2h-185' xml:id='l2h-185'></a><a id='l2h-186' xml:id='l2h-186'></a><a id='l2h-187' xml:id='l2h-187'></a><a id='l2h-188' xml:id='l2h-188'></a><a id='l2h-189' xml:id='l2h-189'></a>
+<p>
+Python fully supports mixed arithmetic: when a binary arithmetic
+operator has operands of different numeric types, the operand with the
+``narrower'' type is widened to that of the other, where plain
+integer is narrower than long integer is narrower than floating point is
+narrower than complex.
+Comparisons between numbers of mixed type use the same rule.<a name="tex2html7"
+  href="#foot4191"><sup>3.2</sup></a> The constructors <tt class="function">int()</tt>, <tt class="function">long()</tt>, <tt class="function">float()</tt>,
+and <tt class="function">complex()</tt> can be used
+to produce numbers of a specific type.
+<a id='l2h-203' xml:id='l2h-203'></a>
+<a id='l2h-190' xml:id='l2h-190'></a><a id='l2h-191' xml:id='l2h-191'></a><a id='l2h-192' xml:id='l2h-192'></a><a id='l2h-193' xml:id='l2h-193'></a>
+<p>
+All numeric types (except complex) support the following operations,
+sorted by ascending priority (operations in the same box have the same
+priority; all numeric operations have a higher priority than
+comparison operations):
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Operation</th>
+      <th class="left"  >Result</th>
+      <th class="center">Notes</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><code><var>x</var> + <var>y</var></code></td>
+        <td class="left"  >sum of <var>x</var> and <var>y</var></td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code><var>x</var> - <var>y</var></code></td>
+        <td class="left"  >difference of <var>x</var> and <var>y</var></td>
+        <td class="center"></td></tr>
+  
+    <tr><td class="center" valign="baseline"><code><var>x</var> * <var>y</var></code></td>
+        <td class="left"  >product of <var>x</var> and <var>y</var></td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code><var>x</var> / <var>y</var></code></td>
+        <td class="left"  >quotient of <var>x</var> and <var>y</var></td>
+        <td class="center">(1)</td></tr>
+    <tr><td class="center" valign="baseline"><code><var>x</var> // <var>y</var></code></td>
+        <td class="left"  >(floored) quotient of <var>x</var> and <var>y</var></td>
+        <td class="center">(5)</td></tr>
+    <tr><td class="center" valign="baseline"><code><var>x</var> % <var>y</var></code></td>
+        <td class="left"  >remainder of <code><var>x</var> / <var>y</var></code></td>
+        <td class="center">(4)</td></tr>
+  
+    <tr><td class="center" valign="baseline"><code>-<var>x</var></code></td>
+        <td class="left"  ><var>x</var> negated</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code>+<var>x</var></code></td>
+        <td class="left"  ><var>x</var> unchanged</td>
+        <td class="center"></td></tr>
+  
+    <tr><td class="center" valign="baseline"><code>abs(<var>x</var>)</code></td>
+        <td class="left"  >absolute value or magnitude of <var>x</var></td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code>int(<var>x</var>)</code></td>
+        <td class="left"  ><var>x</var> converted to integer</td>
+        <td class="center">(2)</td></tr>
+    <tr><td class="center" valign="baseline"><code>long(<var>x</var>)</code></td>
+        <td class="left"  ><var>x</var> converted to long integer</td>
+        <td class="center">(2)</td></tr>
+    <tr><td class="center" valign="baseline"><code>float(<var>x</var>)</code></td>
+        <td class="left"  ><var>x</var> converted to floating point</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code>complex(<var>re</var>,<var>im</var>)</code></td>
+        <td class="left"  >a complex number with real part <var>re</var>, imaginary part <var>im</var>.  <var>im</var> defaults to zero.</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code><var>c</var>.conjugate()</code></td>
+        <td class="left"  >conjugate of the complex number <var>c</var></td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code>divmod(<var>x</var>, <var>y</var>)</code></td>
+        <td class="left"  >the pair <code>(<var>x</var> // <var>y</var>, <var>x</var> % <var>y</var>)</code></td>
+        <td class="center">(3)(4)</td></tr>
+    <tr><td class="center" valign="baseline"><code>pow(<var>x</var>, <var>y</var>)</code></td>
+        <td class="left"  ><var>x</var> to the power <var>y</var></td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><code><var>x</var> ** <var>y</var></code></td>
+        <td class="left"  ><var>x</var> to the power <var>y</var></td>
+        <td class="center"></td></tr></tbody>
+</table></div>
+<a id='l2h-194' xml:id='l2h-194'></a><a id='l2h-196' xml:id='l2h-196'></a>
+<p>
+Notes:
+<dl>
+<dt><strong>(1)</strong></dt>
+<dd>For (plain or long) integer division, the result is an integer.
+The result is always rounded towards minus infinity: 1/2 is 0,
+(-1)/2 is -1, 1/(-2) is -1, and (-1)/(-2) is 0.  Note that the result
+is a long integer if either operand is a long integer, regardless of
+the numeric value.
+<a id='l2h-197' xml:id='l2h-197'></a><a id='l2h-198' xml:id='l2h-198'></a>
+<p>
+</dd>
+<dt><strong>(2)</strong></dt>
+<dd>Conversion from floating point to (long or plain) integer may round or
+truncate as in C; see functions <tt class="function">floor()</tt> and
+<tt class="function">ceil()</tt> in the <tt class="module"><a href="module-math.html">math</a></tt><a id='l2h-204' xml:id='l2h-204'></a> module
+for well-defined conversions.
+<a id='l2h-200' xml:id='l2h-200'></a><a id='l2h-201' xml:id='l2h-201'></a><a id='l2h-202' xml:id='l2h-202'></a>
+<p>
+</dd>
+<dt><strong>(3)</strong></dt>
+<dd>See section <a href="built-in-funcs.html#built-in-funcs">2.1</a>, ``Built-in Functions,'' for a full
+description.
+
+<p>
+</dd>
+<dt><strong>(4)</strong></dt>
+<dd>Complex floor division operator, modulo operator, and <tt class="function">divmod()</tt>.
+
+<p>
+<div class="versionnote"><b>Deprecated since release 2.3.</b>
+Instead convert to float using <tt class="function">abs()</tt>
+if appropriate.</div><p></p>
+
+<p>
+</dd>
+<dt><strong>(5)</strong></dt>
+<dd>Also referred to as integer division.  The resultant value is a whole integer,
+though the result's type is not necessarily int.
+</dd>
+</dl>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot4191">... rule.</a><A
+ href="typesnumeric.html#tex2html7"><sup>3.2</sup></a></dt>
+<dd>
+	As a consequence, the list <code>[1, 2]</code> is considered equal
+        to <code>[1.0, 2.0]</code>, and similarly for tuples.
+
+
+</dd>
+</dl>
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="bitstring-ops.html">3.4.1 Bit-string Operations on Integer Types</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.3 Comparisons"
+  href="comparisons.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. built-in Types"
+  href="types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.1 bit-string Operations on"
+  href="bitstring-ops.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="comparisons.html">3.3 Comparisons</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="types.html">3. Built-in Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="bitstring-ops.html">3.4.1 Bit-string Operations on</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

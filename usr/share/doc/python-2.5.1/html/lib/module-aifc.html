@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-sunau.html" />
+<link rel="prev" href="module-imageop.html" />
+<link rel="parent" href="mmedia.html" />
+<link rel="next" href="module-sunau.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>19.3 aifc -- Read and write AIFF and AIFC files</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.2 imageop  "
+  href="module-imageop.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.4 sunau  "
+  href="module-sunau.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-imageop.html">19.2 imageop  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-sunau.html">19.4 sunau  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0021300000000000000000">
+19.3 <tt class="module">aifc</tt> --
+         Read and write AIFF and AIFC files</a>
+</h1>
+
+<p>
+<a name="module-aifc"></a>
+
+<p>
+This module provides support for reading and writing AIFF and AIFF-C
+files.  AIFF is Audio Interchange File Format, a format for storing
+digital audio samples in a file.  AIFF-C is a newer version of the
+format that includes the ability to compress the audio data.
+<a id='l2h-4559' xml:id='l2h-4559'></a>
+
+<p>
+<strong>Caveat:</strong>  Some operations may only work under IRIX; these will
+raise <tt class="exception">ImportError</tt> when attempting to import the
+<tt class="module">cl</tt> module, which is only available on IRIX.
+
+<p>
+Audio files have a number of parameters that describe the audio data.
+The sampling rate or frame rate is the number of times per second the
+sound is sampled.  The number of channels indicate if the audio is
+mono, stereo, or quadro.  Each frame consists of one sample per
+channel.  The sample size is the size in bytes of each sample.  Thus a
+frame consists of <var>nchannels</var>*<var>samplesize</var> bytes, and a
+second's worth of audio consists of
+<var>nchannels</var>*<var>samplesize</var>*<var>framerate</var> bytes.
+
+<p>
+For example, CD quality audio has a sample size of two bytes (16
+bits), uses two channels (stereo) and has a frame rate of 44,100
+frames/second.  This gives a frame size of 4 bytes (2*2), and a
+second's worth occupies 2*2*44100 bytes (176,400 bytes).
+
+<p>
+Module <tt class="module">aifc</tt> defines the following function:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4531' xml:id='l2h-4531' class="function">open</tt></b>(</nobr></td>
+  <td><var>file</var><big>[</big><var>, mode</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open an AIFF or AIFF-C file and return an object instance with
+methods that are described below.  The argument <var>file</var> is either a
+string naming a file or a file object.  <var>mode</var> must be <code>'r'</code>
+or <code>'rb'</code> when the file must be opened for reading, or <code>'w'</code> 
+or <code>'wb'</code> when the file must be opened for writing.  If omitted,
+<code><var>file</var>.mode</code> is used if it exists, otherwise <code>'rb'</code> is
+used.  When used for writing, the file object should be seekable,
+unless you know ahead of time how many samples you are going to write
+in total and use <tt class="method">writeframesraw()</tt> and <tt class="method">setnframes()</tt>.
+</dl>
+
+<p>
+Objects returned by <tt class="function">open()</tt> when a file is opened for
+reading have the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4532' xml:id='l2h-4532' class="method">getnchannels</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the number of audio channels (1 for mono, 2 for stereo).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4533' xml:id='l2h-4533' class="method">getsampwidth</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the size in bytes of individual samples.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4534' xml:id='l2h-4534' class="method">getframerate</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the sampling rate (number of audio frames per second).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4535' xml:id='l2h-4535' class="method">getnframes</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the number of audio frames in the file.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4536' xml:id='l2h-4536' class="method">getcomptype</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a four-character string describing the type of compression used
+in the audio file.  For AIFF files, the returned value is
+<code>'NONE'</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4537' xml:id='l2h-4537' class="method">getcompname</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a human-readable description of the type of compression used in
+the audio file.  For AIFF files, the returned value is <code>'not
+compressed'</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4538' xml:id='l2h-4538' class="method">getparams</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a tuple consisting of all of the above values in the above
+order.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4539' xml:id='l2h-4539' class="method">getmarkers</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a list of markers in the audio file.  A marker consists of a
+tuple of three elements.  The first is the mark ID (an integer), the
+second is the mark position in frames from the beginning of the data
+(an integer), the third is the name of the mark (a string).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4540' xml:id='l2h-4540' class="method">getmark</tt></b>(</nobr></td>
+  <td><var>id</var>)</td></tr></table></dt>
+<dd>
+Return the tuple as described in <tt class="method">getmarkers()</tt> for the mark
+with the given <var>id</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4541' xml:id='l2h-4541' class="method">readframes</tt></b>(</nobr></td>
+  <td><var>nframes</var>)</td></tr></table></dt>
+<dd>
+Read and return the next <var>nframes</var> frames from the audio file.  The
+returned data is a string containing for each frame the uncompressed
+samples of all channels.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4542' xml:id='l2h-4542' class="method">rewind</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Rewind the read pointer.  The next <tt class="method">readframes()</tt> will start from
+the beginning.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4543' xml:id='l2h-4543' class="method">setpos</tt></b>(</nobr></td>
+  <td><var>pos</var>)</td></tr></table></dt>
+<dd>
+Seek to the specified frame number.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4544' xml:id='l2h-4544' class="method">tell</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the current frame number.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4545' xml:id='l2h-4545' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Close the AIFF file.  After calling this method, the object can no
+longer be used.
+</dl>
+
+<p>
+Objects returned by <tt class="function">open()</tt> when a file is opened for
+writing have all the above methods, except for <tt class="method">readframes()</tt> and
+<tt class="method">setpos()</tt>.  In addition the following methods exist.  The
+<tt class="method">get*()</tt> methods can only be called after the corresponding
+<tt class="method">set*()</tt> methods have been called.  Before the first
+<tt class="method">writeframes()</tt> or <tt class="method">writeframesraw()</tt>, all parameters
+except for the number of frames must be filled in.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4546' xml:id='l2h-4546' class="method">aiff</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Create an AIFF file.  The default is that an AIFF-C file is created,
+unless the name of the file ends in <code>'.aiff'</code> in which case the
+default is an AIFF file.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4547' xml:id='l2h-4547' class="method">aifc</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Create an AIFF-C file.  The default is that an AIFF-C file is created,
+unless the name of the file ends in <code>'.aiff'</code> in which case the
+default is an AIFF file.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4548' xml:id='l2h-4548' class="method">setnchannels</tt></b>(</nobr></td>
+  <td><var>nchannels</var>)</td></tr></table></dt>
+<dd>
+Specify the number of channels in the audio file.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4549' xml:id='l2h-4549' class="method">setsampwidth</tt></b>(</nobr></td>
+  <td><var>width</var>)</td></tr></table></dt>
+<dd>
+Specify the size in bytes of audio samples.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4550' xml:id='l2h-4550' class="method">setframerate</tt></b>(</nobr></td>
+  <td><var>rate</var>)</td></tr></table></dt>
+<dd>
+Specify the sampling frequency in frames per second.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4551' xml:id='l2h-4551' class="method">setnframes</tt></b>(</nobr></td>
+  <td><var>nframes</var>)</td></tr></table></dt>
+<dd>
+Specify the number of frames that are to be written to the audio file.
+If this parameter is not set, or not set correctly, the file needs to
+support seeking.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4552' xml:id='l2h-4552' class="method">setcomptype</tt></b>(</nobr></td>
+  <td><var>type, name</var>)</td></tr></table></dt>
+<dd>
+Specify the compression type.  If not specified, the audio data will
+not be compressed.  In AIFF files, compression is not possible.  The
+name parameter should be a human-readable description of the
+compression type, the type parameter should be a four-character
+string.  Currently the following compression types are supported:
+NONE, ULAW, ALAW, G722.
+<a id='l2h-4560' xml:id='l2h-4560'></a>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4553' xml:id='l2h-4553' class="method">setparams</tt></b>(</nobr></td>
+  <td><var>nchannels, sampwidth, framerate, comptype, compname</var>)</td></tr></table></dt>
+<dd>
+Set all the above parameters at once.  The argument is a tuple
+consisting of the various parameters.  This means that it is possible
+to use the result of a <tt class="method">getparams()</tt> call as argument to
+<tt class="method">setparams()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4554' xml:id='l2h-4554' class="method">setmark</tt></b>(</nobr></td>
+  <td><var>id, pos, name</var>)</td></tr></table></dt>
+<dd>
+Add a mark with the given id (larger than 0), and the given name at
+the given position.  This method can be called at any time before
+<tt class="method">close()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4555' xml:id='l2h-4555' class="method">tell</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the current write position in the output file.  Useful in
+combination with <tt class="method">setmark()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4556' xml:id='l2h-4556' class="method">writeframes</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Write data to the output file.  This method can only be called after
+the audio file parameters have been set.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4557' xml:id='l2h-4557' class="method">writeframesraw</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Like <tt class="method">writeframes()</tt>, except that the header of the audio file
+is not updated.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4558' xml:id='l2h-4558' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Close the AIFF file.  The header of the file is updated to reflect the
+actual size of the audio data. After calling this method, the object
+can no longer be used.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.2 imageop  "
+  href="module-imageop.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.4 sunau  "
+  href="module-sunau.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-imageop.html">19.2 imageop  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-sunau.html">19.4 sunau  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-test.html" />
+<link rel="prev" href="module-doctest.html" />
+<link rel="parent" href="development.html" />
+<link rel="next" href="minimal-example.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.3 unittest -- Unit testing framework</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.8 Soapbox"
+  href="doctest-soapbox.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23. development Tools"
+  href="development.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.3.1 basic example"
+  href="minimal-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-soapbox.html">23.2.8 Soapbox</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="development.html">23. Development Tools</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="minimal-example.html">23.3.1 Basic example</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0025300000000000000000">
+23.3 <tt class="module">unittest</tt> --
+         Unit testing framework</a>
+</h1>
+
+<p>
+<a name="module-unittest"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.1.</span>
+
+<p>
+The Python unit testing framework, sometimes referred to as ``PyUnit,'' is
+a Python language version of JUnit, by Kent Beck and Erich Gamma.
+JUnit is, in turn, a Java version of Kent's Smalltalk testing
+framework.  Each is the de facto standard unit testing framework for
+its respective language.
+
+<p>
+<tt class="module">unittest</tt> supports test automation, sharing of setup and shutdown
+code for tests, aggregation of tests into collections, and independence of
+the tests from the reporting framework.  The <tt class="module">unittest</tt> module
+provides classes that make it easy to support these qualities for a
+set of tests.
+
+<p>
+To achieve this, <tt class="module">unittest</tt> supports some important concepts:
+
+<p>
+<dl class="definitions">
+<dt><b><a id='l2h-5001' xml:id='l2h-5001'>test fixture</a></b></dt>
+<dd>
+A <i class="dfn">test fixture</i> represents the preparation needed to perform one
+or more tests, and any associate cleanup actions.  This may involve,
+for example, creating temporary or proxy databases, directories, or
+starting a server process.
+
+<p>
+<dt><b><a id='l2h-5002' xml:id='l2h-5002'>test case</a></b></dt>
+<dd>
+A <i class="dfn">test case</i> is the smallest unit of testing.  It checks for a
+specific response to a particular set of inputs.  <tt class="module">unittest</tt>
+provides a base class, <tt class="class">TestCase</tt>, which may be used to create
+new test cases.
+
+<p>
+<dt><b><a id='l2h-5003' xml:id='l2h-5003'>test suite</a></b></dt>
+<dd>
+A <i class="dfn">test suite</i> is a collection of test cases, test suites, or
+both.  It is used to aggregate tests that should be executed
+together.
+
+<p>
+<dt><b><a id='l2h-5004' xml:id='l2h-5004'>test runner</a></b></dt>
+<dd>
+A <i class="dfn">test runner</i> is a component which orchestrates the execution of
+tests and provides the outcome to the user.  The runner may use a
+graphical interface, a textual interface, or return a special value to
+indicate the results of executing the tests.
+</dl>
+
+<p>
+The test case and test fixture concepts are supported through the
+<tt class="class">TestCase</tt> and <tt class="class">FunctionTestCase</tt> classes; the former
+should be used when creating new tests, and the latter can be used when
+integrating existing test code with a <tt class="module">unittest</tt>-driven framework.
+When building test fixtures using <tt class="class">TestCase</tt>, the <tt class="method">setUp()</tt>
+and <tt class="method">tearDown()</tt> methods can be overridden to provide
+initialization and cleanup for the fixture.  With
+<tt class="class">FunctionTestCase</tt>, existing functions can be passed to the
+constructor for these purposes.  When the test is run, the
+fixture initialization is run first; if it succeeds, the cleanup
+method is run after the test has been executed, regardless of the
+outcome of the test.  Each instance of the <tt class="class">TestCase</tt> will only
+be used to run a single test method, so a new fixture is created for
+each test.
+
+<p>
+Test suites are implemented by the <tt class="class">TestSuite</tt> class.  This
+class allows individual tests and test suites to be aggregated; when
+the suite is executed, all tests added directly to the suite and in
+``child'' test suites are run.
+
+<p>
+A test runner is an object that provides a single method,
+<tt class="method">run()</tt>, which accepts a <tt class="class">TestCase</tt> or <tt class="class">TestSuite</tt>
+object as a parameter, and returns a result object.  The class
+<tt class="class">TestResult</tt> is provided for use as the result object.
+<tt class="module">unittest</tt> provides the <tt class="class">TextTestRunner</tt> as an example
+test runner which reports test results on the standard error stream by
+default.  Alternate runners can be implemented for other environments
+(such as graphical environments) without any need to derive from a
+specific class.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-doctest.html">doctest</a></tt>:</b>
+    <dd>Another test-support module with a very
+                      different flavor.
+  </dl>
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://www.XProgramming.com/testfram.htm"
+        >Simple Smalltalk
+            Testing: With Patterns</a></em></dt>
+    <dd>Kent Beck's original paper on
+            testing frameworks using the pattern shared by
+            <tt class="module">unittest</tt>.</dd>
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="minimal-example.html">23.3.1 Basic example</a>
+<li><a href="organizing-tests.html">23.3.2 Organizing test code</a>
+<li><a href="legacy-unit-tests.html">23.3.3 Re-using old test code</a>
+<li><a href="unittest-contents.html">23.3.4 Classes and functions</a>
+<li><a href="testcase-objects.html">23.3.5 TestCase Objects</a>
+<li><a href="testsuite-objects.html">23.3.6 TestSuite Objects</a>
+<li><a href="testresult-objects.html">23.3.7 TestResult Objects</a>
+<li><a href="testloader-objects.html">23.3.8 TestLoader Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.8 Soapbox"
+  href="doctest-soapbox.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23. development Tools"
+  href="development.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.3.1 basic example"
+  href="minimal-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-soapbox.html">23.2.8 Soapbox</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="development.html">23. Development Tools</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="minimal-example.html">23.3.1 Basic example</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

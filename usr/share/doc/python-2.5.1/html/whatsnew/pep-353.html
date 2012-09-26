@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-357.html" />
+<link rel="prev" href="pep-352.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-357.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>10 PEP 353: Using ssize_t as the index type</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="9 pep 352: Exceptions"
+  href="pep-352.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11 pep 357: The"
+  href="pep-357.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-352.html">9 PEP 352: Exceptions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-357.html">11 PEP 357: The</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0001100000000000000000"></a><a name="pep-353"></a>
+<br>
+10 PEP 353: Using ssize_t as the index type
+</h1>
+
+<p>
+A wide-ranging change to Python's C API, using a new 
+<tt class="ctype">Py_ssize_t</tt> type definition instead of <tt class="ctype">int</tt>, 
+will permit the interpreter to handle more data on 64-bit platforms.
+This change doesn't affect Python's capacity on 32-bit platforms.
+
+<p>
+Various pieces of the Python interpreter used C's <tt class="ctype">int</tt> type to
+store sizes or counts; for example, the number of items in a list or
+tuple were stored in an <tt class="ctype">int</tt>.  The C compilers for most 64-bit
+platforms still define <tt class="ctype">int</tt> as a 32-bit type, so that meant
+that lists could only hold up to <code>2**31 - 1</code> = 2147483647 items.
+(There are actually a few different programming models that 64-bit C
+compilers can use - see
+<a class="url" href="http://www.unix.org/version2/whatsnew/lp64_wp.html">http://www.unix.org/version2/whatsnew/lp64_wp.html</a> for a
+discussion - but the most commonly available model leaves <tt class="ctype">int</tt>
+as 32 bits.)
+
+<p>
+A limit of 2147483647 items doesn't really matter on a 32-bit platform
+because you'll run out of memory before hitting the length limit.
+Each list item requires space for a pointer, which is 4 bytes, plus
+space for a <tt class="ctype">PyObject</tt> representing the item.  2147483647*4 is
+already more bytes than a 32-bit address space can contain.
+
+<p>
+It's possible to address that much memory on a 64-bit platform,
+however.  The pointers for a list that size would only require 16&nbsp;GiB
+of space, so it's not unreasonable that Python programmers might
+construct lists that large.  Therefore, the Python interpreter had to
+be changed to use some type other than <tt class="ctype">int</tt>, and this will be a
+64-bit type on 64-bit platforms.  The change will cause
+incompatibilities on 64-bit machines, so it was deemed worth making
+the transition now, while the number of 64-bit users is still
+relatively small.  (In 5 or 10 years, we may <em>all</em> be on 64-bit
+machines, and the transition would be more painful then.)
+
+<p>
+This change most strongly affects authors of C extension modules.  
+Python strings and container types such as lists and tuples 
+now use <tt class="ctype">Py_ssize_t</tt> to store their size.  
+Functions such as <tt class="cfunction">PyList_Size()</tt> 
+now return <tt class="ctype">Py_ssize_t</tt>.  Code in extension modules
+may therefore need to have some variables changed to
+<tt class="ctype">Py_ssize_t</tt>.  
+
+<p>
+The <tt class="cfunction">PyArg_ParseTuple()</tt> and <tt class="cfunction">Py_BuildValue()</tt> functions
+have a new conversion code, "<tt class="samp">n</tt>", for <tt class="ctype">Py_ssize_t</tt>.  
+<tt class="cfunction">PyArg_ParseTuple()</tt>'s "<tt class="samp">s#</tt>" and "<tt class="samp">t#</tt>" still output
+<tt class="ctype">int</tt> by default, but you can define the macro 
+PY_SSIZE_T_CLEAN before including <span class="file">Python.h</span> 
+to make them return <tt class="ctype">Py_ssize_t</tt>.
+
+<p>
+<a class="rfc" id='rfcref-2377' xml:id='rfcref-2377'
+href="http://www.python.org/peps/pep-0353.html">PEP 353</a> has a section on conversion guidelines that 
+extension authors should read to learn about supporting 64-bit
+platforms.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0353.html"
+        title="Using ssize_t as the index type"
+        >PEP 353, <em>Using ssize_t as the index type</em></a>
+    <dd>PEP written and implemented by Martin von&nbsp;Löwis.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="9 pep 352: Exceptions"
+  href="pep-352.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11 pep 357: The"
+  href="pep-357.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-352.html">9 PEP 352: Exceptions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-357.html">11 PEP 357: The</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

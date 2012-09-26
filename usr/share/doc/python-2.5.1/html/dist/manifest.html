@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="manifest-options.html" />
+<link rel="prev" href="source-dist.html" />
+<link rel="parent" href="source-dist.html" />
+<link rel="next" href="manifest-options.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.1 Specifying the files to distribute</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4. creating a Source"
+  href="source-dist.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. creating a Source"
+  href="source-dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.2 manifest-related options"
+  href="manifest-options.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="source-dist.html">4. Creating a Source</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="source-dist.html">4. Creating a Source</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="manifest-options.html">4.2 Manifest-related options</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION004100000000000000000"></a>
+<a name="manifest"></a>
+<br>
+4.1 Specifying the files to distribute
+</h1>
+
+<p>
+If you don't supply an explicit list of files (or instructions on how to
+generate one), the <code class="du-command">sdist</code> command puts a minimal default set
+into the source distribution:
+
+<ul>
+<li>all Python source files implied by the <span class="du-option">py_modules</span> and
+  <span class="du-option">packages</span> options
+</li>
+<li>all C source files mentioned in the <span class="du-option">ext_modules</span> or
+  <span class="du-option">libraries</span> options (<b class="du-xxx">getting C library sources currently
+    broken--no <tt class="method">get_source_files()</tt> method in <span class="file">build_clib.py</span>!</b>)
+</li>
+<li>scripts identified by the <span class="du-option">scripts</span> option
+</li>
+<li>anything that looks like a test script: <span class="file">test/test*.py</span>
+  (currently, the Distutils don't do anything with test scripts except
+  include them in source distributions, but in the future there will be
+  a standard for testing Python module distributions)
+</li>
+<li><span class="file">README.txt</span> (or <span class="file">README</span>), <span class="file">setup.py</span> (or whatever 
+  you called your setup script), and <span class="file">setup.cfg</span>
+</li>
+</ul>
+
+<p>
+Sometimes this is enough, but usually you will want to specify
+additional files to distribute.  The typical way to do this is to write
+a <em>manifest template</em>, called <span class="file">MANIFEST.in</span> by default.  The
+manifest template is just a list of instructions for how to generate
+your manifest file, <span class="file">MANIFEST</span>, which is the exact list of files to
+include in your source distribution.  The <code class="du-command">sdist</code> command
+processes this template and generates a manifest based on its
+instructions and what it finds in the filesystem.
+
+<p>
+If you prefer to roll your own manifest file, the format is simple: one
+filename per line, regular files (or symlinks to them) only.  If you do
+supply your own <span class="file">MANIFEST</span>, you must specify everything: the
+default set of files described above does not apply in this case.
+
+<p>
+The manifest template has one command per line, where each command
+specifies a set of files to include or exclude from the source
+distribution.  For an example, again we turn to the Distutils' own
+manifest template:
+
+<p>
+<div class="verbatim"><pre>
+include *.txt
+recursive-include examples *.txt *.py
+prune examples/sample?/build
+</pre></div>
+
+<p>
+The meanings should be fairly clear: include all files in the
+distribution root matching <span class="file">*.txt</span>, all files anywhere under the
+<span class="file">examples</span> directory matching <span class="file">*.txt</span> or <span class="file">*.py</span>, and
+exclude all directories matching <span class="file">examples/sample?/build</span>.  All of
+this is done <em>after</em> the standard include set, so you can exclude
+files from the standard set with explicit instructions in the manifest
+template.  (Or, you can use the <b class="programopt">--no-defaults</b> option to
+disable the standard set entirely.)  There are several other commands
+available in the manifest template mini-language; see
+section&nbsp;<a href="sdist-cmd.html#sdist-cmd">10.2</a>.
+
+<p>
+The order of commands in the manifest template matters: initially, we
+have the list of default files as described above, and each command in
+the template adds to or removes from that list of files.  Once we have
+fully processed the manifest template, we remove files that should not
+be included in the source distribution:
+
+<ul>
+<li>all files in the Distutils ``build'' tree (default <span class="file">build/</span>)
+</li>
+<li>all files in directories named <span class="file">RCS</span>, <span class="file">CVS</span> or <span class="file">.svn</span>
+</li>
+</ul>
+Now we have our complete list of files, which is written to the manifest
+for future reference, and then used to build the source distribution
+archive(s).
+
+<p>
+You can disable the default set of included files with the
+<b class="programopt">--no-defaults</b> option, and you can disable the standard
+exclude set with <b class="programopt">--no-prune</b>.
+
+<p>
+Following the Distutils' own manifest template, let's trace how the
+<code class="du-command">sdist</code> command builds the list of files to include in the
+Distutils source distribution:
+
+<ol>
+<li>include all Python source files in the <span class="file">distutils</span> and
+  <span class="file">distutils/command</span> subdirectories (because packages
+  corresponding to those two directories were mentioned in the
+  <span class="du-option">packages</span> option in the setup script--see
+  section&nbsp;<a href="setup-script.html#setup-script">2</a>)
+</li>
+<li>include <span class="file">README.txt</span>, <span class="file">setup.py</span>, and <span class="file">setup.cfg</span>
+  (standard files)
+</li>
+<li>include <span class="file">test/test*.py</span> (standard files)
+</li>
+<li>include <span class="file">*.txt</span> in the distribution root (this will find
+  <span class="file">README.txt</span> a second time, but such redundancies are weeded out
+  later)
+</li>
+<li>include anything matching <span class="file">*.txt</span> or <span class="file">*.py</span> in the
+  sub-tree under <span class="file">examples</span>,
+</li>
+<li>exclude all files in the sub-trees starting at directories
+  matching <span class="file">examples/sample?/build</span>--this may exclude files
+  included by the previous two steps, so it's important that the
+  <code>prune</code> command in the manifest template comes after the
+  <code>recursive-include</code> command
+</li>
+<li>exclude the entire <span class="file">build</span> tree, and any <span class="file">RCS</span>,
+  <span class="file">CVS</span> and <span class="file">.svn</span> directories
+</li>
+</ol>
+Just like in the setup script, file and directory names in the manifest
+template should always be slash-separated; the Distutils will take care
+of converting them to the standard representation on your platform.
+That way, the manifest template is portable across operating systems.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4. creating a Source"
+  href="source-dist.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. creating a Source"
+  href="source-dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.2 manifest-related options"
+  href="manifest-options.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="source-dist.html">4. Creating a Source</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="source-dist.html">4. Creating a Source</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="manifest-options.html">4.2 Manifest-related options</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

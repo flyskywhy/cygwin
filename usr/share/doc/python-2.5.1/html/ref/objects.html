@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="types.html" />
+<link rel="prev" href="datamodel.html" />
+<link rel="parent" href="datamodel.html" />
+<link rel="next" href="types.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.1 Objects, values and types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3. data model"
+  href="datamodel.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. data model"
+  href="datamodel.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.2 the standard type"
+  href="types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="datamodel.html">3. Data model</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datamodel.html">3. Data model</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="types.html">3.2 The standard type</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION005100000000000000000"></a><a name="objects"></a><a id='l2h-19' xml:id='l2h-19'></a>
+<br>
+3.1 Objects, values and types
+</h1>
+
+<p>
+<i class="dfn">Objects</i> are Python's abstraction for data.  All data in a Python
+program is represented by objects or by relations between objects.
+(In a sense, and in conformance to Von Neumann's model of a
+``stored program computer,'' code is also represented by objects.)
+
+<p>
+Every object has an identity, a type and a value.  An object's
+<em>identity</em> never changes once it has been created; you may think
+of it as the object's address in memory.  The `<tt class="keyword">is</tt>' operator
+compares the identity of two objects; the
+<tt class="function">id()</tt><a id='l2h-20' xml:id='l2h-20'></a> function returns an integer
+representing its identity (currently implemented as its address).
+An object's <i class="dfn">type</i> is
+also unchangeable.<a name="tex2html2"
+  href="#foot2446"><sup>3.1</sup></a>An object's type determines the operations that the object
+supports (e.g., ``does it have a length?'') and also defines the
+possible values for objects of that type.  The
+<tt class="function">type()</tt><a id='l2h-21' xml:id='l2h-21'></a> function returns an object's type
+(which is an object itself).  The <em>value</em> of some
+objects can change.  Objects whose value can change are said to be
+<em>mutable</em>; objects whose value is unchangeable once they are
+created are called <em>immutable</em>.
+(The value of an immutable container object that contains a reference
+to a mutable object can change when the latter's value is changed;
+however the container is still considered immutable, because the
+collection of objects it contains cannot be changed.  So, immutability
+is not strictly the same as having an unchangeable value, it is more
+subtle.)
+An object's mutability is determined by its type; for instance,
+numbers, strings and tuples are immutable, while dictionaries and
+lists are mutable.
+
+<p>
+Objects are never explicitly destroyed; however, when they become
+unreachable they may be garbage-collected.  An implementation is
+allowed to postpone garbage collection or omit it altogether -- it is
+a matter of implementation quality how garbage collection is
+implemented, as long as no objects are collected that are still
+reachable.  (Implementation note: the current implementation uses a
+reference-counting scheme with (optional) delayed detection of
+cyclically linked garbage, which collects most objects as soon as they
+become unreachable, but is not guaranteed to collect garbage
+containing circular references.  See the
+<em class="citetitle"><a
+ href="../lib/module-gc.html"
+ title="Python Library Reference"
+ >Python Library Reference</a></em> for
+information on controlling the collection of cyclic garbage.)
+
+<p>
+Note that the use of the implementation's tracing or debugging
+facilities may keep objects alive that would normally be collectable.
+Also note that catching an exception with a
+`<tt class="keyword">try</tt>...<tt class="keyword">except</tt>' statement may keep objects alive.
+
+<p>
+Some objects contain references to ``external'' resources such as open
+files or windows.  It is understood that these resources are freed
+when the object is garbage-collected, but since garbage collection is
+not guaranteed to happen, such objects also provide an explicit way to
+release the external resource, usually a <tt class="method">close()</tt> method.
+Programs are strongly recommended to explicitly close such
+objects.  The `<tt class="keyword">try</tt>...<tt class="keyword">finally</tt>' statement provides
+a convenient way to do this.
+
+<p>
+Some objects contain references to other objects; these are called
+<em>containers</em>.  Examples of containers are tuples, lists and
+dictionaries.  The references are part of a container's value.  In
+most cases, when we talk about the value of a container, we imply the
+values, not the identities of the contained objects; however, when we
+talk about the mutability of a container, only the identities of
+the immediately contained objects are implied.  So, if an immutable
+container (like a tuple)
+contains a reference to a mutable object, its value changes
+if that mutable object is changed.
+
+<p>
+Types affect almost all aspects of object behavior.  Even the importance
+of object identity is affected in some sense: for immutable types,
+operations that compute new values may actually return a reference to
+any existing object with the same type and value, while for mutable
+objects this is not allowed.  E.g., after
+"<tt class="samp">a = 1; b = 1</tt>",
+<code>a</code> and <code>b</code> may or may not refer to the same object with the
+value one, depending on the implementation, but after
+"<tt class="samp">c = []; d = []</tt>", <code>c</code> and <code>d</code>
+are guaranteed to refer to two different, unique, newly created empty
+lists.
+(Note that "<tt class="samp">c = d = []</tt>" assigns the same object to both
+<code>c</code> and <code>d</code>.)
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot2446">... unchangeable.</a><A
+ href="objects.html#tex2html2"><sup>3.1</sup></a></dt>
+<dd>Since Python 2.2, a gradual merging of
+types and classes has been started that makes this and a few other
+assertions made in this manual not 100% accurate and complete:
+for example, it <em>is</em> now possible in some cases to change an
+object's type, under certain controlled conditions.  Until this manual
+undergoes extensive revision, it must now be taken as authoritative
+only regarding ``classic classes'', that are still the default, for
+compatibility purposes, in Python 2.2 and 2.3.  For more information,
+see <a class="url" href="http://www.python.org/doc/newstyle.html">http://www.python.org/doc/newstyle.html</a>.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3. data model"
+  href="datamodel.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. data model"
+  href="datamodel.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.2 the standard type"
+  href="types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="datamodel.html">3. Data model</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datamodel.html">3. Data model</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="types.html">3.2 The standard type</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

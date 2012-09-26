@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="listing-modules.html" />
+<link rel="prev" href="setup-script.html" />
+<link rel="parent" href="setup-script.html" />
+<link rel="next" href="listing-modules.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.1 Listing whole packages</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2 listing individual modules"
+  href="listing-modules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="listing-modules.html">2.2 Listing individual modules</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION002100000000000000000"></a>
+<a name="listing-packages"></a>
+<br>
+2.1 Listing whole packages
+</h1>
+
+<p>
+The <span class="du-option">packages</span> option tells the Distutils to process (build,
+distribute, install, etc.) all pure Python modules found in each package
+mentioned in the <span class="du-option">packages</span> list.  In order to do this, of
+course, there has to be a correspondence between package names and
+directories in the filesystem.  The default correspondence is the most
+obvious one, i.e. package <tt class="module">distutils</tt> is found in the directory
+<span class="file">distutils</span> relative to the distribution root.  Thus, when you say
+<code>packages = ['foo']</code> in your setup script, you are promising that
+the Distutils will find a file <span class="file">foo/__init__.py</span> (which might
+be spelled differently on your system, but you get the idea) relative to
+the directory where your setup script lives.  If you break this
+promise, the Distutils will issue a warning but still process the broken
+package anyways.
+
+<p>
+If you use a different convention to lay out your source directory,
+that's no problem: you just have to supply the <span class="du-option">package_dir</span>
+option to tell the Distutils about your convention.  For example, say
+you keep all Python source under <span class="file">lib</span>, so that modules in the
+``root package'' (i.e., not in any package at all) are in
+<span class="file">lib</span>, modules in the <tt class="module">foo</tt> package are in <span class="file">lib/foo</span>,
+and so forth.  Then you would put
+
+<p>
+<div class="verbatim"><pre>
+package_dir = {'': 'lib'}
+</pre></div>
+
+<p>
+in your setup script.  The keys to this dictionary are package names,
+and an empty package name stands for the root package.  The values are
+directory names relative to your distribution root.  In this case, when
+you say <code>packages = ['foo']</code>, you are promising that the file
+<span class="file">lib/foo/__init__.py</span> exists.
+
+<p>
+Another possible convention is to put the <tt class="module">foo</tt> package right in 
+<span class="file">lib</span>, the <tt class="module">foo.bar</tt> package in <span class="file">lib/bar</span>, etc.  This
+would be written in the setup script as
+
+<p>
+<div class="verbatim"><pre>
+package_dir = {'foo': 'lib'}
+</pre></div>
+
+<p>
+A <code><var>package</var>: <var>dir</var></code> entry in the <span class="du-option">package_dir</span>
+dictionary implicitly applies to all packages below <var>package</var>, so
+the <tt class="module">foo.bar</tt> case is automatically handled here.  In this
+example, having <code>packages = ['foo', 'foo.bar']</code> tells the Distutils
+to look for <span class="file">lib/__init__.py</span> and
+<span class="file">lib/bar/__init__.py</span>.  (Keep in mind that although
+<span class="du-option">package_dir</span> applies recursively, you must explicitly list all
+packages in <span class="du-option">packages</span>: the Distutils will <em>not</em> recursively
+scan your source tree looking for any directory with an
+<span class="file">__init__.py</span> file.)
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2 listing individual modules"
+  href="listing-modules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="listing-modules.html">2.2 Listing individual modules</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

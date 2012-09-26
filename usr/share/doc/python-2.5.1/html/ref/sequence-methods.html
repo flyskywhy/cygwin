@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="numeric-types.html" />
+<link rel="prev" href="sequence-types.html" />
+<link rel="parent" href="specialnames.html" />
+<link rel="next" href="numeric-types.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.4.6 Additional methods for emulation of sequence types </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.5 emulating container types"
+  href="sequence-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.7 emulating numeric types"
+  href="numeric-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="sequence-types.html">3.4.5 Emulating container types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="numeric-types.html">3.4.7 Emulating numeric types</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION005460000000000000000"></a><a name="sequence-methods"></a>
+<br>
+3.4.6 Additional methods for emulation of sequence types
+  
+</h2>
+
+<p>
+The following optional methods can be defined to further emulate sequence
+objects.  Immutable sequences methods should at most only define
+<tt class="method">__getslice__()</tt>; mutable sequences might define all three
+methods.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-242' xml:id='l2h-242' class="method">__getslice__</tt></b>(</nobr></td>
+  <td><var>self, i, j</var>)</td></tr></table></dt>
+<dd>
+<div class="versionnote"><b>Deprecated since release 2.0.</b>
+Support slice objects as parameters to the
+<tt class="method">__getitem__()</tt> method.</div><p></p>
+Called to implement evaluation of <code><var>self</var>[<var>i</var>:<var>j</var>]</code>.
+The returned object should be of the same type as <var>self</var>.  Note
+that missing <var>i</var> or <var>j</var> in the slice expression are replaced
+by zero or <code>sys.maxint</code>, respectively.  If negative indexes are
+used in the slice, the length of the sequence is added to that index.
+If the instance does not implement the <tt class="method">__len__()</tt> method, an
+<tt class="exception">AttributeError</tt> is raised.
+No guarantee is made that indexes adjusted this way are not still
+negative.  Indexes which are greater than the length of the sequence
+are not modified.
+If no <tt class="method">__getslice__()</tt> is found, a slice
+object is created instead, and passed to <tt class="method">__getitem__()</tt> instead.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-243' xml:id='l2h-243' class="method">__setslice__</tt></b>(</nobr></td>
+  <td><var>self, i, j, sequence</var>)</td></tr></table></dt>
+<dd>
+Called to implement assignment to <code><var>self</var>[<var>i</var>:<var>j</var>]</code>.
+Same notes for <var>i</var> and <var>j</var> as for <tt class="method">__getslice__()</tt>.
+
+<p>
+This method is deprecated. If no <tt class="method">__setslice__()</tt> is found,
+or for extended slicing of the form
+<code><var>self</var>[<var>i</var>:<var>j</var>:<var>k</var>]</code>, a
+slice object is created, and passed to <tt class="method">__setitem__()</tt>,
+instead of <tt class="method">__setslice__()</tt> being called.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-244' xml:id='l2h-244' class="method">__delslice__</tt></b>(</nobr></td>
+  <td><var>self, i, j</var>)</td></tr></table></dt>
+<dd>
+Called to implement deletion of <code><var>self</var>[<var>i</var>:<var>j</var>]</code>.
+Same notes for <var>i</var> and <var>j</var> as for <tt class="method">__getslice__()</tt>.
+This method is deprecated. If no <tt class="method">__delslice__()</tt> is found,
+or for extended slicing of the form
+<code><var>self</var>[<var>i</var>:<var>j</var>:<var>k</var>]</code>, a
+slice object is created, and passed to <tt class="method">__delitem__()</tt>,
+instead of <tt class="method">__delslice__()</tt> being called.
+</dl>
+
+<p>
+Notice that these methods are only invoked when a single slice with a
+single colon is used, and the slice method is available.  For slice
+operations involving extended slice notation, or in absence of the
+slice methods, <tt class="method">__getitem__()</tt>, <tt class="method">__setitem__()</tt> or
+<tt class="method">__delitem__()</tt> is called with a slice object as argument.
+
+<p>
+The following example demonstrate how to make your program or module
+compatible with earlier versions of Python (assuming that methods
+<tt class="method">__getitem__()</tt>, <tt class="method">__setitem__()</tt> and <tt class="method">__delitem__()</tt>
+support slice objects as arguments):
+
+<p>
+<div class="verbatim"><pre>
+class MyClass:
+    ...
+    def __getitem__(self, index):
+        ...
+    def __setitem__(self, index, value):
+        ...
+    def __delitem__(self, index):
+        ...
+
+    if sys.version_info &lt; (2, 0):
+        # They won't be defined if version is at least 2.0 final
+
+        def __getslice__(self, i, j):
+            return self[max(0, i):max(0, j):]
+        def __setslice__(self, i, j, seq):
+            self[max(0, i):max(0, j):] = seq
+        def __delslice__(self, i, j):
+            del self[max(0, i):max(0, j):]
+    ...
+</pre></div>
+
+<p>
+Note the calls to <tt class="function">max()</tt>; these are necessary because of
+the handling of negative indices before the
+<tt class="method">__*slice__()</tt> methods are called.  When negative indexes are
+used, the <tt class="method">__*item__()</tt> methods receive them as provided, but
+the <tt class="method">__*slice__()</tt> methods get a ``cooked'' form of the index
+values.  For each negative index value, the length of the sequence is
+added to the index before calling the method (which may still result
+in a negative index); this is the customary handling of negative
+indexes by the built-in sequence types, and the <tt class="method">__*item__()</tt>
+methods are expected to do this as well.  However, since they should
+already be doing that, negative indexes cannot be passed in; they must
+be constrained to the bounds of the sequence before being passed to
+the <tt class="method">__*item__()</tt> methods.
+Calling <code>max(0, i)</code> conveniently returns the proper value.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.5 emulating container types"
+  href="sequence-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.7 emulating numeric types"
+  href="numeric-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="sequence-types.html">3.4.5 Emulating container types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="numeric-types.html">3.4.7 Emulating numeric types</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

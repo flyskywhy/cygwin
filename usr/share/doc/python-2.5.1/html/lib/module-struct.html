@@ -1,0 +1,468 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-difflib.html" />
+<link rel="prev" href="module-re.html" />
+<link rel="parent" href="strings.html" />
+<link rel="next" href="struct-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.3 struct -- Interpret strings as packed binary data</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.2.6 Examples"
+  href="node49.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.3.1 struct Objects"
+  href="struct-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node49.html">4.2.6 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="struct-objects.html">4.3.1 Struct Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006300000000000000000">
+4.3 <tt class="module">struct</tt> --
+         Interpret strings as packed binary data</a>
+</h1>
+<a name="module-struct"></a>
+<p>
+
+<p>
+<a id='l2h-440' xml:id='l2h-440'></a><a id='l2h-441' xml:id='l2h-441'></a>
+<p>
+This module performs conversions between Python values and C
+structs represented as Python strings.  It uses <i class="dfn">format strings</i>
+(explained below) as compact descriptions of the lay-out of the C
+structs and the intended conversion to/from Python values.  This can
+be used in handling binary data stored in files or from network
+connections, among other sources.
+
+<p>
+The module defines the following exception and functions:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-442' xml:id='l2h-442' class="exception">error</tt></b></dt>
+<dd>
+  Exception raised on various occasions; argument is a string
+  describing what is wrong.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-443' xml:id='l2h-443' class="function">pack</tt></b>(</nobr></td>
+  <td><var>fmt, v1, v2,  ...</var>)</td></tr></table></dt>
+<dd>
+  Return a string containing the values
+  <code><var>v1</var>, <var>v2</var>,  ...</code> packed according to the given
+  format.  The arguments must match the values required by the format
+  exactly.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-444' xml:id='l2h-444' class="function">pack_into</tt></b>(</nobr></td>
+  <td><var>fmt, buffer, offset, v1, v2, ...</var>)</td></tr></table></dt>
+<dd>
+  Pack the values <code><var>v1</var>, <var>v2</var>,  ...</code> according to the given
+  format, write the packed bytes into the writable <var>buffer</var> starting at
+  <var>offset</var>.
+  Note that the offset is not an optional argument.
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-445' xml:id='l2h-445' class="function">unpack</tt></b>(</nobr></td>
+  <td><var>fmt, string</var>)</td></tr></table></dt>
+<dd>
+  Unpack the string (presumably packed by <code>pack(<var>fmt</var>,
+   ...)</code>) according to the given format.  The result is a
+  tuple even if it contains exactly one item.  The string must contain
+  exactly the amount of data required by the format
+  (<code>len(<var>string</var>)</code> must equal <code>calcsize(<var>fmt</var>)</code>).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-446' xml:id='l2h-446' class="function">unpack_from</tt></b>(</nobr></td>
+  <td><var>fmt, buffer</var><big>[</big><var>,offset <code>= 0</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Unpack the <var>buffer</var> according to tthe given format.
+  The result is a tuple even if it contains exactly one item. The
+  <var>buffer</var> must contain at least the amount of data required by the
+  format (<code>len(buffer[offset:])</code> must be at least
+  <code>calcsize(<var>fmt</var>)</code>).
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-447' xml:id='l2h-447' class="function">calcsize</tt></b>(</nobr></td>
+  <td><var>fmt</var>)</td></tr></table></dt>
+<dd>
+  Return the size of the struct (and hence of the string)
+  corresponding to the given format.
+</dl>
+
+<p>
+Format characters have the following meaning; the conversion between
+C and Python values should be obvious given their types:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Format</th>
+      <th class="left"  >C Type</th>
+      <th class="left"  >Python</th>
+      <th class="center">Notes</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><samp>x</samp></td>
+        <td class="left"  >pad byte</td>
+        <td class="left"  >no value</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>c</samp></td>
+        <td class="left"  ><tt class="ctype">char</tt></td>
+        <td class="left"  >string of length 1</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>b</samp></td>
+        <td class="left"  ><tt class="ctype">signed char</tt></td>
+        <td class="left"  >integer</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>B</samp></td>
+        <td class="left"  ><tt class="ctype">unsigned char</tt></td>
+        <td class="left"  >integer</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>h</samp></td>
+        <td class="left"  ><tt class="ctype">short</tt></td>
+        <td class="left"  >integer</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>H</samp></td>
+        <td class="left"  ><tt class="ctype">unsigned short</tt></td>
+        <td class="left"  >integer</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>i</samp></td>
+        <td class="left"  ><tt class="ctype">int</tt></td>
+        <td class="left"  >integer</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>I</samp></td>
+        <td class="left"  ><tt class="ctype">unsigned int</tt></td>
+        <td class="left"  >long</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>l</samp></td>
+        <td class="left"  ><tt class="ctype">long</tt></td>
+        <td class="left"  >integer</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>L</samp></td>
+        <td class="left"  ><tt class="ctype">unsigned long</tt></td>
+        <td class="left"  >long</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>q</samp></td>
+        <td class="left"  ><tt class="ctype">long long</tt></td>
+        <td class="left"  >long</td>
+        <td class="center">(1)</td></tr>
+    <tr><td class="center" valign="baseline"><samp>Q</samp></td>
+        <td class="left"  ><tt class="ctype">unsigned long long</tt></td>
+        <td class="left"  >long</td>
+        <td class="center">(1)</td></tr>
+    <tr><td class="center" valign="baseline"><samp>f</samp></td>
+        <td class="left"  ><tt class="ctype">float</tt></td>
+        <td class="left"  >float</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>d</samp></td>
+        <td class="left"  ><tt class="ctype">double</tt></td>
+        <td class="left"  >float</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>s</samp></td>
+        <td class="left"  ><tt class="ctype">char[]</tt></td>
+        <td class="left"  >string</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>p</samp></td>
+        <td class="left"  ><tt class="ctype">char[]</tt></td>
+        <td class="left"  >string</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>P</samp></td>
+        <td class="left"  ><tt class="ctype">void *</tt></td>
+        <td class="left"  >integer</td>
+        <td class="center"></td></tr></tbody>
+</table></div>
+
+<p>
+Notes:
+
+<p>
+<dl>
+<dt><strong>(1)</strong></dt>
+<dd>The "<tt class="character">q</tt>" and "<tt class="character">Q</tt>" conversion codes are available in
+  native mode only if the platform C compiler supports C <tt class="ctype">long long</tt>,
+  or, on Windows, <tt class="ctype">__int64</tt>.  They are always available in standard
+  modes.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd>
+</dl>
+
+<p>
+A format character may be preceded by an integral repeat count.  For
+example, the format string <code>'4h'</code> means exactly the same as
+<code>'hhhh'</code>.
+
+<p>
+Whitespace characters between formats are ignored; a count and its
+format must not contain whitespace though.
+
+<p>
+For the "<tt class="character">s</tt>" format character, the count is interpreted as the
+size of the string, not a repeat count like for the other format
+characters; for example, <code>'10s'</code> means a single 10-byte string, while
+<code>'10c'</code> means 10 characters.  For packing, the string is
+truncated or padded with null bytes as appropriate to make it fit.
+For unpacking, the resulting string always has exactly the specified
+number of bytes.  As a special case, <code>'0s'</code> means a single, empty
+string (while <code>'0c'</code> means 0 characters).
+
+<p>
+The "<tt class="character">p</tt>" format character encodes a "Pascal string", meaning
+a short variable-length string stored in a fixed number of bytes.
+The count is the total number of bytes stored.  The first byte stored is
+the length of the string, or 255, whichever is smaller.  The bytes
+of the string follow.  If the string passed in to <tt class="function">pack()</tt> is too
+long (longer than the count minus 1), only the leading count-1 bytes of the
+string are stored.  If the string is shorter than count-1, it is padded
+with null bytes so that exactly count bytes in all are used.  Note that
+for <tt class="function">unpack()</tt>, the "<tt class="character">p</tt>" format character consumes count
+bytes, but that the string returned can never contain more than 255
+characters.
+
+<p>
+For the "<tt class="character">I</tt>", "<tt class="character">L</tt>", "<tt class="character">q</tt>" and "<tt class="character">Q</tt>"
+format characters, the return value is a Python long integer.
+
+<p>
+For the "<tt class="character">P</tt>" format character, the return value is a Python
+integer or long integer, depending on the size needed to hold a
+pointer when it has been cast to an integer type.  A <tt class="constant">NULL</tt> pointer will
+always be returned as the Python integer <code>0</code>. When packing pointer-sized
+values, Python integer or long integer objects may be used.  For
+example, the Alpha and Merced processors use 64-bit pointer values,
+meaning a Python long integer will be used to hold the pointer; other
+platforms use 32-bit pointers and will use a Python integer.
+
+<p>
+By default, C numbers are represented in the machine's native format
+and byte order, and properly aligned by skipping pad bytes if
+necessary (according to the rules used by the C compiler).
+
+<p>
+Alternatively, the first character of the format string can be used to
+indicate the byte order, size and alignment of the packed data,
+according to the following table:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Character</th>
+      <th class="left"  >Byte order</th>
+      <th class="left"  >Size and alignment</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><samp>@</samp></td>
+        <td class="left"  >native</td>
+        <td class="left"  >native</td></tr>
+    <tr><td class="center" valign="baseline"><samp>=</samp></td>
+        <td class="left"  >native</td>
+        <td class="left"  >standard</td></tr>
+    <tr><td class="center" valign="baseline"><samp>&lt;</samp></td>
+        <td class="left"  >little-endian</td>
+        <td class="left"  >standard</td></tr>
+    <tr><td class="center" valign="baseline"><samp>&gt;</samp></td>
+        <td class="left"  >big-endian</td>
+        <td class="left"  >standard</td></tr>
+    <tr><td class="center" valign="baseline"><samp>!</samp></td>
+        <td class="left"  >network (= big-endian)</td>
+        <td class="left"  >standard</td></tr></tbody>
+</table></div>
+
+<p>
+If the first character is not one of these, "<tt class="character">@</tt>" is assumed.
+
+<p>
+Native byte order is big-endian or little-endian, depending on the
+host system.  For example, Motorola and Sun processors are big-endian;
+Intel and DEC processors are little-endian.
+
+<p>
+Native size and alignment are determined using the C compiler's
+<tt class="keyword">sizeof</tt> expression.  This is always combined with native byte
+order.
+
+<p>
+Standard size and alignment are as follows: no alignment is required
+for any type (so you have to use pad bytes);
+<tt class="ctype">short</tt> is 2 bytes;
+<tt class="ctype">int</tt> and <tt class="ctype">long</tt> are 4 bytes;
+<tt class="ctype">long long</tt> (<tt class="ctype">__int64</tt> on Windows) is 8 bytes;
+<tt class="ctype">float</tt> and <tt class="ctype">double</tt> are 32-bit and 64-bit
+IEEE floating point numbers, respectively.
+
+<p>
+Note the difference between "<tt class="character">@</tt>" and "<tt class="character">=</tt>": both use
+native byte order, but the size and alignment of the latter is
+standardized.
+
+<p>
+The form "<tt class="character">!</tt>" is available for those poor souls who claim they
+can't remember whether network byte order is big-endian or
+little-endian.
+
+<p>
+There is no way to indicate non-native byte order (force
+byte-swapping); use the appropriate choice of "<tt class="character">&lt;</tt>" or
+"<tt class="character">&gt;</tt>".
+
+<p>
+The "<tt class="character">P</tt>" format character is only available for the native
+byte ordering (selected as the default or with the "<tt class="character">@</tt>" byte
+order character). The byte order character "<tt class="character">=</tt>" chooses to
+use little- or big-endian ordering based on the host system. The
+struct module does not interpret this as native ordering, so the
+"<tt class="character">P</tt>" format is not available.
+
+<p>
+Examples (all using native byte order, size and alignment, on a
+big-endian machine):
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from struct import *
+&gt;&gt;&gt; pack('hhl', 1, 2, 3)
+'\x00\x01\x00\x02\x00\x00\x00\x03'
+&gt;&gt;&gt; unpack('hhl', '\x00\x01\x00\x02\x00\x00\x00\x03')
+(1, 2, 3)
+&gt;&gt;&gt; calcsize('hhl')
+8
+</pre></div>
+
+<p>
+Hint: to align the end of a structure to the alignment requirement of
+a particular type, end the format with the code for that type with a
+repeat count of zero.  For example, the format <code>'llh0l'</code>
+specifies two pad bytes at the end, assuming longs are aligned on
+4-byte boundaries.  This only works when native size and alignment are
+in effect; standard size and alignment does not enforce any alignment.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-array.html">array</a></tt>:</b>
+    <dd>Packed binary storage of homogeneous data.
+  </dl>
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-xdrlib.html">xdrlib</a></tt>:</b>
+    <dd>Packing and unpacking of XDR data.
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="struct-objects.html">4.3.1 Struct Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.2.6 Examples"
+  href="node49.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.3.1 struct Objects"
+  href="struct-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node49.html">4.2.6 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="struct-objects.html">4.3.1 Struct Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

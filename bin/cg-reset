@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#
+# Reset the state of the working tree
+# Copyright (c) Petr Baudis, 2005
+#
+# Reverts the working tree to a consistent state before any changes to it
+# (including merges etc.) were done. This command will rebuild the state
+# of the tree according to the commit of .git/refs/heads/master, so if your
+# working tree got into basically any inconsistent state, this will cure it.
+#
+# Basically, this is the opposite of `cg-commit` in some sense.
+#
+# This command is complementary to `cg-restore`, which only brings
+# individual files in sync with their state at the time of the
+# last commit.
+#
+# OPTIONS
+# -------
+# --adds-removes:: Only reset info about added and removed files
+#	Reset ONLY the so-called "index" file. This effectively means that
+#	any adds and removes you did will be unrecorded (but if you removed
+#	the file physically as well, that will not be undone - run
+#	'cg-restore' to restore it physically afterwards).
+
+# Testsuite: TODO
+
+USAGE="cg-reset [--adds-removes]"
+_git_requires_root=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+
+indexonly=
+while optparse; do
+	if optparse --adds-removes; then
+		indexonly=1
+	else
+		optfail
+	fi
+done
+
+[ "${ARGS[0]}" ] && die "this command takes no parameters; use cg-restore to restore individual files"
+
+
+if [ "$indexonly" ]; then
+	( git read-tree --reset HEAD ) && git update-index --refresh
+	exit
+fi
+
+
+if ! [ -s "$_git/HEAD" ]; then
+	rm -f "$_git/HEAD"
+	# XXX: git symbolic-ref is a weenie and won't do the job at this point.
+	echo "ref: refs/heads/$_git_head" >"$_git/HEAD"
+fi
+
+# Undo seek?
+if [ -s "$_git/head-name" ]; then
+	echo "Unseeking: $(cat "$_git/$(git symbolic-ref HEAD)") -> $(cat "$_git/refs/heads/$_git_head") ($_git_head)"
+	if [ -s "$_git/refs/heads/$_git_head" ]; then
+		git symbolic-ref HEAD "refs/heads/$_git_head"
+		rm "$_git/refs/heads/cg-seek-point" "$_git/head-name"
+	else
+		echo "ERROR: Unknown branch $_git_head! Preserving HEAD." >&2
+	fi
+fi
+
+rm -f "$_git/blocked" "$_git/merging" "$_git/merging-sym" "$_git/merge-base" "$_git/commit-ignore" "$_git/squashing"
+git read-tree --reset HEAD
+
+git checkout-index -u -f -a

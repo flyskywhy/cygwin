@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-unittest.html" />
+<link rel="prev" href="module-pydoc.html" />
+<link rel="parent" href="development.html" />
+<link rel="next" href="doctest-simple-testmod.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.2 doctest -- Test interactive Python examples</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.1 pydoc  "
+  href="module-pydoc.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23. development Tools"
+  href="development.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.1 simple Usage: Checking"
+  href="doctest-simple-testmod.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-pydoc.html">23.1 pydoc  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="development.html">23. Development Tools</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-simple-testmod.html">23.2.1 Simple Usage: Checking</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0025200000000000000000">
+23.2 <tt class="module">doctest</tt> --
+         Test interactive Python examples</a>
+</h1>
+
+<p>
+<a name="module-doctest"></a>
+
+<p>
+
+<p>
+The <tt class="module"><a href="module-doctest.html">doctest</a></tt> module searches for pieces of text that look like
+interactive Python sessions, and then executes those sessions to
+verify that they work exactly as shown.  There are several common ways to
+use doctest:
+
+<p>
+
+<ul>
+<li>To check that a module's docstrings are up-to-date by verifying
+      that all interactive examples still work as documented.
+</li>
+<li>To perform regression testing by verifying that interactive
+      examples from a test file or a test object work as expected.
+</li>
+<li>To write tutorial documentation for a package, liberally
+      illustrated with input-output examples.  Depending on whether
+      the examples or the expository text are emphasized, this has
+      the flavor of "literate testing" or "executable documentation".
+</li>
+</ul>
+
+<p>
+Here's a complete but small example module:
+
+<p>
+<div class="verbatim"><pre>
+"""
+This is the "example" module.
+
+The example module supplies one function, factorial().  For example,
+
+&gt;&gt;&gt; factorial(5)
+120
+"""
+
+def factorial(n):
+    """Return the factorial of n, an exact integer &gt;= 0.
+
+    If the result is small enough to fit in an int, return an int.
+    Else return a long.
+
+    &gt;&gt;&gt; [factorial(n) for n in range(6)]
+    [1, 1, 2, 6, 24, 120]
+    &gt;&gt;&gt; [factorial(long(n)) for n in range(6)]
+    [1, 1, 2, 6, 24, 120]
+    &gt;&gt;&gt; factorial(30)
+    265252859812191058636308480000000L
+    &gt;&gt;&gt; factorial(30L)
+    265252859812191058636308480000000L
+    &gt;&gt;&gt; factorial(-1)
+    Traceback (most recent call last):
+        ...
+    ValueError: n must be &gt;= 0
+
+    Factorials of floats are OK, but the float must be an exact integer:
+    &gt;&gt;&gt; factorial(30.1)
+    Traceback (most recent call last):
+        ...
+    ValueError: n must be exact integer
+    &gt;&gt;&gt; factorial(30.0)
+    265252859812191058636308480000000L
+
+    It must also not be ridiculously large:
+    &gt;&gt;&gt; factorial(1e100)
+    Traceback (most recent call last):
+        ...
+    OverflowError: n too large
+    """
+</pre></div>
+<div class="verbatim"><pre>
+    import math
+    if not n &gt;= 0:
+        raise ValueError("n must be &gt;= 0")
+    if math.floor(n) != n:
+        raise ValueError("n must be exact integer")
+    if n+1 == n:  # catch a value like 1e300
+        raise OverflowError("n too large")
+    result = 1
+    factor = 2
+    while factor &lt;= n:
+        result *= factor
+        factor += 1
+    return result
+
+def _test():
+    import doctest
+    doctest.testmod()
+
+if __name__ == "__main__":
+    _test()
+</pre></div>
+
+<p>
+If you run <span class="file">example.py</span> directly from the command line,
+<tt class="module"><a href="module-doctest.html">doctest</a></tt> works its magic:
+
+<p>
+<div class="verbatim"><pre>
+$ python example.py
+$
+</pre></div>
+
+<p>
+There's no output!  That's normal, and it means all the examples
+worked.  Pass <b class="programopt">-v</b> to the script, and <tt class="module"><a href="module-doctest.html">doctest</a></tt>
+prints a detailed log of what it's trying, and prints a summary at the
+end:
+
+<p>
+<div class="verbatim"><pre>
+$ python example.py -v
+Trying:
+    factorial(5)
+Expecting:
+    120
+ok
+Trying:
+    [factorial(n) for n in range(6)]
+Expecting:
+    [1, 1, 2, 6, 24, 120]
+ok
+Trying:
+    [factorial(long(n)) for n in range(6)]
+Expecting:
+    [1, 1, 2, 6, 24, 120]
+ok
+</pre></div>
+
+<p>
+And so on, eventually ending with:
+
+<p>
+<div class="verbatim"><pre>
+Trying:
+    factorial(1e100)
+Expecting:
+    Traceback (most recent call last):
+        ...
+    OverflowError: n too large
+ok
+1 items had no tests:
+    __main__._test
+2 items passed all tests:
+   1 tests in __main__
+   8 tests in __main__.factorial
+9 tests in 3 items.
+9 passed and 0 failed.
+Test passed.
+$
+</pre></div>
+
+<p>
+That's all you need to know to start making productive use of
+<tt class="module"><a href="module-doctest.html">doctest</a></tt>!  Jump in.  The following sections provide full
+details.  Note that there are many examples of doctests in
+the standard Python test suite and libraries.  Especially useful examples
+can be found in the standard test file <span class="file">Lib/test/test_doctest.py</span>.
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="doctest-simple-testmod.html">23.2.1 Simple Usage: Checking Examples in
+            Docstrings</a>
+<li><a href="doctest-simple-testfile.html">23.2.2 Simple Usage: Checking Examples in a Text
+            File</a>
+<li><a href="doctest-how-it-works.html">23.2.3 How It Works</a>
+<ul>
+<li><a href="doctest-which-docstrings.html">23.2.3.1 Which Docstrings Are Examined?</a>
+<li><a href="doctest-finding-examples.html">23.2.3.2 How are Docstring Examples
+               Recognized?</a>
+<li><a href="doctest-execution-context.html">23.2.3.3 What's the Execution Context?</a>
+<li><a href="doctest-exceptions.html">23.2.3.4 What About Exceptions?</a>
+<li><a href="doctest-options.html">23.2.3.5 Option Flags and Directives</a>
+<li><a href="doctest-warnings.html">23.2.3.6 Warnings</a>
+</ul>
+<li><a href="doctest-basic-api.html">23.2.4 Basic API</a>
+<li><a href="doctest-unittest-api.html">23.2.5 Unittest API</a>
+<li><a href="doctest-advanced-api.html">23.2.6 Advanced API</a>
+<ul>
+<li><a href="doctest-DocTest.html">23.2.6.1 DocTest Objects</a>
+<li><a href="doctest-Example.html">23.2.6.2 Example Objects</a>
+<li><a href="doctest-DocTestFinder.html">23.2.6.3 DocTestFinder objects</a>
+<li><a href="doctest-DocTestParser.html">23.2.6.4 DocTestParser objects</a>
+<li><a href="doctest-DocTestRunner.html">23.2.6.5 DocTestRunner objects</a>
+<li><a href="doctest-OutputChecker.html">23.2.6.6 OutputChecker objects</a>
+</ul>
+<li><a href="doctest-debugging.html">23.2.7 Debugging</a>
+<li><a href="doctest-soapbox.html">23.2.8 Soapbox</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.1 pydoc  "
+  href="module-pydoc.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23. development Tools"
+  href="development.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.1 simple Usage: Checking"
+  href="doctest-simple-testmod.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-pydoc.html">23.1 pydoc  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="development.html">23. Development Tools</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-simple-testmod.html">23.2.1 Simple Usage: Checking</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

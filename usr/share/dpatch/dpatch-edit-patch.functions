@@ -1,0 +1,197 @@
+#!/bin/bash
+
+# Functions for use by dpatch-edit-patch
+# Currently include dpep_usage(),
+# dpep_template_apply(), dpep_template_hardcoded(), and dpep_message()
+
+DPEP_BASENAME="$(basename $0)"
+
+dpep_usage() {
+# Usage message. Expects no arguments and does nothing with them if they're
+# given. Must be 24 lines or less.
+    cat <<EOF
+$DPEP_BASENAME: Manage dpatch patches for a Debian package.
+
+Usage:
+    $DPEP_BASENAME [options] command patchname [basepatch]
+
+Commands:
+    patch		This is the default if no other command is specified.
+			"patchname" is the patch you wish to create or edit, as
+			listed in debian/patches/00list. If the patch does not
+			exist, it will be created - and a second argument is
+			allowed in this case, [basepatch]. It will be the last
+			patched applied (according to 00list) to the working
+			directory.
+
+Options:
+    -d|--description=desc  Description for the new patch, if applicable.
+    -o|--outdir=dir	   Output directory for patches, defaults to
+			   \$(pwd)/debian/patches/
+    -s|--sourcedir=dir	   Source directory, defaults to \$(pwd)
+    -t|--tmpdir=dir	   Temporary directory, defaults to \$TMPDIR or /tmp/
+    -p|--stampdir=dir	   Stamp directory, defaults to
+			   \$(pwd)/debian/patched/
+    -e|--exclude	   List of files and directories to be excluded
+    -b|--debianonly[=path] Unpack .orig.tar.gz before invoking the shell
+    -k|--keeptemp	   Keep working source tree after exit.
+    -c|--clean		   Clean the current directory.
+    --cowcmd=cow-shell	   (dpatch-cowdancer-patch only)The command used for 
+			   cow operation.
+    -l|--shell=shell	   Which shell should be invoked.
+    -P|--origtargzpath=path  
+                           Path where to look for upstream tarballs
+			   (colon-separated list of directories,
+			   meaninfgul only with -b).
+    -h|--help		   Print this message.
+
+Examples:
+    $DPEP_BASENAME 20_upstream_fix2 19_upstream_fix1
+    $DPEP_BASENAME patch 20_upstream_fix2
+    $DPEP_BASENAME --sourcedir=~/debian/dpatch-1.15 19
+
+EOF
+}
+
+dpep_template_apply() {
+    if [ "$DPEP_OPTION_EXEC_TEMPLATE" = "1" ]; then
+	chmod +x debian/patches/00template
+	debian/patches/00template "$(basename "$1")" "$2" > "$1"
+    else
+	cat debian/patches/00template > "$1"
+    fi
+}
+
+dpep_template_hardcoded() {
+# Function to populate files with a template; 
+# The patch name is $1 (which can be a temporary filename), 
+# $2 is the new actual filename, and the rest is the description line for '# DP:'.
+# Up to 2.0.13 it used to iterate through all arguments
+# changed again in 2.0.17.
+    local dpep_template__file dpep_template__dpatch_basename
+    dpep_template__file=$1
+    dpep_template__filename=$2
+    shift; shift;
+    dpep_template__dpatch_basename="$(basename "$dpep_template__filename")"
+    dpatch patch-template "${dpep_template__dpatch_basename%%.dpatch}" \
+	"$@" > "$dpep_template__file"
+}
+
+dpep_message() {
+# Message function takes two or more arguments; the first argument is the
+# priority of the message, and the second (and further) arguments are the
+# message itself. Preferrably, you should pass the message as a single
+# argument; if you don't, formatting may not be preserved.
+    case "$1" in
+	error)
+	    shift; printf "%s: Error: %s\n" "$DPEP_BASENAME" "$*" >&2
+	    ;;
+	debug1)
+	    if [[ "$VERBOSITY" -ge "1" ]]; then
+		shift; printf "%s: Debug1: %s\n" "$DPEP_BASENAME" "$*" >&2
+	    fi
+	    ;;
+	warn)
+	    if [[ "$VERBOSITY" -ge "-1" ]]; then
+		shift; printf "%s: Warning: %s\n" "$DPEP_BASENAME" "$*"
+	    fi
+	    ;;
+	norm)
+	    if [[ "$VERBOSITY" -ge "0" ]]; then
+		shift; printf "%s: %s\n" "$DPEP_BASENAME" "$*"
+	    fi
+	    ;;
+    esac
+}
+
+dpep_parse_options() {
+    TEMP=$(getopt -o d:o:s:t:e:b::l:kchP: \
+                  --long description:,outdir:,sourcedir:,tmpdir:,exclude:,debianonly::,shell:,keeptemp,clean,help,origtargzpath: \
+		  -n 'dpatch-edit-patch' -- "$@")
+
+
+    if [[ "$?" != "0" ]]; then
+	dpep_usage
+	dpep_message error "Bad command line given, aborting."
+	exit 1
+    fi
+
+    eval set -- "$TEMP"
+
+    while true; do
+        case "$1" in
+	    -s|--sourcedir)   DPEP_SOURCEDIR="$2"; shift 2;;
+	    -t|--tmpdir)      DPEP_TMPDIR="$2"; shift 2;;
+	    -p|--stampdir)    DPEP_STAMPDIR="$2"; shift 2;;
+	    -e|--exclude)     DPEP_EXCLUDE="$2"; shift 2;;
+	    -b|--debianonly)  DPEP_DEBIANONLY=1; DPEP_ORIGTARGZ="$2"; shift 2;;
+	    -P|--origtargzpath) DPEP_ORIGTARGZPATH="$2"; shift 2;;
+	    -k|--keeptemp)    DPEP_KEEPTEMP=1; shift;;
+	    -c|--clean)       DPEP_CLEAN=1; shift;;
+	    --cowcmd)         DPEP_COWCMD="$2"; shift 2;;
+	    -r|--rootcmd)     DPEP_ROOTCMD="$2"; shift 2;;
+	    -d|--description) DPEP_DESC="$2"; shift 2;;
+	    -l|--shell)       DPEP_SHELL="$2"; shift 2;;
+	    -o|--outdir)      DPEP_OUTDIR="$2"; shift 2;;
+	    -h|--help)	      dpep_usage; exit 0;;
+	    --)		      shift; break;;
+	    *)		      dpep_message error "Internal error parsing arguments"; exit 1;;
+	esac
+    done
+
+    DPEP_COMMAND="patch"
+    for argument in "$@"; do
+        case "$argument" in
+	    patch)
+		DPEP_COMMAND="patch"
+		;;
+	    unfuzzy)
+		DPEP_COMMAND="unfuzzy"
+		;;
+	    *)
+		case "$DPEP_COMMAND" in
+		    patch)
+			if [[ -z "$DPEP_PATCH" ]]; then
+			    DPEP_PATCH="$argument"
+			elif [[ -z "$DPEP_BASEPATCH" ]]; then
+			    DPEP_BASEPATCH="$argument"
+			else
+			    dpep_usage
+			    dpep_message error "Extra argument: $argument"
+			    exit 1
+			fi
+			continue
+		    ;;
+		    unfuzzy)
+			if [[ -z "$DPEP_UNFUZZY_LIST" ]]; then
+			    DPEP_UNFUZZY_LIST="$argument"
+			else
+			    DPEP_UNFUZZY_LIST="$DPEP_UNFUZZY_LIST $argument"
+			fi
+			continue
+		    ;;
+		esac
+		dpep_usage
+		dpep_message error "Extra argument: $argument"
+		exit 1
+		;;
+	esac
+	shift
+    done
+}
+
+dpep_cleanup() {
+# Clean up before exiting (unless requested to keep working dir)
+
+    if [[ "$DPEP_KEEPTEMP" = 1 ]]; then
+	# User has opted to keep working directory.
+	dpep_message norm "* Your dpatch working directory, $WORKDIR, has not been deleted (as requested)."
+    else
+	rm -rf "$WORKDIR"
+    fi
+    if [[ "$REFDIR" = "$DPEP_SOURCEDIR" ]]; then
+	dpep_message norm "* Not deleting reference directory $REFDIR/, as it is the same as source directory."
+    else
+	rm -rf "$REFPDIR"
+    fi
+}

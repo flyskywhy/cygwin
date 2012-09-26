@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="shlex-parsing-rules.html" />
+<link rel="prev" href="module-shlex.html" />
+<link rel="parent" href="module-shlex.html" />
+<link rel="next" href="shlex-parsing-rules.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>22.2.1 shlex Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="22.2 shlex  "
+  href="module-shlex.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="22.2 shlex  "
+  href="module-shlex.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="22.2.2 parsing Rules"
+  href="shlex-parsing-rules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-shlex.html">22.2 shlex  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-shlex.html">22.2 shlex  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="shlex-parsing-rules.html">22.2.2 Parsing Rules</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0024210000000000000000"></a><a name="shlex-objects"></a>
+<br>
+22.2.1 shlex Objects 
+</h2>
+
+<p>
+A <tt class="class">shlex</tt> instance has the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4913' xml:id='l2h-4913' class="method">get_token</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a token.  If tokens have been stacked using
+<tt class="method">push_token()</tt>, pop a token off the stack.  Otherwise, read one
+from the input stream.  If reading encounters an immediate
+end-of-file, <tt class="member">self.eof</tt> is returned (the empty string (<code>''</code>)
+in non-POSIX mode, and <code>None</code> in POSIX mode).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4914' xml:id='l2h-4914' class="method">push_token</tt></b>(</nobr></td>
+  <td><var>str</var>)</td></tr></table></dt>
+<dd>
+Push the argument onto the token stack.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4915' xml:id='l2h-4915' class="method">read_token</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Read a raw token.  Ignore the pushback stack, and do not interpret source
+requests.  (This is not ordinarily a useful entry point, and is
+documented here only for the sake of completeness.)
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4916' xml:id='l2h-4916' class="method">sourcehook</tt></b>(</nobr></td>
+  <td><var>filename</var>)</td></tr></table></dt>
+<dd>
+When <tt class="class">shlex</tt> detects a source request (see
+<tt class="member">source</tt> below) this method is given the following token as
+argument, and expected to return a tuple consisting of a filename and
+an open file-like object.
+
+<p>
+Normally, this method first strips any quotes off the argument.  If
+the result is an absolute pathname, or there was no previous source
+request in effect, or the previous source was a stream
+(such as <code>sys.stdin</code>), the result is left alone.  Otherwise, if the
+result is a relative pathname, the directory part of the name of the
+file immediately before it on the source inclusion stack is prepended
+(this behavior is like the way the C preprocessor handles
+<code>#include "file.h"</code>).
+
+<p>
+The result of the manipulations is treated as a filename, and returned
+as the first component of the tuple, with
+<tt class="function">open()</tt> called on it to yield the second component. (Note:
+this is the reverse of the order of arguments in instance initialization!)
+
+<p>
+This hook is exposed so that you can use it to implement directory
+search paths, addition of file extensions, and other namespace hacks.
+There is no corresponding `close' hook, but a shlex instance will call
+the <tt class="method">close()</tt> method of the sourced input stream when it
+returns EOF.
+
+<p>
+For more explicit control of source stacking, use the
+<tt class="method">push_source()</tt> and <tt class="method">pop_source()</tt> methods. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4917' xml:id='l2h-4917' class="method">push_source</tt></b>(</nobr></td>
+  <td><var>stream</var><big>[</big><var>, filename</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Push an input source stream onto the input stack.  If the filename
+argument is specified it will later be available for use in error
+messages.  This is the same method used internally by the
+<tt class="method">sourcehook</tt> method.
+
+<span class="versionnote">New in version 2.1.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4918' xml:id='l2h-4918' class="method">pop_source</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Pop the last-pushed input source from the input stack.
+This is the same method used internally when the lexer reaches
+EOF on a stacked input stream.
+
+<span class="versionnote">New in version 2.1.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4919' xml:id='l2h-4919' class="method">error_leader</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>file</var><big>[</big><var>, line</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This method generates an error message leader in the format of a
+<span class="Unix">Unix</span> C compiler error label; the format is <code>'"%s", line %d: '</code>,
+where the "<tt class="samp">%s</tt>" is replaced with the name of the current source
+file and the "<tt class="samp">%d</tt>" with the current input line number (the
+optional arguments can be used to override these).
+
+<p>
+This convenience is provided to encourage <tt class="module">shlex</tt> users to
+generate error messages in the standard, parseable format understood
+by Emacs and other <span class="Unix">Unix</span> tools.
+</dl>
+
+<p>
+Instances of <tt class="class">shlex</tt> subclasses have some public instance
+variables which either control lexical analysis or can be used for
+debugging:
+
+<p>
+<dl><dt><b><tt id='l2h-4920' xml:id='l2h-4920' class="member">commenters</tt></b></dt>
+<dd>
+The string of characters that are recognized as comment beginners.
+All characters from the comment beginner to end of line are ignored.
+Includes just "<tt class="character">#</tt>" by default.   
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4921' xml:id='l2h-4921' class="member">wordchars</tt></b></dt>
+<dd>
+The string of characters that will accumulate into multi-character
+tokens.  By default, includes all ASCII alphanumerics and
+underscore.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4922' xml:id='l2h-4922' class="member">whitespace</tt></b></dt>
+<dd>
+Characters that will be considered whitespace and skipped.  Whitespace
+bounds tokens.  By default, includes space, tab, linefeed and
+carriage-return.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4923' xml:id='l2h-4923' class="member">escape</tt></b></dt>
+<dd>
+Characters that will be considered as escape. This will be only used
+in POSIX mode, and includes just "<tt class="character">\</tt>" by default.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4924' xml:id='l2h-4924' class="member">quotes</tt></b></dt>
+<dd>
+Characters that will be considered string quotes.  The token
+accumulates until the same quote is encountered again (thus, different
+quote types protect each other as in the shell.)  By default, includes
+ASCII single and double quotes.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4925' xml:id='l2h-4925' class="member">escapedquotes</tt></b></dt>
+<dd>
+Characters in <tt class="member">quotes</tt> that will interpret escape characters
+defined in <tt class="member">escape</tt>.  This is only used in POSIX mode, and
+includes just "<tt class="character">"</tt>" by default.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4926' xml:id='l2h-4926' class="member">whitespace_split</tt></b></dt>
+<dd>
+If <code>True</code>, tokens will only be split in whitespaces. This is useful, for
+example, for parsing command lines with <tt class="class">shlex</tt>, getting tokens
+in a similar way to shell arguments.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4927' xml:id='l2h-4927' class="member">infile</tt></b></dt>
+<dd>
+The name of the current input file, as initially set at class
+instantiation time or stacked by later source requests.  It may
+be useful to examine this when constructing error messages.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4928' xml:id='l2h-4928' class="member">instream</tt></b></dt>
+<dd>
+The input stream from which this <tt class="class">shlex</tt> instance is reading
+characters.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4929' xml:id='l2h-4929' class="member">source</tt></b></dt>
+<dd>
+This member is <code>None</code> by default.  If you assign a string to it,
+that string will be recognized as a lexical-level inclusion request
+similar to the "<tt class="samp">source</tt>" keyword in various shells.  That is, the
+immediately following token will opened as a filename and input taken
+from that stream until EOF, at which point the <tt class="method">close()</tt>
+method of that stream will be called and the input source will again
+become the original input stream. Source requests may be stacked any
+number of levels deep.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4930' xml:id='l2h-4930' class="member">debug</tt></b></dt>
+<dd>
+If this member is numeric and <code>1</code> or more, a <tt class="class">shlex</tt>
+instance will print verbose progress output on its behavior.  If you
+need to use this, you can read the module source code to learn the
+details.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4931' xml:id='l2h-4931' class="member">lineno</tt></b></dt>
+<dd>
+Source line number (count of newlines seen so far plus one).
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4932' xml:id='l2h-4932' class="member">token</tt></b></dt>
+<dd>
+The token buffer.  It may be useful to examine this when catching
+exceptions.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4933' xml:id='l2h-4933' class="member">eof</tt></b></dt>
+<dd>
+Token used to determine end of file. This will be set to the empty
+string (<code>''</code>), in non-POSIX mode, and to <code>None</code> in
+POSIX mode.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="22.2 shlex  "
+  href="module-shlex.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="22.2 shlex  "
+  href="module-shlex.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="22.2.2 parsing Rules"
+  href="shlex-parsing-rules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-shlex.html">22.2 shlex  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-shlex.html">22.2 shlex  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="shlex-parsing-rules.html">22.2.2 Parsing Rules</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

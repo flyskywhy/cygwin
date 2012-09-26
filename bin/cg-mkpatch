@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+#
+# Create a patch from a commit or a series of commits
+# Copyright (c) Petr Baudis, 2005
+#
+# Generate a patch with diff statistics and meta info about each commit.
+#
+# Note that if you want to use this as the output interface for your
+# GIT tree containing changes against upstream GIT tree, please consider
+# using the StGIT tool ("quilt for GIT"), which will enable you to
+# update your patches seamlessly, rebase them against the latest upstream
+# version, directly send them over mail, etc.
+#
+# OPTIONS
+# -------
+# -d DIRNAME:: Create patches in the DIRNAME directory
+#	Split the patches to separate files with their names in the
+#	format "%02d.patch", created in directory DIRNAME (will be
+#	created if non-existent). Note that this makes sense only
+#	when generating patch series, that is when you use the -r
+#	argument.
+#
+# -f FORMAT:: Specify patch file name format
+#	Format string used for generating the patch filename when
+#	outputting the split-out patches (that is, passed the -d
+#	option). This is by default "%s/%02d-%s.patch". The first %s
+#	represents the directory name and %d represents the patch
+#	sequence number. The last %s is mangled first line of the
+#	commit message - kind of patch title.
+#
+# -m::	Base the diff at the merge base
+#	Base the patches at the merge base of the -r arguments
+#	(defaulting to HEAD and origin).
+#
+# -r FROM_ID[..TO_ID]::	Limit to revision range
+#	Specify a set of commits to make patches from using either
+#	'-r FROM_ID[..TO_ID]' or '-r FROM_ID -r TO_ID'. In both cases the
+#	option expects IDs which resolve to commits and will include the
+#	specified IDs. If 'TO_ID' is omitted patches for all commits
+#	from 'FROM_ID' to the initial commit will be generated. If the
+#	`-r` option is not given the commit ID defaults to 'HEAD'.
+#
+# -s:: Omit patch header
+#	Specify whether to print a short version of the patch without
+#	a patch header with meta info such as author and committer.
+#
+# EXAMPLE USAGE
+# -------------
+# To make patches for all commits between two releases tagged as
+# 'releasetag-0.9' and 'releasetag-0.10' do:
+#
+#	$ cg-mkpatch -r releasetag-0.9..releasetag-0.10
+#
+# The output will be a continuous dump of patches each separated by
+# the line:
+#
+#	!-------------------------------------------------------------flip-
+#
+# NOTES
+# -----
+# The ':' is equivalent to '..' in revisions range specification (to make
+# things more comfortable to SVN users). See cogito(7) for more details
+# about revision specification.
+
+# Testsuite: TODO
+
+USAGE="cg-mkpatch [-m] [-s] [-r FROM_ID[..TO_ID] [-d DIRNAME]]"
+_git_requires_root=1
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+showpatch()
+{
+	header="$(mktemp -t gitpatch.XXXXXX)"
+	patch="$(mktemp -t gitpatch.XXXXXX)"
+	id="$1"
+	cg-diff -p -r "$id" >"$patch"
+	git cat-file commit "$id" | while read -r key rest; do
+		case "$key" in
+		"author"|"committer")
+			date=(${rest#*> })
+			showdate ${date[*]}; pdate="$_showdate"
+			[ "$pdate" ] && rest="${rest%> *}> $pdate"
+			echo "$key" "$rest" >>"$header"
+			;;
+		"")
+			cat
+			if [ ! "$omit_header" ]; then
+				echo
+				echo ---
+
+				echo commit "$id"
+				cat "$header"
+				echo
+				cat "$patch" | git apply --stat
+			fi
+			;;
+		*)
+			echo "$key" "$rest" >>"$header"
+			;;
+		esac
+	done
+	echo
+	cat "$patch"
+	rm "$header" "$patch"
+}
+
+
+omit_header=
+log_start=
+log_end=
+mergebase=
+outdir=
+fileformat="%s/%02d-%s.patch"
+while optparse; do
+	if optparse -s; then
+		omit_header=1
+	elif optparse -r=; then
+		if echo "$OPTARG" | fgrep -q '..'; then
+			log_end="${OPTARG#*..}"
+			[ "$log_end" ] || log_end="HEAD"
+			log_start="${OPTARG%..*}"
+		elif echo "$OPTARG" | grep -q ':'; then
+			log_end="${OPTARG#*:}"
+			[ "$log_end" ] || log_end="HEAD"
+			log_start="${OPTARG%:*}"
+		elif [ -z "$log_start" ]; then
+			log_start="$OPTARG"
+		else
+			log_end="$OPTARG"
+		fi
+	elif optparse -m; then
+		mergebase=1
+	elif optparse -d=; then
+		outdir="$OPTARG"
+	elif optparse -f=; then
+		fileformat="$OPTARG"
+	else
+		optfail
+	fi
+done
+
+if [ "$mergebase" ]; then
+	[ "$log_start" ] || log_start="HEAD"
+	[ "$log_end" ] || { log_end="$(choose_origin refs/heads "what to mkpatch against?")" || exit 1; }
+	id1="$(cg-object-id -c "$log_start")" || exit 1
+	id2="$(cg-object-id -c "$log_end")" || exit 1
+	conservative_merge_base "$id1" "$id2" || exit 1
+	[ "$_cg_base_conservative" ] &&
+		warn -b "multiple merge bases, picking the most conservative one"
+	log_start="$_cg_baselist"
+fi
+
+if [ "$log_end" ]; then
+	id1="$(cg-object-id -c "$log_start")" || exit 1
+	id2="$(cg-object-id -c "$log_end")" || exit 1
+
+	if [ "$outdir" ]; then
+		mkdir -p "$outdir" || die "cannot create patch directory"
+		pnum=001
+	fi
+
+	git rev-list --topo-order "$id2" "^$id1" | tac | while read id; do
+		if [ "$outdir" ]; then
+			title="$(git cat-file commit "$id" |
+			         sed -n '/^$/{n;
+				              s/^[ \t]*\[[^]]*\][ \t]*//;
+				              s/[:., \t][:., \t]*/-/g;
+					      s/_/-/g;
+					      # *cough*
+					      y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/;
+					      s/[^a-zA-Z0-9-]//g;
+				              p;q;}')"
+			filename="$(printf "$fileformat" "$outdir" "$pnum" "$title")"
+			echo "$filename"
+			showpatch "$id" >"$filename"
+			pnum=$((pnum+1))
+		else
+			showpatch "$id"
+			echo
+			echo
+			echo -e '\014'
+			echo '!-------------------------------------------------------------flip-'
+			echo
+			echo
+		fi
+	done
+
+else
+	[ "$outdir" ] && die "-d makes sense only for patch series"
+	id="$(cg-object-id -c "$log_start")" || exit 1
+	showpatch "$id"
+fi

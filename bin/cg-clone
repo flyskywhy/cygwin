@@ -1,0 +1,184 @@
+#!/usr/bin/env bash
+#
+# Clone a remote repository
+# Copyright (c) Petr Baudis, 2005
+#
+# This clones a remote GIT repository and checks it out locally.
+#
+# Takes a parameter specifying the location of the source repository and an
+# optional second parameter specifying the destination. If the second
+# parameter is omitted, the basename of the source repository is used as the
+# destination.
+#
+# For detailed description of the location of the source repository format
+# (available protocols, specifying different remote branch, etc) please see
+# the `cg-branch-add` documentation.
+#
+# OPTIONS
+# -------
+# -b::	Create a bare repository - do not check out working copy
+#	Create only the bare repository, without a working copy attached;
+#	this is useful e.g. for public repository mirrors. `cg-clone`
+#	is to `cg-init` as `cg-clone -b` is to `cg-admin-setuprepo`.
+#	(Still, if you are setting up a public or a central repository
+#	other people will push into, it might be more practical to just
+#	`cg-admin-setuprepo` it and then populate it with `cg-push`
+#	from the other side.)
+#
+# -l::	"Borrow" the object database when cloning locally
+#	Instead of hardlinking all the objects, set up an "alternate"
+#	record pointing at the source object database; this will cause
+#	any objects not found locally to be looked up remotely, which
+#	effectively eliminates the need to copy/hardlink the objects
+#	around. This is suitable for very fast cloning of arbitrarily
+#	big repositories, but your repository will become largely useless
+#	if the source repository disappears or gets damaged (note that
+#	it is generally BAD IDEA to prune the original repository if any
+#	repository is borrowing objects from it).  The choice is yours.
+#
+# --reference PATH:: "Borrow" the object database from a third-party source
+#	This does the same thing as '-l' but instead of borrowing the
+#	objects from the source repository, it borrows them from yet
+#	another local repository. E.g. if you have Linus' kernel repository
+#	cloned locally and now want to clone akpm's repository, you can
+#	do something like
+#
+#		cg-clone --reference /path/to/linus/repo git://kernel.org/akpm/repo
+#
+#	and it will download and keep only the objects that are really
+#	missing. Same considerations and warnings on the third-party source
+#	as in the case of '-l' apply. Also, you can reference only local
+#	repositories.
+#
+# -s::	Clone into the current directory
+#	Clone in the current directory instead of creating a new one.
+#	Specifying both -s and a destination directory makes no sense.
+#
+# NOTES
+# -----
+# If the clone has been interrupted for any reason, do not panic, calmly
+# cd to the destination directory and run `cg-fetch`, which will in this case
+# restart the initial clone. Chances are that you will not actually download
+# any duplicate data. (At the time of writing this, the chances aren't for
+# the native git protocol and ssh, but this may change in the future).
+#
+# EXAMPLE USAGE
+# -------------
+# If you want to clone the Cogito repository, you can say:
+#
+#	$ cg-clone http://www.kernel.org/pub/scm/cogito/cogito.git
+#
+# and it will be cloned to the 'cogito' subdirectory of the current directory.
+#
+# To clone the 'next' branch of the Git repository, do e.g.:
+#
+#	$ cg-clone git://git.kernel.org/pub/scm/git/git.git#next
+
+# Testsuite: Checked as part of t-9105-fetch-local but tests for some features
+# are missing.
+
+USAGE="cg-clone [-l] [-b] [-s] LOCATION [DESTDIR]"
+_git_repo_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+same_dir=
+repoonly=
+alternate=
+reference=()
+while optparse; do
+	if optparse -l; then
+		alternate=1
+	elif optparse -b; then
+		repoonly=1
+	elif optparse --reference=; then
+		reference[${#reference[@]}]="$OPTARG"
+	elif optparse -s; then
+		same_dir=1
+	else
+		optfail
+	fi
+done
+
+location="${ARGS[0]}"
+
+[ -n "$location" ] || usage
+location="${location%/}"
+
+destdir="${ARGS[1]}"
+if [ "$destdir" ]; then
+	[ ! "$same_dir" ] || die "specifying both -s and DESTDIR makes no sense"
+	dir="$destdir"
+else
+	dir="${location%#*}"; dir="${dir%/.git}"; dir="${dir##*/}"; dir="${dir%.git}"
+	[ "$repoonly" ] && dir="$dir.git"
+fi
+
+if ! echo "$location" | grep -q ":" ; then
+	location=$(echo "$location" | sed -e "s#^[^/]#$(pwd)\/&#")
+else
+	[ ! "$alternate" ] || die "specifying -l for non-local clone makes no sense"
+	location="$location"
+fi
+
+if [ ! "$same_dir" ]; then
+	[ -e "$dir" ] && die "$dir/ already exists"
+	if [ "$repoonly" ]; then
+		cg-admin-setuprepo "$dir" || exit $?
+	else
+		mkdir -p "$dir" || exit $?
+	fi
+	cd "$dir" || exit $?
+else
+	dir=.
+fi
+
+if [ "$repoonly" ]; then
+	_git=.
+	export GIT_DIR=.
+	_git_no_wc=1
+fi
+
+
+cleanup ()
+{
+	if [ -s "$_git/info/cg-fetch-earlydie" ] && [ ! "$same_dir" ]; then
+		cd ..
+		rm -rf "$dir"
+	fi
+}
+
+cleanup_trap "cleanup"
+
+
+if [ ! "$repoonly" ]; then
+	cg-init -I || die "init failed"
+fi
+echo $$ >"$_git/info/cg-fetch-earlydie"
+
+repoloc="$location"
+[ ! -d "$repoloc/.git/objects" ] || repoloc="$repoloc/.git"
+[ "$alternate" ] && echo "$repoloc/objects" >> "$_git/objects/info/alternates"
+for ref in "${reference[@]}"; do
+	[ -d "$ref" ] || die "referenced repository $ref not found"
+	[ ! -d "$ref/.git/objects" ] || reference="$ref/.git"
+	[ -d "$ref/objects" ] || die "reference $ref not a git repository"
+	echo "$ref/objects" >>"$_git/objects/info/alternates"
+done
+
+cg-branch-add origin "$location"
+
+mkdir -p "$_git/info"
+[ "$repoonly" ] && echo $$ >"$_git/info/cg-fetch-initial-wcless"
+echo $$ >"$_git/info/cg-fetch-initial"
+cat >___ <<__EOT__
+This is a clone-in-progress GIT working tree containing a GIT repository
+in the .git subdirectory. If you see this file and noone is fetching or
+cloning in this repository, the clone has been interrupted; you can restart
+it by issuing this command (it's enough as-is):
+
+	cg-fetch
+__EOT__
+cg-fetch origin || { cleanup; exit 1; }
+
+echo "Cloned to $dir/ (origin $location available as branch \"origin\")"

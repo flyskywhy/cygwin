@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-sched.html" />
+<link rel="prev" href="module-array.html" />
+<link rel="parent" href="datatypes.html" />
+<link rel="next" href="set-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.7 sets -- Unordered collections of unique elements</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.6 array  "
+  href="module-array.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.7.1 set Objects"
+  href="set-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-array.html">5.6 array  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="set-objects.html">5.7.1 Set Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION007700000000000000000">
+5.7 <tt class="module">sets</tt> --
+         Unordered collections of unique elements</a>
+</h1>
+
+<p>
+<a name="module-sets"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+The <tt class="module">sets</tt> module provides classes for constructing and manipulating
+unordered collections of unique elements.  Common uses include membership
+testing, removing duplicates from a sequence, and computing standard math
+operations on sets such as intersection, union, difference, and symmetric
+difference.
+
+<p>
+Like other collections, sets support <code><var>x</var> in <var>set</var></code>,
+<code>len(<var>set</var>)</code>, and <code>for <var>x</var> in <var>set</var></code>.  Being an
+unordered collection, sets do not record element position or order of
+insertion.  Accordingly, sets do not support indexing, slicing, or
+other sequence-like behavior.
+
+<p>
+Most set applications use the <tt class="class">Set</tt> class which provides every set
+method except for <tt class="method">__hash__()</tt>. For advanced applications requiring
+a hash method, the <tt class="class">ImmutableSet</tt> class adds a <tt class="method">__hash__()</tt>
+method but omits methods which alter the contents of the set. Both
+<tt class="class">Set</tt> and <tt class="class">ImmutableSet</tt> derive from <tt class="class">BaseSet</tt>, an
+abstract class useful for determining whether something is a set:
+<code>isinstance(<var>obj</var>, BaseSet)</code>.
+
+<p>
+The set classes are implemented using dictionaries.  Accordingly, the
+requirements for set elements are the same as those for dictionary keys;
+namely, that the element defines both <tt class="method">__eq__</tt> and <tt class="method">__hash__</tt>.
+As a result, sets
+cannot contain mutable elements such as lists or dictionaries.
+However, they can contain immutable collections such as tuples or
+instances of <tt class="class">ImmutableSet</tt>.  For convenience in implementing
+sets of sets, inner sets are automatically converted to immutable
+form, for example, <code>Set([Set(['dog'])])</code> is transformed to
+<code>Set([ImmutableSet(['dog'])])</code>.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-787' xml:id='l2h-787' class="class">Set</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>iterable</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Constructs a new empty <tt class="class">Set</tt> object.  If the optional <var>iterable</var>
+parameter is supplied, updates the set with elements obtained from iteration.
+All of the elements in <var>iterable</var> should be immutable or be transformable
+to an immutable using the protocol described in
+section&nbsp;<a href="immutable-transforms.html#immutable-transforms">5.7.3</a>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-788' xml:id='l2h-788' class="class">ImmutableSet</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>iterable</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Constructs a new empty <tt class="class">ImmutableSet</tt> object.  If the optional
+<var>iterable</var> parameter is supplied, updates the set with elements obtained
+from iteration.  All of the elements in <var>iterable</var> should be immutable or
+be transformable to an immutable using the protocol described in
+section&nbsp;<a href="immutable-transforms.html#immutable-transforms">5.7.3</a>.
+
+<p>
+Because <tt class="class">ImmutableSet</tt> objects provide a <tt class="method">__hash__()</tt> method,
+they can be used as set elements or as dictionary keys.  <tt class="class">ImmutableSet</tt>
+objects do not have methods for adding or removing elements, so all of the
+elements must be known when the constructor is called.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="set-objects.html">5.7.1 Set Objects</a>
+<li><a href="set-example.html">5.7.2 Example</a>
+<li><a href="immutable-transforms.html">5.7.3 Protocol for automatic conversion to immutable</a>
+<li><a href="comparison-to-builtin-set.html">5.7.4 Comparison to the built-in <tt class="class">set</tt> types</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.6 array  "
+  href="module-array.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.7.1 set Objects"
+  href="set-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-array.html">5.6 array  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="set-objects.html">5.7.1 Set Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

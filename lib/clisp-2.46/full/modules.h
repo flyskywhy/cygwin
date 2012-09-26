@@ -1,0 +1,13 @@
+
+MODULE(i18n)
+MODULE(syscalls)
+MODULE(regexp)
+MODULE(readline)
+MODULE(rawsock)
+MODULE(dirkey)
+MODULE(bdb)
+MODULE(pcre)
+MODULE(postgresql)
+MODULE(fastcgi)
+MODULE(zlib)
+MODULE(gdbm)

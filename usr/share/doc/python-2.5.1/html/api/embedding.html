@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="debugging.html" />
+<link rel="prev" href="exceptions.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="debugging.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.4 Embedding Python </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.3 Exceptions"
+  href="exceptions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. Introduction"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.5 debugging Builds"
+  href="debugging.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="exceptions.html">1.3 Exceptions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Introduction</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="debugging.html">1.5 Debugging Builds</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION003400000000000000000"></a><a name="embedding"></a>
+<br>
+1.4 Embedding Python 
+</h1>
+
+<p>
+The one important task that only embedders (as opposed to extension
+writers) of the Python interpreter have to worry about is the
+initialization, and possibly the finalization, of the Python
+interpreter.  Most functionality of the interpreter can only be used
+after the interpreter has been initialized.
+
+<p>
+The basic initialization function is
+<tt class="cfunction">Py_Initialize()</tt><a id='l2h-30' xml:id='l2h-30'></a>.
+This initializes the table of loaded modules, and creates the
+fundamental modules <tt class="module">__builtin__</tt><a id='l2h-31' xml:id='l2h-31'></a>,
+<tt class="module">__main__</tt><a id='l2h-32' xml:id='l2h-32'></a>, <tt class="module">sys</tt><a id='l2h-33' xml:id='l2h-33'></a>,
+and <tt class="module">exceptions</tt>.<a id='l2h-34' xml:id='l2h-34'></a>  It also initializes
+the module search path (<code>sys.path</code>).<a id='l2h-27' xml:id='l2h-27'></a><a id='l2h-29' xml:id='l2h-29'></a>
+<p>
+<tt class="cfunction">Py_Initialize()</tt> does not set the ``script argument list'' 
+(<code>sys.argv</code>).  If this variable is needed by Python code that 
+will be executed later, it must be set explicitly with a call to 
+<code>PySys_SetArgv(<var>argc</var>,
+<var>argv</var>)</code><a id='l2h-35' xml:id='l2h-35'></a> subsequent to the call to
+<tt class="cfunction">Py_Initialize()</tt>.
+
+<p>
+On most systems (in particular, on <span class="Unix">Unix</span> and Windows, although the
+details are slightly different),
+<tt class="cfunction">Py_Initialize()</tt> calculates the module search path based
+upon its best guess for the location of the standard Python
+interpreter executable, assuming that the Python library is found in a
+fixed location relative to the Python interpreter executable.  In
+particular, it looks for a directory named
+<span class="file">lib/python2.5</span> relative to the parent directory where
+the executable named <span class="file">python</span> is found on the shell command
+search path (the environment variable <a class="envvar" id='l2h-36' xml:id='l2h-36'>PATH</a>).
+
+<p>
+For instance, if the Python executable is found in
+<span class="file">/usr/local/bin/python</span>, it will assume that the libraries are in
+<span class="file">/usr/local/lib/python2.5</span>.  (In fact, this particular path
+is also the ``fallback'' location, used when no executable file named
+<span class="file">python</span> is found along <a class="envvar" id='l2h-37' xml:id='l2h-37'>PATH</a>.)  The user can override
+this behavior by setting the environment variable <a class="envvar" id='l2h-38' xml:id='l2h-38'>PYTHONHOME</a>,
+or insert additional directories in front of the standard path by
+setting <a class="envvar" id='l2h-39' xml:id='l2h-39'>PYTHONPATH</a>.
+
+<p>
+The embedding application can steer the search by calling 
+<code>Py_SetProgramName(<var>file</var>)</code><a id='l2h-40' xml:id='l2h-40'></a> <em>before</em> calling 
+<tt class="cfunction">Py_Initialize()</tt>.  Note that <a class="envvar" id='l2h-41' xml:id='l2h-41'>PYTHONHOME</a> still
+overrides this and <a class="envvar" id='l2h-42' xml:id='l2h-42'>PYTHONPATH</a> is still inserted in front of
+the standard path.  An application that requires total control has to
+provide its own implementation of
+<tt class="cfunction">Py_GetPath()</tt><a id='l2h-43' xml:id='l2h-43'></a>,
+<tt class="cfunction">Py_GetPrefix()</tt><a id='l2h-44' xml:id='l2h-44'></a>,
+<tt class="cfunction">Py_GetExecPrefix()</tt><a id='l2h-45' xml:id='l2h-45'></a>, and
+<tt class="cfunction">Py_GetProgramFullPath()</tt><a id='l2h-46' xml:id='l2h-46'></a> (all
+defined in <span class="file">Modules/getpath.c</span>).
+
+<p>
+Sometimes, it is desirable to ``uninitialize'' Python.  For instance, 
+the application may want to start over (make another call to 
+<tt class="cfunction">Py_Initialize()</tt>) or the application is simply done with its 
+use of Python and wants to free memory allocated by Python.  This
+can be accomplished by calling <tt class="cfunction">Py_Finalize()</tt>.  The function
+<tt class="cfunction">Py_IsInitialized()</tt><a id='l2h-47' xml:id='l2h-47'></a> returns
+true if Python is currently in the initialized state.  More
+information about these functions is given in a later chapter.
+Notice that <tt class="cfunction">Py_Finalize</tt> does <em>not</em> free all memory
+allocated by the Python interpreter, e.g. memory allocated by extension
+modules currently cannot be released.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.3 Exceptions"
+  href="exceptions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. Introduction"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.5 debugging Builds"
+  href="debugging.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="exceptions.html">1.3 Exceptions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Introduction</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="debugging.html">1.5 Debugging Builds</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

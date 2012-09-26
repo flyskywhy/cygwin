@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-wsgiref.simpleserver.html" />
+<link rel="prev" href="module-wsgiref.util.html" />
+<link rel="parent" href="module-wsgiref.html" />
+<link rel="next" href="module-wsgiref.simpleserver.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.4.2 wsgiref.headers - WSGI response header tools</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.1 wsgiref.util - WSGI"
+  href="module-wsgiref.util.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.3 wsgiref.simple_server - a"
+  href="module-wsgiref.simpleserver.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.util.html">18.4.1 wsgiref.util - WSGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.simpleserver.html">18.4.3 wsgiref.simple_server - a</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020420000000000000000">
+18.4.2 <tt class="module">wsgiref.headers</tt> - WSGI response header tools</a>
+</h2>
+<a name="module-wsgiref.headers"></a>
+<p>
+This module provides a single class, <tt class="class">Headers</tt>, for convenient
+manipulation of WSGI response headers using a mapping-like interface.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3848' xml:id='l2h-3848' class="class">Headers</tt></b>(</nobr></td>
+  <td><var>headers</var>)</td></tr></table></dt>
+<dd>
+Create a mapping-like object wrapping <var>headers</var>, which must be a
+list of header name/value tuples as described in <a class="rfc" id='rfcref-102682' xml:id='rfcref-102682'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.  Any changes
+made to the new <tt class="class">Headers</tt> object will directly update the
+<var>headers</var> list it was created with.
+
+<p>
+<tt class="class">Headers</tt> objects support typical mapping operations including
+<tt class="method">__getitem__</tt>, <tt class="method">get</tt>, <tt class="method">__setitem__</tt>,
+<tt class="method">setdefault</tt>, <tt class="method">__delitem__</tt>, <tt class="method">__contains__</tt> and
+<tt class="method">has_key</tt>.  For each of these methods, the key is the header name
+(treated case-insensitively), and the value is the first value
+associated with that header name.  Setting a header deletes any existing
+values for that header, then adds a new value at the end of the wrapped
+header list.  Headers' existing order is generally maintained, with new
+headers added to the end of the wrapped list.
+
+<p>
+Unlike a dictionary, <tt class="class">Headers</tt> objects do not raise an error when
+you try to get or delete a key that isn't in the wrapped header list.
+Getting a nonexistent header just returns <code>None</code>, and deleting
+a nonexistent header does nothing.
+
+<p>
+<tt class="class">Headers</tt> objects also support <tt class="method">keys()</tt>, <tt class="method">values()</tt>,
+and <tt class="method">items()</tt> methods.  The lists returned by <tt class="method">keys()</tt>
+and <tt class="method">items()</tt> can include the same key more than once if there
+is a multi-valued header.  The <code>len()</code> of a <tt class="class">Headers</tt> object
+is the same as the length of its <tt class="method">items()</tt>, which is the same
+as the length of the wrapped header list.  In fact, the <tt class="method">items()</tt>
+method just returns a copy of the wrapped header list.
+
+<p>
+Calling <code>str()</code> on a <tt class="class">Headers</tt> object returns a formatted
+string suitable for transmission as HTTP response headers.  Each header
+is placed on a line with its value, separated by a colon and a space.
+Each line is terminated by a carriage return and line feed, and the
+string is terminated with a blank line.
+
+<p>
+In addition to their mapping interface and formatting features,
+<tt class="class">Headers</tt> objects also have the following methods for querying
+and adding multi-valued headers, and for adding headers with MIME
+parameters:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3849' xml:id='l2h-3849' class="method">get_all</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+Return a list of all the values for the named header.
+
+<p>
+The returned list will be sorted in the order they appeared in the
+original header list or were added to this instance, and may contain
+duplicates.  Any fields deleted and re-inserted are always appended to
+the header list.  If no fields exist with the given name, returns an
+empty list.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3850' xml:id='l2h-3850' class="method">add_header</tt></b>(</nobr></td>
+  <td><var>name, value, **_params</var>)</td></tr></table></dt>
+<dd>
+Add a (possibly multi-valued) header, with optional MIME parameters
+specified via keyword arguments.
+
+<p>
+<var>name</var> is the header field to add.  Keyword arguments can be used to
+set MIME parameters for the header field.  Each parameter must be a
+string or <code>None</code>.  Underscores in parameter names are converted to
+dashes, since dashes are illegal in Python identifiers, but many MIME
+parameter names include dashes.  If the parameter value is a string, it
+is added to the header value parameters in the form <code>name="value"</code>.
+If it is <code>None</code>, only the parameter name is added.  (This is used
+for MIME parameters without a value.)  Example usage:
+
+<p>
+<div class="verbatim"><pre>
+h.add_header('content-disposition', 'attachment', filename='bud.gif')
+</pre></div>
+
+<p>
+The above will add a header that looks like this:
+
+<p>
+<div class="verbatim"><pre>
+Content-Disposition: attachment; filename="bud.gif"
+</pre></div>
+</dl>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.1 wsgiref.util - WSGI"
+  href="module-wsgiref.util.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.3 wsgiref.simple_server - a"
+  href="module-wsgiref.simpleserver.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.util.html">18.4.1 wsgiref.util - WSGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.simpleserver.html">18.4.3 wsgiref.simple_server - a</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

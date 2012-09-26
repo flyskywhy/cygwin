@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-distutils.version.html" />
+<link rel="prev" href="module-distutils.sysconfig.html" />
+<link rel="parent" href="api-reference.html" />
+<link rel="next" href="module-distutils.version.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.23 distutils.text_file -- The TextFile class</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.22 distutils.sysconfig  "
+  href="module-distutils.sysconfig.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.24 distutils.version  "
+  href="module-distutils.version.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.sysconfig.html">11.22 distutils.sysconfig  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.version.html">11.24 distutils.version  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00112300000000000000000">
+11.23 <tt class="module">distutils.text_file</tt> -- The TextFile class</a>
+</h1>
+<a name="module-distutils.textfile"></a>
+
+<p>
+This module provides the <tt class="class">TextFile</tt> class, which gives an interface 
+to text files that (optionally) takes care of stripping comments, ignoring 
+blank lines, and joining lines with backslashes.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-119' xml:id='l2h-119' class="class">TextFile</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>filename=<code>None</code>, file=<code>None</code>, **options</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This class provides a file-like object that takes care of all 
+the things you commonly want to do when processing a text file 
+that has some line-by-line syntax: strip comments (as long as <code>#</code> 
+is your comment character), skip blank lines, join adjacent lines by
+escaping the newline (ie. backslash at end of line), strip
+leading and/or trailing whitespace.  All of these are optional
+and independently controllable.
+
+<p>
+The class provides a <tt class="method">warn()</tt> method so you can generate 
+warning messages that report physical line number, even if the 
+logical line in question spans multiple physical lines.  Also 
+provides <tt class="method">unreadline()</tt> for implementing line-at-a-time lookahead.
+
+<p>
+<tt class="class">TextFile</tt> instances are create with either <var>filename</var>, <var>file</var>,
+or both. <tt class="exception">RuntimeError</tt> is raised if both are <code>None</code>.
+<var>filename</var> should be a string, and <var>file</var> a file object (or
+something that provides <tt class="method">readline()</tt> and <tt class="method">close()</tt> 
+methods).  It is recommended that you supply at least <var>filename</var>, 
+so that <tt class="class">TextFile</tt> can include it in warning messages.  If 
+<var>file</var> is not supplied, <tt class="class">TextFile</tt> creates its own using the 
+<tt class="function">open()</tt> built-in function.
+
+<p>
+The options are all boolean, and affect the values returned by
+<tt class="method">readline()</tt>
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">option name</th>
+      <th class="left"  >description</th>
+      <th class="left"  >default</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><option name>strip_comments</option></td>
+        <td class="left"  >
+strip from "<tt class="character">#</tt>" to end-of-line, as well as any whitespace
+leading up to the "<tt class="character">#</tt>"--unless it is escaped by a backslash</td>
+        <td class="left"  >true</td></tr>
+    <tr><td class="center" valign="baseline"><option name>lstrip_ws</option></td>
+        <td class="left"  >
+strip leading whitespace from each line before returning it</td>
+        <td class="left"  >false</td></tr>
+    <tr><td class="center" valign="baseline"><option name>rstrip_ws</option></td>
+        <td class="left"  >
+strip trailing whitespace (including line terminator!) from
+each line before returning it.</td>
+        <td class="left"  >true</td></tr>
+    <tr><td class="center" valign="baseline"><option name>skip_blanks</option></td>
+        <td class="left"  >
+skip lines that are empty *after* stripping comments and
+whitespace.  (If both lstrip_ws and rstrip_ws are false,
+then some lines may consist of solely whitespace: these will
+*not* be skipped, even if <var>skip_blanks</var> is true.)</td>
+        <td class="left"  >true</td></tr>
+    <tr><td class="center" valign="baseline"><option name>join_lines</option></td>
+        <td class="left"  >
+if a backslash is the last non-newline character on a line
+after stripping comments and whitespace, join the following line
+to it to form one logical line; if N consecutive lines end
+with a backslash, then N+1 physical lines will be joined to
+form one logical line.</td>
+        <td class="left"  >false</td></tr>
+    <tr><td class="center" valign="baseline"><option name>collapse_join</option></td>
+        <td class="left"  >
+strip leading whitespace from lines that are joined to their
+predecessor; only matters if "<tt class="samp">(join_lines and not lstrip_ws)</tt>"</td>
+        <td class="left"  >false</td></tr></tbody>
+</table></div>
+
+<p>
+Note that since <var>rstrip_ws</var> can strip the trailing newline, the
+semantics of <tt class="method">readline()</tt> must differ from those of the builtin file
+object's <tt class="method">readline()</tt> method!  In particular, <tt class="method">readline()</tt> 
+returns <code>None</code> for end-of-file: an empty string might just be a 
+blank line (or an all-whitespace line), if <var>rstrip_ws</var> is true 
+but <var>skip_blanks</var> is not.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-120' xml:id='l2h-120' class="method">open</tt></b>(</nobr></td>
+  <td><var>filename</var>)</td></tr></table></dt>
+<dd>
+Open a new file <var>filename</var>. This overrides any <var>file</var> or 
+<var>filename</var> constructor arguments.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-121' xml:id='l2h-121' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Close the current file and forget everything we know about it (including
+the filename and the current line number).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-122' xml:id='l2h-122' class="method">warn</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>,line=<code>None</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Print (to stderr) a warning message tied to the current logical
+line in the current file.  If the current logical line in the
+file spans multiple physical lines, the warning refers to the
+whole range, such as "<tt class="samp">"lines 3-5"</tt>".  If <var>line</var> is supplied, 
+it overrides the current line number; it may be a list or tuple 
+to indicate a range of physical lines, or an integer for a 
+single physical line.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-123' xml:id='l2h-123' class="method">readline</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Read and return a single logical line from the current file (or
+from an internal buffer if lines have previously been ``unread''
+with <tt class="method">unreadline()</tt>).  If the <var>join_lines</var> option 
+is true, this may involve reading multiple physical lines 
+concatenated into a single string.  Updates the current line number, 
+so calling <tt class="method">warn()</tt> after <tt class="method">readline()</tt> emits a warning 
+about the physical line(s) just read.  Returns <code>None</code> on end-of-file, 
+since the empty string can occur if <var>rstrip_ws</var> is true but 
+<var>strip_blanks</var> is not.
+</dl>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-124' xml:id='l2h-124' class="method">readlines</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Read and return the list of all logical lines remaining in the current file.
+This updates the current line number to the last line of the file.
+</dl>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-125' xml:id='l2h-125' class="method">unreadline</tt></b>(</nobr></td>
+  <td><var>line</var>)</td></tr></table></dt>
+<dd>
+Push <var>line</var> (a string) onto an internal buffer that will be
+checked by future <tt class="method">readline()</tt> calls.  Handy for implementing
+a parser with line-at-a-time lookahead. Note that lines that are ``unread''
+with <tt class="method">unreadline</tt> are not subsequently re-cleansed (whitespace 
+stripped, or whatever) when read with <tt class="method">readline</tt>. If multiple
+calls are made to <tt class="method">unreadline</tt> before a call to <tt class="method">readline</tt>,
+the lines will be returned most in most recent first order.
+</dl>
+
+<p>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.22 distutils.sysconfig  "
+  href="module-distutils.sysconfig.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.24 distutils.version  "
+  href="module-distutils.version.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.sysconfig.html">11.22 distutils.sysconfig  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.version.html">11.24 distutils.version  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node10.html" />
+<link rel="prev" href="listing-modules.html" />
+<link rel="parent" href="setup-script.html" />
+<link rel="next" href="node10.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.3 Describing extension modules</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2 listing individual modules"
+  href="listing-modules.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.4 relationships between Distributions"
+  href="node10.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="listing-modules.html">2.2 Listing individual modules</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node10.html">2.4 Relationships between Distributions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="describing-extensions.html#SECTION002310000000000000000">2.3.1 Extension names and packages</a>
+<li><a href="describing-extensions.html#SECTION002320000000000000000">2.3.2 Extension source files</a>
+<li><a href="describing-extensions.html#SECTION002330000000000000000">2.3.3 Preprocessor options</a>
+<li><a href="describing-extensions.html#SECTION002340000000000000000">2.3.4 Library options</a>
+<li><a href="describing-extensions.html#SECTION002350000000000000000">2.3.5 Other options</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION002300000000000000000"></a>
+<a name="describing-extensions"></a>
+<br>
+2.3 Describing extension modules
+</h1>
+
+<p>
+Just as writing Python extension modules is a bit more complicated than
+writing pure Python modules, describing them to the Distutils is a bit
+more complicated.  Unlike pure modules, it's not enough just to list
+modules or packages and expect the Distutils to go out and find the
+right files; you have to specify the extension name, source file(s), and
+any compile/link requirements (include directories, libraries to link
+with, etc.).
+
+<p>
+All of this is done through another keyword argument to
+<tt class="function">setup()</tt>, the <span class="du-option">ext_modules</span> option.  <span class="du-option">ext_modules</span>
+is just a list of <tt class="class">Extension</tt> instances, each of which describes a
+single extension module.  Suppose your distribution includes a single
+extension, called <tt class="module">foo</tt> and implemented by <span class="file">foo.c</span>.  If no
+additional instructions to the compiler/linker are needed, describing
+this extension is quite simple:
+
+<p>
+<div class="verbatim"><pre>
+Extension('foo', ['foo.c'])
+</pre></div>
+
+<p>
+The <tt class="class">Extension</tt> class can be imported from
+<tt class="module">distutils.core</tt> along with <tt class="function">setup()</tt>.  Thus, the setup
+script for a module distribution that contains only this one extension
+and nothing else might be:
+
+<p>
+<div class="verbatim"><pre>
+from distutils.core import setup, Extension
+setup(name='foo',
+      version='1.0',
+      ext_modules=[Extension('foo', ['foo.c'])],
+      )
+</pre></div>
+
+<p>
+The <tt class="class">Extension</tt> class (actually, the underlying extension-building
+machinery implemented by the <code class="du-command">build_ext</code> command) supports a
+great deal of flexibility in describing Python extensions, which is
+explained in the following sections.  
+
+<p>
+
+<h2><a name="SECTION002310000000000000000">
+2.3.1 Extension names and packages</a>
+</h2>
+
+<p>
+The first argument to the <tt class="class">Extension</tt> constructor is always the
+name of the extension, including any package names.  For example,
+
+<p>
+<div class="verbatim"><pre>
+Extension('foo', ['src/foo1.c', 'src/foo2.c'])
+</pre></div>
+
+<p>
+describes an extension that lives in the root package, while
+
+<p>
+<div class="verbatim"><pre>
+Extension('pkg.foo', ['src/foo1.c', 'src/foo2.c'])
+</pre></div>
+
+<p>
+describes the same extension in the <tt class="module">pkg</tt> package.  The source
+files and resulting object code are identical in both cases; the only
+difference is where in the filesystem (and therefore where in Python's
+namespace hierarchy) the resulting extension lives.
+
+<p>
+If you have a number of extensions all in the same package (or all under
+the same base package), use the <span class="du-option">ext_package</span> keyword argument
+to <tt class="function">setup()</tt>.  For example,
+
+<p>
+<div class="verbatim"><pre>
+setup(...
+      ext_package='pkg',
+      ext_modules=[Extension('foo', ['foo.c']),
+                   Extension('subpkg.bar', ['bar.c'])],
+     )
+</pre></div>
+
+<p>
+will compile <span class="file">foo.c</span> to the extension <tt class="module">pkg.foo</tt>, and
+<span class="file">bar.c</span> to <tt class="module">pkg.subpkg.bar</tt>.
+
+<p>
+
+<h2><a name="SECTION002320000000000000000">
+2.3.2 Extension source files</a>
+</h2>
+
+<p>
+The second argument to the <tt class="class">Extension</tt> constructor is a list of
+source files.  Since the Distutils currently only support C, C++, and
+Objective-C extensions, these are normally C/C++/Objective-C source
+files.  (Be sure to use appropriate extensions to distinguish C++ source files: <span class="file">.cc</span> and <span class="file">.cpp</span> seem to be recognized by both
+<span class="Unix">Unix</span> and Windows compilers.)
+
+<p>
+However, you can also include SWIG interface (<span class="file">.i</span>) files in the
+list; the <code class="du-command">build_ext</code> command knows how to deal with SWIG
+extensions: it will run SWIG on the interface file and compile the
+resulting C/C++ file into your extension.
+
+<p>
+<b class="du-xxx">SWIG support is rough around the edges and largely untested;
+  especially SWIG support for C++ extensions!  Explain in more detail
+  here when the interface firms up.</b>
+
+<p>
+On some platforms, you can include non-source files that are processed
+by the compiler and included in your extension.  Currently, this just
+means Windows message text (<span class="file">.mc</span>) files and resource definition
+(<span class="file">.rc</span>) files for Visual C++. These will be compiled to binary resource
+(<span class="file">.res</span>) files and linked into the executable.
+
+<p>
+
+<h2><a name="SECTION002330000000000000000">
+2.3.3 Preprocessor options</a>
+</h2>
+
+<p>
+Three optional arguments to <tt class="class">Extension</tt> will help if you need to
+specify include directories to search or preprocessor macros to
+define/undefine: <code>include_dirs</code>, <code>define_macros</code>, and
+<code>undef_macros</code>.
+
+<p>
+For example, if your extension requires header files in the
+<span class="file">include</span> directory under your distribution root, use the
+<code>include_dirs</code> option:
+
+<p>
+<div class="verbatim"><pre>
+Extension('foo', ['foo.c'], include_dirs=['include'])
+</pre></div>
+
+<p>
+You can specify absolute directories there; if you know that your
+extension will only be built on <span class="Unix">Unix</span> systems with X11R6 installed to
+<span class="file">/usr</span>, you can get away with
+
+<p>
+<div class="verbatim"><pre>
+Extension('foo', ['foo.c'], include_dirs=['/usr/include/X11'])
+</pre></div>
+
+<p>
+You should avoid this sort of non-portable usage if you plan to
+distribute your code: it's probably better to write C code like
+<div class="verbatim"><pre>
+#include &lt;X11/Xlib.h&gt;
+</pre></div>
+
+<p>
+If you need to include header files from some other Python extension,
+you can take advantage of the fact that header files are installed in a
+consistent way by the Distutils <code class="du-command">install_header</code> command.  For
+example, the Numerical Python header files are installed (on a standard
+<span class="Unix">Unix</span> installation) to <span class="file">/usr/local/include/python1.5/Numerical</span>.
+(The exact location will differ according to your platform and Python
+installation.)  Since the Python include
+directory--<span class="file">/usr/local/include/python1.5</span> in this case--is always
+included in the search path when building Python extensions, the best
+approach is to write C code like
+<div class="verbatim"><pre>
+#include &lt;Numerical/arrayobject.h&gt;
+</pre></div>
+If you must put the <span class="file">Numerical</span> include directory right into your
+header search path, though, you can find that directory using the
+Distutils <tt class="module"><a href="module-distutils.sysconfig.html">distutils.sysconfig</a></tt> module:
+
+<p>
+<div class="verbatim"><pre>
+from distutils.sysconfig import get_python_inc
+incdir = os.path.join(get_python_inc(plat_specific=1), 'Numerical')
+setup(...,
+      Extension(..., include_dirs=[incdir]),
+      )
+</pre></div>
+
+<p>
+Even though this is quite portable--it will work on any Python
+installation, regardless of platform--it's probably easier to just
+write your C code in the sensible way.
+
+<p>
+You can define and undefine pre-processor macros with the
+<code>define_macros</code> and <code>undef_macros</code> options.
+<code>define_macros</code> takes a list of <code>(name, value)</code> tuples, where
+<code>name</code> is the name of the macro to define (a string) and
+<code>value</code> is its value: either a string or <code>None</code>.  (Defining a
+macro <code>FOO</code> to <code>None</code> is the equivalent of a bare
+<code>#define FOO</code> in your C source: with most compilers, this sets
+<code>FOO</code> to the string <code>1</code>.)  <code>undef_macros</code> is just
+a list of macros to undefine.
+
+<p>
+For example:
+
+<p>
+<div class="verbatim"><pre>
+Extension(...,
+          define_macros=[('NDEBUG', '1'),
+                         ('HAVE_STRFTIME', None)],
+          undef_macros=['HAVE_FOO', 'HAVE_BAR'])
+</pre></div>
+
+<p>
+is the equivalent of having this at the top of every C source file:
+
+<p>
+<div class="verbatim"><pre>
+#define NDEBUG 1
+#define HAVE_STRFTIME
+#undef HAVE_FOO
+#undef HAVE_BAR
+</pre></div>
+
+<p>
+
+<h2><a name="SECTION002340000000000000000">
+2.3.4 Library options</a>
+</h2>
+
+<p>
+You can also specify the libraries to link against when building your
+extension, and the directories to search for those libraries.  The
+<code>libraries</code> option is a list of libraries to link against,
+<code>library_dirs</code> is a list of directories to search for libraries at 
+link-time, and <code>runtime_library_dirs</code> is a list of directories to 
+search for shared (dynamically loaded) libraries at run-time.
+
+<p>
+For example, if you need to link against libraries known to be in the
+standard library search path on target systems
+
+<p>
+<div class="verbatim"><pre>
+Extension(...,
+          libraries=['gdbm', 'readline'])
+</pre></div>
+
+<p>
+If you need to link with libraries in a non-standard location, you'll
+have to include the location in <code>library_dirs</code>:
+
+<p>
+<div class="verbatim"><pre>
+Extension(...,
+          library_dirs=['/usr/X11R6/lib'],
+          libraries=['X11', 'Xt'])
+</pre></div>
+
+<p>
+(Again, this sort of non-portable construct should be avoided if you
+intend to distribute your code.)
+
+<p>
+<b class="du-xxx">Should mention clib libraries here or somewhere else!</b>
+
+<p>
+
+<h2><a name="SECTION002350000000000000000">
+2.3.5 Other options</a>
+</h2>
+
+<p>
+There are still some other options which can be used to handle special
+cases.
+
+<p>
+The <span class="du-option">extra_objects</span> option is a list of object files to be passed
+to the linker. These files must not have extensions, as the default
+extension for the compiler is used.
+
+<p>
+<span class="du-option">extra_compile_args</span> and <span class="du-option">extra_link_args</span> can be used
+to specify additional command line options for the respective compiler and
+linker command lines.
+
+<p>
+<span class="du-option">export_symbols</span> is only useful on Windows.  It can contain a list
+of symbols (functions or variables) to be exported. This option
+is not needed when building compiled extensions: Distutils 
+will automatically add <code>initmodule</code>
+to the list of exported symbols.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2 listing individual modules"
+  href="listing-modules.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.4 relationships between Distributions"
+  href="node10.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="listing-modules.html">2.2 Listing individual modules</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node10.html">2.4 Relationships between Distributions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

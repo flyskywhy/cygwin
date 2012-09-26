@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node33.html" />
+<link rel="prev" href="node29.html" />
+<link rel="parent" href="dnt-type-methods.html" />
+<link rel="next" href="node33.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.2.4 Object Comparison</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.3.2 type-specific Attribute Management"
+  href="node31.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.5 abstract Protocol Support"
+  href="node33.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node31.html">2.2.3.2 Type-specific Attribute Management</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node33.html">2.2.5 Abstract Protocol Support</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004240000000000000000">
+2.2.4 Object Comparison</a>
+</h2>
+
+<p>
+<div class="verbatim"><pre>
+    cmpfunc tp_compare;
+</pre></div>
+
+<p>
+The <tt class="member">tp_compare</tt> handler is called when comparisons are needed
+and the object does not implement the specific rich comparison method
+which matches the requested comparison.  (It is always used if defined
+and the <tt class="cfunction">PyObject_Compare()</tt> or <tt class="cfunction">PyObject_Cmp()</tt>
+functions are used, or if <tt class="function">cmp()</tt> is used from Python.)
+It is analogous to the <tt class="method">__cmp__()</tt> method.  This function
+should return <code>-1</code> if <var>obj1</var> is less than
+<var>obj2</var>, <code>0</code> if they are equal, and <code>1</code> if
+<var>obj1</var> is greater than
+<var>obj2</var>.
+(It was previously allowed to return arbitrary negative or positive
+integers for less than and greater than, respectively; as of Python
+2.2, this is no longer allowed.  In the future, other return values
+may be assigned a different meaning.)
+
+<p>
+A <tt class="member">tp_compare</tt> handler may raise an exception.  In this case it
+should return a negative value.  The caller has to test for the
+exception using <tt class="cfunction">PyErr_Occurred()</tt>.
+
+<p>
+Here is a sample implementation:
+
+<p>
+<div class="verbatim"><pre>
+static int
+newdatatype_compare(newdatatypeobject * obj1, newdatatypeobject * obj2)
+{
+    long result;
+
+    if (obj1-&gt;obj_UnderlyingDatatypePtr-&gt;size &lt;
+        obj2-&gt;obj_UnderlyingDatatypePtr-&gt;size) {
+        result = -1;
+    }
+    else if (obj1-&gt;obj_UnderlyingDatatypePtr-&gt;size &gt;
+             obj2-&gt;obj_UnderlyingDatatypePtr-&gt;size) {
+        result = 1;
+    }
+    else {
+        result = 0;
+    }
+    return result;
+}
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.3.2 type-specific Attribute Management"
+  href="node31.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.5 abstract Protocol Support"
+  href="node33.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node31.html">2.2.3.2 Type-specific Attribute Management</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node33.html">2.2.5 Abstract Protocol Support</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

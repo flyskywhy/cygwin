@@ -1,0 +1,2552 @@
+2005-08-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.6.10 ===
+
+	* NEWS: Updates
+
+2005-08-17  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkmenu.c (gtk_menu_grab_notify): Complete the 
+	backported fix.  
+
+2005-08-15  Matthias Clasen  <mclasen@redhat.com>
+
+	Backported fixes from 2.8:
+	
+	* gtk/gtkmenu.c (gtk_menu_grab_notify): Take window
+	groups into account.  (#309473, Diego Gonzalez)
+
+	* gtk/gtkwindow.[hc]: Add a non-exported function to
+	get the grab widget of a window group.
+
+	* gtk/gtkicontheme.c: When changing the icon theme, defer
+	the resetting of rc styles to an idle, so that it does
+	not happen e.g during expose handling (which is problematic,
+	since some widgets, like the toolbar, are changing the
+	hierarchy in response to style changes).  (#300539, reported
+	by many people, analyzed by Owen Taylor)
+
+Fri Aug  5 16:54:19 2005  Søren Sandmann  <sandmann@redhat.com>
+
+	* gtk/gtkmenutoolbutton.c
+	(gtk_menu_tool_button_construct_contents): Set the relief of the
+	arrow button to the value returned by
+	gtk_tool_item_get_relief_style(). Patch from Benjamin Berg.
+	Bug 312695.
+
+2005-08-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Bump version
+
+	* === Released 2.6.9 ===
+
+	* gtk/gtkuimanager.c (update_node): Update tooltips when 
+	reconnecting toolitems.  (#312173, Alex Graveley)
+
+	* gtk/gtkclipboard.c (gtk_clipboard_set_image) 
+	(gtk_clipboard_set_text): Don't leak atom names.  (#311933,
+	Peter Zelezny)
+
+	* gtk/gtkmain.c (do_post_parse_initialization): Call
+	gettext_initialization() here as well.  (#311612, Dan Winship)
+
+2005-07-30  Hans Breuer  <hans@breuer.org>
+
+	* gtk/makefile.msc.in : updated
+
+2005-07-29  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkdrawable-win32.c (blit_inside_drawable): Rename
+	from blit_inside_window(), as it now does blitting inside a
+	bitmap, too. No code change, still just call BitBlt().
+	(_gdk_win32_blit): Check for source equalling destination
+	first. (#169508, #131977) 
+	Do away with the superfluous local draw_impl variable, the
+	parameter to this function is already a GdkDrawableImplWin32*, no
+	need to copy and cast it.
+
+2005-07-28  Robert Ögren  <gtk@roboros.com>
+
+	Avoid spurious core pointer events when the tablet pen is lifted.
+	(#167000)
+
+	* gdk/win32/gdkinput-win32.c (set_ignore_core): New static function,
+	handles delayed unsetting of _gdk_input_ignore_core.
+	(_gdk_input_other_event): Call set_ignore_core instead of setting
+	_gdk_input_ignore_core directly.
+
+2005-07-27  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkmain-win32.c (_gdk_win32_psstyle_to_string): Handle
+	PS_ALTERNATE, too.
+
+	* gdk/win32/gdkmain-win32.c (gdk_screen_get_height_mm): Fix for
+	multi-monitor cases. (#311677, Tim Evans)
+
+2005-07-23  Matthias Clasen  <mclasen@redhat.com>
+
+	* NEWS: Updates
+
+2005-07-21  Christian Rose  <menthos@menthos.com>
+
+	* configure.in: Added "hy" to ALL_LINGUAS.
+
+2005-07-21  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkwindow-win32.c (gdk_window_set_title): Use
+	wide-char API when available. (#311079, Peter Zelezny)
+
+2005-07-20  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkdnd.c (gtk_drag_begin_internal): Don't fail if we
+	can't get a keyboard grab.  (#168351)
+
+2005-07-19  Kristian Rietveld  <kris@gtk.org>
+
+	* gtk/gtkentry.c (gtk_entry_move_forward_word): don't iterate
+	past the end of the string, so pango_layout_get_cursor_pos() won't
+	complain. (#309211, Tommi Komulainen).
+
+2005-07-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkmain.c (gtk_parse_args, gtk_init_with_args): Call
+	gettext_initialization before checking gtk_initialized, otherwise
+	there are scenarios where it is not called at all. For an
+	example, see tests/testfilechooserbutton.c.  (#310323, 
+	Arkady L. Shane)
+
+2005-07-14  Tor Lillqvist  <tml@novell.com>
+
+	* gtk/gtkfilesystemwin32.c (filename_get_info): Implement getting
+	the MIME type of a file. Look it up in the Registry. Bug reported
+	by Hans Oesterholt.
+
+2005-07-13  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkicontheme.c (load_themes): Don't keep the caches
+	for unthemed directories in a separate list, instead append
+	them at the end of the dir_mtimes list, so that we can check
+	them for staleness like the other caches.  (#310221, Mark 
+	McLoughlin)
+
+2005-07-13  Robert Ögren  <gtk@roboros.com>
+
+	Fix handling of Aiptek and Aiptek-like graphical tablets such as Trust
+	on Windows. (#167004, thanks to	"pnohant" for testing)
+
+	Code cleanup: Remove the unused and unmaintained code for using a
+	non-system tablet context (USE_SYSCONTEXT ifdef:s), suggested
+	by Tor Lillqvist.
+
+	* gdk/win32/gdkinput-win32.c (_gdk_input_wintab_init_check): Handle
+	tablet drivers that don't support WTI_DDCTXS/WTI_DSCTXS gracefully.
+	Sligthly reorganize and simplify the code to support this.
+	(_gdk_input_wintab_init_check, _gdk_input_other_event): Remove
+	USE_SYSCONTEXT ifdef:s and the code for the case it was not defined.
+	(gdk_input_window_find_within): Removed.
+
+2005-07-07  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Add -DHPPEX -DSHMLINK to CFLAGS for HP-UX.  
+	(#162979, Paul Cornett)
+
+	* gtk/gtkhscale.c (gtk_hscale_new_with_range): 
+	(gtk_vscale_new_with_range): Add some additional docs on 
+	precision here too.  (#309238, Steve Chaplin)
+
+2005-07-07  Matthias Clasen  <mclasen@redhat.com>
+
+	Implement Drag-and-Drop to the file list.  (#145121, Sven Neumann)
+	
+	* gtk/gtkfilechooserdefault.c (file_list_drag_data_received_cb) 
+	(file_list_drag_drop_cb, file_list_drag_motion_cb): New functions
+	to handle drag-and-drop on the file list.
+	(create_file_list): Set up drag-and-drop handlers on the file list.
+
+2005-07-07  Matthias Clasen  <mclasen@redhat.com>
+
+	Fix #157787, reported by Jonathan Blandford: 
+	
+	* gtk/gtkfilechooserdefault.c 
+	(gtk_file_chooser_default_set_current_folder): Don't leave a 
+	"trail" behind when set_current_folder is called explicitly.
+	(gtk_file_chooser_default_update_current_folder): New function
+	that is called to update the current folder in response to
+	user actions.
+
+	* gtk/gtkpathbar.c (_gtk_path_bar_set_path): Add a boolean
+	keep_trail argument, and don't leave a "trail" behind unless
+	it is set.
+
+2005-07-05  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkspinbutton.c (gtk_spin_button_new_with_range): Add some
+	additional docs on precision.  (#309238, Steve Chaplin)
+
+2005-07-05  Matthias Clasen  <mclasen@redhat.com>
+
+	* modules/input/imime.c: Fix includes.  (#309462, Kazuki IWAMOTO)
+
+2005-07-03  Manish Singh  <yosh@gimp.org>
+
+	* gtk/gtktreeview.c (gtk_tree_view_vertical_autoscroll): remove
+	stray debugging g_prints.
+
+2005-07-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilesel.c (cmpl_init_state): Prevent an infinite
+	loop when G_FILENAME_ENCODING is invalid.  (#309280, Padraig Brady)
+
+2005-06-30  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkvisual-x11.c (gdk_visual_decompose_mask): Avoid
+	infinite loop if a mask is zero.  (#309222, David Saxton)
+
+	* gtk/gtktreemodelfilter.c (gtk_tree_model_filter_fetch_child): 
+	Clarify the code, gcc 4 complains about predecrement in  MAX().
+
+	* modules/input/gtkimcontextxim.c (gtk_im_context_xim_finalize): 
+	Don't prematurely unregister callbacks.
+
+2005-06-27  Matthias Clasen  <mclasen@redhat.com>
+
+	* modules/input/gtkimcontextxim.c (gtk_im_context_xim_finalize): 
+	Avoid a segfault.  (#309054)
+
+	* gtk/gtkmenu.c (gtk_menu_grab_notify): Cancel menus when
+	they are grab-shadowed by something thats not a
+	submenu.  (#145416, Euan MacGregor)
+
+2005-06-26  Matthias Clasen  <mclasen@redhat.com>
+
+	* modules/input/gtkimcontextxim.c (gtk_im_context_xim_finalize): 
+	Unregister XIM callbacks here.  (#309054)
+
+2005-06-24  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktextview.c (gtk_text_view_scroll_hpages): Don't
+	jump to the next line if we are at the end of the line.  
+	(gtk_text_view_move_cursor_internal): Make movement by
+	paragraphs up/down symmetric.  (#307055, Behnam Esfahbod)
+
+2005-06-23  Tor Lillqvist  <tml@novell.com>
+
+	Improve and simplify line segment rendering on Win32, especially
+	the implementation of GDK_CAP_NOT_LAST, and dashed lines. Fixes
+	bugs #306396 and #308413.
+
+	* gdk/win32/gdkprivate-win32.h (GdkGCWin32): Save the GdkGC's
+	line_style, cap_style and join_style as such in the
+	GdkGCWin32. Don't need to keep the pen_double_dash flag, we can
+	check the line_style.
+
+	* gdk/win32/gdkgc-win32.c (fixup_pen): New internal function. Sets
+	up the GDI pen type, style, end cap and join attributes to use
+	based on the pen width, GDK line style, end cap style, and join
+	style.
+
+	For a narrow (zero-width) GDK pen with the GDK_CAP_NOT_LAST end
+	cap style, which typically are used for XOR drawing where it is
+	essential that the last pixel is not drawn, use a GDI cosmetic
+	pen. Only for a cosmetic pen does GDI not draw the last pixel. I
+	deduced this by experimetation, the documentation is rather vague.
+
+	For other GDK pens use a geometric GDI pen. If the width is 0 or 1
+	and the GDK end cap style is GDK_CAP_BUTT, and the line style is
+	GDK_LINE_SOLID, use PS_ENDCAP_ROUND. This ensures that also
+	single-pixel length lines are drawn. (For sngle-pixel width lines
+	roundness as such is of course irrelevant.) For dashed lines, use
+	PS_ENDCAP_FLAT.
+
+	For wide lines use PS_ENDCAP_FLAT, _ROUND or _SQUARE,
+	respectively, for GDK_CAP_BUTT, GDK_CAP_ROUND and GDK_CAP_PROJECTING.
+
+	For one pixel on-off dashed lines, use PS_ALTERNATE, it seems to
+	work better than PS_USERSTYLE. For other dashed lines, use
+	PS_USERSTYLE and the dashes as set by the user (or the default
+	four-pixel on-off style).
+
+	(gdk_win32_gc_values_to_win32values, gdk_win32_gc_set_dashes):
+	Call fixup_pen() to do the pen settings after modifying some of
+	the GDK GC attributes that affect pens.
+
+	* gdk/win32/gdkdrawable-win32.c (render_line_horizontal,
+	render_line_vertical, draw_segments): Check GdkGCWin32::line_style
+	instead of the the removed pen_double_dash member. Don't use
+	PATCOPY unconditionally in the PatBlt() call, use a raster op
+	code that depends on the GC function in use.
+
+	(draw_rectangle, draw_segments, draw_lines): Be more careful in
+	deciding when to do the manual dash rendering.
+
+	(draw_segments): Don't do any manual "last point" drawing at
+	all. The above changes takes care of narrow line segments being
+	drawn correctly in most cases, at least on NT-based Windows.
+
+2005-06-23  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilesystemunix.c (gtk_file_system_unix_get_folder): 
+	Fix an error in the cache timeout logic.  (#166601, Morten
+	Welinder)
+
+	* gtk/gtkiconcache.c (_gtk_icon_cache_new_for_path): Remove
+	a leftover debugging envvar.  
+
+2005-06-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkdnd-x11.c (xdnd_finished_filter): Set the
+	time field in the event.  (#308573, Morten Welinder)
+
+	* gtk/gtkbutton.c (gtk_button_construct_child): Don't
+	trigger warnings if there are extra references to the
+	hbox.  (#308677, Dan Winship)
+
+	* gtk/gtkfilesystemunix.c: Ignore everything after the
+	first space in lines from the .gtk-bookmarks file.
+
+2005-06-21  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkdnd.c (gtk_drag_source_set): Connect to 
+	button-release-event as well, to handle touchscreen 
+	scenarios better.  (#171490, Markku Vire)
+
+2005-06-20  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkiconcache.c: Handle missing MAP_FAILED.  (#308449, Georg
+	Schwarz) 
+
+2005-06-17  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkdnd-win32.c (gdk_dropfiles_filter): Set the actions
+	and suggested_action fields in the GdkDragContext to
+	GDK_ACTION_COPY. Otherwise apps that check the suggested_action
+	field, like eog, won't accept dropped files.
+
+2005-06-17  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkentrycompletion.c (gtk_entry_completion_complete): 
+	Resize the popup if necessary.  (#308076, Vincent Noel)
+
+	* gtk/gtkwindow.c (gtk_window_real_set_focus): Queue a
+	draw on the old and new focus widgets, if their defaultness
+	changes.  (#305607, Billy Biggs)
+
+2005-06-16  Tor Lillqvist  <tml@novell.com>
+
+	* gtk/gtkmain.c (g_win32_locale_filename_from_utf8): [Win32]
+	Borrow this function from GLib HEAD.
+	(_gtk_get_localedir): [Win32] Make sure the run-time locale
+	directory is in system codepage, as it is passed to the
+	non-UTF8-aware gettext library.
+
+2005-06-15  Matthias Clasen  <mclasen@redhat.com>
+	
+	* configure.in: Bump version
+
+	* === Released 2.6.8 ===
+
+2005-06-15  Matthias Clasen  <mclasen@redhat.com>
+
+	* NEWS: More updates, move bug numbers to my
+	separate list of bugs, which will get merged into
+	the announcement. For 2.8.0, I will try a somewhat
+	different style for the NEWS, and list bugs and
+	contributors separately from features.
+
+2005-06-14  Federico Mena Quintero  <federico@ximian.com>
+
+	* NEWS: Fill in with GtkFileChooser bugs.
+
+2005-06-14  Federico Mena Quintero  <federico@ximian.com>
+
+	Fix #302087:
+
+	* gtk/gtkfilechooserdefault.c (list_selection_changed): Emit
+	"selection-changed" and do the normal housekeeping even if we are
+	in SAVE mode and there is nothing selected.  We didn't emit that
+	signal if we were in SAVE mode and unselect_all() got called.
+	(gtk_file_chooser_default_unselect_all): Call
+	pending_select_paths_free() so that we cancel any asynchronous
+	selections.
+	(gtk_file_chooser_default_set_current_name): Likewise.
+
+2005-06-14  Federico Mena Quintero  <federico@ximian.com>
+
+	Fixes #307640:
+
+	* gtk/gtkfilechooserdefault.c
+	(gtk_file_chooser_default_should_respond): Oops, I broke SAVE
+	mode.  If the parent path is a folder, only create a subfolder if
+	we are in CREATE_FOLDER mode; if we are in SAVE mode, just return
+	and respond.  Also, pick up the case where the user types
+	"dirname/" instead of "dirname".
+	(check_save_entry): Make the return type void.  Add some return
+	parameters so that we can do more thorough checking.
+	(gtk_file_chooser_default_get_paths): If the file part is empty
+	and we are in SAVE mode, return an empty selection.
+
+2005-06-13  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserbutton.c (model_update_current_folder): 
+	Free the data of the row before overwriting it.  (#307490,
+	Kjartan Maraas)	
+
+2005-06-12  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkselection.c (gtk_target_list_add_image_targets): 
+	Don't leak the format names.  (#307190, Morten Welinder)
+
+2005-06-12  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gdk/x11/gdkasync.c: (send_event_handler): Merge
+	fix for a leak from HEAD. Bug #307281.
+
+2005-06-10  Matthias Clasen  <mclasen@redhat.com>
+
+	* NEWS: Updates
+
+2005-06-09  Federico Mena Quintero  <federico@ximian.com>
+
+	Fixes #162358:
+
+	* gtk/gtkfilechooserdefault.c (update_chooser_entry): Don't return
+	immediately if we are in CREATE_FOLDER mode, so that we can fill
+	the entry with the newly-selected folder.
+	(gtk_file_chooser_default_set_property): Warn against turning on
+	multiple selection for CREATE_FOLDER mode, or about setting that
+	action while multiple selection is on.
+	(update_chooser_entry): Change the entry's contents as well if we
+	are in CREATE_FOLDER mode.  If nothing is selected, clear the
+	chooser entry.
+	(trap_activate_cb): Don't trap enter/space if modifiers are
+	pressed.  This lets one use Ctrl-space to toggle rows in multiple
+	selection mode.
+	(gtk_file_chooser_default_should_respond): Clean up the if-chain
+	mess of special cases by using an array to determine what to do.
+	Also, for the save-entry case in CREATE_FOLDER mode, actually fix
+	the bug where the file chooser would switch to an existing folder
+	rather than confirming with it, and create the folder ourselves.
+	(error_creating_folder_over_existing_file_dialog): New function.
+
+	* gtk/gtkfilechooserentry.c (check_completion_callback): Only
+	insert the common prefix if we are in an "open" mode.  Use a
+	helper function.
+	(append_common_prefix): New helper function; code moved over from
+	check_completion_callback().
+	(find_common_prefix): New helper function.
+	(gtk_file_chooser_entry_focus): Append the common prefix if the
+	user requests it explicitly.
+
+2005-06-09  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkdnd-x11.c (motif_drop_start, xdnd_drop_filter): Update
+	the user time on the window when a drop happens.  (#169364, Alexander
+	Hunziker, patch by Elijah Newren)
+
+2005-06-08  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreemodel.c (gtk_tree_path_new_from_string): Check for
+	negative before appending the index, to avoid double error
+	message.  (#306393, Morten Welinder)
+
+	* gtk/gtktreeview.c (gtk_tree_view_real_start_interactive_search): 
+	Don't crash if search_window is NULL.  (#304914, Victor Osadci,
+	testcase by Olaf Vitters)
+
+2005-06-07  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gtk/gtkfilechooserbutton.c: (update_label_and_image):
+	Plug a leak. Closes bug #306754.
+
+2005-06-03  Dom Lachowicz <cinamod@hotmail.com>
+
+	Merge from HEAD:
+	
+	* modules/engines/ms-windows/msw_style.c: Re-sync with gtk-wimp
+	* modules/engines/ms-windows/xp_theme.c: Ditto
+	* modules/engines/ms-windows/Theme/gtk-2.0/gtkrc: Ditto
+
+2005-06-05  Tor Lillqvist  <tml@novell.com>
+
+	* modules/engines/Makefile.am
+	* modules/input/Makefile.am: Decide whether to build the
+	ms-windows theme engine based on the GDK backend, not based on
+	platform. (I.e., if building for Cygwin with the X11 backend, we
+	shouldn't build the ms-windows engine, but if building for Cygwin
+	but with the Win32 backend, we should.) Ditto for the IME
+	(Windows) input module. (#305832)
+
+2005-06-04  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkcursor-win32.c
+	* gdk/win32/gdkwindow-win32.c
+	* gdk/win32/gdkprivate-win32.h: Support full-colour cursors.
+	Support cursors with alpha on XP. Use code in common with the
+	support for alpha icons that already was present. (#306101, Tim
+	Evans)
+
+	* modules/engines/ms-windows/msw_style.c: Render insensitive icons
+	in a way that more closely matches Windows. (#305986, Tim Evans).
+
+	* modules/engines/ms-windows/Makefile.am (LDADDS): Link with
+	gdk-pixbuf.
+
+2005-05-26  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktextbtree.c (_gtk_text_btree_tag): Queue the 
+	redisplay after modifying the tag in the btree, otherwise 
+	we end up showing the old tags until the next redraw comes 
+	around.   (#143537, Gary Kramlich, Peter Wainwright)
+
+	* gtk/gtkcombobox.c (gtk_combo_box_list_auto_scroll): Make 
+	autoscrolling work at the bottom of the screen.
+
+2005-05-26  Maciej Katafiasz  <email@mathrick.org>
+
+	* docs/reference/gtk/tmpl/gtkentry.sgml:
+	Point to GtkTextView instead of GtkText. Fixes bug #305535
+
+2005-05-26  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkdrawable-win32.c (_gdk_win32_blit): If blitting
+	from the root window, take the multi-monitor offset into
+	account. (#305511)
+
+2005-05-25  Matthias Clasen  <mclasen@redhat.com>
+
+	* demos/gtk-demo/clipboard.c: Demonstrate image copy-and-paste
+	and drag-and-drop.
+
+	* demos/gtk-demo/appwindow.c (do_appwindow): Set the window
+	icon by name.
+
+	* gtk/gtktreeview.c (gtk_tree_view_bin_expose): Draw the 
+	background of rows insensitive when the treeview is insensitive.
+	(pointed out by Billy Biggs)
+
+	* gtk/gtkselection.c (gtk_target_list_add_image_targets): 
+	Make sure png comes first, otherwise dnd may use bmp by
+	default, loosing transparency.
+
+2005-05-25  Michael Natterer  <mitch@imendio.com>
+
+	* gtk/gtktextview.c (blink_cb): block the text_layout's "changed"
+	handler when changing cursor visibility because it would expose
+	the whole paragraph where the cursor is. Instead, expose the
+	cursors' areas manually. (#173047).
+
+	(text_window_invalidate_cursors): new function which exposes the
+	cursors.
+
+	* gtk/gtkstyle.c (draw_insertion_cursor): added comment that the
+	same cursor size calculation is in text_window_invalidate_cursors().
+
+2005-05-25  Matthias Clasen  <mclasen@redhat.com>
+
+	* demos/gtk-demo/editable_cells.c (create_items_model): Also
+	demonstrate GtkCellRendererProgress.
+
+	* demos/gtk-demo/Makefile.am (demos): 
+	* demos/gtk-demo/combobox.c: Add a demo showing combo box 
+	variations.
+
+	* demos/gtk-demo/Makefile.am (demos): 
+	* demos/gtk-demo/pickers.c: Add a demo showing all picker widgets.
+
+2005-05-23  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserdefault.c (gtk_file_chooser_default_init):
+	Revert an accidental commit.
+
+	* gtk/gtkfilechooserdefault.c (filter_create): Don't grab
+	the focus away from the file list when operating the filter
+	combo with the pointer.  (#304844, Sven Neumann)
+
+2005-05-23  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkkeys-win32.c (handle_special): Map VK_APPS to
+	GDK_Menu. (#172383, Ivan Wong)
+
+	* gdk/win32/gdkkeys-win32.c (handle_dead): If the keysym isn't one
+	of the special cases this function takes care of, use it as
+	such. This takes care of for instance the Bengali Virama, see bug
+	#165723.
+
+2005-05-20  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkimcontextsimple.c (check_table): Avoid a possible
+	buffer overrun.  (#142444, Leonard Michlmayr)
+
+2005-05-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooser.c (gtk_file_chooser_remove_shortcut_folder_uri): 
+	Use the correct function to conver the uri to a path.  (#304565,
+	Ismael Juma)
+
+	* gtk/gtkfilechooserbutton.c (dialog_response_cb): Handle the
+	Cancel button properly.  (#304234, Sven Neumann)
+
+	* gtk/gtkwidget.c (gtk_widget_add_events): Try harder to set
+	the event masks of descendent windows.  (#169821, Tommi Komulainen)
+
+2005-05-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkproperty-x11.c (gdk_property_get): Warn if
+	length overflows.  (#161520, Ian Wienand)
+
+2005-05-18  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkevents-win32.c
+	* gdk/win32/gdkkeys-win32.c
+	* gdk/win32/gdkprivate-win32.h: Check the KF_EXTENDED bit in
+	lParam of WM_KEY* messages to distinguish between left and right
+	Control and Alt keys. Unfortunately, the right Shift key doesnt
+	set KF_EXTENDED, so to distinguish between left and right Shift
+	keys, check the scan code. (#304584)
+
+2005-05-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkscale.c (gtk_scale_class_init): Fix the default
+	values of draw-value and value-pos to be the values we
+	actually use in _init. (#304547, Mikael Hallendal)
+
+2005-05-17  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktextview.c (cursor_blinks): Don't blink the cursor
+	if the text view is not editable.  
+
+	* gtk/gtkcombobox.c (gtk_combo_box_list_button_released): Keep
+	the popup posted if the button is released over the cellview.
+	This matches the behaviour of other combo box implementations.  
+	(#171378)
+
+2005-05-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkscale.c (gtk_scale_class_init): Don't bind GDK_Page_Up 
+	and GDK_Page_Down twice.  (#168333, Hazael Maldonado Torres)
+
+2005-05-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkentry.c (cursor_blinks): Don't blink the cursor if 
+	the entry is not editable.  (#304171,Nikos Kouremenos)
+
+2005-05-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserbutton.c (gtk_file_chooser_button_constructor): 
+	Make sure the action of the button and the dialog are in sync,
+	when the dialog is provided by the app.  (#303987, David A Knight)
+
+2005-05-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/gdkpango.c (gdk_pango_renderer_get_default): Fix a typo
+	in the docs.  (#303940, Masao Mutoh)
+
+2005-05-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktoggleaction.c (connect_proxy): Be more careful when
+	casting.  (#304089, Philip Langdale)
+
+	* gtk/gtkstatusbar.c (gtk_statusbar_size_allocate): Only shrink
+	the label if we need to.  (#169390, Felix Riemann)
+
+2005-05-10  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkproperty-win32.c (gdk_screen_get_setting): Check
+	that GDK_IS_SCREEN(screen) (like the X11 backend does), not screen
+	== gdk_screen_get_default(), as that might return NULL when this
+	function is called.
+
+2005-05-09  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkalignment.c (gtk_alignment_size_allocate): Flip the
+	padding in RTL mode.  (#303572, Maciej Katafiasz)
+
+2005-05-07  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkscreen-x11.c (gdk_screen_get_width_mm) 
+	(gdk_screen_get_height_mm): Fix typos in the docs. (#303389,
+	Masao Mutoh)
+
+2005-05-06  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilesystemunix.c (fill_in_mime_type): Don't fill the mime
+	types if this is an AFS directory.
+	(fill_in_names): If we are in an AFS directory, set the MIME type
+	blindly to "x-directory/normal".
+
+2005-05-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtknotebook.c (gtk_notebook_insert_page_menu): Always
+	initialize child-visible to FALSE, otherwise we may end up
+	with the wrong page visible initially.  (#302283, Patrik Fimml)
+
+	* gtk/gtktreeview.c (gtk_tree_view_draw_arrow): Make expanders
+	appear insensitive in insensitive treeviews. 
+
+2005-05-04  Owen Taylor  <otaylor@redhat.com>
+
+	* gdk/x11/gdkevents-x11.c gdk/x11/gdkwindow-x11.h: Fix a bug
+	in focus tracking when we move between has_pointer_focus and 
+	has_focus_window directly. (#109246, Billy Biggs, Niko Tyni 
+	and others)
+
+	* gdk/x11/gdkevents-x11.c: Also fix some extremely confusion
+	that could happen in the case of no window manager + keyboard grabs,
+	by moving to a more consistent model of when we pay attention
+	to mode=NotifyGrab/NotifyUngrab events.
+
+2005-05-02  Federico Mena Quintero  <federico@ximian.com>
+
+	* tests/testfilechooser.c: Oops, remove mtrace() stuff.
+
+	Fixes #301068:
+
+	* gtk/gtkfilesystemunix.c (struct _GtkFileSystemUnix): Add fields
+	to store struct stat for /afs and /net, and boolean fields to say
+	whether these are valid.
+	(struct _GtkFileFolderUnix): Added a boolean is_network_dir field.
+	(gtk_file_system_unix_get_folder): Fill in the is_network_dir
+	field of the folder structure.
+	(fill_in_names): If the folder is a network directory, create a
+	fake struct stat for its entries.
+	(fill_in_stats): Don't stat() the children of network directories.
+
+	* gtk/gtkfilechooserdefault.c (list_mtime_data_func): If the mtime
+	is 0, use "Unknown" for the cell's displayed text.
+
+2005-05-02  Michael Natterer  <mitch@imendio.com>
+
+	* gtk/gtkmain.c (do_post_parse_initialization): return silently if
+	"gtk_initialized" is TRUE. Re-enables calling GTK's init functions
+	multiple times when using gtk_get_option_group(), just as one can
+	call gtk_init() multiple times without doing any harm.
+
+2005-05-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktextview.c (gtk_text_view_expose_event): Propagate
+	the event to unanchored children in the text window.  
+	(#302494, Stephen Kennedy)
+
+2005-04-30  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkdnd-win32.c (gdk_dropfiles_filter): Take
+	multi-monitor offset into account. (#302525)
+
+2005-04-29  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkiconview.c (gtk_icon_view_map): Get rid of this
+	function, instead show the bin_window when it is created.
+
+	* gtk/gtkradiobutton.c (gtk_radio_button_focus): Don't 
+	grab focus to unrealized widgets.  (#302240, Philip Langdale)
+
+	* gtk/gtktreeview.c (gtk_tree_view_state_changed): Set
+	background upon state changes.  (#301651, Billy Biggs)
+	(gtk_tree_view_get_path_at_pos): Take RTL into account
+	when iterating over the columns.  (#302163)
+
+	* configure.in: Check for nm.
+
+	* gtk/Makefile.am: Use $(NM), not nm directly. (#301299, 
+	Nguyen Thai Ngoc Duy)
+
+	* gtk/gtkiconview.c (gtk_icon_view_move_cursor_start_end): Use
+	the internal unselect_all function, since we need the unselection
+	to happen even in browse mode.  (#300995, Mathias Hasselmann)
+
+	* gtk/gtkuimanager.c (update_node): Use g_object_notify() instead
+	of triggering a ::notify by re-setting the property.  (#300982,
+	Sven Neumann)
+
+	* gtk/gtkaction.c (connect_proxy): Use gtk_action_sync_tooltip().
+
+	* gtk/gtkiconview.c (gtk_icon_view_scroll_to_item): Also
+	scroll horizontally when necessary, and keep the northwest
+	corner of the item visible.  (#300913, Mathias Hasselmann)
+
+	* tests/testiconview.c: Add some more tests.
+
+	* gtk/gtkiconview.c (gtk_icon_view_select_path): Don't crash
+	if the path does not point to a row in the model.  (#300909,
+	Mathias Hasselmann)
+	(gtk_icon_view_rows_reordered): Re-layout here.  (#301009, 
+	Mathias Hasselmann)
+
+	* tests/testtext.c: Add some more attribute tests.
+
+	* gtk/gtktexttag.c (gtk_text_tag_class_init): Correct the documentation
+	of the rise property. String change, but it is more important to
+	be correct than to be translated.  (#301740)
+
+2005-04-25  Tor Lillqvist  <tml@novell.com>
+
+	* gtk/gtkfilesystemwin32.c
+	(gtk_file_system_win32_volume_get_display_name): Get volume name
+	also on Win9x. (#301798, Daniel Atallah)
+	(canonicalize_filename): Add explicit braces to silence compiler
+	warning.
+
+2005-04-24  Hans Breuer  <hans@breuer.org>
+
+	* gtk/stock-icons/makefile.msc : updated
+
+2005-04-22  Tor Lillqvist  <tml@novell.com>
+
+	* gtk/gtkmain.c: Initailize gettext before use. Calling
+	bindtextdomain() and bind_textdomain_codeset() in
+	do_post_parse_initialization() is too late. Put the calls in a new
+	function gettext_initialization(), and call that from
+	gtk_init_with_args() and gtk_parse_args(). Fixes #170948 for
+	GTK+'s part, but the same problem occurs also at least in
+	atk. Thanks to Robert Ögren, Daniel Atallah and Kevin Stange.
+
+2005-04-19  Ivan, Wong Yat Cheung  <email@ivanwong.info>
+
+	* gdk/win32/gdkfont-win32.c (gdk_font_load_internal): Match
+	character height instead of cell height. Fix #301228.
+
+2005-04-18  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c (remove_selected_bookmarks): Remove
+	obsolete assertion that the selected row can't be a volume; this
+	is handled by the "removable" column now.  Fixes #301017.
+
+2005-04-15  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c (pending_select_paths_process):
+	Patch from Christian Neumair <chris@gnome-de.org>; only select the
+	first row if we are in OPEN mode.  The only other case we were
+	letting pass through was SELECT_FOLDER, but selecting the first
+	row when changing folders confuses people when folders are
+	actually being selected.  Fixes #171885.
+
+2005-04-12  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Bump version
+
+	* === Released 2.6.7 ====
+
+	* gtk/gtkactiongroup.c (gtk_action_group_add_action_with_accel): 
+	Revert the fix for #170727, since it causes problems
+	with user-specified accelerators. 
+
+	* gtk/gtkimage.c (gtk_image_calc_size, gtk_image_expose): 
+	Revert the changes to display broken images, since there
+	are applications which rely on the old behaviour.
+
+2005-04-11  Ivan, Wong Yat Cheung  <email@ivanwong.info>
+
+	Fix #300218:
+
+	* gdk/win32/gdkselection-win32.c (gdk_selection_convert): Fix
+	C99ism.
+
+	* gtk/updateiconcache.c: Guard inclusion of unistd.h and
+	utime.h.
+
+2005-04-11  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Bump version.
+
+2005-04-10  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.6.6 ===
+
+	* gdk/abicheck.sh: Handle duplicate symbols.
+
+	* NEWS: Updates
+
+2005-04-09  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkinput-xfree.c:
+	* gdk/x11/gdkinput-none.c:
+	* gdk/gtk.symbols: Some more fixes necessary to 
+	make building with gcc 4 work.
+
+	Add 16x16 versions of the zoom icons and of 
+	GTK_STOCK_INDEX. Some of the images were taken from 
+	the hicolor icon theme, and were originally created 
+	by Jakub Steiner and Tuomas Kuosmanen. 	(#167515, 
+	Vincent Noel)
+	
+	* gtk/stock-icons/stock_index_16.png:
+	* gtk/stock-icons/stock_zoom_1_16.png:
+	* gtk/stock-icons/stock_zoom_fit_16.png:
+	* gtk/stock-icons/stock_zoom_in_16.png:
+	* gtk/stock-icons/stock_zoom_out_16.png: New images.
+	
+	* gtk/stock-icons/Makefile.am: Add the new images. 
+
+	* gtk/gtkiconfactory.c (get_default_icons): Add the new 
+	images. 
+
+	* gtk/gtkimage.c (gtk_image_calc_size, gtk_image_expose): 
+	Don't display too many broken images.  (#169870, Roman
+	Kagan, patch by Ivan Wong)
+
+	* gtk/gtkwidget.c (gtk_widget_unparent): Remove debugging
+	output.  (#300013, Tommi Komulainen)
+
+2005-04-09  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Bump version
+
+	* === Released 2.6.5 ===
+
+	* NEWS: Updates
+
+2005-04-08  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkimage.c (gtk_image_expose, gtk_image_calc_size): 
+	If a stock_id is unknown, display the missing image. (#169870,
+	Steven Walter)
+
+	* gtk/gtkiconcache.c (icon_name_hash): Use the same function 
+	as in updateiconcache.c.  (spotted by Morten Welinder)
+
+	* gtk/gtkcombobox.c (gtk_combo_box_popdown): Make this
+	work when called from gtk_combo_box_destroy().  (#172999,
+	Christian Persch)
+
+2005-04-08  Matthias Clasen  <mclasen@redhat.com>
+
+	Fix double-click to autosize treeview columns. This was
+	probably broken since 2.2 ! (#169675)
+	
+	* gtk/gtktreeview.c (gtk_tree_view_button_press): Leave the
+	"user-resized" state of the column on a double-click to
+	autosize.
+	(gtk_tree_view_button_press, gtk_tree_view_motion_resize_column): 
+	Enter the "user-resized" state of the column only if a drag
+	actually changes the column width, not on any click.
+
+2005-04-07  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/updateiconcache.c (write_card32, write_card16): Avoid
+	unaligned access.  (#172947)
+
+	Some fixes from Morten Welinder (#172947):
+	
+	* gtk/updateiconcache.c (icon_name_hash): Make this compiler- 
+	and platform-independent.
+	(is_cache_up_to_date): Don't compare mtimes is a stat call failed.
+	(build_cache): Error out if a stat fails.  
+
+2005-04-07  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/updateiconcache.c (is_cache_up_to_date): Return 
+	TRUE if the cache is newer than the directory.  (#172852,
+	Jacob Kroon)
+
+	* configure.in: Replace an explicit pkg-config by 
+	$PKG_CONFIG.  (#168074, Hans-Wolfgang Loidl)
+
+	* gdk/gdkpango.c (gdk_pango_layout_line_get_clip_region): 
+	Ignore regions which fall completely outside the line.  
+	(#165862, Felipe Heidrich)
+
+2005-04-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/*.c, gdk/gdkdisplaymanager.c: s/G-OBJECT/G_OBJECT/g, 
+	and some more build fixes.
+
+2005-04-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreeview.c (gtk_tree_view_enable_model_drag_source) 
+	(gtk_tree_view_enable_model_drag_dest): Pass the target list 
+	to the underlying dnd implementation, otherwise we miss the 
+	target info in the drag-data-received signal.  (#164085, Jorn
+	Baayen)
+
+	* gtk/*.c, gdk/gdkdisplaymanager.c: Use canonical property
+	names for g_object_notify() calls.  (#171746, Morten Welinder)
+	  
+2005-04-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreeview.c (gtk_tree_view_set_search_column): Allow
+	resetting search-column to -1, and document it.  (#172891,
+	Lorenzo Gil Sanchez)
+
+2005-04-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreeview.c (gtk_tree_view_motion_resize_column) 
+	(gtk_tree_view_bin_expose): Avoid a few unnecessary calls
+	to gdk_window_get_pointer(). (#168015, Billy Biggs)
+
+	* gtk/gtkwindow.c (gtk_window_set_keep_below): Fix the EWMH link,
+	noticed by Kristof Vansant.
+
+	* po/.cvsignore, po-properties/.cvsignore: Remove
+	Makefile.in.in.  (#171092, Stefan Kasal)
+
+2005-04-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkrc.c (gtk_rc_parse_style): Don't modify scanner->value,
+	copy it first.  (#165693, Tommi Komulainen)
+
+2005-04-05  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkcomboboxentry.c (gtk_combo_box_entry_grab_focus): 
+	* gtk/gtkcombobox.c (gtk_combo_box_grab_focus): Implement
+	grab_focus for GtkComboBox and GtkComboBoxEntry.  (#171912,
+	Gustavo Carneiro)
+
+2005-04-05  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkicontheme.c: Store icon caches along with the
+	mtimes of the toplevel directories. The previous
+	mechanism of a hashtable-per-theme caused duplicate icon
+	caches for the same toplevel directory to be created.  
+	(#170030)
+
+2005-04-05  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkaboutdialog.c (gtk_about_dialog_init): Protect
+	the license and credits buttons from being affected by 
+	gtk_widget_show_all().  (#172724)
+
+	* gtk/gtkmenushell.c (gtk_menu_shell_activate_item): Keep a 
+	reference to the item.  (#167920, Hazael Maldonado Torres)
+
+	* gtk/gtktreeview.c (gtk_tree_view_set_search_column): Add some
+	more docs on interactive search.
+
+	* NEWS: Updates
+
+2005-04-05  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkvisual-win32.c (_gdk_visual_init): Handle 16 colour
+	display mode. For some reason, in this mode GetDeviceCaps(BITSPIXEL)
+	returns 1 (but GetDeviceCaps(NUMCOLORS)	does return 16). (#143415)
+
+	* gdk/win32/gdkvisual-win32.c (_gdk_visual_init): Don't force
+	24bpp GdkVisual on 32bpp displays. (#140706)
+
+Mon Apr  4 19:13:23 2005  Jonathan Blandford  <jrb@redhat.com>
+
+	Fix for #172319, Tristan Van Berkom:
+
+	* gtk/gtktreeview.c (gtk_tree_view_expand_all): change to use
+	gtk_tree_view_real_expand_row() instead of doing this by hand.
+
+Mon Apr  4 14:33:55 2005  Manish Singh  <yosh@gimp.org>
+
+	* gtk/gtkcomboboxentry.c (gtk_combo_box_entry_get_active_text):
+	cast combo->priv->entry to GTK_ENTRY()
+
+Mon Apr  4 12:14:35 2005  Søren Sandmann  <sandmann@redhat.com>
+
+	* gtk/gtkmenu.c (gtk_menu_handle_scrolling): Translate x, y into
+	widget coordinates instead of root coordinates. Patch from Jorn
+	Baayen. (#172236)
+
+2005-04-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkiconview.c (gtk_icon_view_calculate_item_size): Take
+	padding into account when calculating max_layout_width.  
+
+	* gtk/gtkactiongroup.c (gtk_action_group_add_action_with_accel): 
+	Use gtk_accel_map_change_entry(), so that reusing the same
+	action name works.  (#170727, Paolo Borelli)
+
+2005-04-04  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkmain.c (_gdk_win32_cf_to_string): New debugging
+	function, to log a clipboard format name symbolically.
+	(_gdk_win32_data_to_string): Also new, to log random data bytes.
+
+	Merge from HEAD:
+	
+	* gdk/win32/gdkdisplay-win32.c (_win32_on_clipboard_change): Print
+	debugging output only if asked for, not always.
+
+	* gdk/win32/gdkmain-win32.c (_gdk_win32_key_to_string): New
+	debugging function. As GetKeyNameText() returns a localized key
+	name we need to convert it to UTF-8.
+
+	* gdk/win32/gdkprivate-win32.h
+	* gdk/win32/gdkevents-win32.c: : Declare new functions, use them.
+
+	Implement delayed rendering on Win32, specifically for transfering
+	images through the clipboard from GTK+ apps to other
+	apps (#168173, implementation by Ivan Wong):
+
+	* gdk/win32/gdkevents-win32.c (gdk_event_translate): 
+	Handle WM_RENDERFORMAT.
+
+	* gdk/win32/gdkprivate-win32.h
+	* gdk/win32/gdkglobals-win32.c: Add _format_atom_table,
+	_delayed_rendering_data and _image_bmp.
+
+	* gdk/win32/gdkmain-win32.c: Initialize _image_bmp.
+
+	* gdk/win32/gdkproperty-win32.c (gdk_property_change):
+	Accept formats other than GDK_TARGET_STRING or _utf8_string, and
+	assume they are handled through delayed rendering.
+
+	* gdk/win32/gdkselection-win32.c (gdk_selection_convert):
+	Return all available formats (including those registered by GTK+
+	apps) on request_targets.
+	(gdk_selection_property_get): We should append a zero byte like
+	X11 does.
+	(gdk_win32_selection_add_targets): New function, for
+	gtkselection's use. Win32 requires that the clipboard owner
+	registers all valid formats even if the owner wants delayed
+	rendering.
+	(_gdk_win32_selection_convert_to_dib): New function. Convert
+	images to DIB using gdk-pixbuf.
+
+	* gdk/win32/gdkwin32.h: Declare gdk_win32_selection_add_targets().
+
+	* gtk/gtkselection.c (gtk_selection_add_target,
+	gtk_selection_add_targets): Call gdk_win32_selection_add_targets()
+	to register target formats.
+
+	* gdk/gdk.symbols: Add gdk_win32_selection_add_targets().
+
+2005-04-03  Hans Breuer  <hans@breuer.org>
+
+	* gdk/win32/gdkdrawable-win32.c : let dash_offset shift the start of
+	the line pattern not the start of the line. Fixes bug #171641.
+
+	* gtk/makefile.msc.in : follow .symbols changes
+
+2005-04-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkselection.c: Move documentation inline, document
+	if add_target functions append or prepend.  (#172350, 
+	Jon-Kare Hellan)
+
+	Make gtk_combo_box_get_active_text do the right thing for
+	GtkComboBoxEntry (#171373, Robert Staudinger)
+	
+	* gtk/gtkcombobox.h: Add a get_active_text vfunc.
+	
+	* gtk/gtkcombobox.c (gtk_combo_box_real_get_active_text): And
+	implement it here.
+
+	* gtk/gtkcomboboxentry.c (gtk_combo_box_entry_get_active_text): 
+	Implement get_active_text by always returning the content of 
+	the entry.
+
+2005-03-31  Sven Neumann  <sven@gimp.org>
+
+	* gtk/gtkbutton.c
+	* gtk/gtkiconview.c: fixed gtk-doc comments.
+
+2005-03-30  Federico Mena Quintero  <federico@ximian.com>
+
+	Fix #170755:
+
+	* gtk/gtktreeview.c (gtk_tree_view_row_changed): Only stop editing
+	if the row which changed is the same as the row being edited.
+
+2005-03-30  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreeview.c (gtk_tree_view_real_start_interactive_search): 
+	Make enable_search control only typeahead, not C-f.  (#170435,
+	Sven Neumann)
+	(gtk_tree_view_start_interactive_search): Pass keybinding == TRUE.
+
+	* gtk/gtkclipboard.c (gtk_clipboard_set_can_store): 
+	Don't accept n_targets == -1.
+	(clipboard_unset): unref the old_data, not the
+	user_data which we have just cleared.  (#172038, Sven
+	Neumann)
+
+	* gtk/gtkcombobox.c (gtk_combo_box_popup): Don't 
+	segfault if somebody tries to popup an unrealized
+	combo box.  (#172031, Felipe Heidrich)
+
+2005-03-30  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkevents-win32.c (build_pointer_event_state): The
+	state field should represent the state before the event, like on
+	X11. (#169753)
+	(gdk_event_translate): Fix event filter handling. If an event
+	filter (global, client message filter, of window-specific) returns
+	GDK_FILTER_CONTINUE, continue as if nothing happened. If it
+	returns GDK_FILTER_REMOVE or GDK_FILTER_TRANSLATE, return TRUE
+	from gdk_event_translate() which means that DefWindowProc() will
+	not be called.
+	(gdk_event_translate): Fix client message handling. Append a
+	GDK_CLIENT_EVENT unless there is a filter that matches and returns
+	something other than GDK_FILTER_CONTINUE. (#135552)
+
+	Merge from HEAD:
+
+	* gdk/win32/gdkevents-win32.c (gdk_event_translate): On
+	WM_MOUSEMOVE, don't check if this process owns the active
+	window. This makes cross-application widget embedding work better.
+	On WM_MOVE, don't bother checking for window visibility.
+
+2005-03-29  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreemodelfilter.c (gtk_tree_model_filter_set_visible_func): 
+	Document the need to refilter if parameters of the visibility function
+	change.  (#169516, Olivier Sessink)
+
+2005-03-28  Jeroen Zwartepoorte  <jeroen.zwartepoorte@gmail.com>
+
+	* gtk/gtkfilechooserdefault.c: (update_preview_widget_visibility): Make
+	the preview label ellipsize so the dialog layout stays constant.
+	(#171398)
+
+2005-03-28  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreeview.c (gtk_tree_view_key_press): Don't pop up
+	the context menu of the search entry if it is not visible.
+	(#169534, Billy Biggs)
+
+2005-03-27  Tor Lillqvist  <tml@novell.com>
+
+	* configure.in: Apparently AC_LIBTOOL_WIN32_DLL isn't deprecated
+	after all, and in fact necessary with HEAD libtool.
+
+2005-03-23  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserbutton.c (update_combo_box): Remove
+	a call whose result was unused and leaked.  (#170776,
+	Kjartan Maraas)
+
+	Some cleanups to the GtkDialog code:  (#170746, 
+	Morten Welinder)
+	* gtk/gtkdialog.c (action_widget_activated): Simplify,
+	use _gtk_dialog_get_response_for_widget.
+	(gtk_dialog_add_action_widget): Use the correct signal
+	id for non-buttons.
+	(gtk_dialog_set_response_sensitive): 
+	(gtk_dialog_set_default_response): Use get_response_data.
+	(gtk_dialog_run): Don't disconnect the signals if the
+	dialog was destroyed while running.
+
+2005-03-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkpathbar.c (gtk_path_bar_unmap): 
+	* gtk/gtkspinbutton.c (gtk_spin_button_unmap): 
+	* gtk/gtknotebook.c (gtk_notebook_unmap): 
+	* gtk/gtkrange.c (gtk_range_unmap): Stop scrolling when
+	the widget is unmapped.  (#168791, Ryan Lortie)
+
+2005-03-21  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkspinbutton.h: Fix a typo.
+
+2005-03-21  Tor Lillqvist  <tml@novell.com>
+
+	* gtk/Makefile.am: Use grep | head -n 1 instead of grep -m 1 which
+	doesn't work with slightly older versions of GNU grep in
+	install-libtool-import-lib rule. List the Win32 libs in LIBADD,
+	not LDFLAGS. Add -lgdi32.
+
+	* modules/engines/ms-windows/*.c: Silence gcc warnings (unused
+	variables, unhandled enum value in switch). Use g_object_unref()
+	instead of deprecated gdk_gc_unref() and gdk_drawable_unref().
+
+	* modules/engines/ms-windows/xp_theme.c (xp_theme_map_gtk_state): 
+	Add missing "case" keyword.
+
+	* modules/engines/ms-windows/Makefile.am: Link with -lgdi32
+	explicitly.
+
+	* gdk/win32/gdkim-win32.c: Remove bogus empty doc comment. Remove
+	unused variables. Add some casts to silence gcc.
+
+2005-03-20  Matthias Clasen  <mclasen@redhat.com>
+
+	Make PLT-reduction work with gcc4, and don't include
+	everything in gdkalias.h:
+	
+	* gtk/grk.symbols: Group symbols by header and source file.
+	* gtk/makegtkalias.pl: Protect definitions by the same 
+	preprocessor symbols used to guard the headers. Move
+	the alias declarations to a separate file which is 
+	produced when calling makegtkalias.pl -def
+	* gdk/Makefile.am (gtkaliasdef.c): Add a rule to generate 
+	this file.
+	* gtk/*.c: Include gtkalias.h after the other headers, 
+	include gtkaliasdef.c at the bottom.
+	* gtk/*.h: Small cleanups.
+
+2005-03-18  Hans Breuer  <hans@breuer.org>
+
+	* gdk/makefile.msc gdk-pixbuf/makefile.msc : handle gdk*alias.def
+
+	* gdk/makefile.msc.in : add gtkmnemonichash.obj
+
+	* test/testgtk.c(set_parent_signal) : use g_message instead of
+	g_print to keep the 'testgtk --bench=all' output clean
+
+2005-03-17  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtklabel.c (gtk_label_set_markup): Fix formatting
+	in example in the docs.  (#170611, Jianfei Wang)
+
+	* gtk/gtkiconview.c (gtk_icon_view_size_allocate): Clamp
+	adjustment values on resize.  (#170567, Tomislav Jonjic)
+
+	* gtk/gtkentrycompletion.c (gtk_entry_completion_real_insert_prefix): 
+	Make inline completion insert the prefix at the
+	right spot.  (#170146, Doug Quale)
+
+2005-03-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkprogressbar.c (gtk_progress_bar_get_ellipsize): 
+	Typo fix in the docs.
+
+	* gtk/gtkmenutoolbutton.c (gtk_menu_tool_button_set_arrow_tooltip): 
+	Typo fix in the docs.
+
+	* gtk/gtkiconview.c (gtk_icon_view_get_columns) 
+	(gtk_icon_view_set_columns, gtk_icon_view_set_item_width) 
+	(gtk_icon_view_get_item_width, gtk_icon_view_set_spacing) 
+	(gtk_icon_view_get_spacing, gtk_icon_view_set_row_spacing) 
+	(gtk_icon_view_set_column_spacing, gtk_icon_view_get_row_spacing) 
+	(gtk_icon_view_get_column_spacing, gtk_icon_view_set_margin) 
+	(gtk_icon_view_get_margin): Add docs.
+
+	* gtk/gtkcellview.c (gtk_cell_view_get_displayed_row): 
+	Add docs.
+
+Tue Mar 15 20:34:33 2005  Manish Singh  <yosh@gimp.org>
+
+	* gdk/x11/gdkinput-xfree.c: #include gdkaliasdef.c here too.
+
+2005-03-15  Matthias Clasen  <mclasen@redhat.com>
+
+	Make PLT-reduction work with gcc4, and don't include
+	everything in gdkalias.h:
+	
+	* gdk/gdk.symbols: Group symbols by header and source file.
+	* gdk/makegdkalias.pl: Protect definitions by the same 
+	preprocessor symbols used to guard the headers. Move
+	the alias declarations to a separate file which is 
+	produced when calling makegdkalias.pl -def
+	* gdk/Makefile.am (gdkaliasdef.c): Add a rule to generate this
+	file.
+	* gdk/*.c, gdk/x11/*.c: Include gdkalias.h after the other
+	headers, include gdkaliasdef.c at the bottom.
+
+2005-03-15  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkentrycompletion.c (gtk_entry_completion_class_init): 
+	Document that inline completion requires text-column to be set.
+	(gtk_entry_completion_compute_prefix): Return NULL if text-column
+	is not set.
+
+	* gtk/gtkentry.c (check_completion_callback): Call 
+	gtk_entry_completion_complete() before inserting the prefix,
+	otherwise the prefix may depend on (random) state of the
+	filter model.  
+
+2005-03-13  Ivan, Wong Yat Cheung  <email@ivanwong.info>
+
+	* gdk/win32/gdkgeometry-win32.c (gdk_window_scroll): A further fix
+	for big window support. Now also the test in testgtk works.
+
+2005-03-11  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkaboutdialog.c (add_credits_page): Don't crash on
+	style changes.  (#169334, Yury Puzis)
+
+2005-03-12  Ivan, Wong Yat Cheung  <email@ivanwong.info>
+
+	Big window fix for Win32. Big windows are still emulated within
+	16-bit coordinate limits, though. Big windows now work on NT-based
+	Windows. (#169989)
+
+	* gdk/win32/gdkgc-win32.c (_gdk_win32_gdkregion_to_hrgn): Use
+	32-bit coordinates.
+
+	* gdk/win32/gdkgeometry-win32.c: Largely rewrite.
+
+	* gdk/win32/gdkwindow-win32.c: Minor related changes.
+	
+2005-03-10  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkliststore.c (gtk_list_store_insert_with_valuesv): 
+	Fix a doc typo.  (#169873, Johan Dahlin)
+
+	* gtk/gtkdialog.c (gtk_dialog_map): Don't
+	try to focus the default_widget if there is 
+	none.  (#169881, Thomas Leonard)
+
+2005-03-09  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkaccelgroup.c (substitute_underscores): Remove
+	this unused function. It lives in gtkaccellabel.c now.  
+
+	* gtk/gtkiconview.c (gtk_icon_view_set_model): Queue a resize 
+	when the model is unset.  (#169528, Tomislav Jonjic)
+
+Thu Mar  3 16:59:44 2005  Manish Singh  <yosh@gimp.org>
+
+	* configure.in: URL escape the '+' in gtk+ in the bugzilla URL.
+
+2005-03-03  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtksettings.c (gtk_settings_get_property): 
+	* gtk/gtkrc.c (gtk_rc_parse_assignment): Don't leak 
+	the values here.  (#169047, Philip Langdale)
+
+	* gtk/gtkcellrendererpixbuf.c (gtk_cell_renderer_pixbuf_render): 
+	Don't warn if a stock icon cannot be found.  (#168830,
+	Sven Neumann)
+
+2005-03-03  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkwidget.c (gtk_widget_reparent_subwindows): 
+	Avoid warnings if gtk_widget_reparent() is called at
+	unusual times.  (#168966, Christian Persch)
+
+2005-03-02  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Bump version
+	
+Tue Mar  1 14:04:08 2005  Manish Singh  <yosh@gimp.org>
+
+	* gdk/x11/gdkproperty-x11.c (virtual_atom_check_init): Cast to avoid
+	const warnings on data structure seeding.
+
+2005-03-01  Matthias Clasen  <mclasen@redhat.com>
+		
+	* === Released 2.6.4 ===
+
+	* NEWS: Updates
+
+2005-03-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkmenutoolbutton.c (button_state_changed_cb): 
+	Fix prelighting.  (#157392, Vincent Noel, patch by
+	Christian Persch)
+
+	* gtk/gtkicontheme.c (theme_lookup_icon): Make 
+	icon data caching work again.  (#168851, Alexander Larsson)
+
+	* gdk-pixbuf/gdk-pixbuf.c:
+	* gdk-pixbuf/gdk-pixbuf-features.h.in:
+	* gtk/xdgmime/xdgmime.[hc]:
+	Revert the previous change, since it breaks
+	bin compat.
+
+2005-03-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/gdkkeyuni.c
+	* gdk/gdkpixbuf-drawable.c
+	* gdk/gdkrgb.c
+	* gdk/x11/gdkdnd-x11.c
+	* gdk/x11/gdkevents-x11.c
+	* gdk/x11/gdkproperty-x11.c
+	* gdk/x11/gdkvisual-x11.c
+	* gdk-pixbuf/gdk-pixbuf.c
+	* gdk-pixbuf/gdk-pixbuf-features.h.in
+	* gtk/gtkaction.c
+	* gtk/gtkbindings.c
+	* gtk/gtkcolorbutton.c
+	* gtk/gtkcombo.c
+	* gtk/gtkcontainer.c
+	* gtk/gtkfilechooserdefault.c
+	* gtk/gtkfilesel.c
+	* gtk/gtkgamma.c
+	* gtk/gtkiconview.c
+	* gtk/gtkinputdialog.c
+	* gtk/gtkitemfactory.c
+	* gtk/gtkmenu.c
+	* gtk/gtktextview.c
+	* gtk/gtktooltips.c
+	* gtk/gtktreedatalist.c
+	* gtk/gtkuimanager.c
+	* gtk/tree_minus.xpm
+	* gtk/tree_plus.xpm
+	* gtk/xdgmime/xdgmime.c
+	* gtk/xdgmime/xdgmime.h: 
+	Move constant data to .rodata.
+
+2005-02-28  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Bump version
+
+	* === Released 2.6.3 ===
+
+	* NEWS: Updates.
+
+2005-02-27  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkaction.c (connect_proxy): Improve the handling
+	of buttons as action proxys.  (#165534, Milosz Derezynski)
+
+	* gtk/gtklabel.c (gtk_label_size_request): Fix a typo.  
+	(#168646, Vincent Untz)
+
+	* gtk/gtkfilechooserdefault.c (save_folder_combo_create): 
+	Unset "focus-on-click" for the save folder combo.  (#168688,
+	Sven Neumann)
+
+2005-02-25  Matthias Clasen  <mclasen@redhat.com>
+
+	* demos/testpixbuf.c (main): Remove a C++ comment.  (#168531, 
+	Paul Cornett)
+
+	* gtk/gtkcombobox.c (gtk_combo_box_menu_fill_level): Don't leak a 
+	path here.  (#168443, Morten Welinder)
+
+2005-02-24  Robert Ögren  <gtk@roboros.com>
+
+	Implement better handling of Wintab tablet context overlap on
+	Win32. (#167298)
+
+	* gdk/win32/gdkinput-win32.c (_gdk_input_set_tablet_active): New
+	function that brings any tablet contexts to the top of the overlap
+	order.
+	* gdk/win32/gdkinput-win32.h: Declare _gdk_input_set_tablet_active ()
+	* gdk/win32/gdkevents-win32.c (gdk_event_translate):
+	Call _gdk_input_set_tablet_active when a window is activated (on
+	WM_ACTIVATE)
+
+2005-02-24  Matthias Clasen  <mclasen@redhat.com>
+
+	* NEWS: Updates.
+
+	* gtk/gtkfilechooserdefault.c (gtk_file_chooser_default_select_path): 
+	Don't leak parent_path.  (#168435, Morten Welinder)
+
+	* gtk/gtkcombobox.c: Consistently use gtk_tree_row_reference_valid().
+	(gtk_combo_box_model_row_deleted): Update the displayed row in 
+	the cell_view.  (#167842, Gustavo Carneiro)
+
+2005-02-24  Matthias Clasen  <mclasen@redhat.com>
+
+	Fix #167259, reported by  Christian Persch:
+	
+	* gtk/gtkwidget.c (gtk_widget_unparent): Unmap the reparented 
+	widget, even if we avoid the unrealizing. 
+	(gtk_widget_reparent_subwindows): Make reparenting work for
+	!NO_WINDOW widgets which have other windows which are siblings
+	of widget->window (as e.g. GtkSpinButton).
+
+2005-02-24  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreemodelfilter.c (gtk_tree_model_filter_row_changed): 
+	Don't emit a warning if a parent node is filtered out. (#164726,
+	Olivier Sessink)
+
+2005-02-23  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtklabel.c (gtk_label_style_set): Revert the last 
+	change, since gtk_widget_set_style_internal() already
+	queues a resize.
+
+2005-02-23  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtklabel.c (gtk_label_style_set): Queue a resize, since
+	fonts may have changed.  (#164128, Phil Blundell)
+
+	* gtk/gtkaboutdialog.c (gtk_about_dialog_init) 
+	(gtk_about_dialog_new): Move initialization code from _new to 
+	_init.  (#168249, Murray Cumming)
+
+Wed Feb 23 17:34:01 2005  Jonathan Blandford  <jrb@redhat.com>
+
+	* gtk/gtktreeview.c (gtk_tree_view_node_queue_redraw): Patch from
+	jorn@nl.linux.org (Jorn Baayen) to notice changes to fixed-height
+	widgets.
+
+2005-02-23  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkkeys-win32.c (update_keymap): Workaround for bug in
+	MapVirtualKey(VK_DIVIDE, 0) in some Windows versions. (#142998)
+
+Tue Feb 22 13:49:09 2005  Manish Singh  <yosh@gimp.org>
+
+        * gtk/updateiconcache.c: #include <config.h>
+
+2005-02-22  Federico Mena Quintero  <federico@ximian.com>
+
+	Fix #164940, patch by Ben Maurer and Tommi Komulainen.
+
+	* gdk/gdkrgb.c (gdk_rgb_convert_565_d): Constify the "dmp" variable.
+	(gdk_rgb_convert_565_d): Likewise.
+	(DM_565): Made a static const precomputed array to avoid
+	allocating it at runtime.
+	(gdk_rgb_preprocess_dm_565): #ifdef out.
+
+2005-02-20  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkwindow.c: 
+	* gtk/gtkclipboard.c: Fix freedesktop.org links in the docs.
+
+	* gdk/x11/gdkdrawable-x11.c (_gdk_x11_have_render_with_trapezoids): 
+	Set have_render_with_trapezoids to GDK_YES when we have 
+	a new enough Render extension.  (#167965,Billy Biggs) 
+
+	* gdk/x11/gdkx.h: 
+	* gdk/x11/gdkdisplay-x11.c (gdk_x11_display_get_user_time_libgtk_only):
+	Add libgtk_only api to obtain the user_time of the display. 
+	This function will become generally available api in 2.8.
+
+	* gtk/gtkwindow.c (gtk_window_present): Use the timestamp of
+	the last user interaction when focusing the window.  (#166379, 
+	Elijah Newren)
+
+Thu Feb 17 14:52:57 2005  Manish Singh  <yosh@gimp.org>
+
+	* gtk/gtkcombobox.c: Pass gtk_widget_get_toplevel() a GTK_WIDGET.
+
+2005-02-16  Matthias Clasen  <mclasen@redhat.com>
+
+	Fixes for #143829, Tommi Komulainen, Christian Persch:
+	
+	* gtk/gtktreeview.c (gtk_tree_view_destroy): Remove the
+	typeselect_flush_timeout when destroying the widgets
+	it is operating on.  
+	(gtk_tree_view_ensure_interactive_directory): Add the 
+	popup to the window group of the toplevel it belongs to.
+
+	* gtk/gtkcombobox.c (gtk_combo_box_set_popup_widget) 
+	(gtk_combo_box_popup): Do the same here. 
+
+2005-02-11  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkpathbar.c (gtk_path_bar_finalize): Stop scrolling 
+	when the pathbar goes away.  (#167094, Rodney Dawes)
+	(change_icon_theme): Use GTK_ICON_SIZE_MENU here as 
+	well  (Vincent Noel)
+
+2005-02-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Complete the fix for #165770, Vincent Noel:
+	
+	* gtk/gtkfilechooserbutton.c (FALLBACK_ICON_SIZE): Make the
+	fallback size be 16, to be equal to the default for
+	GTK_ICON_SIZE_MENU (in gtkiconfactory.c:init_icon_sizes()).
+	(gtk_file_chooser_button_init):
+	(change_icon_theme): Use GTK_ICON_SIZE_MENU instead of
+	GTK_ICON_SIZE_SMALL_TOOLBAR. 
+
+2005-02-09  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkmenushell.c (gtk_real_menu_shell_move_current): Fix RTL
+	keynav for going from menubar to menu.
+
+2005-02-08  Christian Rose  <menthos@menthos.com>
+
+	* configure.in: Added "xh" to ALL_LINGUAS.
+
+2005-02-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Post-release version bump.
+
+	* === Released 2.6.2 ===
+
+	* NEWS: Updates
+
+2005-02-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkpaned.c (gtk_paned_compute_position): Work better
+	when there is not enough space. This avoids a nasty size
+	allocation loop in the file chooser.  (#154007, reported 
+	by Milosz Derezynski, patch by Robert Ögren)
+	
+2005-02-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkentry.c (gtk_entry_create_layout): Avoid spurious
+	selection of RTL direction if the widget does not have 
+	focus.  (#164125, Frederic Crozat)
+
+2005-02-03  Tor Lillqvist  <tml@novell.com>
+
+	* modules/input/gtkimcontextime.c (get_pango_attr_list): Use the
+	wide character version of ImmGetCompositionString() here,
+	too. (#165278, Takuro Ashie)
+
+2005-02-03  Mark McLoughlin  <mark@skynet.ie>
+
+	* gtk/gtkicontheme.c: (load_themes): remove debug spew.
+
+2005-02-03  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkmenu.c (gtk_menu_handle_scrolling): Don't do
+	one roundtrip per motion event.  (#166173, pointed out
+	by Chris Lee, patch by Søren Sandmann)
+
+2005-02-03  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/gdkkeynames.c: Make the gdk_key array const (#166075,
+	Tommi Komulainen)
+
+2005-02-02  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c (pending_select_paths_process):
+	Don't select the first row if the chooser is not mapped.  This
+	happens when it's acting on behalf of GtkFileChooserButton.  Also,
+	don't select the first row if we are in SAVE or CREATE_FOLDER
+	modes --- I had missed that (see the ChangeLog entry from
+	2005-01-18).  Fixes #165264.
+
+2005-02-02  Tor Lillqvist  <tml@novell.com>
+
+	Implement lazy extended input initialization on Win32, by Robert
+	Ögren. Fixes #163163, possibly #162334. Lazy initialization would
+	be a good idea in any case even if it didn't fix any visible
+	problems, though.
+
+	The Wacom tablet driver seems to get confused if Wintab is
+	initialized but no window is shown before the process exits. This
+	is the case for some GIMP plug-ins, for instance. 
+
+	* gdk/win32/gdkinput-win32.c (_gdk_input_wintab_init_check): Made
+	non-static (and renamed).
+	(_gdk_input_init): Don't call _gdk_input_wintab_init_check().
+
+	* gdk/win32/gdkinput-win32.h: Declare _gdk_input_wintab_init_check().
+
+	* gdk/win32/gdkinput.c (gdk_devices_list,
+	gdk_display_list_devices, gdk_input_set_extension_events): Call
+	_gdk_input_wintab_init_check() here instead.
+
+2005-02-02  Ivan, Wong Yat Cheung  <email@ivanwong.info>
+
+	* gdk/win32/gdkselection.c: Use a FIFO list for storing GdkSelProp
+	of a single window so that gtk_clipboard_request_contents() can be
+	called inside a GtkClipboardReceivedFunc(). (#163844)
+
+2005-02-02  Matthias Clasen  <mclasen@redhat.com>
+
+	* NEWS: Updates
+
+2005-02-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkicontheme.c (gtk_icon_theme_init): Look for icons
+	in XDG_DATA_DIRS/pixmaps.  (#165950, Thomas Zajic)
+
+	* gtk/gtkwindow.c (gtk_window_set_icon_name): Set info->icon_list
+	to NULL after freeing it.  (#165800, Damon Chaplin)
+	
+2005-02-01  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c
+	(browse_files_model_finished_loading_cb): Don't
+	g_assert_not_reached() if we are in any other state.  Another code
+	path may have triggered a folder reload.  Fixes #165556.
+
+2005-02-01  Michael Natterer  <mitch@gimp.org>
+
+	* configure.in: depend on stable pango-1.8, not unstable 1.7
+
+2005-02-01  Federico Mena Quintero  <federico@ximian.com>
+
+	Fix #165770:
+
+	* gtk/gtkfilechooserdefault.c (FALLBACK_ICON_SIZE): Make the
+	fallback size be 16, to be equal to the default for
+	GTK_ICON_SIZE_MENU (in gtkiconfactory.c:init_icon_sizes()).
+	(change_icon_theme): Use GTK_ICON_SIZE_MENU instead of
+	GTK_ICON_SIZE_SMALL_TOOLBAR.
+
+2005-02-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktreeview.c (gtk_tree_view_adjustment_changed): 
+	Remove debug printf.  (#165877, Carlos Garnacho Parro)
+
+	* */*.c: Fix many instances of "the the" in docs and
+	comments.  (#165815, Masao Mutoh)
+
+	* gtk/updateiconcache.c (main): Add a --quiet option.
+
+2005-02-01  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkkeys-win32.c (handle_special, set_shift_vks,
+	reset_after_dead, handle_dead): New functions, code blocks
+	refactored out of update_keymap(). No functionality change.
+
+	(update_keymap): Use ToUnicodeEx() when available (on NT-based
+	Windows) instead of ToAsciiEx(). Makes keyboard input work in
+	Unicode-only input locales that don't have any ANSI codepage, for
+	instance Hindi and Bengali. Use _gdk_input_codepage only on
+	Win9x. (#165723)
+
+	* gdk/win32/gdkevents-win32.c (gdk_event_translate): On
+	WM_INPUTLANGCHANGE, use GetLocaleInfo() instead of
+	TranslateCharsetInfo() to get the input locale's corresponding
+	codepage, if any.
+
+2005-01-31  Matthias Clasen  <mclasen@redhat.com>
+
+	* modules/input/gtkimcontextxim.c: Use NULL, not 0 to terminate 
+	NULL-terminated va lists.  (#165683)
+
+Thu Jan 27 14:25:45 2005  Manish Singh  <yosh@gimp.org>
+
+	* README.cvs-commits: update ancient IRC info.
+
+2005-01-27  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c
+	(gtk_file_chooser_default_select_path): Oops, don't assert that we
+	can't reach the end of the function; this happens if we are still
+	loading but don't need a path change.  Fixes #165213.
+
+2005-01-27  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkaboutdialog.c: Some visual tweaks to the about dialog,
+	obey HIG spacing a bit more, add a hand cursor when over the
+	link button.  (#163979, Jorn Baayen)
+
+2005-01-26  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkentrycompletion.c (gtk_entry_completion_class_init): 
+	Don't allow -1 as minimum-key-length.
+	(gtk_entry_completion_set_model): Add missing notification.
+	(gtk_entry_completion_set_minimum_key_length): Add missing
+	notification, allow setting minimum-key-length to 0.  (#165194,
+	Vincent Ladeuil)
+
+2005-01-26  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkaboutdialog.c (display_license_dialog): Make sure
+	the license dialog is initially displayed without a horizontal
+	scrollbar.  
+	(gtk_about_dialog_class_init): Document the fact that the 
+	license text is not wrapped.  (#165012, Christian Rose)
+
+2005-01-25  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkbutton.c (gtk_button_set_image): Fix docs.  (#165180,
+	Jeff Franks)
+
+	* gdk/x11/gdkwindow-x11.c (gdk_window_configure_finished): Fix 
+	docs.  (#165163, Jeff Franks)
+
+	* gtk/gtkimage.c (gtk_image_get_property): Use the correct setter
+	for a string GValue.  (#165203, Damon Chaplin)
+
+2005-01-24  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkdisplay-x11.c (_gdk_windowing_set_default_display): 
+	Initialize user_time from DESKTOP_STARTUP_ID.  (#165131,
+	Elijah Newren)
+
+2005-01-24  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c: Removed leftover comments.
+
+2005-01-24  Federico Mena Quintero  <federico@ximian.com>
+
+	Fix #147785 and clean up the loading code:
+
+	* gtk/gtkfilechooserdefault.c (LoadState): Make the set of states
+	be EMPTY, PRELOAD, LOADING, FINISHED.
+	(gtk_file_chooser_default_init): Start in the LOAD_EMPTY state.
+	(struct _GtkFileChooserDefault): Added a pending_select_paths
+	field.
+	(load_remove_timer): Add the new states.
+	(load_setup_timer): Likewise.
+	(load_timeout_cb): Likewise.  Switch to the LOAD_LOADING state.
+	(browse_files_model_finished_loading_cb): Switch to the
+	LOAD_FINISHED state.
+	(enum PendingOp): Removed.
+	(struct _GtkFileChooserDefault): Removed the pending_op and
+	pending_select_path fields.
+	(pending_select_paths_free): New utility function.
+	(pending_select_paths_add): New utility function.
+	(gtk_file_chooser_default_finalize): Call
+	pending_select_paths_free().
+	(pending_op_queue): Removed.
+	(pending_op_process): Removed.
+	(pending_select_paths_process): New function.
+	(browse_files_model_finished_loading_cb): Call
+	pending_select_paths_process().
+	(center_selected_row_foreach_cb): Handle multiple selection by
+	only centering the first row.
+	(get_is_file_filtered): Constify.
+	(gtk_file_chooser_default_select_path): Queue into a list of paths
+	to select if we are not finished loading.
+	(show_and_select_paths): New utility function.
+	(up_folder_handler): Use pending_select_paths_add().
+	(gtk_file_chooser_default_should_respond): Do not call
+	pending_op_queue(); free the pending_selected_paths instead.
+	(gtk_file_chooser_default_initial_focus): Don't queue a pending
+	operation, and don't select the first row unconditionally --- this
+	will happen when the folder is done loading.
+	(shortcuts_row_activated_cb): Free the pending_select_paths.
+	(pending_select_paths_store_selection): New utility function.
+	(gtk_file_chooser_default_map): Call
+	pending_select_paths_store_selection() to save the selection
+	before reloading the folder.
+	(select_func): Umm?  Call gtk_tree_selection_select_iter().  Don't
+	move the cursor here; it will be done when processing the pending paths.
+
+	* tests/testfilechooser.c (main): Add a button to the command
+	window to unmap and remap the file chooser.
+
+2005-01-24  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkwidget.c (gtk_widget_class_init): Document 
+	GtkWidget::style-set.  (#164222, Alex Graveley)
+
+2005-01-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/gdkdisplay.h (gdk_display_add_client_message_filter_full): 
+	Remove the accidentally added prototype for this unimplemented 
+	function.  (#164893, Jeff Franks)
+
+	* gtk/gtktreeview.c (gtk_tree_view_leave_notify): Avoid spurious
+	drags.  (#164884)
+
+2005-01-23  Tor Lillqvist  <tml@novell.com>
+
+	Merged from HEAD:
+
+	Fix for #162790, by Iwan Wong:
+	
+	* gdk/win32/gdkdrawable-win32.c: Implement dashed lines
+	correctly. Simplify the interface to render_line_horizontal() and
+	render_line_vertical(). Need to draw lines "manually" also on
+	NT-based Windowses if we have a dash offset or are drawing
+	double-dashed lines.
+
+	* gdk/win32/gdkprivate-win32.h: Keep also the dash offset,
+	double-dash flag, and a brush for the background colour (used by
+	the odd dashes in the double-dash line style) in the GdkGCWin32
+	struct.
+
+	* gdk/win32/gdkgc-win32.c: Set up above new fields.
+
+2005-01-23  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkkeys-win32.c (update_keymap): Handle Greek tonos
+	dead accent key. (#164859, reported and fix verified by Daniel
+	Atallah.)
+
+	* gtk/gtkimcontextsimple.c (gtk_compose_seqs): Handle
+	GDK_Greek_accentdieresis (tonos and dialytika) combining with iota
+	and upsilon.
+
+	* gtk/gtkfilesystemwin32.c (gtk_file_system_win32_volume_get_display_name): 
+	Don't call GetVolumeInformation() for network drives. They might
+	be disconnected, and calling GetVolumeInformation() will then
+	cause long delays. (#164448, reported by Dave Neary.) It seems to
+	be very hard to reliably find out whether a network drive is
+	connected or not, so it's easier to just not try getting the
+	volume name for them. See the bug report for discussion.
+
+	Fix for #163702, from Ivan Wong: 
+	
+	* gdk/win32/gdkprivate-win32.h 
+	* gdk/win32/gdkglobals-win32.c: New flag _ignore_destroy_clipboard.
+	
+	* gdk/win32/gdkevents-win32.c (gdk_event_translate): Handle
+	WM_DESTROYCLIPBOARD. Unless _ignore_destroy_clipboard, generate a
+	GDK_SELECTION_CLEAR event.
+
+	* gdk/win32/gdkselection-win32.c
+	(gdk_selection_owner_set_for_display): Set _ignore_destroy_clipboard
+	when emptying the clipboard ourselves.
+
+	(gdk_selection_send_notify_for_display): Remove the artifical
+	GDK_SELECTION_CLEAR event generation.
+
+2005-01-20  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkdialog.c (gtk_dialog_map): Don't loop forever
+	here, even if the only focusable widgets are labels.
+
+	* gtk/gtkmodules.c (load_module): Don't reverse the order
+	of modules when putting them in gtk_modules.  (#162676, Dennis
+	Cranston, patch by Remus Draica)
+	
+	* gtk/gtktreeview.c (gtk_tree_view_search_move): Don't crash 
+	if the tree is empty.  (#164669, Priit Laes)
+
+Wed Jan 19 18:57:02 2005  Manish Singh  <yosh@gimp.org>
+
+	* gdk/x11/gdkwindow-x11.c (gdk_window_get_frame_extents): Call
+	GDK_DISPLAY_XDISPLAY with a display, not a window. Clean up the
+	function a bit too.
+
+Wed Jan 19 17:17:31 2005  Manish Singh  <yosh@gimp.org>
+
+	* gdk/x11/gdkwindow-x11.c (gdk_window_get_frame_extents): Squash
+	strict aliasing warning in _NET_VIRTUAL_ROOTS code.
+
+2005-01-19  Tor Lillqvist  <tml@novell.com>
+
+	* gdk/win32/gdkkeys-win32.c (update_keymap,
+	gdk_keymap_translate_keyboard_state): Handle keyboards with
+	ShiftLock (and not CapsLock) correctly. (#161814)
+
+2005-01-19  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserdefault.c (gtk_file_chooser_default_should_respond):
+	In save mode, don't return paths containing nonexisting 
+	directories.  (#162443, Jean Marie Favreau)
+
+	* gtk/gtkobject.c (gtk_object_add_arg_type): Use GLib limit 
+	macros to avoid sparse warnings. Pointed out by Kjartan Maraas.
+
+	* gdk/x11/gdkdisplay-x11.c: Precache the _NET_VIRTUAL_ROOTS
+	atom.
+
+	* gdk/x11/gdkwindow-x11.c (gdk_window_get_frame_extents): 
+	Support _NET_VIRTUAL_ROOTS.  (#163910, Carsten Haitzler)
+
+Tue Jan 18 13:56:09 2005  Manish Singh  <yosh@gimp.org>
+
+	* gtk/gtkfilechooserdefault.c (pending_op_queue): Actually assign
+	PENDING_OP_NONE.
+
+Tue Jan 18 13:46:46 2005  Manish Singh  <yosh@gimp.org>
+
+	* gdk/x11/gdkdrawable-x11.c (_gdk_x11_have_render_with_trapezoids):
+	disambiguate nested if/else.
+
+2005-01-18  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c (pending_op_queue): Don't queue an
+	operation to select the first file if we are in SAVE or
+	CREATE_FOLDER modes.  Executing that operation would overwrite the
+	contents of the save-name entry.
+
+2005-01-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkstyle.c (gtk_default_draw_check) 
+	(gtk_default_draw_option, gtk_default_draw_handle): Add some
+	more NULL checks, patch by Michael Natterer.
+
+Tue Jan 18 10:55:47 2005  Søren Sandmann  <sandmann@redhat.com>
+
+	* gtk/gtkstyle.c (gtk_default_draw_handle): Check for NULL detail
+	and NULL widget.
+
+	* gtk/gtkstyle.c (gtk_default_draw_box): Check for NULL detail and
+	NULL widget.  (#164477, Michael Natterer)
+
+2005-01-18  Matthias Clasen  <mclasen@redhat.com>
+
+	Avoid X errors when running against servers which
+	implement XRender < 0.4.  (#164427, Albert Chin)
+	
+	* gdk/x11/gdkprivate-x11.h:
+	* gdk/x11/gdkdrawable-x11.c (_gdk_x11_have_render_with_trapezoids): 
+	New function to check for trapezoid support in XRender.
+	(gdk_x11_draw_trapezoids, _gdk_x11_drawable_draw_xtrapezoids): 
+	Use it here.
+	
+	* gdk/x11/gdkdisplay-x11.h (struct _GdkDisplayX11): Add a 
+	separate have_render_with_trapezoids field.
+
+	* gdk/x11/gdkdisplay-x11.c (gdk_display_open): Initialize it.
+
+2005-01-17  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkiconview.c: Remove debug output. (#164376, Jens Finke)
+
+2005-01-17  Federico Mena Quintero  <federico@ximian.com>
+
+	Merged from HEAD:
+
+	Fix #162617.
+
+	* gtk/gtkfilesystemunix.c (STAT_NEEDED_MASK): Take out
+	GTK_FILE_INFO_IS_HIDDEN; we don't need to stat() to know this.
+	(gtk_file_system_unix_get_folder): Make error reporting more
+	accurate.  Don't bail out if we can't read the directory.
+	(fill_in_stats): Don't return an error; just assume we don't have
+	stat info for this folder's files.
+	(fill_in_names): Don't create the hash table for the names if we
+	can't open the directory.
+	(gtk_file_folder_unix_list_children): Don't emit the
+	"finished-loading" signal --- we don't do asynchronous loads, so
+	we are always finished loading.
+	(gtk_file_folder_unix_get_info): Use helper functions; handle the
+	case where we can't stat '/'.
+	(get_icon_type_from_path): Don't call fill_in_stats() here; only
+	use the info we have.
+	(fill_in_mime_type): Don't return an error.  Don't do anything if
+	we don't have the stat info.
+
+2005-01-17  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserdefault.c (shortcuts_add_bookmarks): Save
+	and restore the selected row in the bookmark list and the
+	save folder combo.  (#164290)
+
+2005-01-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserdialog.c (gtk_file_chooser_dialog_new_with_backend):
+	Fix argument order in docs.  
+
+2005-01-15  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtktextview.c (gtk_text_view_check_keymap_direction): 
+	* gtk/gtkentry.c (gtk_entry_create_layout): Prefer LTR over RTL 
+	if the keymap is neutral.  (#164125, Phil Blundell)
+
+2005-01-13  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Add an OS_LINUX conditional.
+
+	* gdk/Makefile.am (TESTS):
+	* gdk-pixbuf/Makefile.am (TESTS):
+	* gtk/Makefile.am (TESTS): Only run abicheck on Linux.  (#163917,
+	Roger Leigh)
+
+2005-01-13  Matthias Clasen <mclasen@redhat.com>
+
+	* gtk/gtktreeview.c: (gtk_tree_view_class_init),
+	(gtk_tree_view_set_headers_clickable): Make the headers-visible
+	property readwrite instead of just writable, and remove the
+	g_return_if_fail check that there is a model when setting this
+	property.  (#163851, Richard Hult)
+
+2005-01-10  Owen Taylor  <otaylor@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Adding missing ChangeLog.pre*
+	to EXTRA_DIST.
+
+2005-01-10  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkaccelgroup.c (gtk_accel_group_class_init): Document
+	signals.  (#163319, Murray Cumming)
+
+2005-01-09  Tor Lillqvist  <tlillqvist@novell.com>
+
+	* gdk/win32/gdkwindow-win32.c (gdk_window_set_cursor): Set current
+	cursor also when changing the cursor of a window that is the first
+	ancestor of the window containing the pointer that has a cursor
+	defined. (#163035, Ivan Wong)
+
+2005-01-09  Anders Carlsson <andersca@gnome.org>
+
+	* gtk/gtkcellrenderertext.c: (get_size):
+	* gtk/gtklabel.c: (gtk_label_size_request):
+	* gtk/gtkprogressbar.c: (gtk_progress_bar_size_request):
+	Don't pass NULL to pango_context_get_metrics. Use 
+	pango_context_get_language instead, which is way faster.
+	
+2005-01-08  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.in: Bump version
+
+	* === Released 2.6.1 ===
+	
+	* gdk-pixbuf-2.0.pc.in: Require gmodule-no-export-2.0
+
+2005-01-07  Tor Lillqvist  <tml@iki.fi>
+
+	* gdk/win32/gdkselection-win32.c (_gdk_selection_property_store):
+	Fix braino. (#163232, Arnaud Charlet)
+
+2005-01-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkiconview.c: Make markup_column work, and fix some
+	layout issues when either icon or text is missing.  (#163065)
+
+2005-01-06  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkfilechooserdefault.c (file_list_build_popup_menu): Add an
+	"Open _Location" item.  Fixes #148839.
+
+2005-01-06  Matthias Clasen  <mclasen@redhat.com>
+
+	* README.in: Fix a typo.  (#163128, kentaro fukuchi)
+
+2005-01-06  James M. Cape  <jcape@ignore-your.tv>
+
+	* gtk/gtkfilechooserbutton.c (gtk_file_chooser_button_new)
+	(gtk_file_chooser_button_new_with_backend): Use default title if
+	NULL is passed.
+
+	* docs/reference/gtk/tmpl/gtkfilechooserbutton.sgml: Make examples
+	match API.
+
+2005-01-05  Federico Mena Quintero  <federico@ximian.com>
+
+	Fix #161409:
+
+	* gtk/gtkfilechooserdefault.c (shortcuts_row_activated_cb): Queue
+	a pending operation to select the first row.
+
+2005-01-05  Federico Mena Quintero  <federico@ximian.com>
+
+	* gtk/gtkpathbar.c (_gtk_path_bar_set_path): Don't call
+	button_data_free() explicitly; the button is weak-reffed and the
+	callback will free the button data.  Fixes #163010.
+	(_gtk_path_bar_set_path): Don't ref/sink the button.  And for the
+	failure case, call gtk_widget_destroy() on it.
+
+	* gtk/gtkfilechooserdefault.c (check_is_folder): Use
+	gtk_file_system_get_folder() again (see the ChangeLog entry from
+	2004-08-25).  We can't first get the parent folder and then
+	request the info for the path in question, as the parent folder
+	may not be readable.  See bug #162617.
+	(gtk_file_chooser_default_set_current_folder): Assert that the
+	passed-in path is not null.
+	(shortcuts_find_current_folder): Likewise.
+	(shortcuts_add_current_folder): Likewise.
+	(set_list_model): Likewise.
+	(gtk_file_chooser_default_map): Only reload the current folder if
+	it exists.
+	(bookmarks_check_add_sensitivity): Check for the current folder
+	being NULL.
+	(browse_files_select_first_row): Don't set the cursor if there is
+	no model loaded.
+
+2005-01-05  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserdefault.c: Don't construct errors from 
+	the GTK_FILE_SYSTEM_ERROR domain. Partial fix for #162911.
+	(get_file_info, check_is_folder): Translate errors from
+	the filesystem into the GTK_FILE_CHOOSER_ERROR domain. Rest
+	of the fix for #162911, noticed by Murray Cumming.
+
+Wed Jan  5 11:42:49 2005  Søren Sandmann  <sandmann@redhat.com>
+
+	* gtk/gtkviewport.c (gtk_viewport_realize):
+	* gtk/gtktextview.c ((text_window_realize): Set the background of
+	the windows to None instead of adding EXPOSURE_MASK, as suggested
+	by Owen in #162112.
+
+	* gdk/x11/gdkevents-x11.c (gdk_wm_protocols_filter): Update 
+	the user time when receiving a WM_DELETE message.  (#162980, 
+	Elijah Newren)
+	
+Tue Jan  4 16:52:14 2005  Jonathan Blandford  <jrb@redhat.com>
+
+	* gtk/gtktreeviewcolumn.c (gtk_tree_view_column_button_event):
+	only reorder on button 1, part of #141937
+
+Tue Jan  4 11:36:43 2005  Søren Sandmann  <sandmann@redhat.com>
+
+	Bug 162112.
+	
+	* gtk/gtktextview.c (text_window_realize): Add GDK_EXPOSURE_MASK
+	to win->window's event_mask
+
+	* gtk/gtkviewport.c (gtk_viewport_realize): Add GDK_EXPOSURE_MASK
+	to viewport->view_window.
+
+2005-01-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* demos/testpixbuf.c (main): Remove the size_prepared callback,
+	to test incremental display.
+	(new_testrgb_window): Return the drawing area, not the window,
+	since we want to queue draws on the drawing area.
+
+2005-01-03  Matthias Clasen  <mclasen@redhat.com>
+
+	* examples/*: Re-extract.
+
+	* docs/tutorial/gtk-tut.sgml: Small corrections.
+	
+	* docs/tutorial/gtk-tut.sgml: Some updates for the drawing
+	section.  (#161414, Robert Ancell)
+
+	* docs/tutorial/gtk-tut.sgml: Make it build.
+
+	* gtk/gtkdialog.c (gtk_dialog_run): Some clarification
+	regarding modality.  (#112903, Dave Bordoley)
+
+	* gtk/gtkfixed.c (gtk_fixed_set_has_window): 
+	Add a little motivation.  (#145556, Tommi Komulainen)
+
+	* docs/tutorial/gtk-tut.sgml: Clarify section on 
+	g_signal_connect_swapped.   (#120543, David Bourguignon)
+
+	Make gtk_icon_theme_load_icon() work independent of
+	icon factory initialization.  (#162791, Tristan Van Berkom)
+	
+	* gtk/gtkiconfactory.[hc]: Rename ensure_default_icons to
+	_gtk_icon_factory_ensure_default_icons, and make it non-static.
+
+	* gtk/gtkicontheme.c (find_builtin_icon): ..and call it here.
+
+2005-01-02  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserbutton.c (gtk_file_chooser_button_remove_shortcut_folder): 
+	Don't add a shortcut here.  (#162752, Tor Lillqvist)
+
+2005-01-02  Tor Lillqvist  <tml@iki.fi>
+
+	* gtk/Makefile.am (libgtk_target_ldflags): Add -lole32, needed for
+	CoTaskMemFree in get_special_folder() below.
+
+	* gtk/gtkfilesystem.h: Implement case-insensitive path compare on
+	Win32 using _gtk_file_system_win32_path_compare().
+
+	* gtk/gtk.symbols: Add _gtk_file_system_win32_path_compare.
+
+	* gtk/gtkfilechooserbutton.c (model_add_special)
+	* gtk/gtkfilechooserdefault.c (shortcuts_append_desktop): Use
+	_gtk_file_system_win32_get_desktop() to get correct Desktop folder
+	on Win32. (#144003)
+
+	* gtk/gtkfilesystemwin32.c: Remove unnecessary includes. Do
+	consider all drives "mounted", including floppies. Trying to
+	inspect the contents of a nonexistent floppy will cause errors
+	later that are handled normally, no need to avoid them
+	completely. Keep the drive type in the GtkFileSystemVolume.
+	Support UNC paths. (#161797, #137874) Fix error message
+	capitalizations as in gtkfilesystemunix.c.
+
+	(gtk_file_system_win32_init): Start one timeout per
+	GtkFileSystemWin32.
+
+	(gtk_file_system_win32_finalize): Remove the timeout.
+
+	(get_special_folder): Copied from GLib.
+
+	(_gtk_file_system_win32_get_desktop): New function, uses
+	get_special_folder().
+
+	(gtk_file_system_win32_list_volumes): Don't start a timeout at
+	each call to this function. Don't assume A: and B: are floppies.
+
+	(gtk_file_system_win32_get_volume_for_path): Don't assume all
+	volumes are drive roots, i.e. support share roots of UNC paths
+	(\\server\share).
+
+	(gtk_file_system_win32_get_folder): Don't assume errno is set
+	after g_file_test() returns FALSE. It isn't on Win32 (and even on
+	Unix I don't think one should assume anything about errno after
+	g_file_test()).
+
+	(gtk_file_system_win32_volume_get_is_mounted): Always return TRUE.
+
+	(gtk_file_system_win32_volume_get_display_name): Don't call
+	GetVolumeInformation() on drives A: or B: if they are removable,
+	as they might then be floppies, causing an unnecessary
+	delay. (#157820)
+
+	(gtk_file_system_win32_volume_render_icon): Use network icon for
+	unrecognized drive types.
+
+	(canonicalize_filename, gtk_file_system_win32_parse): Don't get
+	confused by UNC paths.
+
+	(bookmarks_serialize): Use _gtk_file_system_win32_path_compare()
+	for case-insensitive UTF-8 path comparison.
+
+	(extract_icon): Use SHGetFileInfo() which is faster than
+	ExtractAssociatedIcon(). Icon extraction is still slow, though,
+	needs work.
+
+	(win32_pseudo_mime_lookup): Don't use the same icon for all
+	shortcuts or executables. Cache only other file type icons.
+
+	(gtk_file_system_win32_render_icon): Use network stock icon for
+	remote drives and UNC server share roots. Compare home directory
+	case-insensitively. Do lookup icons also for executable files,
+	after all, it's these files that can have individual icons in the
+	first place. Yes, it can be slow. Needs work.
+
+	(filename_is_drive_root): Require also the slash after the colon.
+
+	(filename_is_server_share): New function.
+
+	(_gtk_file_system_win32_path_compare): New function, does
+	case-folded UTF-8 comparison.
+
+	* gtk/gtkfilesystemwin32.h: Declare
+	_gtk_file_system_win32_path_compare().
+
+2005-01-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkbutton.c (gtk_button_set_image): Allow unsetting the
+	custom image by passing NULL.
+	(gtk_button_init): Initialize image_is_stock to TRUE, fixing
+	a problem with changing stock labels.  (#162273, Marcin 
+	Krzyzanowski)
+
+2005-01-01  Tor Lillqvist  <tml@iki.fi>
+
+	* gtk/gtkmodules.c (get_module_path)
+	* gtk/gtkrc.c (gtk_rc_make_default_dir, gtk_rc_get_im_module_file,
+	gtk_rc_get_theme_dir, gtk_rc_add_initial_default_files): With
+	g_getenv() now returning UTF-8 on Win32, no need to call
+	g_locale_to_utf8().
+
+2004-12-31  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkkeyhash.c (_gtk_key_hash_lookup_keyval) 
+	(_gtk_key_hash_lookup): Don't sort a list of values as if
+	it was a list of entries. This fixes crashes during mnemonic
+	activation in the presence of multiple keymaps. (#162488, 
+	Christian Persch)
+
+2004-12-30  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkcombobox.c (gtk_combo_box_button_state_changed): Fix
+	state propagation when making an insensitive combo box sensitive
+	again.  (#162524, Carlos Garnacho Parro)
+
+	* gtk/gtkfilechooserdefault.c: Use secondary text for error 
+	dialogs.
+
+	* gtk/gtkfilesystemunix.c: Clean up some cases of errno handling
+	(#162496, noted by Tor Lillqvist), and use g_filename_display_name()
+	for error messages. Also mark some error messages for translation,
+	fix capitalization of error messages.
+
+	* gtk/gtkcellrenderertext.c (gtk_cell_renderer_text_set_property): 
+	Use g_value_get_boolean() for ellipsize_set.  (#162447, 
+	Brian Tarricone)
+
+2004-12-30  Tor Lillqvist  <tml@iki.fi>
+
+	* gtk/gtkicontheme.c (gtk_icon_theme_init): Use /usr/share/pixmaps
+	only on Unix.
+
+2004-12-28  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkmenuitem.c (gtk_menu_item_position_menu): Inherit
+	submenu direction from the parent menu.
+
+	* gtk/gtkmenushell.c (gtk_menu_shell_select_submenu_first): 
+	Return a boolean indicating whether an item in the submenu
+	was selected.
+	(gtk_real_menu_shell_move_current): When going in child 
+	direction, don't get stuck at completely insensitive 
+	submenus.  (#162055, Billy Biggs)	
+
+2004-12-27  Matthias Clasen  <mclasen@redhat.com>
+
+	Make the clipboard image API more robust (#162357, 
+	Torsten Schoenfeld):
+	
+	* gtk/gtkclipboard.c (clipboard_image_received_func): Don't
+	ref the pixbuf if it is NULL.
+
+	* gtk/gtkselection.c (gtk_selection_data_set_pixbuf): 
+	NULL-terminate the varargs in the call to 
+	gdk_pixbuf_save_to_buffer(). 
+	(gtk_selection_data_get_pixbuf): Only use a pixbuf loader 
+	if there is data to load.
+
+2004-12-27  Matthias Clasen  <mclasen@redhat.com>
+
+	* gdk/x11/gdkinput-x11.c (_gdk_input_common_other_event): 
+	Set x_root and y_root in button and motion events from 
+	extended input devices.  (#148715, Robert Ögren)
+
+	* gtk/gtktreeview.c (gtk_tree_view_class_init): Fix a 
+	typo.  (#162339, Alessio Dessi)
+
+	* gtk/gtkadjustment.c (gtk_adjustment_class_init): Document
+	properties as new since 2.4.  (#156101, Billy Biggs)
+
+	* configure.in: Add a warning about the linux-fb 
+	target.  (#155488, Zeeshan Ali)
+
+	* gtk/gtkmain.c (gtk_init_with_args): Typo fix.  (#162278,
+	Torsten Schoenfeld)
+
+2004-12-26  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooser.c (gtk_file_chooser_set_action): 
+	Typo fix.  (#162219, Masao Mutoh)
+	(gtk_file_chooser_set_preview_widget_active): 
+	Another typo.  (#162218, Masao Mutoh)
+
+2004-12-23  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkliststore.c (gtk_list_store_iter_children): 
+	Return TRUE if there are children.  (#162134, Iñigo Serna,
+	patch by John Finlay)
+
+	* gtk/gtkcombobox.c (gtk_combo_box_button_state_changed): 
+	Transfer state from the button to the cell view to get
+	prelighting right.  (#156327, Ricardo Veguilla)
+
+Wed Dec 22 14:22:19 2004  Søren Sandmann  <sandmann@redhat.com>
+
+	* tests/testtoolbar.c (timeout_cb): Add sensitivity-changing
+	timeout. Written by Christian Persch.
+
+Wed Dec 22 14:14:02 2004  Søren Sandmann  <sandmann@redhat.com>
+
+	Bug #161561
+	
+	* gdk/x11/gdkwindow-x11.c (tmp_{re,un}set_bg): Only set/reset the
+	background for windows that get expose events. 
+
+	* gdk/gdkwindow.c (gdk_window_process_updates_internal): Remove
+	hack to repaint !expose windows.
+
+Wed Dec 22 11:35:41 2004  Søren Sandmann  <sandmann@redhat.com>
+
+	Bug #147497, make menu items activate immediately when you release
+	the button.
+	
+	* gtk/gtkmenu.c (gtk_menu_enter_notify, menu_motion_notify): Make
+	items activate immediately.
+
+	* gtk/gtkmenu.c (definitely_within_item): New function
+	* gtk/gtkmenu.c (check_threshold): New function
+
+2004-12-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtklabel.c (gtk_label_setup_mnemonic): Don't forget to
+	null the mnemonic_menu when unsetting a mnemonic, reported
+	by Owen Taylor.
+
+2004-12-21  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkliststore.c (generate_order): Generate the order the
+	way it is supposed to be, order[new_pos] == old_pos.
+	(gtk_list_store_reorder): Invert the order before using it.
+
+2004-12-22  Matthias Clasen  <mclasen@redhat.com>
+
+	Fix sorting of list stores.  (#161886, Marcin Krzyzanowski)
+
+	* gtk/gtkliststore.c (generate_order): Generate the order the
+	way it is supposed to be, order[new_pos] == old_pos.
+	(gtk_list_store_reorder): Invert the order before using it.
+
+	* gtk/gtkiconview.c (gtk_icon_view_rows_reordered): Adapt to the
+	list store fix.
+
+Wed Dec 22 01:24:01 2004  Jonathan Blandford  <jrb@redhat.com>
+
+	* gtk/queryimmodules.c (main): print out the version and binary
+	name in the header comment.  Problem reported by Seth Nickell.
+
+2004-12-20  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkliststore.c (gtk_list_store_sort_iter_changed): Pass a
+	root path to gtk_tree_model_rows_reordered().  (#161720,
+	Marcin Krzyzanowski)
+
+	* gtk/gtkactiongroup.c (gtk_action_group_translate_string): Don't 
+	translate NULL messages.  (#161789, Morten Welinder)
+
+	* gtk/gtkmessagedialog.c (setup_primary_label_font): Don't show
+	the secondary label on show_all().  (#161707, Christian Persch)
+
+2004-12-19  Tor Lillqvist  <tml@iki.fi>
+
+	* gdk/win32/gdkdnd-win32.c (resolve_link, gdk_dropfiles_filter):
+	Use wide character API when available. Use UTF-8 for filenames.
+
+	* gdk/win32/gdkselection-win32.c (_gdk_dropfiles_store): Include
+	the string's trailing zero byte in the property's length, just for
+	safety.
+
+2004-12-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* gtk/gtkfilechooserentry.c (check_completion_callback) 
+	(load_directory_callback): Add missing GDK_THREADS_ENTER/LEAVE.
+
+	* gtk/gtkfilechooserdefault.c (edited_idle_cb) 
+	(shortcuts_drag_outside_idle_cb): Add missing 
+	GDK_THREADS_ENTER/LEAVE.  (#161604)
+	
+	* gtk/gtkfilechooserdefault.c (selection_check_foreach_cb): 
+	(list_select_func): Don't call gtk_file_info_get_is_folder()
+	on NULL. 
+
+	* gtk/gtkaboutdialog.c (gtk_about_dialog_get_logo_icon_name): 
+	(gtk_about_dialog_init): Add missing initializations.  (#161646,
+	Torsten Schoenfeld)
+

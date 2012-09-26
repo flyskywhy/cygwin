@@ -1,0 +1,101 @@
+################################################################################
+#
+# mono.cygclass - functions for building Mono assemblies
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: mono.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+MONO=/usr/bin/mono
+MCS=/usr/bin/mcs
+GMCS=/usr/bin/gmcs
+GACUTIL=/usr/bin/gacutil
+
+HOMEPAGE="http://www.mono-project.com/"
+
+if ! defined SVN_URI
+then
+	SRC_URI="http://go-mono.com/sources/${ORIG_PN:-${PN}}/${ORIG_PN:-${PN}}-${PV}.${MONO_SOURCE_TYPE:-tar.bz2}"
+	SVN_URI="svn://anonsvn.mono-project.com/source/trunk/${SVN_MODULE:-${ORIG_PN:-${PN}}}"
+	SRC_DIR="${SRC_DIR:-${ORIG_PN:-${PN}}-${PV}}"
+fi
+
+CYGCONF_ARGS+=" --disable-static"
+MAKEOPTS+=" -j1"
+
+dogac() {
+	local gacdll=${1}
+	local gacpkg="${2:+-package} ${2}"
+
+	if (( $# > 2 ))
+	then
+		error "dogac: Accepts one or two arguments"
+	fi
+
+	check_prog_req ${GACUTIL} mono
+
+	if [ ! -f ${gacdll} ]
+	then
+		error "dogac: ${gacdll}: File not found"
+	fi
+
+	${GACUTIL} -i ${gacdll} ${gacpkg} -gacdir ${D}/usr/lib || error "dogac ${gacdll} failed"
+}
+
+mono_wrapper() {
+	local massembly
+	local massemblyfile
+	local massemblypath
+	local mscript
+
+	if (( $# != 2 ))
+	then
+		error "mono_wrapper requires exactly two arguments"
+	fi
+
+	mscript=${1}
+	mscriptfile=${mscript##*/}
+	case "${mscriptfile}" in
+		"${mscript}")
+			mscriptpath=/usr/bin
+			mscript=/usr/bin/${mscriptfile} ;;
+		*)	mscriptpath=${mscript%/*} ;;
+	esac
+
+	massembly=${2}
+	massemblyfile=${massembly##*/}
+	massemblypath=${massembly%/*}
+
+	dodir ${mscriptpath}
+
+	if [ -x ${D}${mscriptpath}/${massemblyfile} ]
+	then
+		dodir ${massemblypath}
+		mv ${D}${mscriptpath}/${massemblyfile} ${D}${massemblypath}
+	fi
+
+	if [ ! -f ${D}${massembly} ]
+	then
+		error "${massemblyfile} is not installed into ${massemblypath}"
+	fi
+
+	echo -e "#!/bin/sh\nexec /usr/bin/mono ${massembly} \"\$@\"" > ${D}${mscript}
+	chmod +x ${D}${mscript}
+}

@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-user.html" />
+<link rel="prev" href="module-inspect.html" />
+<link rel="parent" href="python.html" />
+<link rel="next" href="module-user.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>26.11 site -- Site-specific configuration hook</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.10.4 the interpreter stack"
+  href="inspect-stack.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26. python Runtime Services"
+  href="python.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.12 user  "
+  href="module-user.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="inspect-stack.html">26.10.4 The interpreter stack</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="python.html">26. Python Runtime Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-user.html">26.12 user  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00281100000000000000000">
+26.11 <tt class="module">site</tt> --
+         Site-specific configuration hook</a>
+</h1>
+
+<p>
+<a name="module-site"></a>
+
+<p>
+<strong>This module is automatically imported during initialization.</strong>
+The automatic import can be suppressed using the interpreter's
+<b class="programopt">-S</b> option.
+
+<p>
+Importing this module will append site-specific paths to the module
+search path.
+<a id='l2h-5294' xml:id='l2h-5294'></a>
+<p>
+It starts by constructing up to four directories from a head and a
+tail part.  For the head part, it uses <code>sys.prefix</code> and
+<code>sys.exec_prefix</code>; empty heads are skipped.  For
+the tail part, it uses the empty string and then
+<span class="file">lib/site-packages</span> (on Windows) or
+<span class="file">lib/python2.5/site-packages</span> and then
+<span class="file">lib/site-python</span> (on <span class="Unix">Unix</span> and Macintosh).  For each of the
+distinct head-tail combinations, it sees if it refers to an existing
+directory, and if so, adds it to <code>sys.path</code> and also inspects
+the newly added path for configuration files.
+<a id='l2h-5295' xml:id='l2h-5295'></a><a id='l2h-5296' xml:id='l2h-5296'></a>
+<p>
+A path configuration file is a file whose name has the form
+<span class="file"><var>package</var>.pth</span> and exists in one of the four directories
+mentioned above; its contents are additional items (one
+per line) to be added to <code>sys.path</code>.  Non-existing items are
+never added to <code>sys.path</code>, but no check is made that the item
+refers to a directory (rather than a file).  No item is added to
+<code>sys.path</code> more than once.  Blank lines and lines beginning with
+<code>#</code> are skipped.  Lines starting with <code>import</code> are executed.
+<a id='l2h-5298' xml:id='l2h-5298'></a>
+<a id='l2h-5297' xml:id='l2h-5297'></a>
+<p>
+For example, suppose <code>sys.prefix</code> and <code>sys.exec_prefix</code> are
+set to <span class="file">/usr/local</span>.  The Python 2.5.1 library is then
+installed in <span class="file">/usr/local/lib/python2.5</span> (where only the
+first three characters of <code>sys.version</code> are used to form the
+installation path name).  Suppose this has a subdirectory
+<span class="file">/usr/local/lib/python2.5/site-packages</span> with three
+subsubdirectories, <span class="file">foo</span>, <span class="file">bar</span> and <span class="file">spam</span>, and two
+path configuration files, <span class="file">foo.pth</span> and <span class="file">bar.pth</span>.  Assume
+<span class="file">foo.pth</span> contains the following:
+
+<p>
+<div class="verbatim"><pre>
+# foo package configuration
+
+foo
+bar
+bletch
+</pre></div>
+
+<p>
+and <span class="file">bar.pth</span> contains:
+
+<p>
+<div class="verbatim"><pre>
+# bar package configuration
+
+bar
+</pre></div>
+
+<p>
+Then the following directories are added to <code>sys.path</code>, in this
+order:
+
+<p>
+<div class="verbatim"><pre>
+/usr/local/lib/python2.3/site-packages/bar
+/usr/local/lib/python2.3/site-packages/foo
+</pre></div>
+
+<p>
+Note that <span class="file">bletch</span> is omitted because it doesn't exist; the
+<span class="file">bar</span> directory precedes the <span class="file">foo</span> directory because
+<span class="file">bar.pth</span> comes alphabetically before <span class="file">foo.pth</span>; and
+<span class="file">spam</span> is omitted because it is not mentioned in either path
+configuration file.
+
+<p>
+After these path manipulations, an attempt is made to import a module
+named <tt class="module">sitecustomize</tt><a id='l2h-5299' xml:id='l2h-5299'></a>, which can
+perform arbitrary site-specific customizations.  If this import fails
+with an <tt class="exception">ImportError</tt> exception, it is silently ignored.
+
+<p>
+Note that for some non-<span class="Unix">Unix</span> systems, <code>sys.prefix</code> and
+<code>sys.exec_prefix</code> are empty, and the path manipulations are
+skipped; however the import of
+<tt class="module">sitecustomize</tt><a id='l2h-5300' xml:id='l2h-5300'></a> is still attempted.
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.10.4 the interpreter stack"
+  href="inspect-stack.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26. python Runtime Services"
+  href="python.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.12 user  "
+  href="module-user.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="inspect-stack.html">26.10.4 The interpreter stack</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="python.html">26. Python Runtime Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-user.html">26.12 user  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

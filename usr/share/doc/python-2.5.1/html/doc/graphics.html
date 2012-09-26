@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="doc.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="doc.html" title='Documenting Python' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="futures.html" />
+<link rel="prev" href="tools.html" />
+<link rel="parent" href="doc.html" />
+<link rel="next" href="futures.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>8 Including Graphics </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3 working on Cygwin"
+  href="cygwin.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Documenting Python"
+  href="doc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="9 future Directions"
+  href="futures.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Documenting Python</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cygwin.html">7.3 Working on Cygwin</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doc.html">Documenting Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="futures.html">9 Future Directions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION000900000000000000000"></a><a name="graphics"></a>
+<br>
+8 Including Graphics 
+</h1>
+
+<p>
+The standard documentation included with Python makes no use of
+  diagrams or images; this is intentional.  The outside tools used to
+  format the documentation have not always been suited to working with
+  graphics.  As the tools have evolved and been improved by their
+  maintainers, support for graphics has improved.
+
+<p>
+The internal tools, starting with the <b class="program">mkhowto</b> script, do
+  not provide any direct support for graphics.  However,
+  <b class="program">mkhowto</b> will not interfere with graphics support in the
+  external tools.
+
+<p>
+Experience using graphics together with these tools and the
+  <code>howto</code> and <code>manual</code> document classes is not extensive,
+  but has been known to work.  The basic approach is this:
+
+<p>
+
+<ol>
+<li>Create the image or graphic using your favorite
+          application.
+
+<p>
+</li>
+<li>Convert the image to a format supported by the conversion to
+          your desired output format.  If you want to generate HTML or
+          PostScript, you can convert the image or graphic to
+          encapsulated PostScript (a <span class="file">.eps</span> file); <span class="LaTeX">LaTeX</span>2HTML
+          can convert that to a <span class="file">.gif</span> file; it may be possible
+          to provide a <span class="file">.gif</span> file directly.  If you want to
+          generate PDF, you need to provide an ``encapsulated'' PDF
+          file.  This can be generated from encapsulated PostScript
+          using the <b class="program">epstopdf</b> tool provided with the te<span class="TeX">TeX</span>
+          distribution on Linux and <span class="Unix">Unix</span>.
+
+<p>
+</li>
+<li>In your document, add this line to ``import'' the general
+          graphics support package <code>graphicx</code>:
+
+<p>
+<div class="verbatim"><pre>
+\usepackage{graphicx}
+</pre></div>
+
+<p>
+</li>
+<li>Where you want to include your graphic or image, include
+          markup similar to this:
+
+<p>
+<div class="verbatim"><pre>
+\begin{figure}
+  \centering
+  \includegraphics[width=5in]{myimage}
+  \caption{Description of my image}
+\end{figure}
+</pre></div>
+
+<p>
+In particular, note for the <tt class='macro'>\includegraphics</tt> macro
+          that no file extension is provided.  If you're only
+          interested in one target format, you can include the
+          extension of the appropriate input file, but to allow
+          support for multiple formats, omitting the extension makes
+          life easier.
+
+<p>
+</li>
+<li>Run <b class="program">mkhowto</b> normally.
+  
+</li>
+</ol>
+
+<p>
+If you're working on systems which support some sort of
+  <b class="program">make</b> facility, you can use that to ensure the intermediate
+  graphic formats are kept up to date.  This example shows a
+  <span class="file">Makefile</span> used to format a document containing a diagram
+  created using the <b class="program">dia</b> application:
+
+<p>
+<div class="verbatim"><pre>
+default: pdf
+all:     html pdf ps
+
+html:   mydoc/mydoc.html
+pdf:    mydoc.pdf
+ps:     mydoc.ps
+
+mydoc/mydoc.html:  mydoc.tex mygraphic.eps
+        mkhowto --html $&lt;
+
+mydoc.pdf:  mydoc.tex mygraphic.pdf
+        mkhowto --pdf $&lt;
+
+mydoc.ps:   mydoc.tex mygraphic.eps
+        mkhowto --postscript $&lt;
+
+.SUFFIXES: .dia .eps .pdf
+
+.dia.eps:
+        dia --nosplash --export $@ $&lt;
+
+.eps.pdf:
+        epstopdf $&lt;
+</pre></div> 
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3 working on Cygwin"
+  href="cygwin.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Documenting Python"
+  href="doc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="9 future Directions"
+  href="futures.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Documenting Python</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cygwin.html">7.3 Working on Cygwin</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doc.html">Documenting Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="futures.html">9 Future Directions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

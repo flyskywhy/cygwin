@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="node130.html" />
+<link rel="parent" href="decimal-notes.html" />
+<link rel="next" href="decimal-threads.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.5.2 Special values</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.5.1 mitigating round-off error"
+  href="node130.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.6 working with threads"
+  href="decimal-threads.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node130.html">6.3.5.1 Mitigating round-off error</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-threads.html">6.3.6 Working with threads</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION008352000000000000000">
+6.3.5.2 Special values</a>
+</h3>
+
+<p>
+The number system for the <tt class="module">decimal</tt> module provides special
+values including <tt class="constant">NaN</tt>, <tt class="constant">sNaN</tt>, <tt class="constant">-Infinity</tt>,
+<tt class="constant">Infinity</tt>, and two zeroes, <tt class="constant">+0</tt> and <tt class="constant">-0</tt>.
+
+<p>
+Infinities can be constructed directly with:  <code>Decimal('Infinity')</code>. Also,
+they can arise from dividing by zero when the <tt class="exception">DivisionByZero</tt>
+signal is not trapped.  Likewise, when the <tt class="exception">Overflow</tt> signal is not
+trapped, infinity can result from rounding beyond the limits of the largest
+representable number.
+
+<p>
+The infinities are signed (affine) and can be used in arithmetic operations
+where they get treated as very large, indeterminate numbers.  For instance,
+adding a constant to infinity gives another infinite result.
+
+<p>
+Some operations are indeterminate and return <tt class="constant">NaN</tt>, or if the
+<tt class="exception">InvalidOperation</tt> signal is trapped, raise an exception.  For
+example, <code>0/0</code> returns <tt class="constant">NaN</tt> which means ``not a number''.  This
+variety of <tt class="constant">NaN</tt> is quiet and, once created, will flow through other
+computations always resulting in another <tt class="constant">NaN</tt>.  This behavior can be
+useful for a series of computations that occasionally have missing inputs --
+it allows the calculation to proceed while flagging specific results as
+invalid.     
+
+<p>
+A variant is <tt class="constant">sNaN</tt> which signals rather than remaining quiet
+after every operation.  This is a useful return value when an invalid
+result needs to interrupt a calculation for special handling.
+
+<p>
+The signed zeros can result from calculations that underflow.
+They keep the sign that would have resulted if the calculation had
+been carried out to greater precision.  Since their magnitude is
+zero, both positive and negative zeros are treated as equal and their
+sign is informational.
+
+<p>
+In addition to the two signed zeros which are distinct yet equal,
+there are various representations of zero with differing precisions
+yet equivalent in value.  This takes a bit of getting used to.  For
+an eye accustomed to normalized floating point representations, it
+is not immediately obvious that the following calculation returns
+a value equal to zero:          
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 1 / Decimal('Infinity')
+Decimal("0E-1000000026")
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.5.1 mitigating round-off error"
+  href="node130.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.6 working with threads"
+  href="decimal-threads.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node130.html">6.3.5.1 Mitigating round-off error</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-threads.html">6.3.6 Working with threads</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

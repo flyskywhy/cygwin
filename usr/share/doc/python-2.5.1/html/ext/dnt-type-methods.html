@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="dnt-basics.html" />
+<link rel="parent" href="defining-new-types.html" />
+<link rel="next" href="node27.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.2 Type Methods </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1.4 subclassing other types"
+  href="node25.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. defining New Types"
+  href="defining-new-types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.1 finalization and De-allocation"
+  href="node27.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node25.html">2.1.4 Subclassing other types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="defining-new-types.html">2. Defining New Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node27.html">2.2.1 Finalization and De-allocation</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION004200000000000000000"></a><a name="dnt-type-methods"></a>
+<br>
+2.2 Type Methods
+         
+</h1>
+
+<p>
+This section aims to give a quick fly-by on the various type methods
+you can implement and what they do.
+
+<p>
+Here is the definition of <tt class="ctype">PyTypeObject</tt>, with some fields only
+used in debug builds omitted:
+
+<p>
+<div class="verbatim">
+<pre>typedef struct _typeobject {
+    PyObject_VAR_HEAD
+    char *tp_name; /* For printing, in format "&lt;module&gt;.&lt;name&gt;" */
+    int tp_basicsize, tp_itemsize; /* For allocation */
+
+    /* Methods to implement standard operations */
+
+    destructor tp_dealloc;
+    printfunc tp_print;
+    getattrfunc tp_getattr;
+    setattrfunc tp_setattr;
+    cmpfunc tp_compare;
+    reprfunc tp_repr;
+
+    /* Method suites for standard classes */
+
+    PyNumberMethods *tp_as_number;
+    PySequenceMethods *tp_as_sequence;
+    PyMappingMethods *tp_as_mapping;
+
+    /* More standard operations (here for binary compatibility) */
+
+    hashfunc tp_hash;
+    ternaryfunc tp_call;
+    reprfunc tp_str;
+    getattrofunc tp_getattro;
+    setattrofunc tp_setattro;
+
+    /* Functions to access object as input/output buffer */
+    PyBufferProcs *tp_as_buffer;
+
+    /* Flags to define presence of optional/expanded features */
+    long tp_flags;
+
+    char *tp_doc; /* Documentation string */
+
+    /* Assigned meaning in release 2.0 */
+    /* call function for all accessible objects */
+    traverseproc tp_traverse;
+
+    /* delete references to contained objects */
+    inquiry tp_clear;
+
+    /* Assigned meaning in release 2.1 */
+    /* rich comparisons */
+    richcmpfunc tp_richcompare;
+
+    /* weak reference enabler */
+    long tp_weaklistoffset;
+
+    /* Added in release 2.2 */
+    /* Iterators */
+    getiterfunc tp_iter;
+    iternextfunc tp_iternext;
+
+    /* Attribute descriptor and subclassing stuff */
+    struct PyMethodDef *tp_methods;
+    struct PyMemberDef *tp_members;
+    struct PyGetSetDef *tp_getset;
+    struct _typeobject *tp_base;
+    PyObject *tp_dict;
+    descrgetfunc tp_descr_get;
+    descrsetfunc tp_descr_set;
+    long tp_dictoffset;
+    initproc tp_init;
+    allocfunc tp_alloc;
+    newfunc tp_new;
+    freefunc tp_free; /* Low-level free-memory routine */
+    inquiry tp_is_gc; /* For PyObject_IS_GC */
+    PyObject *tp_bases;
+    PyObject *tp_mro; /* method resolution order */
+    PyObject *tp_cache;
+    PyObject *tp_subclasses;
+    PyObject *tp_weaklist;
+
+} PyTypeObject;
+</pre>
+<div class="footer">
+<a href="typestruct.txt" type="text/plain">Download as text (original file name: <span class="file">typestruct.h</span>).</a>
+</div></div>
+
+<p>
+Now that's a <em>lot</em> of methods.  Don't worry too much though - if
+you have a type you want to define, the chances are very good that you
+will only implement a handful of these.
+
+<p>
+As you probably expect by now, we're going to go over this and give
+more information about the various handlers.  We won't go in the order
+they are defined in the structure, because there is a lot of
+historical baggage that impacts the ordering of the fields; be sure
+your type initialization keeps the fields in the right order!  It's
+often easiest to find an example that includes all the fields you need
+(even if they're initialized to <code>0</code>) and then change the values
+to suit your new type.
+
+<p>
+<div class="verbatim"><pre>
+    char *tp_name; /* For printing */
+</pre></div>
+
+<p>
+The name of the type - as mentioned in the last section, this will
+appear in various places, almost entirely for diagnostic purposes.
+Try to choose something that will be helpful in such a situation!
+
+<p>
+<div class="verbatim"><pre>
+    int tp_basicsize, tp_itemsize; /* For allocation */
+</pre></div>
+
+<p>
+These fields tell the runtime how much memory to allocate when new
+objects of this type are created.  Python has some built-in support
+for variable length structures (think: strings, lists) which is where
+the <tt class="member">tp_itemsize</tt> field comes in.  This will be dealt with
+later.
+
+<p>
+<div class="verbatim"><pre>
+    char *tp_doc;
+</pre></div>
+
+<p>
+Here you can put a string (or its address) that you want returned when
+the Python script references <code>obj.__doc__</code> to retrieve the
+doc string.
+
+<p>
+Now we come to the basic type methods--the ones most extension types
+will implement.
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node27.html">2.2.1 Finalization and De-allocation</a>
+<li><a href="node28.html">2.2.2 Object Presentation</a>
+<li><a href="node29.html">2.2.3 Attribute Management</a>
+<ul>
+<li><a href="node30.html">2.2.3.1 Generic Attribute Management</a>
+<li><a href="node31.html">2.2.3.2 Type-specific Attribute Management</a>
+</ul>
+<li><a href="node32.html">2.2.4 Object Comparison</a>
+<li><a href="node33.html">2.2.5 Abstract Protocol Support</a>
+<li><a href="weakref-support.html">2.2.6 Weak Reference Support</a>
+<li><a href="node35.html">2.2.7 More Suggestions</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1.4 subclassing other types"
+  href="node25.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. defining New Types"
+  href="defining-new-types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.1 finalization and De-allocation"
+  href="node27.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node25.html">2.1.4 Subclassing other types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="defining-new-types.html">2. Defining New Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node27.html">2.2.1 Finalization and De-allocation</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

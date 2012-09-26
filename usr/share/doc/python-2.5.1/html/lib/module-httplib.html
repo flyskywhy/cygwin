@@ -1,0 +1,558 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-ftplib.html" />
+<link rel="prev" href="module-urllib2.html" />
+<link rel="parent" href="internet.html" />
+<link rel="next" href="httpconnection-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.7 httplib -- HTTP protocol client</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.6.22 Examples"
+  href="urllib2-examples.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.7.1 httpconnection Objects"
+  href="httpconnection-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="urllib2-examples.html">18.6.22 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="httpconnection-objects.html">18.7.1 HTTPConnection Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0020700000000000000000">
+18.7 <tt class="module">httplib</tt> --
+         HTTP protocol client</a>
+</h1>
+
+<p>
+<a name="module-httplib"></a>
+
+<p>
+<a id='l2h-4005' xml:id='l2h-4005'></a><a id='l2h-4024' xml:id='l2h-4024'></a>
+
+<p>
+This module defines classes which implement the client side of the
+HTTP and HTTPS protocols.  It is normally not used directly -- the
+module <tt class="module"><a href="module-urllib.html">urllib</a></tt><a id='l2h-4025' xml:id='l2h-4025'></a> uses it to handle URLs
+that use HTTP and HTTPS.
+
+<p>
+<div class="note"><b class="label">Note:</b>
+HTTPS support is only available if the <tt class="module"><a href="module-socket.html">socket</a></tt> module was
+  compiled with SSL support.
+</div>
+
+<p>
+<div class="note"><b class="label">Note:</b>
+The public interface for this module changed substantially in Python
+  2.0.  The <tt class="class">HTTP</tt> class is retained only for backward
+  compatibility with 1.5.2.  It should not be used in new code.  Refer
+  to the online docstrings for usage.
+</div>
+
+<p>
+The module provides the following classes:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4006' xml:id='l2h-4006' class="class">HTTPConnection</tt></b>(</nobr></td>
+  <td><var>host</var><big>[</big><var>, port</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+An <tt class="class">HTTPConnection</tt> instance represents one transaction with an HTTP
+server.  It should be instantiated passing it a host and optional port number.
+If no port number is passed, the port is extracted from the host string if it
+has the form <code><var>host</var>:<var>port</var></code>, else the default HTTP port (80) is
+used.  For example, the following calls all create instances that connect to
+the server at the same host and port:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; h1 = httplib.HTTPConnection('www.cwi.nl')
+&gt;&gt;&gt; h2 = httplib.HTTPConnection('www.cwi.nl:80')
+&gt;&gt;&gt; h3 = httplib.HTTPConnection('www.cwi.nl', 80)
+</pre></div>
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4007' xml:id='l2h-4007' class="class">HTTPSConnection</tt></b>(</nobr></td>
+  <td><var>host</var><big>[</big><var>, port, key_file, cert_file</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+A subclass of <tt class="class">HTTPConnection</tt> that uses SSL for communication with
+secure servers.  Default port is <code>443</code>.
+<var>key_file</var> is
+the name of a PEM formatted file that contains your private
+key. <var>cert_file</var> is a PEM formatted certificate chain file.
+
+<p>
+<span class="warning"><b class="label">Warning:</b>
+This does not do any certificate verification!</span>
+
+<p>
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4008' xml:id='l2h-4008' class="class">HTTPResponse</tt></b>(</nobr></td>
+  <td><var>sock</var><big>[</big><var>, debuglevel=0</var><big>]</big><var></var><big>[</big><var>, strict=0</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Class whose instances are returned upon successful connection.  Not
+instantiated directly by user.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dl>
+
+<p>
+The following exceptions are raised as appropriate:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4009' xml:id='l2h-4009' class="exception">HTTPException</tt></b></dt>
+<dd>
+The base class of the other exceptions in this module.  It is a
+subclass of <tt class="exception">Exception</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4010' xml:id='l2h-4010' class="exception">NotConnected</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4011' xml:id='l2h-4011' class="exception">InvalidURL</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>, raised if a port is given and is
+either non-numeric or empty.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4012' xml:id='l2h-4012' class="exception">UnknownProtocol</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4013' xml:id='l2h-4013' class="exception">UnknownTransferEncoding</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4014' xml:id='l2h-4014' class="exception">UnimplementedFileMode</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4015' xml:id='l2h-4015' class="exception">IncompleteRead</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4016' xml:id='l2h-4016' class="exception">ImproperConnectionState</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4017' xml:id='l2h-4017' class="exception">CannotSendRequest</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">ImproperConnectionState</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4018' xml:id='l2h-4018' class="exception">CannotSendHeader</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">ImproperConnectionState</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4019' xml:id='l2h-4019' class="exception">ResponseNotReady</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">ImproperConnectionState</tt>.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4020' xml:id='l2h-4020' class="exception">BadStatusLine</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">HTTPException</tt>.  Raised if a server responds with a
+HTTP status code that we don't understand.
+
+<span class="versionnote">New in version 2.0.</span>
+
+</dd></dl>
+
+<p>
+The constants defined in this module are:
+
+<p>
+<dl><dt><b><tt id='l2h-4021' xml:id='l2h-4021'>HTTP_PORT</tt></b></dt>
+<dd>
+  The default port for the HTTP protocol (always <code>80</code>).
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4022' xml:id='l2h-4022'>HTTPS_PORT</tt></b></dt>
+<dd>
+  The default port for the HTTPS protocol (always <code>443</code>).
+</dd></dl>
+
+<p>
+and also the following constants for integer status codes:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Constant</th>
+      <th class="center">Value</th>
+      <th class="left"  >Definition</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><tt class="constant">CONTINUE</tt></td>
+        <td class="center"><code>100</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.1.1"
+  >RFC 2616, Section 10.1.1</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">SWITCHING_PROTOCOLS</tt></td>
+        <td class="center"><code>101</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.1.2"
+  >RFC 2616, Section 10.1.2</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">PROCESSING</tt></td>
+        <td class="center"><code>102</code></td>
+        <td class="left"  >WEBDAV, <a class="ulink" href="http://www.webdav.org/specs/rfc2518.html#STATUS_102"
+  >RFC 2518, Section 10.1</a></td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><tt class="constant">OK</tt></td>
+        <td class="center"><code>200</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1"
+  >RFC 2616, Section 10.2.1</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">CREATED</tt></td>
+        <td class="center"><code>201</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2"
+  >RFC 2616, Section 10.2.2</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">ACCEPTED</tt></td>
+        <td class="center"><code>202</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.3"
+  >RFC 2616, Section 10.2.3</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">NON_AUTHORITATIVE_INFORMATION</tt></td>
+        <td class="center"><code>203</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.4"
+  >RFC 2616, Section 10.2.4</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">NO_CONTENT</tt></td>
+        <td class="center"><code>204</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5"
+  >RFC 2616, Section 10.2.5</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">RESET_CONTENT</tt></td>
+        <td class="center"><code>205</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.6"
+  >RFC 2616, Section 10.2.6</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">PARTIAL_CONTENT</tt></td>
+        <td class="center"><code>206</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.7"
+  >RFC 2616, Section 10.2.7</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">MULTI_STATUS</tt></td>
+        <td class="center"><code>207</code></td>
+        <td class="left"  >WEBDAV <a class="ulink" href="http://www.webdav.org/specs/rfc2518.html#STATUS_207"
+  >RFC 2518, Section 10.2</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">IM_USED</tt></td>
+        <td class="center"><code>226</code></td>
+        <td class="left"  >Delta encoding in HTTP, <a class="rfc" id='rfcref-102925' xml:id='rfcref-102925'
+href="http://www.faqs.org/rfcs/rfc3229.html">RFC 3229</a>, Section 10.4.1</td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><tt class="constant">MULTIPLE_CHOICES</tt></td>
+        <td class="center"><code>300</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.1"
+  >RFC 2616, Section 10.3.1</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">MOVED_PERMANENTLY</tt></td>
+        <td class="center"><code>301</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.2"
+  >RFC 2616, Section 10.3.2</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">FOUND</tt></td>
+        <td class="center"><code>302</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.3"
+  >RFC 2616, Section 10.3.3</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">SEE_OTHER</tt></td>
+        <td class="center"><code>303</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.4"
+  >RFC 2616, Section 10.3.4</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">NOT_MODIFIED</tt></td>
+        <td class="center"><code>304</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5"
+  >RFC 2616, Section 10.3.5</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">USE_PROXY</tt></td>
+        <td class="center"><code>305</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.6"
+  >RFC 2616, Section 10.3.6</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">TEMPORARY_REDIRECT</tt></td>
+        <td class="center"><code>307</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.8"
+  >RFC 2616, Section 10.3.8</a></td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><tt class="constant">BAD_REQUEST</tt></td>
+        <td class="center"><code>400</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1"
+  >RFC 2616, Section 10.4.1</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">UNAUTHORIZED</tt></td>
+        <td class="center"><code>401</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2"
+  >RFC 2616, Section 10.4.2</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">PAYMENT_REQUIRED</tt></td>
+        <td class="center"><code>402</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.3"
+  >RFC 2616, Section 10.4.3</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">FORBIDDEN</tt></td>
+        <td class="center"><code>403</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4"
+  >RFC 2616, Section 10.4.4</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">NOT_FOUND</tt></td>
+        <td class="center"><code>404</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5"
+  >RFC 2616, Section 10.4.5</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">METHOD_NOT_ALLOWED</tt></td>
+        <td class="center"><code>405</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.6"
+  >RFC 2616, Section 10.4.6</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">NOT_ACCEPTABLE</tt></td>
+        <td class="center"><code>406</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.7"
+  >RFC 2616, Section 10.4.7</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">PROXY_AUTHENTICATION_REQUIRED</tt></td>
+        <td class="center"><code>407</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.8"
+  >RFC 2616, Section 10.4.8</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REQUEST_TIMEOUT</tt></td>
+        <td class="center"><code>408</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.9"
+  >RFC 2616, Section 10.4.9</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">CONFLICT</tt></td>
+        <td class="center"><code>409</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.10"
+  >RFC 2616, Section 10.4.10</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">GONE</tt></td>
+        <td class="center"><code>410</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.11"
+  >RFC 2616, Section 10.4.11</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">LENGTH_REQUIRED</tt></td>
+        <td class="center"><code>411</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.12"
+  >RFC 2616, Section 10.4.12</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">PRECONDITION_FAILED</tt></td>
+        <td class="center"><code>412</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.13"
+  >RFC 2616, Section 10.4.13</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REQUEST_ENTITY_TOO_LARGE</tt></td>
+        <td class="center"><code>413</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.14"
+  >RFC 2616, Section 10.4.14</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REQUEST_URI_TOO_LONG</tt></td>
+        <td class="center"><code>414</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.15"
+  >RFC 2616, Section 10.4.15</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">UNSUPPORTED_MEDIA_TYPE</tt></td>
+        <td class="center"><code>415</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.16"
+  >RFC 2616, Section 10.4.16</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REQUESTED_RANGE_NOT_SATISFIABLE</tt></td>
+        <td class="center"><code>416</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.17"
+  >RFC 2616, Section 10.4.17</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">EXPECTATION_FAILED</tt></td>
+        <td class="center"><code>417</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.18"
+  >RFC 2616, Section 10.4.18</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">UNPROCESSABLE_ENTITY</tt></td>
+        <td class="center"><code>422</code></td>
+        <td class="left"  >WEBDAV, <a class="ulink" href="http://www.webdav.org/specs/rfc2518.html#STATUS_422"
+  >RFC 2518, Section 10.3</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">LOCKED</tt></td>
+        <td class="center"><code>423</code></td>
+        <td class="left"  >WEBDAV <a class="ulink" href="http://www.webdav.org/specs/rfc2518.html#STATUS_423"
+  >RFC 2518, Section 10.4</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">FAILED_DEPENDENCY</tt></td>
+        <td class="center"><code>424</code></td>
+        <td class="left"  >WEBDAV, <a class="ulink" href="http://www.webdav.org/specs/rfc2518.html#STATUS_424"
+  >RFC 2518, Section 10.5</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">UPGRADE_REQUIRED</tt></td>
+        <td class="center"><code>426</code></td>
+        <td class="left"  >HTTP Upgrade to TLS, <a class="rfc" id='rfcref-102927' xml:id='rfcref-102927'
+href="http://www.faqs.org/rfcs/rfc2817.html">RFC 2817</a>, Section 6</td></tr><p>
+
+    <tr><td class="left"   valign="baseline"><tt class="constant">INTERNAL_SERVER_ERROR</tt></td>
+        <td class="center"><code>500</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1"
+  >RFC 2616, Section 10.5.1</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">NOT_IMPLEMENTED</tt></td>
+        <td class="center"><code>501</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2"
+  >RFC 2616, Section 10.5.2</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">BAD_GATEWAY</tt></td>
+        <td class="center"><code>502</code></td>
+        <td class="left"  >HTTP/1.1 <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.3"
+  >RFC 2616, Section 10.5.3</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">SERVICE_UNAVAILABLE</tt></td>
+        <td class="center"><code>503</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.4"
+  >RFC 2616, Section 10.5.4</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">GATEWAY_TIMEOUT</tt></td>
+        <td class="center"><code>504</code></td>
+        <td class="left"  >HTTP/1.1 <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.5"
+  >RFC 2616, Section 10.5.5</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">HTTP_VERSION_NOT_SUPPORTED</tt></td>
+        <td class="center"><code>505</code></td>
+        <td class="left"  >HTTP/1.1, <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.6"
+  >RFC 2616, Section 10.5.6</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">INSUFFICIENT_STORAGE</tt></td>
+        <td class="center"><code>507</code></td>
+        <td class="left"  >WEBDAV, <a class="ulink" href="http://www.webdav.org/specs/rfc2518.html#STATUS_507"
+  >RFC 2518, Section 10.6</a></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">NOT_EXTENDED</tt></td>
+        <td class="center"><code>510</code></td>
+        <td class="left"  >An HTTP Extension Framework, <a class="rfc" id='rfcref-102929' xml:id='rfcref-102929'
+href="http://www.faqs.org/rfcs/rfc2774.html">RFC 2774</a>, Section 7</td></tr></tbody>
+</table></div>
+
+<p>
+<dl><dt><b><tt id='l2h-4023' xml:id='l2h-4023'>responses</tt></b></dt>
+<dd>
+This dictionary maps the HTTP 1.1 status codes to the W3C names.
+
+<p>
+Example: <code>httplib.responses[httplib.NOT_FOUND]</code> is <code>'Not Found'</code>.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dd></dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="httpconnection-objects.html">18.7.1 HTTPConnection Objects</a>
+<li><a href="httpresponse-objects.html">18.7.2 HTTPResponse Objects</a>
+<li><a href="httplib-examples.html">18.7.3 Examples</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.6.22 Examples"
+  href="urllib2-examples.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.7.1 httpconnection Objects"
+  href="httpconnection-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="urllib2-examples.html">18.6.22 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="httpconnection-objects.html">18.7.1 HTTPConnection Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

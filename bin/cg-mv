@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# Rename or move files in the repository
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes either two filenames and removes a file from the first one to
+# the second one, or a list of filenames and a dirname and moves all
+# the files to the directory. The changes will be executed in your working
+# tree immediately, but recorded to the repository only at the time of the
+# next commit.
+#
+# Note that so far, GIT/Cogito does not track file renames/moves per se.
+# Therefore, doing `cg-mv` is currently the same as doing `cg-rm`, `cg-add`
+# from the Cogito perspective, and no special information is recorded that
+# the file moved around. When any rename tracking gets involved currently,
+# it is purely heuristical method executed at the time of examination.
+#
+# OPTIONS
+# -------
+# -f:: Force overwriting of existing files
+#	Remove the target file if it already exists.
+
+# Testsuite: TODO
+
+USAGE="cg-mv [-f] FILE... DEST"
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+force=
+while optparse; do
+	if optparse -f; then
+		force=-f
+	else
+		optfail
+	fi
+done
+
+[ -n "${ARGS[*]}" ] || usage
+
+# Strip trailing / which is something GIT does not bear well, as well as
+# some relpath issues. Allegedly fixed in GIT in 90924d55c... (post-1.2.4)
+ARGS2=()
+for arg in "${ARGS[@]}"; do
+	ARGS2[${#ARGS2[@]}]="$_git_relpath${arg%/}"
+done
+
+git mv $force "${ARGS2[@]}"

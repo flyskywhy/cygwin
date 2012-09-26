@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="node24.html" />
+<link rel="parent" href="dnt-basics.html" />
+<link rel="next" href="dnt-type-methods.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.1.4 Subclassing other types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1.3 supporting cyclic garbage"
+  href="node24.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node24.html">2.1.3 Supporting cyclic garbage</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="dnt-type-methods.html">2.2 Type Methods</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004140000000000000000">
+2.1.4 Subclassing other types</a>
+</h2>
+
+<p>
+It is possible to create new extension types that are derived from existing
+types. It is easiest to inherit from the built in types, since an extension
+can easily use the <tt class="class">PyTypeObject</tt> it needs. It can be difficult to
+share these <tt class="class">PyTypeObject</tt> structures between extension modules.
+
+<p>
+In this example we will create a <tt class="class">Shoddy</tt> type that inherits from
+the builtin <tt class="class">list</tt> type. The new type will be completely compatible
+with regular lists, but will have an additional <tt class="method">increment()</tt> method
+that increases an internal counter.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import shoddy
+&gt;&gt;&gt; s = shoddy.Shoddy(range(3))
+&gt;&gt;&gt; s.extend(s)
+&gt;&gt;&gt; print len(s)
+6
+&gt;&gt;&gt; print s.increment()
+1
+&gt;&gt;&gt; print s.increment()
+2
+</pre></div>
+
+<p>
+<div class="verbatim">
+<pre>#include &lt;Python.h&gt;
+
+typedef struct {
+    PyListObject list;
+    int state;
+} Shoddy;
+
+static PyObject *
+Shoddy_increment(Shoddy *self, PyObject *unused)
+{
+    self-&gt;state++;
+    return PyInt_FromLong(self-&gt;state);
+}
+
+static PyMethodDef Shoddy_methods[] = {
+    {"increment", (PyCFunction)Shoddy_increment, METH_NOARGS,
+     PyDoc_STR("increment state counter")},
+    {NULL,	NULL},
+};
+
+static int
+Shoddy_init(Shoddy *self, PyObject *args, PyObject *kwds)
+{
+    if (PyList_Type.tp_init((PyObject *)self, args, kwds) &lt; 0)
+        return -1;
+    self-&gt;state = 0;
+    return 0;
+}
+
+static PyTypeObject ShoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                       /* ob_size */
+    "shoddy.Shoddy",         /* tp_name */
+    sizeof(Shoddy),          /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    0,                       /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT |
+      Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    Shoddy_methods,          /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    (initproc)Shoddy_init,   /* tp_init */
+    0,                       /* tp_alloc */
+    0,                       /* tp_new */
+};
+
+PyMODINIT_FUNC
+initshoddy(void)
+{
+    PyObject *m;
+
+    ShoddyType.tp_base = &amp;PyList_Type;
+    if (PyType_Ready(&amp;ShoddyType) &lt; 0)
+        return;
+
+    m = Py_InitModule3("shoddy", NULL, "Shoddy module");
+    if (m == NULL)
+        return;
+
+    Py_INCREF(&amp;ShoddyType);
+    PyModule_AddObject(m, "Shoddy", (PyObject *) &amp;ShoddyType);
+}
+</pre>
+<div class="footer">
+<a href="shoddy.txt" type="text/plain">Download as text (original file name: <span class="file">shoddy.c</span>).</a>
+</div></div>
+
+<p>
+As you can see, the source code closely resembles the <tt class="class">Noddy</tt> examples in previous
+sections. We will break down the main differences between them.
+
+<p>
+<div class="verbatim"><pre>
+typedef struct {
+	PyListObject list;
+	int state;
+} Shoddy;
+</pre></div>
+
+<p>
+The primary difference for derived type objects is that the base type's
+object structure must be the first value. The base type will already
+include the <tt class="cfunction">PyObject_HEAD</tt> at the beginning of its structure.
+
+<p>
+When a Python object is a <tt class="class">Shoddy</tt> instance, its <var>PyObject*</var> pointer
+can be safely cast to both <var>PyListObject*</var> and <var>Shoddy*</var>.
+
+<p>
+<div class="verbatim"><pre>
+static int
+Shoddy_init(Shoddy *self, PyObject *args, PyObject *kwds)
+{
+	if (PyList_Type.tp_init((PyObject *)self, args, kwds) &lt; 0)
+		return -1;
+	self-&gt;state = 0;
+	return 0;
+}
+</pre></div>
+
+<p>
+In the <tt class="member">__init__</tt> method for our type, we can see how to call through
+to the <tt class="member">__init__</tt> method of the base type.
+
+<p>
+This pattern is important when writing a type with custom <tt class="member">new</tt> and
+<tt class="member">dealloc</tt> methods. The <tt class="member">new</tt> method should not actually create the
+memory for the object with <tt class="member">tp_alloc</tt>, that will be handled by
+the base class when calling its <tt class="member">tp_new</tt>.
+
+<p>
+When filling out the <tt class="cfunction">PyTypeObject</tt> for the <tt class="class">Shoddy</tt> type,
+you see a slot for <tt class="cfunction">tp_base</tt>. Due to cross platform compiler
+issues, you can't fill that field directly with the <tt class="cfunction">PyList_Type</tt>;
+it can be done later in the module's <tt class="cfunction">init</tt> function.
+
+<p>
+<div class="verbatim"><pre>
+PyMODINIT_FUNC
+initshoddy(void)
+{
+	PyObject *m;
+
+	ShoddyType.tp_base = &amp;PyList_Type;
+	if (PyType_Ready(&amp;ShoddyType) &lt; 0)
+		return;
+
+	m = Py_InitModule3("shoddy", NULL, "Shoddy module");
+	if (m == NULL)
+		return;
+
+	Py_INCREF(&amp;ShoddyType);
+	PyModule_AddObject(m, "Shoddy", (PyObject *) &amp;ShoddyType);
+}
+</pre></div>
+
+<p>
+Before calling <tt class="cfunction">PyType_Ready</tt>, the type structure must have the
+<tt class="member">tp_base</tt> slot filled in. When we are deriving a new type, it is
+not necessary to fill out the <tt class="member">tp_alloc</tt> slot with
+<tt class="cfunction">PyType_GenericNew</tt> - the allocate function from the base type
+will be inherited.
+
+<p>
+After that, calling <tt class="cfunction">PyType_Ready</tt> and adding the type object
+to the module is the same as with the basic <tt class="class">Noddy</tt> examples.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1.3 supporting cyclic garbage"
+  href="node24.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node24.html">2.1.3 Supporting cyclic garbage</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="dnt-type-methods.html">2.2 Type Methods</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

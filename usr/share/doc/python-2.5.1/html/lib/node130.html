@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node131.html" />
+<link rel="prev" href="decimal-notes.html" />
+<link rel="parent" href="decimal-notes.html" />
+<link rel="next" href="node131.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.5.1 Mitigating round-off error with increased precision</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.5.2 special values"
+  href="node131.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node131.html">6.3.5.2 Special values</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION008351000000000000000">
+6.3.5.1 Mitigating round-off error with increased precision</a>
+</h3>
+
+<p>
+The use of decimal floating point eliminates decimal representation error
+(making it possible to represent <tt class="constant">0.1</tt> exactly); however, some
+operations can still incur round-off error when non-zero digits exceed the
+fixed precision.
+
+<p>
+The effects of round-off error can be amplified by the addition or subtraction
+of nearly offsetting quantities resulting in loss of significance.  Knuth
+provides two instructive examples where rounded floating point arithmetic with
+insufficient precision causes the breakdown of the associative and
+distributive properties of addition:
+
+<p>
+<div class="verbatim"><pre>
+# Examples from Seminumerical Algorithms, Section 4.2.2.
+&gt;&gt;&gt; from decimal import Decimal, getcontext
+&gt;&gt;&gt; getcontext().prec = 8
+
+&gt;&gt;&gt; u, v, w = Decimal(11111113), Decimal(-11111111), Decimal('7.51111111')
+&gt;&gt;&gt; (u + v) + w
+Decimal("9.5111111")
+&gt;&gt;&gt; u + (v + w)
+Decimal("10")
+
+&gt;&gt;&gt; u, v, w = Decimal(20000), Decimal(-6), Decimal('6.0000003')
+&gt;&gt;&gt; (u*v) + (u*w)
+Decimal("0.01")
+&gt;&gt;&gt; u * (v+w)
+Decimal("0.0060000")
+</pre></div>
+
+<p>
+The <tt class="module">decimal</tt> module makes it possible to restore the identities
+by expanding the precision sufficiently to avoid loss of significance:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; getcontext().prec = 20
+&gt;&gt;&gt; u, v, w = Decimal(11111113), Decimal(-11111111), Decimal('7.51111111')
+&gt;&gt;&gt; (u + v) + w
+Decimal("9.51111111")
+&gt;&gt;&gt; u + (v + w)
+Decimal("9.51111111")
+&gt;&gt;&gt; 
+&gt;&gt;&gt; u, v, w = Decimal(20000), Decimal(-6), Decimal('6.0000003')
+&gt;&gt;&gt; (u*v) + (u*w)
+Decimal("0.0060000")
+&gt;&gt;&gt; u * (v+w)
+Decimal("0.0060000")
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.5.2 special values"
+  href="node131.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node131.html">6.3.5.2 Special values</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

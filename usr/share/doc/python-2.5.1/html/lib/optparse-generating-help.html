@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-printing-version-string.html" />
+<link rel="prev" href="optparse-default-values.html" />
+<link rel="parent" href="optparse-tutorial.html" />
+<link rel="next" href="optparse-printing-version-string.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.2.6 Generating help</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.2.5 default values"
+  href="optparse-default-values.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.2 Tutorial"
+  href="optparse-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.2.7 printing a version"
+  href="optparse-printing-version-string.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-default-values.html">14.3.2.5 Default values</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-tutorial.html">14.3.2 Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-printing-version-string.html">14.3.2.7 Printing a version</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016326000000000000000"></a><a name="optparse-generating-help"></a>
+<br>
+14.3.2.6 Generating help
+</h3>
+
+<p>
+<tt class="module">optparse</tt>'s ability to generate help and usage text automatically is useful
+for creating user-friendly command-line interfaces.  All you have to do
+is supply a <tt class="member">help</tt> value for each option, and optionally a short usage
+message for your whole program.  Here's an OptionParser populated with
+user-friendly (documented) options:
+<div class="verbatim"><pre>
+usage = "usage: %prog [options] arg1 arg2"
+parser = OptionParser(usage=usage)
+parser.add_option("-v", "--verbose",
+                  action="store_true", dest="verbose", default=True,
+                  help="make lots of noise [default]")
+parser.add_option("-q", "--quiet",
+                  action="store_false", dest="verbose", 
+                  help="be vewwy quiet (I'm hunting wabbits)")
+parser.add_option("-f", "--filename",
+                  metavar="FILE", help="write output to FILE"),
+parser.add_option("-m", "--mode",
+                  default="intermediate",
+                  help="interaction mode: novice, intermediate, "
+                       "or expert [default: %default]")
+</pre></div>
+
+<p>
+If <tt class="module">optparse</tt> encounters either <code>"-h"</code> or <code>"-help"</code> on the command-line,
+or if you just call <tt class="method">parser.print_help()</tt>, it prints the following to
+standard output:
+<div class="verbatim"><pre>
+usage: &lt;yourscript&gt; [options] arg1 arg2
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         make lots of noise [default]
+  -q, --quiet           be vewwy quiet (I'm hunting wabbits)
+  -f FILE, --filename=FILE
+                        write output to FILE
+  -m MODE, --mode=MODE  interaction mode: novice, intermediate, or
+                        expert [default: intermediate]
+</pre></div>
+
+<p>
+(If the help output is triggered by a help option, <tt class="module">optparse</tt> exits after
+printing the help text.)
+
+<p>
+There's a lot going on here to help <tt class="module">optparse</tt> generate the best possible
+help message:
+
+<ul>
+<li> 
+the script defines its own usage message:
+<div class="verbatim"><pre>
+usage = "usage: %prog [options] arg1 arg2"
+</pre></div>
+
+<p>
+<tt class="module">optparse</tt> expands <code>"%prog"</code> in the usage string to the name of the current
+program, i.e. <code>os.path.basename(sys.argv[0])</code>.  The expanded string
+is then printed before the detailed option help.
+
+<p>
+If you don't supply a usage string, <tt class="module">optparse</tt> uses a bland but sensible
+default: ``<code>usage: %prog [options]"</code>, which is fine if your script
+doesn't take any positional arguments.
+
+<p>
+</li>
+<li> 
+every option defines a help string, and doesn't worry about line-
+wrapping--<tt class="module">optparse</tt> takes care of wrapping lines and making the
+help output look good.
+
+<p>
+</li>
+<li> 
+options that take a value indicate this fact in their
+automatically-generated help message, e.g. for the ``mode'' option:
+<div class="verbatim"><pre>
+-m MODE, --mode=MODE
+</pre></div>
+
+<p>
+Here, ``MODE'' is called the meta-variable: it stands for the argument
+that the user is expected to supply to <b class="programopt">-m</b>/<b class="programopt">--mode</b>.  By default,
+<tt class="module">optparse</tt> converts the destination variable name to uppercase and uses
+that for the meta-variable.  Sometimes, that's not what you want--for example, the <b class="programopt">--filename</b> option explicitly sets
+<code>metavar="FILE"</code>, resulting in this automatically-generated option
+description:
+<div class="verbatim"><pre>
+-f FILE, --filename=FILE
+</pre></div>
+
+<p>
+This is important for more than just saving space, though: the
+manually written help text uses the meta-variable ``FILE'' to clue the
+user in that there's a connection between the semi-formal syntax ``-f
+FILE'' and the informal semantic description ``write output to FILE''.
+This is a simple but effective way to make your help text a lot
+clearer and more useful for end users.
+
+<p>
+</li>
+<li> 
+options that have a default value can include <code>%default</code> in
+the help string--<tt class="module">optparse</tt> will replace it with <tt class="function">str()</tt> of the
+option's default value.  If an option has no default value (or the
+default value is <code>None</code>), <code>%default</code> expands to <code>none</code>.
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.2.5 default values"
+  href="optparse-default-values.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.2 Tutorial"
+  href="optparse-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.2.7 printing a version"
+  href="optparse-printing-version-string.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-default-values.html">14.3.2.5 Default values</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-tutorial.html">14.3.2 Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-printing-version-string.html">14.3.2.7 Printing a version</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

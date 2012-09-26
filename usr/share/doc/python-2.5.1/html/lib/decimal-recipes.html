@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="decimal-faq.html" />
+<link rel="prev" href="decimal-threads.html" />
+<link rel="parent" href="module-decimal.html" />
+<link rel="next" href="decimal-faq.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.7 Recipes </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.6 working with threads"
+  href="decimal-threads.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.8 decimal FAQ"
+  href="decimal-faq.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-threads.html">6.3.6 Working with threads</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-faq.html">6.3.8 Decimal FAQ</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION008370000000000000000"></a><a name="decimal-recipes"></a>
+<br>
+6.3.7 Recipes 
+</h2>
+
+<p>
+Here are a few recipes that serve as utility functions and that demonstrate
+ways to work with the <tt class="class">Decimal</tt> class:
+
+<p>
+<div class="verbatim"><pre>
+def moneyfmt(value, places=2, curr='', sep=',', dp='.',
+             pos='', neg='-', trailneg=''):
+    """Convert Decimal to a money formatted string.
+
+    places:  required number of places after the decimal point
+    curr:    optional currency symbol before the sign (may be blank)
+    sep:     optional grouping separator (comma, period, space, or blank)
+    dp:      decimal point indicator (comma or period)
+             only specify as blank when places is zero
+    pos:     optional sign for positive numbers: '+', space or blank
+    neg:     optional sign for negative numbers: '-', '(', space or blank
+    trailneg:optional trailing minus indicator:  '-', ')', space or blank
+
+    &gt;&gt;&gt; d = Decimal('-1234567.8901')
+    &gt;&gt;&gt; moneyfmt(d, curr='$')
+    '-$1,234,567.89'
+    &gt;&gt;&gt; moneyfmt(d, places=0, sep='.', dp='', neg='', trailneg='-')
+    '1.234.568-'
+    &gt;&gt;&gt; moneyfmt(d, curr='$', neg='(', trailneg=')')
+    '($1,234,567.89)'
+    &gt;&gt;&gt; moneyfmt(Decimal(123456789), sep=' ')
+    '123 456 789.00'
+    &gt;&gt;&gt; moneyfmt(Decimal('-0.02'), neg='&lt;', trailneg='&gt;')
+    '&lt;.02&gt;'
+
+    """
+    q = Decimal((0, (1,), -places))    # 2 places --&gt; '0.01'
+    sign, digits, exp = value.quantize(q).as_tuple()
+    assert exp == -places    
+    result = []
+    digits = map(str, digits)
+    build, next = result.append, digits.pop
+    if sign:
+        build(trailneg)
+    for i in range(places):
+        if digits:
+            build(next())
+        else:
+            build('0')
+    build(dp)
+    i = 0
+    while digits:
+        build(next())
+        i += 1
+        if i == 3 and digits:
+            i = 0
+            build(sep)
+    build(curr)
+    if sign:
+        build(neg)
+    else:
+        build(pos)
+    result.reverse()
+    return ''.join(result)
+
+def pi():
+    """Compute Pi to the current precision.
+
+    &gt;&gt;&gt; print pi()
+    3.141592653589793238462643383
+    
+    """
+    getcontext().prec += 2  # extra digits for intermediate steps
+    three = Decimal(3)      # substitute "three=3.0" for regular floats
+    lasts, t, s, n, na, d, da = 0, three, 3, 1, 0, 0, 24
+    while s != lasts:
+        lasts = s
+        n, na = n+na, na+8
+        d, da = d+da, da+32
+        t = (t * n) / d
+        s += t
+    getcontext().prec -= 2
+    return +s               # unary plus applies the new precision
+
+def exp(x):
+    """Return e raised to the power of x.  Result type matches input type.
+
+    &gt;&gt;&gt; print exp(Decimal(1))
+    2.718281828459045235360287471
+    &gt;&gt;&gt; print exp(Decimal(2))
+    7.389056098930650227230427461
+    &gt;&gt;&gt; print exp(2.0)
+    7.38905609893
+    &gt;&gt;&gt; print exp(2+0j)
+    (7.38905609893+0j)
+    
+    """
+    getcontext().prec += 2
+    i, lasts, s, fact, num = 0, 0, 1, 1, 1
+    while s != lasts:
+        lasts = s    
+        i += 1
+        fact *= i
+        num *= x     
+        s += num / fact   
+    getcontext().prec -= 2        
+    return +s
+
+def cos(x):
+    """Return the cosine of x as measured in radians.
+
+    &gt;&gt;&gt; print cos(Decimal('0.5'))
+    0.8775825618903727161162815826
+    &gt;&gt;&gt; print cos(0.5)
+    0.87758256189
+    &gt;&gt;&gt; print cos(0.5+0j)
+    (0.87758256189+0j)
+    
+    """
+    getcontext().prec += 2
+    i, lasts, s, fact, num, sign = 0, 0, 1, 1, 1, 1
+    while s != lasts:
+        lasts = s    
+        i += 2
+        fact *= i * (i-1)
+        num *= x * x
+        sign *= -1
+        s += num / fact * sign 
+    getcontext().prec -= 2        
+    return +s
+
+def sin(x):
+    """Return the sine of x as measured in radians.
+
+    &gt;&gt;&gt; print sin(Decimal('0.5'))
+    0.4794255386042030002732879352
+    &gt;&gt;&gt; print sin(0.5)
+    0.479425538604
+    &gt;&gt;&gt; print sin(0.5+0j)
+    (0.479425538604+0j)
+    
+    """
+    getcontext().prec += 2
+    i, lasts, s, fact, num, sign = 1, 0, x, 1, x, 1
+    while s != lasts:
+        lasts = s    
+        i += 2
+        fact *= i * (i-1)
+        num *= x * x
+        sign *= -1
+        s += num / fact * sign 
+    getcontext().prec -= 2        
+    return +s
+</pre></div>                                             
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.6 working with threads"
+  href="decimal-threads.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.8 decimal FAQ"
+  href="decimal-faq.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-threads.html">6.3.6 Working with threads</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-faq.html">6.3.8 Decimal FAQ</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

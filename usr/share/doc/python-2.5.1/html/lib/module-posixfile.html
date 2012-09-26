@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-resource.html" />
+<link rel="prev" href="module-pipes.html" />
+<link rel="parent" href="unix.html" />
+<link rel="next" href="module-resource.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>16.12 posixfile -- File-like objects with locking support</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="16.11.1 template Objects"
+  href="template-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="16. unix Specific Services"
+  href="unix.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16.13 resource  "
+  href="module-resource.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="template-objects.html">16.11.1 Template Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="unix.html">16. Unix Specific Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-resource.html">16.13 resource  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00181200000000000000000">
+16.12 <tt class="module">posixfile</tt> --
+         File-like objects with locking support</a>
+</h1>
+
+<p>
+<a name="module-posixfile"></a>  
+<p class="availability">Availability: <span
+ class="platform">Unix</span>.</p>
+
+<p>
+<a id='l2h-3575' xml:id='l2h-3575'></a>
+<p>
+<div class="versionnote"><b>Deprecated since release 1.5.</b>
+The locking operation that this module provides is
+done better and more portably by the
+<tt class="function"><tt class="module"><a href="module-fcntl.html">fcntl</a></tt>.lockf()</tt> call.
+<a id='l2h-3577' xml:id='l2h-3577'></a></div><p></p>
+
+<p>
+This module implements some additional functionality over the built-in
+file objects.  In particular, it implements file locking, control over
+the file flags, and an easy interface to duplicate the file object.
+The module defines a new file object, the posixfile object.  It
+has all the standard file object methods and adds the methods
+described below.  This module only works for certain flavors of
+<span class="Unix">Unix</span>, since it uses <tt class="function">fcntl.fcntl()</tt> for file locking.<a id='l2h-3579' xml:id='l2h-3579'></a>
+<p>
+To instantiate a posixfile object, use the <tt class="function">open()</tt> function
+in the <tt class="module">posixfile</tt> module.  The resulting object looks and
+feels roughly the same as a standard file object.
+
+<p>
+The <tt class="module">posixfile</tt> module defines the following constants:
+
+<p>
+<dl><dt><b><tt id='l2h-3580' xml:id='l2h-3580'>SEEK_SET</tt></b></dt>
+<dd>
+Offset is calculated from the start of the file.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3581' xml:id='l2h-3581'>SEEK_CUR</tt></b></dt>
+<dd>
+Offset is calculated from the current position in the file.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3582' xml:id='l2h-3582'>SEEK_END</tt></b></dt>
+<dd>
+Offset is calculated from the end of the file.
+</dd></dl>
+
+<p>
+The <tt class="module">posixfile</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3583' xml:id='l2h-3583' class="function">open</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, mode</var><big>[</big><var>, bufsize</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+ Create a new posixfile object with the given filename and mode.  The
+ <var>filename</var>, <var>mode</var> and <var>bufsize</var> arguments are
+ interpreted the same way as by the built-in <tt class="function">open()</tt>
+ function.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3584' xml:id='l2h-3584' class="function">fileopen</tt></b>(</nobr></td>
+  <td><var>fileobject</var>)</td></tr></table></dt>
+<dd>
+ Create a new posixfile object with the given standard file object.
+ The resulting object has the same filename and mode as the original
+ file object.
+</dl>
+
+<p>
+The posixfile object defines the following additional methods:
+
+<p>
+
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3585' xml:id='l2h-3585' class="function">lock</tt></b>(</nobr></td>
+  <td><var>fmt, </var><big>[</big><var>len</var><big>[</big><var>, start</var><big>[</big><var>, whence</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+ Lock the specified section of the file that the file object is
+ referring to.  The format is explained
+ below in a table.  The <var>len</var> argument specifies the length of the
+ section that should be locked. The default is <code>0</code>. <var>start</var>
+ specifies the starting offset of the section, where the default is
+ <code>0</code>.  The <var>whence</var> argument specifies where the offset is
+ relative to. It accepts one of the constants <tt class="constant">SEEK_SET</tt>,
+ <tt class="constant">SEEK_CUR</tt> or <tt class="constant">SEEK_END</tt>.  The default is
+ <tt class="constant">SEEK_SET</tt>.  For more information about the arguments refer
+ to the <span class="manpage"><i>fcntl</i>(2)</span> manual page on your system.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3586' xml:id='l2h-3586' class="function">flags</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>flags</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+ Set the specified flags for the file that the file object is referring
+ to.  The new flags are ORed with the old flags, unless specified
+ otherwise.  The format is explained below in a table.  Without
+ the <var>flags</var> argument
+ a string indicating the current flags is returned (this is
+ the same as the "<tt class="samp">?</tt>" modifier).  For more information about the
+ flags refer to the <span class="manpage"><i>fcntl</i>(2)</span> manual page on your system.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3587' xml:id='l2h-3587' class="function">dup</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+ Duplicate the file object and the underlying file pointer and file
+ descriptor.  The resulting object behaves as if it were newly
+ opened.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3588' xml:id='l2h-3588' class="function">dup2</tt></b>(</nobr></td>
+  <td><var>fd</var>)</td></tr></table></dt>
+<dd>
+ Duplicate the file object and the underlying file pointer and file
+ descriptor.  The new object will have the given file descriptor.
+ Otherwise the resulting object behaves as if it were newly opened.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3589' xml:id='l2h-3589' class="function">file</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+ Return the standard file object that the posixfile object is based
+ on.  This is sometimes necessary for functions that insist on a
+ standard file object.
+</dl>
+
+<p>
+All methods raise <tt class="exception">IOError</tt> when the request fails.
+
+<p>
+Format characters for the <tt class="method">lock()</tt> method have the following
+meaning:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Format</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><samp>u</samp></td>
+        <td class="left"  >unlock the specified region</td></tr>
+    <tr><td class="center" valign="baseline"><samp>r</samp></td>
+        <td class="left"  >request a read lock for the specified section</td></tr>
+    <tr><td class="center" valign="baseline"><samp>w</samp></td>
+        <td class="left"  >request a write lock for the specified section</td></tr></tbody>
+</table></div>
+
+<p>
+In addition the following modifiers can be added to the format:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Modifier</th>
+      <th class="left"  >Meaning</th>
+      <th class="center">Notes</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><samp>|</samp></td>
+        <td class="left"  >wait until the lock has been granted</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><samp>?</samp></td>
+        <td class="left"  >return the first lock conflicting with the requested lock, or
+              <code>None</code> if there is no conflict.</td>
+        <td class="center">(1)</td></tr></tbody>
+</table></div>
+
+<p>
+Note:
+
+<p>
+<dl>
+<dt><strong>(1)</strong></dt>
+<dd>The lock returned is in the format <code>(<var>mode</var>, <var>len</var>,
+<var>start</var>, <var>whence</var>, <var>pid</var>)</code> where <var>mode</var> is a character
+representing the type of lock ('r' or 'w').  This modifier prevents a
+request from being granted; it is for query purposes only.
+</dd>
+</dl>
+
+<p>
+Format characters for the <tt class="method">flags()</tt> method have the following
+meanings:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Format</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><samp>a</samp></td>
+        <td class="left"  >append only flag</td></tr>
+    <tr><td class="center" valign="baseline"><samp>c</samp></td>
+        <td class="left"  >close on exec flag</td></tr>
+    <tr><td class="center" valign="baseline"><samp>n</samp></td>
+        <td class="left"  >no delay flag (also called non-blocking flag)</td></tr>
+    <tr><td class="center" valign="baseline"><samp>s</samp></td>
+        <td class="left"  >synchronization flag</td></tr></tbody>
+</table></div>
+
+<p>
+In addition the following modifiers can be added to the format:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Modifier</th>
+      <th class="left"  >Meaning</th>
+      <th class="center">Notes</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><samp>!</samp></td>
+        <td class="left"  >turn the specified flags 'off', instead of the default 'on'</td>
+        <td class="center">(1)</td></tr>
+    <tr><td class="center" valign="baseline"><samp>=</samp></td>
+        <td class="left"  >replace the flags, instead of the default 'OR' operation</td>
+        <td class="center">(1)</td></tr>
+    <tr><td class="center" valign="baseline"><samp>?</samp></td>
+        <td class="left"  >return a string in which the characters represent the flags that
+  are set.</td>
+        <td class="center">(2)</td></tr></tbody>
+</table></div>
+
+<p>
+Notes:
+
+<p>
+<dl>
+<dt><strong>(1)</strong></dt>
+<dd>The "<tt class="samp">!</tt>" and "<tt class="samp">=</tt>" modifiers are mutually exclusive.
+
+<p>
+</dd>
+<dt><strong>(2)</strong></dt>
+<dd>This string represents the flags after they may have been altered
+by the same call.
+</dd>
+</dl>
+
+<p>
+Examples:
+
+<p>
+<div class="verbatim"><pre>
+import posixfile
+
+file = posixfile.open('/tmp/test', 'w')
+file.lock('w|')
+...
+file.lock('u')
+file.close()
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="16.11.1 template Objects"
+  href="template-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="16. unix Specific Services"
+  href="unix.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16.13 resource  "
+  href="module-resource.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="template-objects.html">16.11.1 Template Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="unix.html">16. Unix Specific Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-resource.html">16.13 resource  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

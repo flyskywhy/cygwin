@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-sndhdr.html" />
+<link rel="parent" href="mmedia.html" />
+<link rel="next" href="ossaudio-device-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>19.11 ossaudiodev -- Access to OSS-compatible audio devices</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.10 sndhdr  "
+  href="module-sndhdr.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.11.1 audio Device Objects"
+  href="ossaudio-device-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-sndhdr.html">19.10 sndhdr  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ossaudio-device-objects.html">19.11.1 Audio Device Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00211100000000000000000">
+19.11 <tt class="module">ossaudiodev</tt> --
+         Access to OSS-compatible audio devices</a>
+</h1>
+
+<p>
+<a name="module-ossaudiodev"></a>
+<p class="availability">Availability: <span
+ class="platform">Linux, FreeBSD</span>.</p>
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+This module allows you to access the OSS (Open Sound System) audio
+interface.  OSS is available for a wide range of open-source and
+commercial Unices, and is the standard audio interface for Linux and
+recent versions of FreeBSD.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://www.opensound.com/pguide/oss.pdf"
+        >Open Sound System Programmer's Guide</a></em></dt>
+    <dd>the official
+         documentation for the OSS C API</dd>
+  </dl>
+<div class="seetext"><p>The module defines a large number of constants supplied by
+         the OSS device driver; see <code>&lt;sys/soundcard.h&gt;</code> on either
+         Linux or FreeBSD for a listing .</p></div>
+</div>
+
+<p>
+<tt class="module">ossaudiodev</tt> defines the following variables and functions:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4665' xml:id='l2h-4665' class="exception">OSSAudioError</tt></b></dt>
+<dd>
+This exception is raised on certain errors.  The argument is a string
+describing what went wrong.
+
+<p>
+(If <tt class="module">ossaudiodev</tt> receives an error from a system call such as
+<tt class="cfunction">open()</tt>, <tt class="cfunction">write()</tt>, or <tt class="cfunction">ioctl()</tt>, it
+raises <tt class="exception">IOError</tt>.  Errors detected directly by
+<tt class="module">ossaudiodev</tt> result in <tt class="exception">OSSAudioError</tt>.)
+
+<p>
+(For backwards compatibility, the exception class is also available as
+<code>ossaudiodev.error</code>.)
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4666' xml:id='l2h-4666' class="function">open</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>device, </var><big>]</big><var>mode</var>)</td></tr></table></dt>
+<dd>
+Open an audio device and return an OSS audio device object.  This
+object supports many file-like methods, such as <tt class="method">read()</tt>,
+<tt class="method">write()</tt>, and <tt class="method">fileno()</tt> (although there are subtle
+differences between conventional <span class="Unix">Unix</span> read/write semantics and those of
+OSS audio devices).  It also supports a number of audio-specific
+methods; see below for the complete list of methods.
+
+<p>
+<var>device</var> is the audio device filename to use.  If it is not
+specified, this module first looks in the environment variable
+<a class="envvar" id='l2h-4668' xml:id='l2h-4668'>AUDIODEV</a> for a device to use.  If not found, it falls back to
+<span class="file">/dev/dsp</span>.
+
+<p>
+<var>mode</var> is one of <code>'r'</code> for read-only (record) access,
+<code>'w'</code> for write-only (playback) access and <code>'rw'</code> for both.
+Since many sound cards only allow one process to have the recorder or
+player open at a time, it is a good idea to open the device only for the
+activity needed.  Further, some sound cards are half-duplex: they can be
+opened for reading or writing, but not both at once.
+
+<p>
+Note the unusual calling syntax: the <em>first</em> argument is optional,
+and the second is required.  This is a historical artifact for
+compatibility with the older <tt class="module">linuxaudiodev</tt> module which
+<tt class="module">ossaudiodev</tt> supersedes.  </dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4667' xml:id='l2h-4667' class="function">openmixer</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>device</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open a mixer device and return an OSS mixer device object.  
+<var>device</var> is the mixer device filename to use.  If it is
+not specified, this module first looks in the environment variable
+<a class="envvar" id='l2h-4669' xml:id='l2h-4669'>MIXERDEV</a> for a device to use.  If not found, it falls back to
+<span class="file">/dev/mixer</span>.
+
+<p>
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="ossaudio-device-objects.html">19.11.1 Audio Device Objects</a>
+<li><a href="mixer-device-objects.html">19.11.2 Mixer Device Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.10 sndhdr  "
+  href="module-sndhdr.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.11.1 audio Device Objects"
+  href="ossaudio-device-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-sndhdr.html">19.10 sndhdr  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ossaudio-device-objects.html">19.11.1 Audio Device Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

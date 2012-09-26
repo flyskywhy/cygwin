@@ -1,0 +1,552 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-itertools.html" />
+<link rel="prev" href="module-decimal.html" />
+<link rel="parent" href="numeric.html" />
+<link rel="next" href="module-itertools.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.4 random -- Generate pseudo-random numbers</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.8 decimal FAQ"
+  href="decimal-faq.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. numeric and Mathematical"
+  href="numeric.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.5 itertools  "
+  href="module-itertools.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-faq.html">6.3.8 Decimal FAQ</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="numeric.html">6. Numeric and Mathematical</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-itertools.html">6.5 itertools  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008400000000000000000">
+6.4 <tt class="module">random</tt> --
+         Generate pseudo-random numbers</a>
+</h1>
+
+<p>
+<a name="module-random"></a>
+
+<p>
+This module implements pseudo-random number generators for various
+distributions.
+
+<p>
+For integers, uniform selection from a range.
+For sequences, uniform selection of a random element, a function to
+generate a random permutation of a list in-place, and a function for
+random sampling without replacement.
+
+<p>
+On the real line, there are functions to compute uniform, normal (Gaussian),
+lognormal, negative exponential, gamma, and beta distributions.
+For generating distributions of angles, the von Mises distribution
+is available.
+
+<p>
+Almost all module functions depend on the basic function
+<tt class="function">random()</tt>, which generates a random float uniformly in
+the semi-open range [0.0, 1.0).  Python uses the Mersenne Twister as
+the core generator.  It produces 53-bit precision floats and has a
+period of 2**19937-1.  The underlying implementation in C
+is both fast and threadsafe.  The Mersenne Twister is one of the most
+extensively tested random number generators in existence.  However, being
+completely deterministic, it is not suitable for all purposes, and is
+completely unsuitable for cryptographic purposes.
+
+<p>
+The functions supplied by this module are actually bound methods of a
+hidden instance of the <tt class="class">random.Random</tt> class.  You can
+instantiate your own instances of <tt class="class">Random</tt> to get generators
+that don't share state.  This is especially useful for multi-threaded
+programs, creating a different instance of <tt class="class">Random</tt> for each
+thread, and using the <tt class="method">jumpahead()</tt> method to make it likely that the
+generated sequences seen by each thread don't overlap.
+
+<p>
+Class <tt class="class">Random</tt> can also be subclassed if you want to use a
+different basic generator of your own devising: in that case, override
+the <tt class="method">random()</tt>, <tt class="method">seed()</tt>, <tt class="method">getstate()</tt>,
+<tt class="method">setstate()</tt> and <tt class="method">jumpahead()</tt> methods.
+Optionally, a new generator can supply a <tt class="method">getrandombits()</tt>
+method -- this allows <tt class="method">randrange()</tt> to produce selections
+over an arbitrarily large range.
+
+<span class="versionnote">New in version 2.4:
+the <tt class="method">getrandombits()</tt> method.</span>
+
+<p>
+As an example of subclassing, the <tt class="module">random</tt> module provides
+the <tt class="class">WichmannHill</tt> class that implements an alternative generator
+in pure Python.  The class provides a backward compatible way to
+reproduce results from earlier versions of Python, which used the
+Wichmann-Hill algorithm as the core generator.  Note that this Wichmann-Hill
+generator can no longer be recommended:  its period is too short by
+contemporary standards, and the sequence generated is known to fail some
+stringent randomness tests.  See the references below for a recent
+variant that repairs these flaws.
+
+<span class="versionnote">Changed in version 2.3:
+Substituted MersenneTwister for Wichmann-Hill.</span>
+
+<p>
+Bookkeeping functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1035' xml:id='l2h-1035' class="function">seed</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>x</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Initialize the basic random number generator.
+  Optional argument <var>x</var> can be any hashable object.
+  If <var>x</var> is omitted or <code>None</code>, current system time is used;
+  current system time is also used to initialize the generator when the
+  module is first imported.  If randomness sources are provided by the
+  operating system, they are used instead of the system time (see the
+  <tt class="function">os.urandom()</tt>
+  function for details on availability).  
+<span class="versionnote">Changed in version 2.4:
+formerly,
+  operating system resources were not used.</span>
+
+  If <var>x</var> is not <code>None</code> or an int or long,
+  <code>hash(<var>x</var>)</code> is used instead.
+  If <var>x</var> is an int or long, <var>x</var> is used directly.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1036' xml:id='l2h-1036' class="function">getstate</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return an object capturing the current internal state of the
+  generator.  This object can be passed to <tt class="function">setstate()</tt> to
+  restore the state.
+  
+<span class="versionnote">New in version 2.1.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1037' xml:id='l2h-1037' class="function">setstate</tt></b>(</nobr></td>
+  <td><var>state</var>)</td></tr></table></dt>
+<dd>
+  <var>state</var> should have been obtained from a previous call to
+  <tt class="function">getstate()</tt>, and <tt class="function">setstate()</tt> restores the
+  internal state of the generator to what it was at the time
+  <tt class="function">setstate()</tt> was called.
+  
+<span class="versionnote">New in version 2.1.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1038' xml:id='l2h-1038' class="function">jumpahead</tt></b>(</nobr></td>
+  <td><var>n</var>)</td></tr></table></dt>
+<dd>
+  Change the internal state to one different from and likely far away from
+  the current state.  <var>n</var> is a non-negative integer which is used to
+  scramble the current state vector.  This is most useful in multi-threaded
+  programs, in conjuction with multiple instances of the <tt class="class">Random</tt>
+  class: <tt class="method">setstate()</tt> or <tt class="method">seed()</tt> can be used to force all
+  instances into the same internal state, and then <tt class="method">jumpahead()</tt>
+  can be used to force the instances' states far apart.
+  
+<span class="versionnote">New in version 2.1.</span>
+
+<span class="versionnote">Changed in version 2.3:
+Instead of jumping to a specific state, <var>n</var> steps
+  ahead, <tt class="method">jumpahead(<var>n</var>)</tt> jumps to another state likely to be
+  separated by many steps.</span>
+
+ </dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1039' xml:id='l2h-1039' class="function">getrandbits</tt></b>(</nobr></td>
+  <td><var>k</var>)</td></tr></table></dt>
+<dd>
+  Returns a python <tt class="class">long</tt> int with <var>k</var> random bits.
+  This method is supplied with the MersenneTwister generator and some
+  other generators may also provide it as an optional part of the API.
+  When available, <tt class="method">getrandbits()</tt> enables <tt class="method">randrange()</tt>
+  to handle arbitrarily large ranges.
+  
+<span class="versionnote">New in version 2.4.</span>
+
+</dl>
+
+<p>
+Functions for integers:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1040' xml:id='l2h-1040' class="function">randrange</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>start,</var><big>]</big><var> stop</var><big>[</big><var>, step</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return a randomly selected element from <code>range(<var>start</var>,
+  <var>stop</var>, <var>step</var>)</code>.  This is equivalent to
+  <code>choice(range(<var>start</var>, <var>stop</var>, <var>step</var>))</code>,
+  but doesn't actually build a range object.
+  
+<span class="versionnote">New in version 1.5.2.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1041' xml:id='l2h-1041' class="function">randint</tt></b>(</nobr></td>
+  <td><var>a, b</var>)</td></tr></table></dt>
+<dd>
+  Return a random integer <var>N</var> such that
+  <code><var>a</var> &lt;= <var>N</var> &lt;= <var>b</var></code>.
+</dl>
+
+<p>
+Functions for sequences:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1042' xml:id='l2h-1042' class="function">choice</tt></b>(</nobr></td>
+  <td><var>seq</var>)</td></tr></table></dt>
+<dd>
+  Return a random element from the non-empty sequence <var>seq</var>.
+  If <var>seq</var> is empty, raises <tt class="exception">IndexError</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1043' xml:id='l2h-1043' class="function">shuffle</tt></b>(</nobr></td>
+  <td><var>x</var><big>[</big><var>, random</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Shuffle the sequence <var>x</var> in place.
+  The optional argument <var>random</var> is a 0-argument function
+  returning a random float in [0.0, 1.0); by default, this is the
+  function <tt class="function">random()</tt>.
+
+<p>
+Note that for even rather small <code>len(<var>x</var>)</code>, the total
+  number of permutations of <var>x</var> is larger than the period of most
+  random number generators; this implies that most permutations of a
+  long sequence can never be generated.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1044' xml:id='l2h-1044' class="function">sample</tt></b>(</nobr></td>
+  <td><var>population, k</var>)</td></tr></table></dt>
+<dd>
+  Return a <var>k</var> length list of unique elements chosen from the
+  population sequence.  Used for random sampling without replacement.
+  
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+Returns a new list containing elements from the population while
+  leaving the original population unchanged.  The resulting list is
+  in selection order so that all sub-slices will also be valid random
+  samples.  This allows raffle winners (the sample) to be partitioned
+  into grand prize and second place winners (the subslices).
+
+<p>
+Members of the population need not be hashable or unique.  If the
+  population contains repeats, then each occurrence is a possible
+  selection in the sample.
+
+<p>
+To choose a sample from a range of integers, use an <tt class="function">xrange()</tt>
+  object as an argument.  This is especially fast and space efficient for
+  sampling from a large population:  <code>sample(xrange(10000000), 60)</code>.
+</dl>
+
+<p>
+The following functions generate specific real-valued distributions.
+Function parameters are named after the corresponding variables in the
+distribution's equation, as used in common mathematical practice; most of
+these equations can be found in any statistics text.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1045' xml:id='l2h-1045' class="function">random</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the next random floating point number in the range [0.0, 1.0).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1046' xml:id='l2h-1046' class="function">uniform</tt></b>(</nobr></td>
+  <td><var>a, b</var>)</td></tr></table></dt>
+<dd>
+  Return a random real number <var>N</var> such that
+  <code><var>a</var> &lt;= <var>N</var> &lt; <var>b</var></code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1047' xml:id='l2h-1047' class="function">betavariate</tt></b>(</nobr></td>
+  <td><var>alpha, beta</var>)</td></tr></table></dt>
+<dd>
+  Beta distribution.  Conditions on the parameters are
+  <code><var>alpha</var> &gt; 0</code> and <code><var>beta</var> &gt; 0</code>.
+  Returned values range between 0 and 1.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1048' xml:id='l2h-1048' class="function">expovariate</tt></b>(</nobr></td>
+  <td><var>lambd</var>)</td></tr></table></dt>
+<dd>
+  Exponential distribution.  <var>lambd</var> is 1.0 divided by the desired
+  mean.  (The parameter would be called ``lambda'', but that is a
+  reserved word in Python.)  Returned values range from 0 to
+  positive infinity.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1049' xml:id='l2h-1049' class="function">gammavariate</tt></b>(</nobr></td>
+  <td><var>alpha, beta</var>)</td></tr></table></dt>
+<dd>
+  Gamma distribution.  (<em>Not</em> the gamma function!)  Conditions on
+  the parameters are <code><var>alpha</var> &gt; 0</code> and <code><var>beta</var> &gt; 0</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1050' xml:id='l2h-1050' class="function">gauss</tt></b>(</nobr></td>
+  <td><var>mu, sigma</var>)</td></tr></table></dt>
+<dd>
+  Gaussian distribution.  <var>mu</var> is the mean, and <var>sigma</var> is the
+  standard deviation.  This is slightly faster than the
+  <tt class="function">normalvariate()</tt> function defined below.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1051' xml:id='l2h-1051' class="function">lognormvariate</tt></b>(</nobr></td>
+  <td><var>mu, sigma</var>)</td></tr></table></dt>
+<dd>
+  Log normal distribution.  If you take the natural logarithm of this
+  distribution, you'll get a normal distribution with mean <var>mu</var>
+  and standard deviation <var>sigma</var>.  <var>mu</var> can have any value,
+  and <var>sigma</var> must be greater than zero.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1052' xml:id='l2h-1052' class="function">normalvariate</tt></b>(</nobr></td>
+  <td><var>mu, sigma</var>)</td></tr></table></dt>
+<dd>
+  Normal distribution.  <var>mu</var> is the mean, and <var>sigma</var> is the
+  standard deviation.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1053' xml:id='l2h-1053' class="function">vonmisesvariate</tt></b>(</nobr></td>
+  <td><var>mu, kappa</var>)</td></tr></table></dt>
+<dd>
+  <var>mu</var> is the mean angle, expressed in radians between 0 and
+  2*<em>pi</em>, and <var>kappa</var> is the concentration parameter, which
+  must be greater than or equal to zero.  If <var>kappa</var> is equal to
+  zero, this distribution reduces to a uniform random angle over the
+  range 0 to 2*<em>pi</em>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1054' xml:id='l2h-1054' class="function">paretovariate</tt></b>(</nobr></td>
+  <td><var>alpha</var>)</td></tr></table></dt>
+<dd>
+  Pareto distribution.  <var>alpha</var> is the shape parameter.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1055' xml:id='l2h-1055' class="function">weibullvariate</tt></b>(</nobr></td>
+  <td><var>alpha, beta</var>)</td></tr></table></dt>
+<dd>
+  Weibull distribution.  <var>alpha</var> is the scale parameter and
+  <var>beta</var> is the shape parameter.
+</dl>
+
+<p>
+Alternative Generators:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1056' xml:id='l2h-1056' class="class">WichmannHill</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>seed</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Class that implements the Wichmann-Hill algorithm as the core generator.
+Has all of the same methods as <tt class="class">Random</tt> plus the <tt class="method">whseed()</tt>
+method described below.  Because this class is implemented in pure
+Python, it is not threadsafe and may require locks between calls.  The
+period of the generator is 6,953,607,871,644 which is small enough to
+require care that two independent random sequences do not overlap.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1057' xml:id='l2h-1057' class="function">whseed</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>x</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  This is obsolete, supplied for bit-level compatibility with versions
+  of Python prior to 2.1.
+  See <tt class="function">seed()</tt> for details.  <tt class="function">whseed()</tt> does not guarantee
+  that distinct integer arguments yield distinct internal states, and can
+  yield no more than about 2**24 distinct internal states in all.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1058' xml:id='l2h-1058' class="class">SystemRandom</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>seed</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Class that uses the <tt class="function">os.urandom()</tt> function for generating
+random numbers from sources provided by the operating system.
+Not available on all systems.
+Does not rely on software state and sequences are not reproducible.
+Accordingly, the <tt class="method">seed()</tt> and <tt class="method">jumpahead()</tt> methods
+have no effect and are ignored.  The <tt class="method">getstate()</tt> and
+<tt class="method">setstate()</tt> methods raise <tt class="exception">NotImplementedError</tt> if
+called.
+
+<span class="versionnote">New in version 2.4.</span>
+
+</dl>
+
+<p>
+Examples of basic usage:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; random.random()        # Random float x, 0.0 &lt;= x &lt; 1.0
+0.37444887175646646
+&gt;&gt;&gt; random.uniform(1, 10)  # Random float x, 1.0 &lt;= x &lt; 10.0
+1.1800146073117523
+&gt;&gt;&gt; random.randint(1, 10)  # Integer from 1 to 10, endpoints included
+7
+&gt;&gt;&gt; random.randrange(0, 101, 2)  # Even integer from 0 to 100
+26
+&gt;&gt;&gt; random.choice('abcdefghij')  # Choose a random element
+'c'
+
+&gt;&gt;&gt; items = [1, 2, 3, 4, 5, 6, 7]
+&gt;&gt;&gt; random.shuffle(items)
+&gt;&gt;&gt; items
+[7, 3, 2, 5, 6, 4, 1]
+
+&gt;&gt;&gt; random.sample([1, 2, 3, 4, 5],  3)  # Choose 3 elements
+[4, 1, 5]
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <div class="seetext"><p>M. Matsumoto and T. Nishimura, ``Mersenne Twister: A
+	   623-dimensionally equidistributed uniform pseudorandom
+	   number generator'',
+	   <em class="citetitle"
+ >ACM Transactions on Modeling and Computer Simulation</em>
+	   Vol. 8, No. 1, January pp.3-30 1998.</p></div>
+
+<p>
+<div class="seetext"><p>Wichmann, B. A. &amp; Hill, I. D., ``Algorithm AS 183:
+           An efficient and portable pseudo-random number generator'',
+           <em class="citetitle"
+ >Applied Statistics</em> 31 (1982) 188-190.</p></div>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.npl.co.uk/ssfm/download/abstracts.html#196"
+        class="url">http://www.npl.co.uk/ssfm/download/abstracts.html#196</a></dt>
+    <dd>A modern
+          variation of the Wichmann-Hill generator that greatly increases
+          the period, and passes now-standard statistical tests that the
+          original generator failed.</dd>
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.8 decimal FAQ"
+  href="decimal-faq.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. numeric and Mathematical"
+  href="numeric.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.5 itertools  "
+  href="module-itertools.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-faq.html">6.3.8 Decimal FAQ</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="numeric.html">6. Numeric and Mathematical</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-itertools.html">6.5 itertools  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,369 @@
+.TH "Module" Printf "2004-08-26" OCamldoc "OCaml library"
+.SH NAME
+Printf \- Formatted output functions.
+.SH Module
+Module   Printf
+.SH Documentation
+.sp
+Module
+.BI "Printf"
+ : 
+.B sig  end
+
+.sp
+Formatted output functions.
+.sp
+
+.sp
+
+.sp
+.sp
+
+.I val fprintf 
+: 
+.B Pervasives.out_channel ->
+.B   ('a, Pervasives.out_channel, unit) Pervasives.format -> 'a
+.sp
+
+.B fprintf outchan format arg1 ... argN
+formats the arguments
+.B arg1
+to 
+.B argN
+according to the format string 
+.B format
+,
+and outputs the resulting string on the channel 
+.B outchan
+.
+.sp
+The format is a character string which contains two types of
+objects:  plain  characters, which are simply copied to the
+output channel, and conversion specifications, each of which
+causes  conversion and printing of one argument.
+.sp
+Conversion specifications consist in the 
+.B %
+character, followed
+by optional flags and field widths, followed by one or two conversion
+character. The conversion characters and their meanings are:.TP
+""
+.B d
+, 
+.B i
+, 
+.B n
+, or 
+.B N
+: convert an integer argument to signed decimal.
+.TP
+""
+.B u
+: convert an integer argument to unsigned decimal.
+.TP
+""
+.B x
+: convert an integer argument to unsigned hexadecimal,
+using lowercase letters.
+.TP
+""
+.B X
+: convert an integer argument to unsigned hexadecimal,
+using uppercase letters.
+.TP
+""
+.B o
+: convert an integer argument to unsigned octal.
+.TP
+""
+.B s
+: insert a string argument.
+.TP
+""
+.B S
+: insert a string argument in Caml syntax (double quotes, escapes).
+.TP
+""
+.B c
+: insert a character argument.
+.TP
+""
+.B C
+: insert a character argument in Caml syntax (single quotes, escapes).
+.TP
+""
+.B f
+: convert a floating-point argument to decimal notation,
+in the style 
+.B dddd.ddd
+.
+.TP
+""
+.B F
+: convert a floating-point argument in Caml syntax (
+.B dddd.ddd
+with a mandatory 
+.B .
+).
+.TP
+""
+.B e
+or 
+.B E
+: convert a floating-point argument to decimal notation,
+in the style 
+.B d.ddd e+-dd
+(mantissa and exponent).
+.TP
+""
+.B g
+or 
+.B G
+: convert a floating-point argument to decimal notation,
+in style 
+.B f
+or 
+.B e
+, 
+.B E
+(whichever is more compact).
+.TP
+""
+.B B
+: convert a boolean argument to the string 
+.B true
+or 
+.B false
+.TP
+""
+.B b
+: convert a boolean argument (for backward compatibility; do not
+use in new programs).
+.TP
+""
+.B ld
+, 
+.B li
+, 
+.B lu
+, 
+.B lx
+, 
+.B lX
+, 
+.B lo
+: convert an 
+.B int32
+argument to
+the format specified by the second letter (decimal, hexadecimal, etc).
+.TP
+""
+.B nd
+, 
+.B ni
+, 
+.B nu
+, 
+.B nx
+, 
+.B nX
+, 
+.B no
+: convert a 
+.B nativeint
+argument to
+the format specified by the second letter.
+.TP
+""
+.B Ld
+, 
+.B Li
+, 
+.B Lu
+, 
+.B Lx
+, 
+.B LX
+, 
+.B Lo
+: convert an 
+.B int64
+argument to
+the format specified by the second letter.
+.TP
+""
+.B a
+: user-defined printer. Takes two arguments and apply the first
+one to 
+.B outchan
+(the current output channel) and to the second
+argument. The first argument must therefore have type
+.B out_channel -> 'b -> unit
+and the second 
+.B 'b
+.
+The output produced by the function is therefore inserted
+in the output of 
+.B fprintf
+at the current point.
+.TP
+""
+.B t
+: same as 
+.B %a
+, but takes only one argument (with type
+.B out_channel -> unit
+) and apply it to 
+.B outchan
+.
+.TP
+""
+.B !
+: take no argument and flush the output.
+.TP
+""
+.B %
+: take no argument and output one 
+.B %
+character.
+
+The optional flags include:.TP
+""
+.B -
+: left-justify the output (default is right justification).
+.TP
+""
+.B 0
+: for numerical conversions, pad with zeroes instead of spaces.
+.TP
+""
+.B +
+: for numerical conversions, prefix number with a 
+.B +
+sign if positive.
+.TP
+""
+space: for numerical conversions, prefix number with a space if positive.
+.TP
+""
+.B #
+: request an alternate formatting style for numbers.
+
+The field widths are composed of an optional integer literal
+indicating the minimal width of the result, possibly followed by
+a dot 
+.B .
+and another integer literal indicating how many digits
+follow the decimal point in the 
+.B %f
+, 
+.B %e
+, and 
+.B %E
+conversions.
+For instance, 
+.B %6d
+prints an integer, prefixing it with spaces to
+fill at least 6 characters; and 
+.B %.4f
+prints a float with 4
+fractional digits.  Each or both of the integer literals can also be
+specified as a 
+.B *
+, in which case an extra integer argument is taken
+to specify the corresponding width or precision.
+.sp
+Warning: if too few arguments are provided,
+for instance because the 
+.B printf
+function is partially
+applied, the format is immediately printed up to
+the conversion of the first missing argument; printing
+will then resume when the missing arguments are provided.
+For example, 
+.B List.iter (printf "x=%d y=%d " 1) [2;3]
+prints 
+.B x=1 y=2 3
+instead of the expected
+.B x=1 y=2 x=1 y=3
+.  To get the expected behavior, do
+.B List.iter (fun y -> printf "x=%d y=%d " 1 y) [2;3]
+.
+.sp
+
+.sp
+
+.I val printf 
+: 
+.B ('a, Pervasives.out_channel, unit) Pervasives.format -> 'a
+.sp
+Same as 
+.B Printf.fprintf
+, but output on 
+.B stdout
+.
+.sp
+
+.sp
+
+.I val eprintf 
+: 
+.B ('a, Pervasives.out_channel, unit) Pervasives.format -> 'a
+.sp
+Same as 
+.B Printf.fprintf
+, but output on 
+.B stderr
+.
+.sp
+
+.sp
+
+.I val sprintf 
+: 
+.B ('a, unit, string) Pervasives.format -> 'a
+.sp
+Same as 
+.B Printf.fprintf
+, but instead of printing on an output channel,
+return a string containing the result of formatting
+the arguments.
+.sp
+
+.sp
+
+.I val bprintf 
+: 
+.B Buffer.t -> ('a, Buffer.t, unit) Pervasives.format -> 'a
+.sp
+Same as 
+.B Printf.fprintf
+, but instead of printing on an output channel,
+append the formatted arguments to the given extensible buffer
+(see module 
+.B Buffer
+).
+.sp
+
+.sp
+
+.I val kprintf 
+: 
+.B (string -> 'a) -> ('b, unit, string, 'a) format4 -> 'b
+.sp
+
+.B kprintf k format arguments
+is the same as 
+.B sprintf format arguments
+,
+except that the resulting string is passed as argument to 
+.B k
+; the
+result of 
+.B k
+is then returned as the result of 
+.B kprintf
+.
+.sp
+
+.sp

@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="creating-rpms.html" />
+<link rel="parent" href="built-dist.html" />
+<link rel="next" href="package-index.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.3 Creating Windows Installers</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.2 creating RPM packages"
+  href="creating-rpms.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. creating Built Distributions"
+  href="built-dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6. registering with the"
+  href="package-index.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="creating-rpms.html">5.2 Creating RPM packages</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="built-dist.html">5. Creating Built Distributions</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="package-index.html">6. Registering with the</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="postinstallation-script.html#SECTION005310000000000000000">5.3.1 The Postinstallation script</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION005300000000000000000"></a>
+<a name="creating-wininst"></a>
+<br>
+5.3 Creating Windows Installers
+</h1>
+
+<p>
+Executable installers are the natural format for binary distributions
+on Windows.  They display a nice graphical user interface, display
+some information about the module distribution to be installed taken
+from the metadata in the setup script, let the user select a few
+options, and start or cancel the installation.
+
+<p>
+Since the metadata is taken from the setup script, creating Windows
+installers is usually as easy as running:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist_wininst
+</pre></div>
+
+<p>
+or the <code class="du-command">bdist</code> command with the <b class="programopt">--formats</b> option:
+
+<p>
+<div class="verbatim"><pre>
+python setup.py bdist --formats=wininst
+</pre></div>
+
+<p>
+If you have a pure module distribution (only containing pure Python
+modules and packages), the resulting installer will be version
+independent and have a name like <span class="file">foo-1.0.win32.exe</span>.  These
+installers can even be created on <span class="Unix">Unix</span> or Mac OS platforms.
+
+<p>
+If you have a non-pure distribution, the extensions can only be
+created on a Windows platform, and will be Python version dependent.
+The installer filename will reflect this and now has the form
+<span class="file">foo-1.0.win32-py2.0.exe</span>.  You have to create a separate installer
+for every Python version you want to support.
+
+<p>
+The installer will try to compile pure modules into bytecode after
+installation on the target system in normal and optimizing mode.  If
+you don't want this to happen for some reason, you can run the
+<code class="du-command">bdist_wininst</code> command with the
+<b class="programopt">--no-target-compile</b> and/or the
+<b class="programopt">--no-target-optimize</b> option.
+
+<p>
+By default the installer will display the cool ``Python Powered'' logo
+when it is run, but you can also supply your own bitmap which must be
+a Windows <span class="file">.bmp</span> file with the <b class="programopt">--bitmap</b> option.
+
+<p>
+The installer will also display a large title on the desktop
+background window when it is run, which is constructed from the name
+of your distribution and the version number.  This can be changed to
+another text by using the <b class="programopt">--title</b> option.
+
+<p>
+The installer file will be written to the ``distribution directory''
+-- normally <span class="file">dist/</span>, but customizable with the
+<b class="programopt">--dist-dir</b> option.
+
+<p>
+
+<h2><a name="SECTION005310000000000000000"></a>
+<a name="postinstallation-script"></a>
+<br>
+5.3.1 The Postinstallation script
+</h2>
+
+<p>
+Starting with Python 2.3, a postinstallation script can be specified
+which the <b class="programopt">--install-script</b> option.  The basename of the
+script must be specified, and the script filename must also be listed
+in the scripts argument to the setup function.
+
+<p>
+This script will be run at installation time on the target system
+after all the files have been copied, with <code>argv[1]</code> set to
+<b class="programopt">-install</b>, and again at uninstallation time before the
+files are removed with <code>argv[1]</code> set to <b class="programopt">-remove</b>.
+
+<p>
+The installation script runs embedded in the windows installer, every
+output (<code>sys.stdout</code>, <code>sys.stderr</code>) is redirected into a
+buffer and will be displayed in the GUI after the script has finished.
+
+<p>
+Some functions especially useful in this context are available as
+additional built-in functions in the installation script.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1' xml:id='l2h-1' class="function">directory_created</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">file_created</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>  These functions should be called when a directory or file is created
+  by the postinstall script at installation time.  It will register
+  <var>path</var> with the uninstaller, so that it will be removed when the
+  distribution is uninstalled.  To be safe, directories are only removed
+  if they are empty.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3' xml:id='l2h-3' class="function">get_special_folder_path</tt></b>(</nobr></td>
+  <td><var>csidl_string</var>)</td></tr></table></dt>
+<dd>
+  This function can be used to retrieve special folder locations on
+  Windows like the Start Menu or the Desktop.  It returns the full
+  path to the folder.  <var>csidl_string</var> must be one of the following
+  strings:
+
+<p>
+<div class="verbatim"><pre>
+"CSIDL_APPDATA"
+
+"CSIDL_COMMON_STARTMENU"
+"CSIDL_STARTMENU"
+
+"CSIDL_COMMON_DESKTOPDIRECTORY"
+"CSIDL_DESKTOPDIRECTORY"
+
+"CSIDL_COMMON_STARTUP"
+"CSIDL_STARTUP"
+
+"CSIDL_COMMON_PROGRAMS"
+"CSIDL_PROGRAMS"
+
+"CSIDL_FONTS"
+</pre></div>
+
+<p>
+If the folder cannot be retrieved, <tt class="exception">OSError</tt> is raised.
+
+<p>
+Which folders are available depends on the exact Windows version,
+  and probably also the configuration.  For details refer to
+  Microsoft's documentation of the
+  <tt class="cfunction">SHGetSpecialFolderPath()</tt> function.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4' xml:id='l2h-4' class="function">create_shortcut</tt></b>(</nobr></td>
+  <td><var>target, description,
+                                  filename</var><big>[</big><var>,
+                                  arguments</var><big>[</big><var>,
+                                  workdir</var><big>[</big><var>,
+                                  iconpath</var><big>[</big><var>, iconindex</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  This function creates a shortcut.
+  <var>target</var> is the path to the program to be started by the shortcut.
+  <var>description</var> is the description of the shortcut.
+  <var>filename</var> is the title of the shortcut that the user will see.
+  <var>arguments</var> specifies the command line arguments, if any.
+  <var>workdir</var> is the working directory for the program.
+  <var>iconpath</var> is the file containing the icon for the shortcut,
+  and <var>iconindex</var> is the index of the icon in the file
+  <var>iconpath</var>.  Again, for details consult the Microsoft
+  documentation for the <tt class="class">IShellLink</tt> interface.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.2 creating RPM packages"
+  href="creating-rpms.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. creating Built Distributions"
+  href="built-dist.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6. registering with the"
+  href="package-index.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="creating-rpms.html">5.2 Creating RPM packages</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="built-dist.html">5. Creating Built Distributions</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="package-index.html">6. Registering with the</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="ast.html" />
+<link rel="parent" href="ast.html" />
+<link rel="next" href="misc.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>32.1 Abstract Grammar</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="32. abstract Syntax Trees"
+  href="ast.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="32. abstract Syntax Trees"
+  href="ast.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="33. miscellaneous Services"
+  href="misc.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ast.html">32. Abstract Syntax Trees</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ast.html">32. Abstract Syntax Trees</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="misc.html">33. Miscellaneous Services</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0034100000000000000000">
+32.1 Abstract Grammar</a>
+</h1>
+
+<p>
+The module defines a string constant <code>__version__</code> which
+is the decimal subversion revision number of the file shown below.
+
+<p>
+The abstract grammar is currently defined as follows:
+
+<p>
+<div class="verbatim">
+<pre>-- ASDL's five builtin types are identifier, int, string, object, bool
+
+module Python version "$Revision: 43614 $"
+{
+	mod = Module(stmt* body)
+	    | Interactive(stmt* body)
+	    | Expression(expr body)
+
+	    -- not really an actual node but useful in Jython's typesystem.
+	    | Suite(stmt* body)
+
+	stmt = FunctionDef(identifier name, arguments args, 
+                           stmt* body, expr* decorators)
+	      | ClassDef(identifier name, expr* bases, stmt* body)
+	      | Return(expr? value)
+
+	      | Delete(expr* targets)
+	      | Assign(expr* targets, expr value)
+	      | AugAssign(expr target, operator op, expr value)
+
+	      -- not sure if bool is allowed, can always use int
+ 	      | Print(expr? dest, expr* values, bool nl)
+
+	      -- use 'orelse' because else is a keyword in target languages
+	      | For(expr target, expr iter, stmt* body, stmt* orelse)
+	      | While(expr test, stmt* body, stmt* orelse)
+	      | If(expr test, stmt* body, stmt* orelse)
+	      | With(expr context_expr, expr? optional_vars, stmt* body)
+
+	      -- 'type' is a bad name
+	      | Raise(expr? type, expr? inst, expr? tback)
+	      | TryExcept(stmt* body, excepthandler* handlers, stmt* orelse)
+	      | TryFinally(stmt* body, stmt* finalbody)
+	      | Assert(expr test, expr? msg)
+
+	      | Import(alias* names)
+	      | ImportFrom(identifier module, alias* names, int? level)
+
+	      -- Doesn't capture requirement that locals must be
+	      -- defined if globals is
+	      -- still supports use as a function!
+	      | Exec(expr body, expr? globals, expr? locals)
+
+	      | Global(identifier* names)
+	      | Expr(expr value)
+	      | Pass | Break | Continue
+
+	      -- XXX Jython will be different
+	      -- col_offset is the byte offset in the utf8 string the parser uses
+	      attributes (int lineno, int col_offset)
+
+	      -- BoolOp() can use left &amp; right?
+	expr = BoolOp(boolop op, expr* values)
+	     | BinOp(expr left, operator op, expr right)
+	     | UnaryOp(unaryop op, expr operand)
+	     | Lambda(arguments args, expr body)
+	     | IfExp(expr test, expr body, expr orelse)
+	     | Dict(expr* keys, expr* values)
+	     | ListComp(expr elt, comprehension* generators)
+	     | GeneratorExp(expr elt, comprehension* generators)
+	     -- the grammar constrains where yield expressions can occur
+	     | Yield(expr? value)
+	     -- need sequences for compare to distinguish between
+	     -- x &lt; 4 &lt; 3 and (x &lt; 4) &lt; 3
+	     | Compare(expr left, cmpop* ops, expr* comparators)
+	     | Call(expr func, expr* args, keyword* keywords,
+			 expr? starargs, expr? kwargs)
+	     | Repr(expr value)
+	     | Num(object n) -- a number as a PyObject.
+	     | Str(string s) -- need to specify raw, unicode, etc?
+	     -- other literals? bools?
+
+	     -- the following expression can appear in assignment context
+	     | Attribute(expr value, identifier attr, expr_context ctx)
+	     | Subscript(expr value, slice slice, expr_context ctx)
+	     | Name(identifier id, expr_context ctx)
+	     | List(expr* elts, expr_context ctx) 
+	     | Tuple(expr *elts, expr_context ctx)
+
+	      -- col_offset is the byte offset in the utf8 string the parser uses
+	      attributes (int lineno, int col_offset)
+
+	expr_context = Load | Store | Del | AugLoad | AugStore | Param
+
+	slice = Ellipsis | Slice(expr? lower, expr? upper, expr? step) 
+	      | ExtSlice(slice* dims) 
+	      | Index(expr value) 
+
+	boolop = And | Or 
+
+	operator = Add | Sub | Mult | Div | Mod | Pow | LShift 
+                 | RShift | BitOr | BitXor | BitAnd | FloorDiv
+
+	unaryop = Invert | Not | UAdd | USub
+
+	cmpop = Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
+
+	comprehension = (expr target, expr iter, expr* ifs)
+
+	-- not sure what to call the first argument for raise and except
+	-- TODO(jhylton): Figure out if there is a better way to handle
+	--                lineno and col_offset fields, particularly when
+        --                ast is exposed to Python.
+	excepthandler = (expr? type, expr? name, stmt* body, int lineno,
+	                 int col_offset)
+
+	arguments = (expr* args, identifier? vararg, 
+		     identifier? kwarg, expr* defaults)
+
+        -- keyword arguments supplied to call
+        keyword = (identifier arg, expr value)
+
+        -- import name with optional 'as' alias.
+        alias = (identifier name, identifier? asname)
+}
+</pre>
+<div class="footer">
+<a href="Python.txt" type="text/plain">Download as text (original file name: <span class="file">../../Parser/Python.asdl</span>).</a>
+</div></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="32. abstract Syntax Trees"
+  href="ast.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="32. abstract Syntax Trees"
+  href="ast.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="33. miscellaneous Services"
+  href="misc.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ast.html">32. Abstract Syntax Trees</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ast.html">32. Abstract Syntax Trees</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="misc.html">33. Miscellaneous Services</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

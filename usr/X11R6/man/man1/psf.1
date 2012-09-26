@@ -1,0 +1,283 @@
+.lf 1 -
+.EQ
+.EN
+.lf 144
+. \" $Header: /home/maics/tcm/cvsroot_DEV/tcm/man/man1/psf.1,v 1.2 2002/05/28 10:05:06 henkz Exp $
+.TH PSF 1 local
+.ds Ps P\s-3OST\s0S\s-3CRIPT\s0
+.if \w'\*(Ps'=\w'POSTSCRIPT' .ds Ps PostScript
+.de Op
+[\|\fB\\$1\fP\fI\\$2\fP\|]
+..
+.EQ
+.EN
+.lf 154
+.SH NAME
+psf \- \*(Ps filter
+.SH SYNOPSIS
+.nh
+.BR psf
+.Op \-p
+.Op \-o list
+.Op \-# N
+.Op \-r
+.Op \-m message
+.Op \-land
+.Op \-upside
+.Op \-2
+.Op \-security N\fR[\fP,message\fR]\fP
+.Op \-c
+.Op \-inputtray N
+.Op \-outputtray N
+.Op \-ips_ignore
+.Op \-ips_fit
+.Op \-ips_error
+.Op \-noreport
+.Op \-sort \fR[\fPN\fR]\fP
+.Op \-duplex
+.Op \-noduplex
+.Op \-tumble
+.Op \-select string
+.Op \-courierold
+.Op \-nondsc
+.Op \-\-
+[\|file\|] ...
+.hy
+.SH DESCRIPTION
+.I Psf
+can be used to change the behavior of a \*(Ps program.
+It uses the Adobe structuring conventions to perform
+operations like page selection, changing the page order, rotate pages,
+print multiple copies, use the printers secondary paper input,
+and the printing of a message across each page.
+The concatenated input files are assumed to form one \*(Ps program
+conforming to the PS-Adobe-2.0 structuring conventions.
+The output conforms to the same conventions.
+The
+.B \-p
+option can be used to convert input files from text to \*(Ps
+before any further processing takes place.
+.br
+In all options with a variable part expressed by italics, except the
+.B \-sort
+option,
+that variable part need not be part of
+the option argument, but can be the next argument.
+For example:
+.I "`psf\ \-#1'"
+and
+.I "`psf\ \-#\ 1'"
+have the same effect.
+.SH OPTIONS
+.TP
+.B \-p
+This option is an exception in that the input files are treated
+as printable text and sent to
+.IR psprint (1)
+before any further processing takes place.
+.TP
+.BI \-o list
+Select the pages mentioned in the
+.I list,
+which has the same format as is used in
+.IR troff (1)
+utilities.
+.I List
+is a comma separated list of page numbers
+.RI ( N )
+and ranges
+.RI ( N1-N2 ).
+The initial or trailing number of a range can be left unspecified.
+Neither the pages in the \*(Ps input, nor in the
+.I list
+need to be ordered.
+.br
+Example:
+.B \-o\-4,9,11\-13,15\-
+will cause the pages 1, 2, 3, 4, 9, 11, 12, 13, 15 and 16 of a 16 page
+document to be present in the output.
+.TP
+.BI \-# N
+Causes
+.I N
+copies of each page to be printed.
+.TP
+.BI \-r
+Reverse the page order.
+.TP
+.BI \-m message
+Print the
+.I message
+diagonally across each page in point size 54 outline helvetica bold.
+.TP
+.BI \-land
+Print each page in landscape mode. I.e. rotated 90 degrees.
+.TP
+.BI \-upside
+Print each page upside down. Assumes upright A4.
+.TP
+.BI \-2
+Each page produced by the options and input files described above is
+.rm 11 
+.as 11 "reduced by a factor 
+.ds 12 "\f1\(12\fP
+.as 12 \|
+.nr 12 0\w'\s+0\*(12'
+.ds 12 \v'0m'\s+1\v'-.04m'\(sr\h'-0.01m'\l'\n(12u\(rn'\v'.04m'\s-1\v'0m'\h'-\n(12u'\*(12
+.ds 12 \x'0-0.12m'\*(12
+.as 11 \*(12
+.lf 260
+.as 11 ".
+\*(11
+.lf 261
+Each pair of consecutive pages is then printed side by side
+on a single page.
+.TP
+.BI \-security N\fR[\fP,message\fR]\fP
+This option uses an Oc\('e specific PostScript operator that can be
+used allow printing of a document only if the printer receives
+security code
+.I N
+at its console.
+If this code is not entered within 30 seconds the document will
+not be printed.
+.I N
+must be a number in the range 0 .. 99999999.
+The optional
+.I message
+will be displayed on the Oc\('e console while it is waiting
+for the code to be entered.
+The default message is the user's login name.
+.TP
+.BI \-c
+Use the secondary paperfeed mechanism.
+This means manualfeed on some machines and cassette on others.
+.TP
+.BI \-inputtray N
+Causes the input to be taken from inputtray
+.I N.
+The default input tray of most printers is set up by the system
+administrators.
+The
+.I \-m
+may set the inputtray on some printers.
+.TP
+.BI \-outputtray N
+Causes the output to be placed in outputtray
+.I N.
+Most printers have output tray 0 as their default.
+.TP
+.B \-ips_ignore
+Causes the printer to ignore any request for unavailable page
+sizes.
+The printer or printer manager might warn when this feature is used.
+The results of using both this option and the
+.B \-inputtray
+option are undefined.
+This option can only be used on printers with PostScript Level 2.
+.TP
+.B \-ips_fit
+Causes the printer to ignore any request for unavailable page
+sizes and scale the page images such that they fit on
+the printed pages.
+The page images from the input are centered on the printed pages.
+The printer or printer manager might warn when this feature is used.
+The results of using both this option and the
+.B \-inputtray
+option are undefined.
+This option can only be used on printers with PostScript Level 2.
+.TP
+.B \-ips_error
+Causes the printer to produce an error for unavailable page
+sizes and stop processing the rest of the job.
+This option can only be used on printers with PostScript Level 2.
+.TP
+.B \-noreport
+Disables warning for unusual medium requests, like unavailable
+page sizes.
+Can be used in combination with the
+.B ips
+options above to avoid warning messages from the printer.
+This option can only be used on printers with PostScript Level 2.
+.TP
+.BI \-sort \fR[\fPN\fR]\fP
+This option is useful when multiple copies of one document are produced.
+On printers with this capability it places each copy in a separate
+output bin.
+The start output bin is the bin indicated by the
+.B \-outputtray
+option.
+The default start output bin is 2.
+.I N
+indicates the maximum number of copies produced.
+The default is the number of copies indicated by the
+.B \-#
+option.
+Blank space is not allowed between
+.B \-sort
+and
+.IR N .
+.TP
+.BI \-duplex
+Causes the output to be printed in duplex mode.
+The default binding is as if the resultant pages are to be
+bound together with their leftmost edge.
+This is under the assumption that the input consist of PostScript
+in the default orientation.
+The
+.I \-tumble
+option can be used for alternative binding.
+.TP
+.BI \-noduplex
+Some printers have duplex mode as their default. This option
+makes these printers produce a single page on each sheet of paper.
+.TP
+.BI \-tumble
+This option is only useful with the
+.I \-duplex
+option.
+It causes the `backside` pages to be flipped relative to the front
+side pages.
+.TP
+.BI \-select string
+The
+.I string
+is placed in the PostScript input.
+If the
+.B statusdict
+dictionary exists in the PostScript interpreter, it will be present
+on top of the dictionary stack during the execution of
+.IR string .
+.TP
+.B \-courierold
+A special feature that triggers use of Old Courier fonts on the Oc\('e
+9145.
+It has no effect on other printers.
+.TP
+.B \-nondsc
+Assume that the input does not obey the Structure Conventions
+and try to make the most of it.
+This is useful for output of packages like WordPerfect that
+do not produce proper \*(Ps.
+.TP
+.B \-\-
+Indicates end of options. All following arguments are considered to be input
+file names.
+.SH BUGS
+Some options do not cooperate well when given on one command line.
+In that case it might be wise to split the twp operations into two
+separate passes over the file. For example: "psf -2 | psf -upside" instead
+of "psf -2 -upside".
+.SH FILES
+.ta \w'/usr/local/lib/ProcSets/pagemess.proc  'u
+/usr/local/lib/ProcSets/pagemess.proc	the ProcSet for
+.B \-m
+.br
+.rm 11 
+.as 11 "/usr/tmp/psf.
+.as 11 ".N	temporary files used for page reversal.
+\*(11
+.lf 405
+.br
+.SH SEE ALSO
+psprint(1), lpr(1), devps(1)

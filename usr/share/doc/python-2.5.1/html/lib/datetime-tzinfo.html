@@ -1,0 +1,530 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="strftime-behavior.html" />
+<link rel="prev" href="datetime-time.html" />
+<link rel="parent" href="module-datetime.html" />
+<link rel="next" href="strftime-behavior.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.1.6 tzinfo Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.1.5 time Objects"
+  href="datetime-time.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.1 datetime  "
+  href="module-datetime.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.1.7 strftime() Behavior"
+  href="strftime-behavior.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="datetime-time.html">5.1.5 time Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-datetime.html">5.1 datetime  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="strftime-behavior.html">5.1.7 strftime() Behavior</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION007160000000000000000"></a><a name="datetime-tzinfo"></a>
+<br>
+5.1.6 <tt class="class">tzinfo</tt> Objects 
+</h2>
+
+<p>
+<tt class="class">tzinfo</tt> is an abstract base clase, meaning that this class
+should not be instantiated directly.  You need to derive a concrete
+subclass, and (at least) supply implementations of the standard
+<tt class="class">tzinfo</tt> methods needed by the <tt class="class">datetime</tt> methods you
+use.  The <tt class="module">datetime</tt> module does not supply any concrete
+subclasses of <tt class="class">tzinfo</tt>.
+
+<p>
+An instance of (a concrete subclass of) <tt class="class">tzinfo</tt> can be passed
+to the constructors for <tt class="class">datetime</tt> and <tt class="class">time</tt> objects.
+The latter objects view their members as being in local time, and the
+<tt class="class">tzinfo</tt> object supports methods revealing offset of local time
+from UTC, the name of the time zone, and DST offset, all relative to a
+date or time object passed to them.
+
+<p>
+Special requirement for pickling:  A <tt class="class">tzinfo</tt> subclass must have an
+<tt class="method">__init__</tt> method that can be called with no arguments, else it
+can be pickled but possibly not unpickled again.  This is a technical
+requirement that may be relaxed in the future.
+
+<p>
+A concrete subclass of <tt class="class">tzinfo</tt> may need to implement the
+following methods.  Exactly which methods are needed depends on the
+uses made of aware <tt class="module">datetime</tt> objects.  If in doubt, simply
+implement all of them.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-688' xml:id='l2h-688' class="method">utcoffset</tt></b>(</nobr></td>
+  <td><var>self, dt</var>)</td></tr></table></dt>
+<dd>
+  Return offset of local time from UTC, in minutes east of UTC.  If
+  local time is west of UTC, this should be negative.  Note that this
+  is intended to be the total offset from UTC; for example, if a
+  <tt class="class">tzinfo</tt> object represents both time zone and DST adjustments,
+  <tt class="method">utcoffset()</tt> should return their sum.  If the UTC offset
+  isn't known, return <code>None</code>.  Else the value returned must be
+  a <tt class="class">timedelta</tt> object specifying a whole number of minutes in the
+  range -1439 to 1439 inclusive (1440 = 24*60; the magnitude of the offset
+  must be less than one day).  Most implementations of
+  <tt class="method">utcoffset()</tt> will probably look like one of these two:
+
+<p>
+<div class="verbatim"><pre>
+    return CONSTANT                 # fixed-offset class
+    return CONSTANT + self.dst(dt)  # daylight-aware class
+</pre></div>
+
+<p>
+If <tt class="method">utcoffset()</tt> does not return <code>None</code>,
+    <tt class="method">dst()</tt> should not return <code>None</code> either.
+
+<p>
+The default implementation of <tt class="method">utcoffset()</tt> raises
+    <tt class="exception">NotImplementedError</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-689' xml:id='l2h-689' class="method">dst</tt></b>(</nobr></td>
+  <td><var>self, dt</var>)</td></tr></table></dt>
+<dd>
+  Return the daylight saving time (DST) adjustment, in minutes east of
+  UTC, or <code>None</code> if DST information isn't known.  Return
+  <code>timedelta(0)</code> if DST is not in effect.
+  If DST is in effect, return the offset as a
+  <tt class="class">timedelta</tt> object (see <tt class="method">utcoffset()</tt> for details).
+  Note that DST offset, if applicable, has
+  already been added to the UTC offset returned by
+  <tt class="method">utcoffset()</tt>, so there's no need to consult <tt class="method">dst()</tt>
+  unless you're interested in obtaining DST info separately.  For
+  example, <tt class="method">datetime.timetuple()</tt> calls its <tt class="member">tzinfo</tt>
+  member's <tt class="method">dst()</tt> method to determine how the
+  <tt class="member">tm_isdst</tt> flag should be set, and
+  <tt class="method">tzinfo.fromutc()</tt> calls <tt class="method">dst()</tt> to account for
+  DST changes when crossing time zones.
+
+<p>
+An instance <var>tz</var> of a <tt class="class">tzinfo</tt> subclass that models both
+  standard and daylight times must be consistent in this sense:
+
+<p>
+<code><var>tz</var>.utcoffset(<var>dt</var>) - <var>tz</var>.dst(<var>dt</var>)</code>
+
+<p>
+must return the same result for every <tt class="class">datetime</tt> <var>dt</var>
+  with <code><var>dt</var>.tzinfo == <var>tz</var></code>  For sane <tt class="class">tzinfo</tt>
+  subclasses, this expression yields the time zone's "standard offset",
+  which should not depend on the date or the time, but only on geographic
+  location.  The implementation of <tt class="method">datetime.astimezone()</tt> relies
+  on this, but cannot detect violations; it's the programmer's
+  responsibility to ensure it.  If a <tt class="class">tzinfo</tt> subclass cannot
+  guarantee this, it may be able to override the default implementation
+  of <tt class="method">tzinfo.fromutc()</tt> to work correctly with <tt class="method">astimezone()</tt>
+  regardless.
+
+<p>
+Most implementations of <tt class="method">dst()</tt> will probably look like one
+  of these two:
+
+<p>
+<div class="verbatim"><pre>
+    def dst(self):
+        # a fixed-offset class:  doesn't account for DST
+        return timedelta(0)
+</pre></div>
+
+<p>
+or
+
+<p>
+<div class="verbatim"><pre>
+    def dst(self):
+        # Code to set dston and dstoff to the time zone's DST
+        # transition times based on the input dt.year, and expressed
+        # in standard local time.  Then
+
+        if dston &lt;= dt.replace(tzinfo=None) &lt; dstoff:
+            return timedelta(hours=1)
+        else:
+            return timedelta(0)
+</pre></div>
+
+<p>
+The default implementation of <tt class="method">dst()</tt> raises
+  <tt class="exception">NotImplementedError</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-690' xml:id='l2h-690' class="method">tzname</tt></b>(</nobr></td>
+  <td><var>self, dt</var>)</td></tr></table></dt>
+<dd>
+  Return the time zone name corresponding to the <tt class="class">datetime</tt>
+  object <var>dt</var>, as a string.
+  Nothing about string names is defined by the
+  <tt class="module">datetime</tt> module, and there's no requirement that it mean
+  anything in particular.  For example, "GMT", "UTC", "-500", "-5:00",
+  "EDT", "US/Eastern", "America/New York" are all valid replies.  Return
+  <code>None</code> if a string name isn't known.  Note that this is a method
+  rather than a fixed string primarily because some <tt class="class">tzinfo</tt>
+  subclasses will wish to return different names depending on the specific
+  value of <var>dt</var> passed, especially if the <tt class="class">tzinfo</tt> class is
+  accounting for daylight time.
+
+<p>
+The default implementation of <tt class="method">tzname()</tt> raises
+  <tt class="exception">NotImplementedError</tt>.
+</dl>
+
+<p>
+These methods are called by a <tt class="class">datetime</tt> or <tt class="class">time</tt> object,
+in response to their methods of the same names.  A <tt class="class">datetime</tt>
+object passes itself as the argument, and a <tt class="class">time</tt> object passes
+<code>None</code> as the argument.  A <tt class="class">tzinfo</tt> subclass's methods should
+therefore be prepared to accept a <var>dt</var> argument of <code>None</code>, or of
+class <tt class="class">datetime</tt>.
+
+<p>
+When <code>None</code> is passed, it's up to the class designer to decide the
+best response.  For example, returning <code>None</code> is appropriate if the
+class wishes to say that time objects don't participate in the
+<tt class="class">tzinfo</tt> protocols.  It may be more useful for <code>utcoffset(None)</code>
+to return the standard UTC offset, as there is no other convention for
+discovering the standard offset.
+
+<p>
+When a <tt class="class">datetime</tt> object is passed in response to a
+<tt class="class">datetime</tt> method, <code>dt.tzinfo</code> is the same object as
+<var>self</var>.  <tt class="class">tzinfo</tt> methods can rely on this, unless
+user code calls <tt class="class">tzinfo</tt> methods directly.  The intent is that
+the <tt class="class">tzinfo</tt> methods interpret <var>dt</var> as being in local time,
+and not need worry about objects in other timezones.
+
+<p>
+There is one more <tt class="class">tzinfo</tt> method that a subclass may wish to
+override:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-691' xml:id='l2h-691' class="method">fromutc</tt></b>(</nobr></td>
+  <td><var>self, dt</var>)</td></tr></table></dt>
+<dd>
+  This is called from the default <tt class="class">datetime.astimezone()</tt>
+  implementation.  When called from that, <code><var>dt</var>.tzinfo</code> is
+  <var>self</var>, and <var>dt</var>'s date and time members are to be viewed as
+  expressing a UTC time.  The purpose of <tt class="method">fromutc()</tt> is to
+  adjust the date and time members, returning an equivalent datetime in
+  <var>self</var>'s local time.
+
+<p>
+Most <tt class="class">tzinfo</tt> subclasses should be able to inherit the default
+  <tt class="method">fromutc()</tt> implementation without problems.  It's strong enough
+  to handle fixed-offset time zones, and time zones accounting for both
+  standard and daylight time, and the latter even if the DST transition
+  times differ in different years.  An example of a time zone the default
+  <tt class="method">fromutc()</tt> implementation may not handle correctly in all cases
+  is one where the standard offset (from UTC) depends on the specific date
+  and time passed, which can happen for political reasons.
+  The default implementations of <tt class="method">astimezone()</tt> and
+  <tt class="method">fromutc()</tt> may not produce the result you want if the result is
+  one of the hours straddling the moment the standard offset changes.
+
+<p>
+Skipping code for error cases, the default <tt class="method">fromutc()</tt>
+  implementation acts like:
+
+<p>
+<div class="verbatim"><pre>
+  def fromutc(self, dt):
+      # raise ValueError error if dt.tzinfo is not self
+      dtoff = dt.utcoffset()
+      dtdst = dt.dst()
+      # raise ValueError if dtoff is None or dtdst is None
+      delta = dtoff - dtdst  # this is self's standard offset
+      if delta:
+          dt += delta   # convert to standard local time
+          dtdst = dt.dst()
+          # raise ValueError if dtdst is None
+      if dtdst:
+          return dt + dtdst
+      else:
+          return dt
+</pre></div>
+</dl>
+
+<p>
+Example <tt class="class">tzinfo</tt> classes:
+
+<p>
+<div class="verbatim">
+<pre>from datetime import tzinfo, timedelta, datetime
+
+ZERO = timedelta(0)
+HOUR = timedelta(hours=1)
+
+# A UTC class.
+
+class UTC(tzinfo):
+    """UTC"""
+
+    def utcoffset(self, dt):
+        return ZERO
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return ZERO
+
+utc = UTC()
+
+# A class building tzinfo objects for fixed-offset time zones.
+# Note that FixedOffset(0, "UTC") is a different way to build a
+# UTC tzinfo object.
+
+class FixedOffset(tzinfo):
+    """Fixed offset in minutes east from UTC."""
+
+    def __init__(self, offset, name):
+        self.__offset = timedelta(minutes = offset)
+        self.__name = name
+
+    def utcoffset(self, dt):
+        return self.__offset
+
+    def tzname(self, dt):
+        return self.__name
+
+    def dst(self, dt):
+        return ZERO
+
+# A class capturing the platform's idea of local time.
+
+import time as _time
+
+STDOFFSET = timedelta(seconds = -_time.timezone)
+if _time.daylight:
+    DSTOFFSET = timedelta(seconds = -_time.altzone)
+else:
+    DSTOFFSET = STDOFFSET
+
+DSTDIFF = DSTOFFSET - STDOFFSET
+
+class LocalTimezone(tzinfo):
+
+    def utcoffset(self, dt):
+        if self._isdst(dt):
+            return DSTOFFSET
+        else:
+            return STDOFFSET
+
+    def dst(self, dt):
+        if self._isdst(dt):
+            return DSTDIFF
+        else:
+            return ZERO
+
+    def tzname(self, dt):
+        return _time.tzname[self._isdst(dt)]
+
+    def _isdst(self, dt):
+        tt = (dt.year, dt.month, dt.day,
+              dt.hour, dt.minute, dt.second,
+              dt.weekday(), 0, -1)
+        stamp = _time.mktime(tt)
+        tt = _time.localtime(stamp)
+        return tt.tm_isdst &gt; 0
+
+Local = LocalTimezone()
+
+# A complete implementation of current DST rules for major US time zones.
+
+def first_sunday_on_or_after(dt):
+    days_to_go = 6 - dt.weekday()
+    if days_to_go:
+        dt += timedelta(days_to_go)
+    return dt
+
+# In the US, DST starts at 2am (standard time) on the first Sunday in April.
+DSTSTART = datetime(1, 4, 1, 2)
+# and ends at 2am (DST time; 1am standard time) on the last Sunday of Oct.
+# which is the first Sunday on or after Oct 25.
+DSTEND = datetime(1, 10, 25, 1)
+
+class USTimeZone(tzinfo):
+
+    def __init__(self, hours, reprname, stdname, dstname):
+        self.stdoffset = timedelta(hours=hours)
+        self.reprname = reprname
+        self.stdname = stdname
+        self.dstname = dstname
+
+    def __repr__(self):
+        return self.reprname
+
+    def tzname(self, dt):
+        if self.dst(dt):
+            return self.dstname
+        else:
+            return self.stdname
+
+    def utcoffset(self, dt):
+        return self.stdoffset + self.dst(dt)
+
+    def dst(self, dt):
+        if dt is None or dt.tzinfo is None:
+            # An exception may be sensible here, in one or both cases.
+            # It depends on how you want to treat them.  The default
+            # fromutc() implementation (called by the default astimezone()
+            # implementation) passes a datetime with dt.tzinfo is self.
+            return ZERO
+        assert dt.tzinfo is self
+
+        # Find first Sunday in April &amp; the last in October.
+        start = first_sunday_on_or_after(DSTSTART.replace(year=dt.year))
+        end = first_sunday_on_or_after(DSTEND.replace(year=dt.year))
+
+        # Can't compare naive to aware objects, so strip the timezone from
+        # dt first.
+        if start &lt;= dt.replace(tzinfo=None) &lt; end:
+            return HOUR
+        else:
+            return ZERO
+
+Eastern  = USTimeZone(-5, "Eastern",  "EST", "EDT")
+Central  = USTimeZone(-6, "Central",  "CST", "CDT")
+Mountain = USTimeZone(-7, "Mountain", "MST", "MDT")
+Pacific  = USTimeZone(-8, "Pacific",  "PST", "PDT")
+</pre>
+<div class="footer">
+<a href="tzinfo-examples.txt" type="text/plain">Download as text (original file name: <span class="file">tzinfo-examples.py</span>).</a>
+</div></div>
+
+<p>
+Note that there are unavoidable subtleties twice per year in a
+<tt class="class">tzinfo</tt>
+subclass accounting for both standard and daylight time, at the DST
+transition points.  For concreteness, consider US Eastern (UTC -0500),
+where EDT begins the minute after 1:59 (EST) on the first Sunday in
+April, and ends the minute after 1:59 (EDT) on the last Sunday in October:
+
+<p>
+<div class="verbatim"><pre>
+    UTC   3:MM  4:MM  5:MM  6:MM  7:MM  8:MM
+    EST  22:MM 23:MM  0:MM  1:MM  2:MM  3:MM
+    EDT  23:MM  0:MM  1:MM  2:MM  3:MM  4:MM
+
+  start  22:MM 23:MM  0:MM  1:MM  3:MM  4:MM
+
+    end  23:MM  0:MM  1:MM  1:MM  2:MM  3:MM
+</pre></div>
+
+<p>
+When DST starts (the "start" line), the local wall clock leaps from 1:59
+to 3:00.  A wall time of the form 2:MM doesn't really make sense on that
+day, so <code>astimezone(Eastern)</code> won't deliver a result with
+<code>hour == 2</code> on the
+day DST begins.  In order for <tt class="method">astimezone()</tt> to make this
+guarantee, the <tt class="method">rzinfo.dst()</tt> method must consider times
+in the "missing hour" (2:MM for Eastern) to be in daylight time.
+
+<p>
+When DST ends (the "end" line), there's a potentially worse problem:
+there's an hour that can't be spelled unambiguously in local wall time:
+the last hour of daylight time.  In Eastern, that's times of
+the form 5:MM UTC on the day daylight time ends.  The local wall clock
+leaps from 1:59 (daylight time) back to 1:00 (standard time) again.
+Local times of the form 1:MM are ambiguous.  <tt class="method">astimezone()</tt> mimics
+the local clock's behavior by mapping two adjacent UTC hours into the
+same local hour then.  In the Eastern example, UTC times of the form
+5:MM and 6:MM both map to 1:MM when converted to Eastern.  In order for
+<tt class="method">astimezone()</tt> to make this guarantee, the <tt class="method">tzinfo.dst()</tt>
+method must consider times in the "repeated hour" to be in
+standard time.  This is easily arranged, as in the example, by expressing
+DST switch times in the time zone's standard local time.
+
+<p>
+Applications that can't bear such ambiguities should avoid using hybrid
+<tt class="class">tzinfo</tt> subclasses; there are no ambiguities when using UTC, or
+any other fixed-offset <tt class="class">tzinfo</tt> subclass (such as a class
+representing only EST (fixed offset -5 hours), or only EDT (fixed offset
+-4 hours)).
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.1.5 time Objects"
+  href="datetime-time.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.1 datetime  "
+  href="module-datetime.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.1.7 strftime() Behavior"
+  href="strftime-behavior.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="datetime-time.html">5.1.5 time Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-datetime.html">5.1 datetime  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="strftime-behavior.html">5.1.7 strftime() Behavior</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

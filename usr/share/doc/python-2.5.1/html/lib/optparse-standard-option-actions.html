@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-option-attributes.html" />
+<link rel="prev" href="optparse-defining-options.html" />
+<link rel="parent" href="optparse-reference-guide.html" />
+<link rel="next" href="optparse-option-attributes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.3.4 Standard option actions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.3.3 defining options"
+  href="optparse-defining-options.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.3 reference Guide"
+  href="optparse-reference-guide.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.3.5 option attributes"
+  href="optparse-option-attributes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-defining-options.html">14.3.3.3 Defining options</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-reference-guide.html">14.3.3 Reference Guide</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-option-attributes.html">14.3.3.5 Option attributes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016334000000000000000"></a><a name="optparse-standard-option-actions"></a>
+<br>
+14.3.3.4 Standard option actions
+</h3>
+
+<p>
+The various option actions all have slightly different requirements and
+effects.  Most actions have several relevant option attributes which you
+may specify to guide <tt class="module">optparse</tt>'s behaviour; a few have required attributes,
+which you must specify for any option using that action.
+
+<ul>
+<li> 
+<code>store</code> [relevant: <tt class="member">type</tt>, <tt class="member">dest</tt>, <code>nargs</code>, <code>choices</code>]
+
+<p>
+The option must be followed by an argument, which is
+converted to a value according to <tt class="member">type</tt> and stored in
+<tt class="member">dest</tt>.  If <code>nargs</code> &gt; 1, multiple arguments will be consumed
+from the command line; all will be converted according to
+<tt class="member">type</tt> and stored to <tt class="member">dest</tt> as a tuple.  See the ``Option
+types'' section below.
+
+<p>
+If <code>choices</code> is supplied (a list or tuple of strings), the type
+defaults to <code>choice</code>.
+
+<p>
+If <tt class="member">type</tt> is not supplied, it defaults to <code>string</code>.
+
+<p>
+If <tt class="member">dest</tt> is not supplied, <tt class="module">optparse</tt> derives a destination from the
+first long option string (e.g., <code>"-foo-bar"</code> implies <code>foo_bar</code>).
+If there are no long option strings, <tt class="module">optparse</tt> derives a destination from
+the first short option string (e.g., <code>"-f"</code> implies <code>f</code>).
+
+<p>
+Example:
+<div class="verbatim"><pre>
+parser.add_option("-f")
+parser.add_option("-p", type="float", nargs=3, dest="point")
+</pre></div>
+
+<p>
+As it parses the command line
+<div class="verbatim"><pre>
+-f foo.txt -p 1 -3.5 4 -fbar.txt
+</pre></div>
+
+<p>
+<tt class="module">optparse</tt> will set
+<div class="verbatim"><pre>
+options.f = "foo.txt"
+options.point = (1.0, -3.5, 4.0)
+options.f = "bar.txt"
+</pre></div>
+
+<p>
+</li>
+<li> 
+<code>store_const</code> [required: <code>const</code>; relevant: <tt class="member">dest</tt>]
+
+<p>
+The value <code>const</code> is stored in <tt class="member">dest</tt>.
+
+<p>
+Example:
+<div class="verbatim"><pre>
+parser.add_option("-q", "--quiet",
+                  action="store_const", const=0, dest="verbose")
+parser.add_option("-v", "--verbose",
+                  action="store_const", const=1, dest="verbose")
+parser.add_option("--noisy",
+                  action="store_const", const=2, dest="verbose")
+</pre></div>
+
+<p>
+If <code>"-noisy"</code> is seen, <tt class="module">optparse</tt> will set
+<div class="verbatim"><pre>
+options.verbose = 2
+</pre></div>
+
+<p>
+</li>
+<li> 
+<code>store_true</code> [relevant: <tt class="member">dest</tt>]
+
+<p>
+A special case of <code>store_const</code> that stores a true value
+to <tt class="member">dest</tt>.
+
+<p>
+</li>
+<li> 
+<code>store_false</code> [relevant: <tt class="member">dest</tt>]
+
+<p>
+Like <code>store_true</code>, but stores a false value.
+
+<p>
+Example:
+<div class="verbatim"><pre>
+parser.add_option("--clobber", action="store_true", dest="clobber")
+parser.add_option("--no-clobber", action="store_false", dest="clobber")
+</pre></div>
+
+<p>
+</li>
+<li> 
+<code>append</code> [relevant: <tt class="member">type</tt>, <tt class="member">dest</tt>, <code>nargs</code>, <code>choices</code>]
+
+<p>
+The option must be followed by an argument, which is appended to the
+list in <tt class="member">dest</tt>.  If no default value for <tt class="member">dest</tt> is supplied, an
+empty list is automatically created when <tt class="module">optparse</tt> first encounters this
+option on the command-line.  If <code>nargs</code> &gt; 1, multiple arguments are
+consumed, and a tuple of length <code>nargs</code> is appended to <tt class="member">dest</tt>.
+
+<p>
+The defaults for <tt class="member">type</tt> and <tt class="member">dest</tt> are the same as for the
+<code>store</code> action.
+
+<p>
+Example:
+<div class="verbatim"><pre>
+parser.add_option("-t", "--tracks", action="append", type="int")
+</pre></div>
+
+<p>
+If <code>"-t3"</code> is seen on the command-line, <tt class="module">optparse</tt> does the equivalent of:
+<div class="verbatim"><pre>
+options.tracks = []
+options.tracks.append(int("3"))
+</pre></div>
+
+<p>
+If, a little later on, <code>"-tracks=4"</code> is seen, it does:
+<div class="verbatim"><pre>
+options.tracks.append(int("4"))
+</pre></div>
+
+<p>
+</li>
+<li> 
+<code>append_const</code> [required: <code>const</code>; relevant: <tt class="member">dest</tt>]
+
+<p>
+Like <code>store_const</code>, but the value <code>const</code> is appended to <tt class="member">dest</tt>;
+as with <code>append</code>, <tt class="member">dest</tt> defaults to <code>None</code>, and an an empty list is
+automatically created the first time the option is encountered.
+
+<p>
+</li>
+<li> 
+<code>count</code> [relevant: <tt class="member">dest</tt>]
+
+<p>
+Increment the integer stored at <tt class="member">dest</tt>.  If no default value is
+supplied, <tt class="member">dest</tt> is set to zero before being incremented the first
+time.
+
+<p>
+Example:
+<div class="verbatim"><pre>
+parser.add_option("-v", action="count", dest="verbosity")
+</pre></div>
+
+<p>
+The first time <code>"-v"</code> is seen on the command line, <tt class="module">optparse</tt> does the
+equivalent of:
+<div class="verbatim"><pre>
+options.verbosity = 0
+options.verbosity += 1
+</pre></div>
+
+<p>
+Every subsequent occurrence of <code>"-v"</code> results in
+<div class="verbatim"><pre>
+options.verbosity += 1
+</pre></div>
+
+<p>
+</li>
+<li> 
+<code>callback</code> [required: <code>callback</code>;
+relevant: <tt class="member">type</tt>, <code>nargs</code>, <code>callback_args</code>, <code>callback_kwargs</code>]
+
+<p>
+Call the function specified by <code>callback</code>, which is called as
+<div class="verbatim"><pre>
+func(option, opt_str, value, parser, *args, **kwargs)
+</pre></div>
+
+<p>
+See section&nbsp;<a href="optparse-option-callbacks.html#optparse-option-callbacks">14.3.4</a>, Option Callbacks for more detail.
+
+<p>
+</li>
+<li> 
+<tt class="member">help</tt>
+
+<p>
+Prints a complete help message for all the options in the
+current option parser.  The help message is constructed from
+the <code>usage</code> string passed to OptionParser's constructor and
+the <tt class="member">help</tt> string passed to every option.
+
+<p>
+If no <tt class="member">help</tt> string is supplied for an option, it will still be
+listed in the help message.  To omit an option entirely, use
+the special value <code>optparse.SUPPRESS_HELP</code>.
+
+<p>
+<tt class="module">optparse</tt> automatically adds a <tt class="member">help</tt> option to all OptionParsers, so
+you do not normally need to create one.
+
+<p>
+Example:
+<div class="verbatim"><pre>
+from optparse import OptionParser, SUPPRESS_HELP
+
+parser = OptionParser()
+parser.add_option("-h", "--help", action="help"),
+parser.add_option("-v", action="store_true", dest="verbose",
+                  help="Be moderately verbose")
+parser.add_option("--file", dest="filename",
+                  help="Input file to read data from"),
+parser.add_option("--secret", help=SUPPRESS_HELP)
+</pre></div>
+
+<p>
+If <tt class="module">optparse</tt> sees either <code>"-h"</code> or <code>"-help"</code> on the command line, it
+will print something like the following help message to stdout
+(assuming <code>sys.argv[0]</code> is <code>"foo.py"</code>):
+<div class="verbatim"><pre>
+usage: foo.py [options]
+
+options:
+  -h, --help        Show this help message and exit
+  -v                Be moderately verbose
+  --file=FILENAME   Input file to read data from
+</pre></div>
+
+<p>
+After printing the help message, <tt class="module">optparse</tt> terminates your process
+with <code>sys.exit(0)</code>.
+
+<p>
+</li>
+<li> 
+<code>version</code>
+
+<p>
+Prints the version number supplied to the OptionParser to stdout and
+exits.  The version number is actually formatted and printed by the
+<code>print_version()</code> method of OptionParser.  Generally only relevant
+if the <code>version</code> argument is supplied to the OptionParser
+constructor.  As with <tt class="member">help</tt> options, you will rarely create
+<code>version</code> options, since <tt class="module">optparse</tt> automatically adds them when needed.
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.3.3 defining options"
+  href="optparse-defining-options.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.3 reference Guide"
+  href="optparse-reference-guide.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.3.5 option attributes"
+  href="optparse-option-attributes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-defining-options.html">14.3.3.3 Defining options</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-reference-guide.html">14.3.3 Reference Guide</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-option-attributes.html">14.3.3.5 Option attributes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

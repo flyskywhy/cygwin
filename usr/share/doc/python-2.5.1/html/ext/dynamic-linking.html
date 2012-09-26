@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="win-dlls.html" />
+<link rel="prev" href="win-cookbook.html" />
+<link rel="parent" href="building-on-windows.html" />
+<link rel="next" href="win-dlls.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.2 Differences Between Unix and Windows </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.1 a Cookbook Approach"
+  href="win-cookbook.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. building C and"
+  href="building-on-windows.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.3 using DLLs in"
+  href="win-dlls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="win-cookbook.html">4.1 A Cookbook Approach</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="building-on-windows.html">4. Building C and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="win-dlls.html">4.3 Using DLLs in</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006200000000000000000"></a><a name="dynamic-linking"></a>
+<br>
+4.2 Differences Between <span class="Unix">Unix</span> and Windows
+     
+</h1>
+
+<p>
+<span class="Unix">Unix</span> and Windows use completely different paradigms for run-time
+loading of code.  Before you try to build a module that can be
+dynamically loaded, be aware of how your system works.
+
+<p>
+In <span class="Unix">Unix</span>, a shared object (<span class="file">.so</span>) file contains code to be used by the
+program, and also the names of functions and data that it expects to
+find in the program.  When the file is joined to the program, all
+references to those functions and data in the file's code are changed
+to point to the actual locations in the program where the functions
+and data are placed in memory.  This is basically a link operation.
+
+<p>
+In Windows, a dynamic-link library (<span class="file">.dll</span>) file has no dangling
+references.  Instead, an access to functions or data goes through a
+lookup table.  So the DLL code does not have to be fixed up at runtime
+to refer to the program's memory; instead, the code already uses the
+DLL's lookup table, and the lookup table is modified at runtime to
+point to the functions and data.
+
+<p>
+In <span class="Unix">Unix</span>, there is only one type of library file (<span class="file">.a</span>) which
+contains code from several object files (<span class="file">.o</span>).  During the link
+step to create a shared object file (<span class="file">.so</span>), the linker may find
+that it doesn't know where an identifier is defined.  The linker will
+look for it in the object files in the libraries; if it finds it, it
+will include all the code from that object file.
+
+<p>
+In Windows, there are two types of library, a static library and an
+import library (both called <span class="file">.lib</span>).  A static library is like a
+<span class="Unix">Unix</span> <span class="file">.a</span> file; it contains code to be included as necessary.
+An import library is basically used only to reassure the linker that a
+certain identifier is legal, and will be present in the program when
+the DLL is loaded.  So the linker uses the information from the
+import library to build the lookup table for using identifiers that
+are not included in the DLL.  When an application or a DLL is linked,
+an import library may be generated, which will need to be used for all
+future DLLs that depend on the symbols in the application or DLL.
+
+<p>
+Suppose you are building two dynamic-load modules, B and C, which should
+share another block of code A.  On <span class="Unix">Unix</span>, you would <em>not</em> pass
+<span class="file">A.a</span> to the linker for <span class="file">B.so</span> and <span class="file">C.so</span>; that would
+cause it to be included twice, so that B and C would each have their
+own copy.  In Windows, building <span class="file">A.dll</span> will also build
+<span class="file">A.lib</span>.  You <em>do</em> pass <span class="file">A.lib</span> to the linker for B and
+C.  <span class="file">A.lib</span> does not contain code; it just contains information
+which will be used at runtime to access A's code.  
+
+<p>
+In Windows, using an import library is sort of like using "<tt class="samp">import
+spam</tt>"; it gives you access to spam's names, but does not create a
+separate copy.  On <span class="Unix">Unix</span>, linking with a library is more like
+"<tt class="samp">from spam import *</tt>"; it does create a separate copy.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.1 a Cookbook Approach"
+  href="win-cookbook.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. building C and"
+  href="building-on-windows.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.3 using DLLs in"
+  href="win-dlls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="win-cookbook.html">4.1 A Cookbook Approach</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="building-on-windows.html">4. Building C and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="win-dlls.html">4.3 Using DLLs in</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

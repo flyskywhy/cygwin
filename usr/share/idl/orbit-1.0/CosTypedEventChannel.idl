@@ -1,0 +1,46 @@
+#ifndef _CosTypedEventChannelAdmin_IDL_
+#define _CosTypedEventChannelAdmin_IDL_
+
+#pragma prefix "omg.org"
+
+#include "CosEventChannel.idl"
+#include "TypedEventComm.idl"
+
+module CosTypedEventChannelAdmin {
+	exception InterfaceNotSupported{};
+	exception NoSuchImplementation{};
+
+	typedef string Key;
+
+	interface TypedProxyPushConsumer:
+		CosEventChannelAdmin::ProxyPushConsumer,
+		CosTypedEventComm::TypedPushConsumer{};
+	
+	interface TypedProxyPullSupplier:
+		CosEventChannelAdmin::ProxyPullSupplier,
+		CosTypedEventComm::TypedPullSupplier{};
+
+	interface TypedSupplierAdmin:
+		CosEventChannelAdmin::SupplierAdmin {
+		TypedProxyPushConsumer obtain_typed_push_consumer(in Key supported_interface)
+			raises(InterfaceNotSupported);
+		CosEventChannelAdmin::ProxyPullConsumer obtain_typed_pull_consumer(in Key uses_interface)
+			raises(NoSuchImplementation);
+	};
+
+	interface TypedConsumerAdmin:
+		CosEventChannelAdmin::ConsumerAdmin {
+		TypedProxyPullSupplier obtain_typed_pull_supplier(in Key supported_interface)
+			raises(InterfaceNotSupported);
+		CosEventChannelAdmin::ProxyPushSupplier obtain_typed_push_supplier(in Key uses_interface)
+			raises(NoSuchImplementation);
+	};
+
+	interface TypedEventChannel {
+		TypedConsumerAdmin for_consumers();
+		TypedSupplierAdmin for_suppliers();
+		void destroy();
+	};
+};
+
+#endif /* !_CosTypedEventChannelAdmin_IDL_ */

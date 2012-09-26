@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="default-cookie-policy-objects.html" />
+<link rel="prev" href="file-cookie-jar-classes.html" />
+<link rel="parent" href="module-cookielib.html" />
+<link rel="next" href="default-cookie-policy-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.22.3 CookiePolicy Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.22.2 filecookiejar subclasses and"
+  href="file-cookie-jar-classes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.4 defaultcookiepolicy Objects"
+  href="default-cookie-policy-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="file-cookie-jar-classes.html">18.22.2 FileCookieJar subclasses and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="default-cookie-policy-objects.html">18.22.4 DefaultCookiePolicy Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00202230000000000000000"></a><a name="cookie-policy-objects"></a>
+<br>
+18.22.3 CookiePolicy Objects 
+</h2>
+
+<p>
+Objects implementing the <tt class="class">CookiePolicy</tt> interface have the
+following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4380' xml:id='l2h-4380' class="method">set_ok</tt></b>(</nobr></td>
+  <td><var>cookie, request</var>)</td></tr></table></dt>
+<dd>
+Return boolean value indicating whether cookie should be accepted from server.
+
+<p>
+<var>cookie</var> is a <tt class="class">cookielib.Cookie</tt> instance.  <var>request</var> is
+an object implementing the interface defined by the documentation for
+<tt class="method">CookieJar.extract_cookies()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4381' xml:id='l2h-4381' class="method">return_ok</tt></b>(</nobr></td>
+  <td><var>cookie, request</var>)</td></tr></table></dt>
+<dd>
+Return boolean value indicating whether cookie should be returned to server.
+
+<p>
+<var>cookie</var> is a <tt class="class">cookielib.Cookie</tt> instance.  <var>request</var> is
+an object implementing the interface defined by the documentation for
+<tt class="method">CookieJar.add_cookie_header()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4382' xml:id='l2h-4382' class="method">domain_return_ok</tt></b>(</nobr></td>
+  <td><var>domain, request</var>)</td></tr></table></dt>
+<dd>
+Return false if cookies should not be returned, given cookie domain.
+
+<p>
+This method is an optimization.  It removes the need for checking
+every cookie with a particular domain (which might involve reading
+many files).  Returning true from <tt class="method">domain_return_ok()</tt> and
+<tt class="method">path_return_ok()</tt> leaves all the work to <tt class="method">return_ok()</tt>.
+
+<p>
+If <tt class="method">domain_return_ok()</tt> returns true for the cookie domain,
+<tt class="method">path_return_ok()</tt> is called for the cookie path.  Otherwise,
+<tt class="method">path_return_ok()</tt> and <tt class="method">return_ok()</tt> are never called
+for that cookie domain.  If <tt class="method">path_return_ok()</tt> returns true,
+<tt class="method">return_ok()</tt> is called with the <tt class="class">Cookie</tt> object itself
+for a full check.  Otherwise, <tt class="method">return_ok()</tt> is never called for
+that cookie path.
+
+<p>
+Note that <tt class="method">domain_return_ok()</tt> is called for every
+<em>cookie</em> domain, not just for the <em>request</em> domain.  For
+example, the function might be called with both <code>".example.com"</code>
+and <code>"www.example.com"</code> if the request domain is
+<code>"www.example.com"</code>.  The same goes for
+<tt class="method">path_return_ok()</tt>.
+
+<p>
+The <var>request</var> argument is as documented for <tt class="method">return_ok()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4383' xml:id='l2h-4383' class="method">path_return_ok</tt></b>(</nobr></td>
+  <td><var>path, request</var>)</td></tr></table></dt>
+<dd>
+Return false if cookies should not be returned, given cookie path.
+
+<p>
+See the documentation for <tt class="method">domain_return_ok()</tt>.
+</dl>
+
+<p>
+In addition to implementing the methods above, implementations of the
+<tt class="class">CookiePolicy</tt> interface must also supply the following
+attributes, indicating which protocols should be used, and how.  All
+of these attributes may be assigned to.
+
+<p>
+<dl><dt><b><tt id='l2h-4384' xml:id='l2h-4384' class="member">netscape</tt></b></dt>
+<dd>
+Implement Netscape protocol.
+</dl>
+<dl><dt><b><tt id='l2h-4385' xml:id='l2h-4385' class="member">rfc2965</tt></b></dt>
+<dd>
+Implement RFC 2965 protocol.
+</dl>
+<dl><dt><b><tt id='l2h-4386' xml:id='l2h-4386' class="member">hide_cookie2</tt></b></dt>
+<dd>
+Don't add <span class="mailheader">Cookie2:</span> header to requests (the presence of
+this header indicates to the server that we understand RFC 2965
+cookies).
+</dl>
+
+<p>
+The most useful way to define a <tt class="class">CookiePolicy</tt> class is by
+subclassing from <tt class="class">DefaultCookiePolicy</tt> and overriding some or
+all of the methods above.  <tt class="class">CookiePolicy</tt> itself may be used as
+a 'null policy' to allow setting and receiving any and all cookies
+(this is unlikely to be useful).
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.22.2 filecookiejar subclasses and"
+  href="file-cookie-jar-classes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.4 defaultcookiepolicy Objects"
+  href="default-cookie-policy-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="file-cookie-jar-classes.html">18.22.2 FileCookieJar subclasses and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="default-cookie-policy-objects.html">18.22.4 DefaultCookiePolicy Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

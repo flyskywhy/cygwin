@@ -1,0 +1,175 @@
+################################################################################
+#
+# php.cygclass - functions for building PHP (PECL and PEAR) extensions
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: php.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+check_prog_req php
+
+PHP=/usr/bin/php
+PHP_CONFIG=/usr/bin/php-config
+PHPIZE=/usr/bin/phpize
+PECL=/usr/bin/pecl
+PEAR=/usr/bin/pear
+
+PHP_VERSION=$(${PHP_CONFIG} --version)
+PHP_EXTENSION_DIR=$(${PHP_CONFIG} --extension-dir)
+PHP_INI_DIR=/etc/php5
+PHP_PEAR_DIR=/usr/share/pear
+LIBPHP="-lphp5lib"
+
+case ${PN} in
+php-*)
+	ORIG_PN=${PN#php-}
+	DESCRIPTION="PHP ${ORIG_PN} extension"
+	;;
+esac
+
+case "${PHP_CHANNEL}" in
+'') ;;
+[Pp][Ee][Aa][Rr]|pear.php.net)
+	HOMEPAGE="http://pear.php.net/package/${ORIG_PN}/"
+	SRC_URI="http://download.pear.php.net/package/${ORIG_PN}-${PV}.tgz"
+	;;
+[Pp][Ee][Cc][Ll]|pecl.php.net)
+	HOMEPAGE="http://pecl.php.net/package/${ORIG_PN}/"
+	SRC_URI="http://pecl.php.net/get/${ORIG_PN}-${PV}.tgz"
+	;;
+*)
+	if ! $(${PEAR} list-channels | grep -q "^${PHP_CHANNEL} ")
+	then
+		if ! $(${PEAR} channel-discover ${PHP_CHANNEL} &> /dev/null)
+		then
+			error "php: unknown channel: ${PHP_CHANNEL}"
+		fi
+	fi
+	SRC_URI="http://${PHP_CHANNEL}/get/${ORIG_PN}-${PV}.tgz"
+	;;
+esac
+
+php_is_binary() {
+	if [ -f ${S}/config.m4 ]
+	then
+		return 0
+	else
+		return 1
+	fi
+}
+
+php_autoreconf() {
+	if [ ! -e config.m4 ]
+	then
+		error "config.m4 not found"
+	fi
+
+	${PHPIZE} || error "phpize failed"
+}
+
+php_compile() {
+	if php_is_binary
+	then
+		cygconf \
+			--disable-static \
+			--enable-${ORIG_PN}=shared --with-${ORIG_PN}=shared \
+			"${@}"
+
+		cygmake
+	fi
+}
+
+php_install() {
+	local PEXX
+
+	if php_is_binary
+	then
+		cygmake -j1 install INSTALL_ROOT=${D}
+		PEXX=PECL
+	else
+		PEXX=PEAR
+	fi
+
+	# unfortunately this won't register the binary extension
+	${!PEXX} install \
+		--force --loose --nobuild --nodeps --offline --packagingroot=${D} \
+		./package.xml \
+		|| error "${PEXX} install failed"
+}
+
+
+php_postinst() {
+	local x
+
+	if [ -d ${D}${PHP_EXTENSION_DIR} ]
+	then
+		dodir ${PHP_INI_DIR}/conf.d
+
+		for x in ${D}${PHP_EXTENSION_DIR}/*.dll
+		do
+			xf=${x##*/}
+			if $(objdump -p ${x} | grep -q zend_startup_module)
+			then
+				echo "zend_extension = ${PHP_EXTENSION_DIR}/${xf}" >> ${D}${PHP_INI_DIR}/conf.d/${xf%.dll}.ini
+			else
+				echo "extension = ${xf}" >> ${D}${PHP_INI_DIR}/conf.d/${xf%.dll}.ini
+			fi
+		done
+	fi
+
+	case ${PHP_CHANNEL} in
+	[Pp][Ee][Aa][Rr]|pear.php.net) ;;
+	[Pp][Ee][Cc][Ll]|pecl.php.net) ;;
+	'') ;;
+	*)	dodir /etc/postinstall
+		cat >> ${D}/etc/postinstall/${PN}.sh <<-_EOF
+			pear channel-discover ${PHP_CHANNEL} || true
+
+			_EOF
+		;;
+	esac
+
+	if [ -d ${D}${PHP_PEAR_DIR} ]
+	then
+		(cd ${D}${PHP_PEAR_DIR}
+		rm -fr .channels/ .depdb .depdblock .filemap .lock)
+	fi
+
+	rm -fr ${D}/tmp/pear
+}
+
+src_compile() {
+	lndirs
+	ln -sf ${S}/../package.xml ${B}
+
+	if php_is_binary
+	then
+		cd ${B}
+		php_autoreconf
+		CYGCONF_SOURCE=${B}
+		php_compile
+	fi
+}
+
+src_install() {
+	cd ${B}
+	php_install
+	php_postinst
+}

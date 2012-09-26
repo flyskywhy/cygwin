@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node565.html" />
+<link rel="prev" href="cgi-security.html" />
+<link rel="parent" href="module-cgi.html" />
+<link rel="next" href="node565.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.2.7 Installing your CGI script on a Unix system</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.6 caring about security"
+  href="cgi-security.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.8 testing your CGI"
+  href="node565.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cgi-security.html">18.2.6 Caring about security</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node565.html">18.2.8 Testing your CGI</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020270000000000000000">
+18.2.7 Installing your CGI script on a <span class="Unix">Unix</span> system</a>
+</h2>
+
+<p>
+Read the documentation for your HTTP server and check with your local
+system administrator to find the directory where CGI scripts should be
+installed; usually this is in a directory <span class="file">cgi-bin</span> in the server tree.
+
+<p>
+Make sure that your script is readable and executable by ``others''; the
+<span class="Unix">Unix</span> file mode should be <code>0755</code> octal (use "<tt class="samp">chmod 0755
+<var>filename</var></tt>").  Make sure that the first line of the script contains
+<code>#!</code> starting in column 1 followed by the pathname of the Python
+interpreter, for instance:
+
+<p>
+<div class="verbatim"><pre>
+#!/usr/local/bin/python
+</pre></div>
+
+<p>
+Make sure the Python interpreter exists and is executable by ``others''.
+
+<p>
+Make sure that any files your script needs to read or write are
+readable or writable, respectively, by ``others'' -- their mode
+should be <code>0644</code> for readable and <code>0666</code> for writable.  This
+is because, for security reasons, the HTTP server executes your script
+as user ``nobody'', without any special privileges.  It can only read
+(write, execute) files that everybody can read (write, execute).  The
+current directory at execution time is also different (it is usually
+the server's cgi-bin directory) and the set of environment variables
+is also different from what you get when you log in.  In particular, don't
+count on the shell's search path for executables (<a class="envvar" id='l2h-3828' xml:id='l2h-3828'>PATH</a>) or
+the Python module search path (<a class="envvar" id='l2h-3829' xml:id='l2h-3829'>PYTHONPATH</a>) to be set to
+anything interesting.
+
+<p>
+If you need to load modules from a directory which is not on Python's
+default module search path, you can change the path in your script,
+before importing other modules.  For example:
+
+<p>
+<div class="verbatim"><pre>
+import sys
+sys.path.insert(0, "/usr/home/joe/lib/python")
+sys.path.insert(0, "/usr/local/lib/python")
+</pre></div>
+
+<p>
+(This way, the directory inserted last will be searched first!)
+
+<p>
+Instructions for non-<span class="Unix">Unix</span> systems will vary; check your HTTP server's
+documentation (it will usually have a section on CGI scripts).
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.6 caring about security"
+  href="cgi-security.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.8 testing your CGI"
+  href="node565.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cgi-security.html">18.2.6 Caring about security</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node565.html">18.2.8 Testing your CGI</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

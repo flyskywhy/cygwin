@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node409.html" />
+<link rel="prev" href="multiple-destinations.html" />
+<link rel="parent" href="module-logging.html" />
+<link rel="next" href="node409.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.5.4 Sending and receiving logging events across a network
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.3 logging to multiple"
+  href="multiple-destinations.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.5 handler Objects"
+  href="node409.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="multiple-destinations.html">14.5.3 Logging to multiple</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node409.html">14.5.5 Handler Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0016540000000000000000"></a><a name="network-logging"></a>
+<br>
+14.5.4 Sending and receiving logging events across a network
+
+</h2>
+
+<p>
+Let's say you want to send logging events across a network, and handle them
+at the receiving end. A simple way of doing this is attaching a
+<tt class="class">SocketHandler</tt> instance to the root logger at the sending end:
+
+<p>
+<div class="verbatim"><pre>
+import logging, logging.handlers
+
+rootLogger = logging.getLogger('')
+rootLogger.setLevel(logging.DEBUG)
+socketHandler = logging.handlers.SocketHandler('localhost',
+                    logging.handlers.DEFAULT_TCP_LOGGING_PORT)
+# don't bother with a formatter, since a socket handler sends the event as
+# an unformatted pickle
+rootLogger.addHandler(socketHandler)
+
+# Now, we can log to the root logger, or any other logger. First the root...
+logging.info('Jackdaws love my big sphinx of quartz.')
+
+# Now, define a couple of other loggers which might represent areas in your
+# application:
+
+logger1 = logging.getLogger('myapp.area1')
+logger2 = logging.getLogger('myapp.area2')
+
+logger1.debug('Quick zephyrs blow, vexing daft Jim.')
+logger1.info('How quickly daft jumping zebras vex.')
+logger2.warning('Jail zesty vixen who grabbed pay from quack.')
+logger2.error('The five boxing wizards jump quickly.')
+</pre></div>
+
+<p>
+At the receiving end, you can set up a receiver using the
+<tt class="module">SocketServer</tt> module. Here is a basic working example:
+
+<p>
+<div class="verbatim"><pre>
+import cPickle
+import logging
+import logging.handlers
+import SocketServer
+import struct
+
+
+class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
+    """Handler for a streaming logging request.
+
+    This basically logs the record using whatever logging policy is
+    configured locally.
+    """
+
+    def handle(self):
+        """
+        Handle multiple requests - each expected to be a 4-byte length,
+        followed by the LogRecord in pickle format. Logs the record
+        according to whatever policy is configured locally.
+        """
+        while 1:
+            chunk = self.connection.recv(4)
+            if len(chunk) &lt; 4:
+                break
+            slen = struct.unpack("&gt;L", chunk)[0]
+            chunk = self.connection.recv(slen)
+            while len(chunk) &lt; slen:
+                chunk = chunk + self.connection.recv(slen - len(chunk))
+            obj = self.unPickle(chunk)
+            record = logging.makeLogRecord(obj)
+            self.handleLogRecord(record)
+
+    def unPickle(self, data):
+        return cPickle.loads(data)
+
+    def handleLogRecord(self, record):
+        # if a name is specified, we use the named logger rather than the one
+        # implied by the record.
+        if self.server.logname is not None:
+            name = self.server.logname
+        else:
+            name = record.name
+        logger = logging.getLogger(name)
+        # N.B. EVERY record gets logged. This is because Logger.handle
+        # is normally called AFTER logger-level filtering. If you want
+        # to do filtering, do it at the client end to save wasting
+        # cycles and network bandwidth!
+        logger.handle(record)
+
+class LogRecordSocketReceiver(SocketServer.ThreadingTCPServer):
+    """simple TCP socket-based logging receiver suitable for testing.
+    """
+
+    allow_reuse_address = 1
+
+    def __init__(self, host='localhost',
+                 port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+                 handler=LogRecordStreamHandler):
+        SocketServer.ThreadingTCPServer.__init__(self, (host, port), handler)
+        self.abort = 0
+        self.timeout = 1
+        self.logname = None
+
+    def serve_until_stopped(self):
+        import select
+        abort = 0
+        while not abort:
+            rd, wr, ex = select.select([self.socket.fileno()],
+                                       [], [],
+                                       self.timeout)
+            if rd:
+                self.handle_request()
+            abort = self.abort
+
+def main():
+    logging.basicConfig(
+        format="%(relativeCreated)5d %(name)-15s %(levelname)-8s %(message)s")
+    tcpserver = LogRecordSocketReceiver()
+    print "About to start TCP server..."
+    tcpserver.serve_until_stopped()
+
+if __name__ == "__main__":
+    main()
+</pre></div>
+
+<p>
+First run the server, and then the client. On the client side, nothing is
+printed on the console; on the server side, you should see something like:
+
+<p>
+<div class="verbatim"><pre>
+About to start TCP server...
+   59 root            INFO     Jackdaws love my big sphinx of quartz.
+   59 myapp.area1     DEBUG    Quick zephyrs blow, vexing daft Jim.
+   69 myapp.area1     INFO     How quickly daft jumping zebras vex.
+   69 myapp.area2     WARNING  Jail zesty vixen who grabbed pay from quack.
+   69 myapp.area2     ERROR    The five boxing wizards jump quickly.
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.3 logging to multiple"
+  href="multiple-destinations.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.5 handler Objects"
+  href="node409.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="multiple-destinations.html">14.5.3 Logging to multiple</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node409.html">14.5.5 Handler Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

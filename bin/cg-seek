@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#
+# Seek the working tree to a given commit
+# Copyright (c) Petr Baudis, 2005
+#
+# Seeking will bring the working tree from its current 'HEAD' to a given
+# commit. Note that it changes just the 'HEAD' of the working tree, not
+# the branch it is corresponding to. It will return to the 'HEAD' of
+# the appropriate branch if passed no arguments.
+#
+# Therefore, for a quick excursion to the past of the 'master' branch:
+#
+#	$ cg-seek git pasky-0.1
+#	$ cg-diff this master	# will do the correct thing
+#	$ cg-seek		# will restore what we had before
+#
+# For intuitiveness, specifying the branch name (`cg-seek master`) will do
+# the right thing too. If you want to migrate your working tree to _another_
+# branch, use `cg-clone` to create a new tree for the new branch, or
+# `cg-switch` to also change your current tree to use the new branch.
+#
+# Note that during the time you are seeked out, commits, merges, and some
+# other operations are blocked, since the next `cg-seek` or `cg-reset`
+# invocation will happily wipe out their products silently. You can override
+# this in the `cg-commit` command by passing it a '-f' parameter - this
+# can be useful e.g. when you seeked to a commit which cannot be compiled
+# and you want to commit a compilation fix, as long as you are aware that
+# the commit of the fix will be rendered unreachable (you will be able to
+# get back to it only if you remember its ID) at the moment you do next
+# seek or a reset. If you want to save the commit, you can save it to
+# a separate branch using `cg-switch -n`.
+#
+# Takes the target commit ID to seek to as an argument.
+#
+# NOTES
+# -----
+# The `cg-seek` command is meant only for temporary excursions to the commit
+# history. If you want to permanently switch your branch to a different commit
+# id (forgetting its current contents), you can use the `cg-switch` command:
+#
+#	$ cg-switch -f -r COMMIT_ID CURRENT_HEAD_NAME
+#
+# Note that this command has some serious caveats! Please read the
+# `cg-switch` documentation for details.
+
+# Testsuite: Complete (t9300-seek)
+
+USAGE="cg-seek [COMMIT_ID]"
+_git_requires_root=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+dstcommit="${ARGS[0]}"
+
+
+[ -s "$_git/blocked" ] && grep -vq '^seeked from ' "$_git/blocked" && die "action blocked: $(cat "$_git/blocked")"
+
+curcommit="$(cg-object-id -c)" || exit 1
+
+if [ "$dstcommit" ] && [ "$dstcommit" != "$_git_head" ]; then
+	seek_mode=away
+	[ -s "$_git/head-name" ] && [ "$(git symbolic-ref HEAD)" != "refs/heads/cg-seek-point" ] &&
+		die "seeked away by some other tool, refusing to meddle (you can still use cg-seek without any arguments to unseek)"
+	[ -s "$_git/refs/heads/$dstcommit" ] &&
+		warn "seeking to a branch head; this is not for permanent switching, please see cg-switch"
+else
+	seek_mode=back
+	dstcommit="$(cg-object-id -c "$_git_head")" || exit 1
+fi
+
+dstcommit="$(cg-object-id -c "$dstcommit")" || exit 1
+if [ "$curcommit" != "$dstcommit" ]; then
+	tree_timewarp --no-head-update "along" "please rollback" "$curcommit" "$dstcommit"
+fi
+
+if [ "$seek_mode" = "away" ]; then
+	echo "$_git_head" >"$_git/head-name"
+	[ -s "$_git/blocked" ] || echo "seeked from $_git_head (some commands can be still forced)" >"$_git/blocked"
+	# We hold this in a temporary branch so that some of the core
+	# GIT tools (git checkout and git fsck-objects) don't get confused.
+	echo "$dstcommit" >"$_git/refs/heads/cg-seek-point"
+	git symbolic-ref HEAD "refs/heads/cg-seek-point"
+else
+	git symbolic-ref HEAD "refs/heads/$_git_head"
+	rm -f "$_git/refs/heads/cg-seek-point" "$_git/head-name"
+	rm -f "$_git/blocked"
+fi
+
+echo "On commit $dstcommit"

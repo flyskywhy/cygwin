@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="typesother.html" />
+<link rel="prev" href="bltin-file-objects.html" />
+<link rel="parent" href="types.html" />
+<link rel="next" href="typesother.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.10 Context Manager Types </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.9 file Objects"
+  href="bltin-file-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. built-in Types"
+  href="types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.11 other Built-in Types"
+  href="typesother.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="bltin-file-objects.html">3.9 File Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="types.html">3. Built-in Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="typesother.html">3.11 Other Built-in Types</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0051000000000000000000"></a><a name="typecontextmanager"></a>
+<br>
+3.10 Context Manager Types 
+</h1>
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<a id='l2h-322' xml:id='l2h-322'></a>
+
+<p>
+Python's <tt class="keyword">with</tt> statement supports the concept of a runtime
+context defined by a context manager.  This is implemented using
+two separate methods that allow user-defined classes to define
+a runtime context that is entered before the statement body is
+executed and exited when the statement ends.
+
+<p>
+The <i class="dfn">context management protocol</i> consists of a pair of
+methods that need to be provided for a context manager object to
+define a runtime context:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-320' xml:id='l2h-320' class="method">__enter__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Enter the runtime context and return either this object or another
+  object related to the runtime context. The value returned by this
+  method is bound to the identifier in the <tt class="keyword">as</tt> clause of
+  <tt class="keyword">with</tt> statements using this context manager.
+
+<p>
+An example of a context manager that returns itself is a file object.
+  File objects return themselves from __enter__() to allow
+  <tt class="function">open()</tt> to be used as the context expression in a
+  <tt class="keyword">with</tt> statement.
+
+<p>
+An example of a context manager that returns a related
+  object is the one returned by <code>decimal.Context.get_manager()</code>.
+  These managers set the active decimal context to a copy of the
+  original decimal context and then return the copy. This allows
+  changes to be made to the current decimal context in the body of
+  the <tt class="keyword">with</tt> statement without affecting code outside
+  the <tt class="keyword">with</tt> statement.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-321' xml:id='l2h-321' class="method">__exit__</tt></b>(</nobr></td>
+  <td><var>exc_type, exc_val, exc_tb</var>)</td></tr></table></dt>
+<dd>
+  Exit the runtime context and return a Boolean flag indicating if any
+  expection that occurred should be suppressed. If an exception
+  occurred while executing the body of the <tt class="keyword">with</tt> statement, the
+  arguments contain the exception type, value and traceback information.
+  Otherwise, all three arguments are <var>None</var>.
+
+<p>
+Returning a true value from this method will cause the <tt class="keyword">with</tt>
+  statement to suppress the exception and continue execution with the
+  statement immediately following the <tt class="keyword">with</tt> statement. Otherwise
+  the exception continues propagating after this method has finished
+  executing. Exceptions that occur during execution of this method will
+  replace any exception that occurred in the body of the <tt class="keyword">with</tt>
+  statement.
+
+<p>
+The exception passed in should never be reraised explicitly - instead,
+  this method should return a false value to indicate that the method
+  completed successfully and does not want to suppress the raised
+  exception. This allows context management code (such as
+  <code>contextlib.nested</code>) to easily detect whether or not an
+  <tt class="method">__exit__()</tt> method has actually failed.
+</dl>
+
+<p>
+Python defines several context managers to support easy thread
+synchronisation, prompt closure of files or other objects, and
+simpler manipulation of the active decimal arithmetic
+context. The specific types are not treated specially beyond
+their implementation of the context management protocol.
+
+<p>
+Python's generators and the <code>contextlib.contextfactory</code> decorator
+provide a convenient way to implement these protocols.  If a generator
+function is decorated with the <code>contextlib.contextfactory</code>
+decorator, it will return a context manager implementing the necessary
+<tt class="method">__enter__()</tt> and <tt class="method">__exit__()</tt> methods, rather than the
+iterator produced by an undecorated generator function.
+
+<p>
+Note that there is no specific slot for any of these methods in the
+type structure for Python objects in the Python/C API. Extension
+types wanting to define these methods must provide them as a normal
+Python accessible method. Compared to the overhead of setting up the
+runtime context, the overhead of a single class dictionary lookup
+is negligible.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.9 file Objects"
+  href="bltin-file-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. built-in Types"
+  href="types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.11 other Built-in Types"
+  href="typesother.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="bltin-file-objects.html">3.9 File Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="types.html">3. Built-in Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="typesother.html">3.11 Other Built-in Types</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

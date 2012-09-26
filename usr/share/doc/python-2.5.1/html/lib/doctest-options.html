@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="doctest-warnings.html" />
+<link rel="prev" href="doctest-exceptions.html" />
+<link rel="parent" href="doctest-how-it-works.html" />
+<link rel="next" href="doctest-warnings.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.2.3.5 Option Flags and Directives</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.4 what About Exceptions?"
+  href="doctest-exceptions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2.3 how It Works"
+  href="doctest-how-it-works.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.3.6 Warnings"
+  href="doctest-warnings.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-exceptions.html">23.2.3.4 What About Exceptions?</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doctest-how-it-works.html">23.2.3 How It Works</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-warnings.html">23.2.3.6 Warnings</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0025235000000000000000"></a><a name="doctest-options"></a>
+<br>
+23.2.3.5 Option Flags and Directives
+</h3>
+
+<p>
+A number of option flags control various aspects of doctest's
+behavior.  Symbolic names for the flags are supplied as module constants,
+which can be or'ed together and passed to various functions.  The names
+can also be used in doctest directives (see below).
+
+<p>
+The first group of options define test semantics, controlling
+aspects of how doctest decides whether actual output matches an
+example's expected output:
+
+<p>
+<dl><dt><b><tt id='l2h-4938' xml:id='l2h-4938'>DONT_ACCEPT_TRUE_FOR_1</tt></b></dt>
+<dd>
+    By default, if an expected output block contains just <code>1</code>,
+    an actual output block containing just <code>1</code> or just
+    <code>True</code> is considered to be a match, and similarly for <code>0</code>
+    versus <code>False</code>.  When <tt class="constant">DONT_ACCEPT_TRUE_FOR_1</tt> is
+    specified, neither substitution is allowed.  The default behavior
+    caters to that Python changed the return type of many functions
+    from integer to boolean; doctests expecting "little integer"
+    output still work in these cases.  This option will probably go
+    away, but not for several years.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4939' xml:id='l2h-4939'>DONT_ACCEPT_BLANKLINE</tt></b></dt>
+<dd>
+    By default, if an expected output block contains a line
+    containing only the string <code>&lt;BLANKLINE&gt;</code>, then that line
+    will match a blank line in the actual output.  Because a
+    genuinely blank line delimits the expected output, this is
+    the only way to communicate that a blank line is expected.  When
+    <tt class="constant">DONT_ACCEPT_BLANKLINE</tt> is specified, this substitution
+    is not allowed.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4940' xml:id='l2h-4940'>NORMALIZE_WHITESPACE</tt></b></dt>
+<dd>
+    When specified, all sequences of whitespace (blanks and newlines) are
+    treated as equal.  Any sequence of whitespace within the expected
+    output will match any sequence of whitespace within the actual output.
+    By default, whitespace must match exactly.
+    <tt class="constant">NORMALIZE_WHITESPACE</tt> is especially useful when a line
+    of expected output is very long, and you want to wrap it across
+    multiple lines in your source.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4941' xml:id='l2h-4941'>ELLIPSIS</tt></b></dt>
+<dd>
+    When specified, an ellipsis marker (<code>...</code>) in the expected output
+    can match any substring in the actual output.  This includes
+    substrings that span line boundaries, and empty substrings, so it's
+    best to keep usage of this simple.  Complicated uses can lead to the
+    same kinds of "oops, it matched too much!" surprises that <tt class="regexp">.*</tt>
+    is prone to in regular expressions.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4942' xml:id='l2h-4942'>IGNORE_EXCEPTION_DETAIL</tt></b></dt>
+<dd>
+    When specified, an example that expects an exception passes if
+    an exception of the expected type is raised, even if the exception
+    detail does not match.  For example, an example expecting
+    "<tt class="samp">ValueError: 42</tt>" will pass if the actual exception raised is
+    "<tt class="samp">ValueError: 3*14</tt>", but will fail, e.g., if
+    <tt class="exception">TypeError</tt> is raised.
+
+<p>
+Note that a similar effect can be obtained using <tt class="constant">ELLIPSIS</tt>,
+    and <tt class="constant">IGNORE_EXCEPTION_DETAIL</tt> may go away when Python releases
+    prior to 2.4 become uninteresting.  Until then,
+    <tt class="constant">IGNORE_EXCEPTION_DETAIL</tt> is the only clear way to write a
+    doctest that doesn't care about the exception detail yet continues
+    to pass under Python releases prior to 2.4 (doctest directives
+    appear to be comments to them).  For example,
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; (1, 2)[3] = 'moo' #doctest: +IGNORE_EXCEPTION_DETAIL
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+TypeError: object doesn't support item assignment
+</pre></div>
+
+<p>
+passes under Python 2.4 and Python 2.3.  The detail changed in 2.4,
+    to say "does not" instead of "doesn't".
+
+<p>
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4943' xml:id='l2h-4943'>SKIP</tt></b></dt>
+<dd>
+
+<p>
+When specified, do not run the example at all.  This can be useful
+    in contexts where doctest examples serve as both documentation and
+    test cases, and an example should be included for documentation
+    purposes, but should not be checked.  E.g., the example's output
+    might be random; or the example might depend on resources which
+    would be unavailable to the test driver.
+
+<p>
+The SKIP flag can also be used for temporarily "commenting out"
+    examples.
+
+<p>
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4944' xml:id='l2h-4944'>COMPARISON_FLAGS</tt></b></dt>
+<dd>
+    A bitmask or'ing together all the comparison flags above.
+</dd></dl>
+
+<p>
+The second group of options controls how test failures are reported:
+
+<p>
+<dl><dt><b><tt id='l2h-4945' xml:id='l2h-4945'>REPORT_UDIFF</tt></b></dt>
+<dd>
+    When specified, failures that involve multi-line expected and
+    actual outputs are displayed using a unified diff.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4946' xml:id='l2h-4946'>REPORT_CDIFF</tt></b></dt>
+<dd>
+    When specified, failures that involve multi-line expected and
+    actual outputs will be displayed using a context diff.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4947' xml:id='l2h-4947'>REPORT_NDIFF</tt></b></dt>
+<dd>
+    When specified, differences are computed by <code>difflib.Differ</code>,
+    using the same algorithm as the popular <span class="file">ndiff.py</span> utility.
+    This is the only method that marks differences within lines as
+    well as across lines.  For example, if a line of expected output
+    contains digit <code>1</code> where actual output contains letter <code>l</code>,
+    a line is inserted with a caret marking the mismatching column
+    positions.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4948' xml:id='l2h-4948'>REPORT_ONLY_FIRST_FAILURE</tt></b></dt>
+<dd>
+  When specified, display the first failing example in each doctest,
+  but suppress output for all remaining examples.  This will prevent
+  doctest from reporting correct examples that break because of
+  earlier failures; but it might also hide incorrect examples that
+  fail independently of the first failure.  When
+  <tt class="constant">REPORT_ONLY_FIRST_FAILURE</tt> is specified, the remaining
+  examples are still run, and still count towards the total number of
+  failures reported; only the output is suppressed.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4949' xml:id='l2h-4949'>REPORTING_FLAGS</tt></b></dt>
+<dd>
+    A bitmask or'ing together all the reporting flags above.
+</dd></dl>
+
+<p>
+"Doctest directives" may be used to modify the option flags for
+individual examples.  Doctest directives are expressed as a special
+Python comment following an example's source code:
+
+<p>
+<dl><dd class="grammar">
+<div class="productions">
+<table>
+
+    <tr>
+    <td><a id='tok-directive' xml:id='tok-directive'>directive</a></td>
+    <td>::=</td>
+    <td>"#" "doctest:" <a class='grammartoken' href="doctest-options.html#tok-doctest-directive_options">directive_options</a></td></tr>
+    <tr>
+    <td><a id='tok-directive_options' xml:id='tok-directive_options'>directive_options</a></td>
+    <td>::=</td>
+    <td><a class='grammartoken' href="doctest-options.html#tok-doctest-directive_option">directive_option</a> ("," <a class='grammartoken' href="doctest-options.html#tok-doctest-directive_option">directive_option</a>)*</td></tr>
+    <tr>
+    <td><a id='tok-directive_option' xml:id='tok-directive_option'>directive_option</a></td>
+    <td>::=</td>
+    <td><a class='grammartoken' href="doctest-options.html#tok-doctest-on_or_off">on_or_off</a> <a class='grammartoken' href="doctest-options.html#tok-doctest-directive_option_name">directive_option_name</a></td></tr>
+    <tr>
+    <td><a id='tok-on_or_off' xml:id='tok-on_or_off'>on_or_off</a></td>
+    <td>::=</td>
+    <td>"+" | "-"</td></tr>
+    <tr>
+    <td><a id='tok-directive_option_name' xml:id='tok-directive_option_name'>directive_option_name</a></td>
+    <td>::=</td>
+    <td>"DONT_ACCEPT_BLANKLINE" | "NORMALIZE_WHITESPACE" | ...</td></tr>
+</table>
+</div>
+<a class="grammar-footer"
+  href="grammar-doctest.txt" type="text/plain"
+  >Download entire grammar as text.</a>
+</dd></dl>
+
+<p>
+Whitespace is not allowed between the <code>+</code> or <code>-</code> and the
+directive option name.  The directive option name can be any of the
+option flag names explained above.
+
+<p>
+An example's doctest directives modify doctest's behavior for that
+single example.  Use <code>+</code> to enable the named behavior, or
+<code>-</code> to disable it.
+
+<p>
+For example, this test passes:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print range(20) #doctest: +NORMALIZE_WHITESPACE
+[0,   1,  2,  3,  4,  5,  6,  7,  8,  9,
+10,  11, 12, 13, 14, 15, 16, 17, 18, 19]
+</pre></div>
+
+<p>
+Without the directive it would fail, both because the actual output
+doesn't have two blanks before the single-digit list elements, and
+because the actual output is on a single line.  This test also passes,
+and also requires a directive to do so:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print range(20) # doctest:+ELLIPSIS
+[0, 1, ..., 18, 19]
+</pre></div>
+
+<p>
+Multiple directives can be used on a single physical line, separated
+by commas:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print range(20) # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+[0,    1, ...,   18,    19]
+</pre></div>
+
+<p>
+If multiple directive comments are used for a single example, then
+they are combined:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print range(20) # doctest: +ELLIPSIS
+...                 # doctest: +NORMALIZE_WHITESPACE
+[0,    1, ...,   18,    19]
+</pre></div>
+
+<p>
+As the previous example shows, you can add "<tt class="samp">...</tt>" lines to your
+example containing only directives.  This can be useful when an
+example is too long for a directive to comfortably fit on the same
+line:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print range(5) + range(10,20) + range(30,40) + range(50,60)
+... # doctest: +ELLIPSIS
+[0, ..., 4, 10, ..., 19, 30, ..., 39, 50, ..., 59]
+</pre></div>
+
+<p>
+Note that since all options are disabled by default, and directives apply
+only to the example they appear in, enabling options (via <code>+</code> in a
+directive) is usually the only meaningful choice.  However, option flags
+can also be passed to functions that run doctests, establishing different
+defaults.  In such cases, disabling an option via <code>-</code> in a directive
+can be useful.
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+Constants <tt class="constant">DONT_ACCEPT_BLANKLINE</tt>,
+    <tt class="constant">NORMALIZE_WHITESPACE</tt>, <tt class="constant">ELLIPSIS</tt>,
+    <tt class="constant">IGNORE_EXCEPTION_DETAIL</tt>,
+    <tt class="constant">REPORT_UDIFF</tt>, <tt class="constant">REPORT_CDIFF</tt>,
+    <tt class="constant">REPORT_NDIFF</tt>, <tt class="constant">REPORT_ONLY_FIRST_FAILURE</tt>,
+    <tt class="constant">COMPARISON_FLAGS</tt> and <tt class="constant">REPORTING_FLAGS</tt>
+    were added; by default <code>&lt;BLANKLINE&gt;</code> in expected output
+    matches an empty line in actual output; and doctest directives
+    were added.</span>
+
+<span class="versionnote">Changed in version 2.5:
+Constant <tt class="constant">SKIP</tt> was added.</span>
+
+<p>
+There's also a way to register new option flag names, although this
+isn't useful unless you intend to extend <tt class="module"><a href="module-doctest.html">doctest</a></tt> internals
+via subclassing:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4950' xml:id='l2h-4950' class="function">register_optionflag</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+  Create a new option flag with a given name, and return the new
+  flag's integer value.  <tt class="function">register_optionflag()</tt> can be
+  used when subclassing <tt class="class">OutputChecker</tt> or
+  <tt class="class">DocTestRunner</tt> to create new options that are supported by
+  your subclasses.  <tt class="function">register_optionflag</tt> should always be
+  called using the following idiom:
+
+<p>
+<div class="verbatim"><pre>
+  MY_FLAG = register_optionflag('MY_FLAG')
+</pre></div>
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.4 what About Exceptions?"
+  href="doctest-exceptions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2.3 how It Works"
+  href="doctest-how-it-works.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.3.6 Warnings"
+  href="doctest-warnings.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-exceptions.html">23.2.3.4 What About Exceptions?</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doctest-how-it-works.html">23.2.3 How It Works</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-warnings.html">23.2.3.6 Warnings</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

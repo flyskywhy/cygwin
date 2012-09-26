@@ -1,0 +1,157 @@
+BINARY TAR.GZ DISTRIBUTIONS.
+============================
+
+To install a TCM distribution (tar.gz file) with binaries: unzip and untar 
+the TCM distribution by:
+
+tar xzvfp <filename>                         or 
+gunzip -c <filename> | tar xvfp -            or
+zcat <filename> | tar xvfp -            
+
+This creates a new directory named tcm-<version>/ in the current
+directory.
+ 
+Every user of TCM should set the TCM_HOME environment variable to the
+directory where TCM is installed. It is recommended that they add
+$TCM_HOME/bin to their PATH and add $TCM_HOME/man to their MANPATH
+environment variable.
+ 
+The distributions for Solaris contain shared object libraries. If you
+have one of these distributions and you have TCM installed in a directory
+other than /opt/tcm, each user should set the LD_LIBRARY_PATH
+variable like this: LD_LIBRARY_PATH=$TCM_HOME/lib:$LD_LIBRARY_PATH.
+Users of Linux do not need to set LD_LIBRARY_PATH.
+ 
+Finally, test the TCM startup tool called tcm and at least one of the editors
+(e.g. tgd, tefd, tssd etc).
+ 
+To configure amongst others the path names of some external Unix programs that 
+are used by TCM you can modify the $TCM_HOME/lib/tcm.conf file.
+
+For more information you are referred to our extensive user's guide which 
+can be found via $TCM_HOME/doc/usersguide.html and in
+$TCM_HOME/doc/usersguide-<version>.ps.gz (gzipped-Postscript).
+
+
+BINARY RPM DISTRIBUTIONS.
+=========================
+
+These distributions are made and tested with Redhat 6.0 and Redhat 6.1.
+
+Install the distribution by:
+rpm --install tcm-<version>.i386.rpm
+
+Or upgrade an existing distribution by:
+rpm --upgrade tcm-<version>.i386.rpm
+
+By default TCM is installed in /opt/tcm. With the rpm option
+'--prefix <dir>' you can install it in a different directory. Some of the 
+documentation will be installed by default in /usr/doc/tcm-<version>.
+
+There are two sorts of binary RPMs. One contains the name 'statmotif'
+and the other 'dynmotif'. The first sort has Motif statically 
+linked into the executables. The 'dynmotif' RPMs are dynamically
+linked against Motif 1.2. It uses the libXm.so (version 1.2) of Motif
+or Lesstif on your system.
+
+The RPM installation creates some initialization scripts for TCM in 
+/etc/profile.d. It is therefore not necessary to set yourself environment
+variables like for the tar.gz distribution.
+You only have to login again before you start using TCM.
+
+
+SOURCE TAR.GZ DISTRIBUTIONS
+===========================
+
+You untar the file in the same way as for binary distributions and you
+set the variables $TCM_HOME and $PATH.
+
+Go to $TCM_HOME and enter 'make'. This tries to configure some things
+and then writes some instructions to standard output for how to proceed.
+
+If the above method does not work well on your system or you are only
+interested in compiling some part of the sources then do the following:
+
+1. Change to the directory ./src of the distribution.
+2. Make a softlink named Config.tmpl to Config.tmpl_YOURPLATFORM.
+3. Check and, if necessary, update the settings in Config.tmpl.
+4. Make a softlink named Makefile to Makefile_YOURCOMPILER.
+5. make clean 
+6. make depend
+7. make all or make <someexecutable> or make <somelibrary>.
+   (step 7 can be repeated an infinite number of times).
+
+
+Additional technical information about compiling the software and
+about the internal structure of the software, see the document
+$TCM_HOME/doc/developersguide/index.html or 
+$TCM_HOME/doc/developersguide-<version>.ps.gz (gzipped PostScript).
+
+
+USER INTERFACE
+==============
+
+For compiling TCM you either need a developer version of Motif or the 
+free Motif-clone Lesstif (www.lesstif.org). 
+
+For running TCM binaries you need a Motif or Lesstif runtime library, 
+unless you have downloaded a distribution with 'statmotif' as
+substring in the file name.
+
+The looks of TCM is sometimes subject of discussion. For users who 
+liked how TCM looked last century there is an option in tcm.conf:
+	{ GUIstyle Classic }
+
+
+MOUSE ISSUES
+==============
+
+TCM needs a 3-button mouse. The left and middle buttons are the most 
+essential for drawing nodes and edges and the right button is only used 
+for a pop-up menu. Most 2-button mice emulate the middle button by 
+pressing both buttons at the same time or by pressing the left button 
+together with the Shift- or Ctrl-key. A possibly better solution is to 
+change the function of the right and middle mouse button with: 
+xmodmap -e "pointer = 1 3 2".
+
+If you're using a so-called 5-button mouse (IntelliMouse with wheel-button), 
+you can change the function of the right and middle mouse button with: 
+xmodmap -e "pointer = 1 3 2 4 5". 
+
+! NEW !
+As of version 1.98 the middle mouse button is not required anymore.
+Pressing or dragging with the left mouse button while you are pressing the
+Shift-key has the same effect as pressing or dragging the middle button. 
+
+
+FONT AND COLOR ISSUES
+=====================
+
+In $TCM_HOME/lib/tcm.conf you can see which (types of) fonts are used for 
+the TCM documents by default. If you wish some other font you can edit this
+file (or better, put the options in a personal file $HOME/.tcmrc ). 
+
+TCM uses scalable X fonts. If these are not installed or don't look good
+for your tastes then you can tell TCM to work with unscalable fonts by 
+specifying:
+       { ScalableFonts False }. 
+If you wish fonts of a certain foundry, e.g. only Adobe fonts, then specify 
+that with the following line in $TCM_HOME/lib/tcm.conf or $HOME/.tcmrc :
+       { FontFoundry Adobe }
+
+In $TCM_HOME/lib/TCM you can see which fonts and colors are being used for
+the Motif GUI of TCM. These can be overridden too if you wish. Changes to 
+these defaults can be added to your .Xdefaults or .Xresources file or 
+loaded for the current X session with the 'xrdb' command.
+
+
+EXPORT FORMATS
+==============
+
+TCM is able to generate Xfig format and PNG graphics format from a diagram.
+For the generation of PNG we rely on the fig2dev tool. You should have a fairly
+recent version of transfig (fig2dev is part of transfig). If you want to download 
+a recent version of fig2dev and you use Linux with RPM support, you could get one 
+of the 'transfig' packages from http://www.rpmfind.net. The sources can be 
+downloaded from: ftp://epb1.lbl.gov/xfig/. At these sites you can also find
+the sources or binaries of the Xfig drawing program.

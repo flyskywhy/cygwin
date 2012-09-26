@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-email.charset.html" />
+<link rel="prev" href="module-email.mime.text.html" />
+<link rel="parent" href="module-email.html" />
+<link rel="next" href="module-email.charset.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.1.5 Internationalized headers</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.4 creating email and"
+  href="module-email.mime.text.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.6 representing character sets"
+  href="module-email.charset.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.mime.text.html">7.1.4 Creating email and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.charset.html">7.1.6 Representing character sets</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009150000000000000000">
+7.1.5 Internationalized headers</a>
+</h2>
+<a name="module-email.header"></a>
+
+<p>
+<a class="rfc" id='rfcref-99297' xml:id='rfcref-99297'
+href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a> is the base standard that describes the format of email
+messages.  It derives from the older <a class="rfc" id='rfcref-99299' xml:id='rfcref-99299'
+href="http://www.faqs.org/rfcs/rfc822.html">RFC 822</a> standard which came
+into widespread use at a time when most email was composed of ASCII
+characters only.  <a class="rfc" id='rfcref-99301' xml:id='rfcref-99301'
+href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a> is a specification written assuming email
+contains only 7-bit ASCII characters.
+
+<p>
+Of course, as email has been deployed worldwide, it has become
+internationalized, such that language specific character sets can now
+be used in email messages.  The base standard still requires email
+messages to be transferred using only 7-bit ASCII characters, so a
+slew of RFCs have been written describing how to encode email
+containing non-ASCII characters into <a class="rfc" id='rfcref-99303' xml:id='rfcref-99303'
+href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>-compliant format.
+These RFCs include <a class="rfc" id='rfcref-99305' xml:id='rfcref-99305'
+href="http://www.faqs.org/rfcs/rfc2045.html">RFC 2045</a>, <a class="rfc" id='rfcref-99307' xml:id='rfcref-99307'
+href="http://www.faqs.org/rfcs/rfc2046.html">RFC 2046</a>, <a class="rfc" id='rfcref-99309' xml:id='rfcref-99309'
+href="http://www.faqs.org/rfcs/rfc2047.html">RFC 2047</a>, and <a class="rfc" id='rfcref-99311' xml:id='rfcref-99311'
+href="http://www.faqs.org/rfcs/rfc2231.html">RFC 2231</a>.
+The <tt class="module">email</tt> package supports these standards in its
+<tt class="module">email.header</tt> and <tt class="module">email.charset</tt> modules.
+
+<p>
+If you want to include non-ASCII characters in your email headers,
+say in the <span class="mailheader">Subject:</span> or <span class="mailheader">To:</span> fields, you should
+use the <tt class="class">Header</tt> class and assign the field in the
+<tt class="class">Message</tt> object to an instance of <tt class="class">Header</tt> instead of
+using a string for the header value.  Import the <tt class="class">Header</tt> class from the
+<tt class="module">email.header</tt> module.  For example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from email.message import Message
+&gt;&gt;&gt; from email.header import Header
+&gt;&gt;&gt; msg = Message()
+&gt;&gt;&gt; h = Header('p\xf6stal', 'iso-8859-1')
+&gt;&gt;&gt; msg['Subject'] = h
+&gt;&gt;&gt; print msg.as_string()
+Subject: =?iso-8859-1?q?p=F6stal?=
+</pre></div>
+
+<p>
+Notice here how we wanted the <span class="mailheader">Subject:</span> field to contain a
+non-ASCII character?  We did this by creating a <tt class="class">Header</tt>
+instance and passing in the character set that the byte string was
+encoded in.  When the subsequent <tt class="class">Message</tt> instance was
+flattened, the <span class="mailheader">Subject:</span> field was properly <a class="rfc" id='rfcref-99313' xml:id='rfcref-99313'
+href="http://www.faqs.org/rfcs/rfc2047.html">RFC 2047</a>
+encoded.  MIME-aware mail readers would show this header using the
+embedded ISO-8859-1 character.
+
+<p>
+
+<span class="versionnote">New in version 2.2.2.</span>
+
+<p>
+Here is the <tt class="class">Header</tt> class description:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1271' xml:id='l2h-1271' class="class">Header</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>s</var><big>[</big><var>, charset</var><big>[</big><var>,
+    maxlinelen</var><big>[</big><var>, header_name</var><big>[</big><var>, continuation_ws</var><big>[</big><var>,
+    errors</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Create a MIME-compliant header that can contain strings in different
+character sets.
+
+<p>
+Optional <var>s</var> is the initial header value.  If <code>None</code> (the
+default), the initial header value is not set.  You can later append
+to the header with <tt class="method">append()</tt> method calls.  <var>s</var> may be a
+byte string or a Unicode string, but see the <tt class="method">append()</tt>
+documentation for semantics.
+
+<p>
+Optional <var>charset</var> serves two purposes: it has the same meaning as
+the <var>charset</var> argument to the <tt class="method">append()</tt> method.  It also
+sets the default character set for all subsequent <tt class="method">append()</tt>
+calls that omit the <var>charset</var> argument.  If <var>charset</var> is not
+provided in the constructor (the default), the <code>us-ascii</code>
+character set is used both as <var>s</var>'s initial charset and as the
+default for subsequent <tt class="method">append()</tt> calls.
+
+<p>
+The maximum line length can be specified explicit via
+<var>maxlinelen</var>.  For splitting the first line to a shorter value (to
+account for the field header which isn't included in <var>s</var>,
+e.g. <span class="mailheader">Subject:</span>) pass in the name of the field in
+<var>header_name</var>.  The default <var>maxlinelen</var> is 76, and the
+default value for <var>header_name</var> is <code>None</code>, meaning it is not
+taken into account for the first line of a long, split header.
+
+<p>
+Optional <var>continuation_ws</var> must be <a class="rfc" id='rfcref-99315' xml:id='rfcref-99315'
+href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>-compliant folding
+whitespace, and is usually either a space or a hard tab character.
+This character will be prepended to continuation lines.
+</dl>
+
+<p>
+Optional <var>errors</var> is passed straight through to the
+<tt class="method">append()</tt> method.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1272' xml:id='l2h-1272' class="method">append</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, charset</var><big>[</big><var>, errors</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Append the string <var>s</var> to the MIME header.
+
+<p>
+Optional <var>charset</var>, if given, should be a <tt class="class">Charset</tt> instance
+(see <tt class="module"><a href="module-email.charset.html">email.charset</a></tt>) or the name of a character set, which
+will be converted to a <tt class="class">Charset</tt> instance.  A value of
+<code>None</code> (the default) means that the <var>charset</var> given in the
+constructor is used.
+
+<p>
+<var>s</var> may be a byte string or a Unicode string.  If it is a byte
+string (i.e. <code>isinstance(s, str)</code> is true), then
+<var>charset</var> is the encoding of that byte string, and a
+<tt class="exception">UnicodeError</tt> will be raised if the string cannot be
+decoded with that character set.
+
+<p>
+If <var>s</var> is a Unicode string, then <var>charset</var> is a hint
+specifying the character set of the characters in the string.  In this
+case, when producing an <a class="rfc" id='rfcref-99317' xml:id='rfcref-99317'
+href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>-compliant header using <a class="rfc" id='rfcref-99319' xml:id='rfcref-99319'
+href="http://www.faqs.org/rfcs/rfc2047.html">RFC 2047</a>
+rules, the Unicode string will be encoded using the following charsets
+in order: <code>us-ascii</code>, the <var>charset</var> hint, <code>utf-8</code>.  The
+first character set to not provoke a <tt class="exception">UnicodeError</tt> is used.
+
+<p>
+Optional <var>errors</var> is passed through to any <tt class="function">unicode()</tt> or
+<tt class="function">ustr.encode()</tt> call, and defaults to ``strict''.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1273' xml:id='l2h-1273' class="method">encode</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>splitchars</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Encode a message header into an RFC-compliant format, possibly
+wrapping long lines and encapsulating non-ASCII parts in base64 or
+quoted-printable encodings.  Optional <var>splitchars</var> is a string
+containing characters to split long ASCII lines on, in rough support
+of <a class="rfc" id='rfcref-99321' xml:id='rfcref-99321'
+href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>'s <em>highest level syntactic breaks</em>.  This doesn't
+affect <a class="rfc" id='rfcref-99323' xml:id='rfcref-99323'
+href="http://www.faqs.org/rfcs/rfc2047.html">RFC 2047</a> encoded lines.
+</dl>
+
+<p>
+The <tt class="class">Header</tt> class also provides a number of methods to support
+standard operators and built-in functions.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1274' xml:id='l2h-1274' class="method">__str__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A synonym for <tt class="method">Header.encode()</tt>.  Useful for
+<code>str(aHeader)</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1275' xml:id='l2h-1275' class="method">__unicode__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A helper for the built-in <tt class="function">unicode()</tt> function.  Returns the
+header as a Unicode string.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1276' xml:id='l2h-1276' class="method">__eq__</tt></b>(</nobr></td>
+  <td><var>other</var>)</td></tr></table></dt>
+<dd>
+This method allows you to compare two <tt class="class">Header</tt> instances for equality.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1277' xml:id='l2h-1277' class="method">__ne__</tt></b>(</nobr></td>
+  <td><var>other</var>)</td></tr></table></dt>
+<dd>
+This method allows you to compare two <tt class="class">Header</tt> instances for inequality.
+</dl>
+
+<p>
+The <tt class="module">email.header</tt> module also provides the following
+convenient functions.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1278' xml:id='l2h-1278' class="function">decode_header</tt></b>(</nobr></td>
+  <td><var>header</var>)</td></tr></table></dt>
+<dd>
+Decode a message header value without converting the character set.
+The header value is in <var>header</var>.
+
+<p>
+This function returns a list of <code>(decoded_string, charset)</code> pairs
+containing each of the decoded parts of the header.  <var>charset</var> is
+<code>None</code> for non-encoded parts of the header, otherwise a lower
+case string containing the name of the character set specified in the
+encoded string.
+
+<p>
+Here's an example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from email.header import decode_header
+&gt;&gt;&gt; decode_header('=?iso-8859-1?q?p=F6stal?=')
+[('p\xf6stal', 'iso-8859-1')]
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1279' xml:id='l2h-1279' class="function">make_header</tt></b>(</nobr></td>
+  <td><var>decoded_seq</var><big>[</big><var>, maxlinelen</var><big>[</big><var>,
+    header_name</var><big>[</big><var>, continuation_ws</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Create a <tt class="class">Header</tt> instance from a sequence of pairs as returned
+by <tt class="function">decode_header()</tt>.
+
+<p>
+<tt class="function">decode_header()</tt> takes a header value string and returns a
+sequence of pairs of the format <code>(decoded_string, charset)</code> where
+<var>charset</var> is the name of the character set.
+
+<p>
+This function takes one of those sequence of pairs and returns a
+<tt class="class">Header</tt> instance.  Optional <var>maxlinelen</var>,
+<var>header_name</var>, and <var>continuation_ws</var> are as in the
+<tt class="class">Header</tt> constructor.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.4 creating email and"
+  href="module-email.mime.text.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.6 representing character sets"
+  href="module-email.charset.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.mime.text.html">7.1.4 Creating email and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-email.charset.html">7.1.6 Representing character sets</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

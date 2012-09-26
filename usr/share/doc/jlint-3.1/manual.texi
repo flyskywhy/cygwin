@@ -1,0 +1,1727 @@
+'\input texinfo   @c -*-texinfo-*-
+@setfilename readme.texi
+@c Jlint will check your Java code and find bugs, inconsistencies and synch-
+@c ronization problems by doing data flow analysis and building a lock graph.
+@c
+@c Original version (1.11) by Konstantin Knizhnik.
+@c Enhanced version (2.0) and a few bug fixes by Cyrille Artho.
+@c Version 2.1: FreeBSD port by Cyrille Artho, Visual C++ port by Maarten Breddels.
+@c
+@c This program is free software; you can redistribute it and/or
+@c modify it under the terms of the GNU General Public
+@c License as published by the Free Software Foundation; either
+@c version 2 of the License, or (at your option) any later version.
+@c
+@c This program is distributed in the hope that it will be useful,
+@c but WITHOUT ANY WARRANTY; without even the implied warranty of
+@c MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+@c General Public License for more details.
+@c
+@c You should have received a copy of the GNU General Public
+@c License along with this library; if not, write to the Free
+@c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+@c MA 02111-1307, USA.
+
+@dircategory Programming tools
+@direntry
+* jlint: (jlint). Java program checker
+@end direntry
+
+@titlepage
+@title Jlint manual
+@subtitle Java program checker
+@author Konstantin Knizhnik, Cyrille Artho
+     
+@c  The following two commands
+@c  start the copyright page.
+@page
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+MA 02111-1307, USA.
+@end titlepage
+
+@contents
+
+@node Jlint, , ,
+
+@top jlint
+
+This document described Jlint, a Java program checker that will check your Java code and find bugs, inconsistencies and synchronization problems by doing data flow analysis and building a lock graph.
+
+@menu
+* Introduction::              Introduction.
+* Bugs detected by AntiC::    Overview of AntiC.
+* Bugs detected by Jlint::    Overview of Jlint.
+* Command line options::      Usage of antic and jlint.
+* How to build::              Information about the Makefile.
+* Release notes::             Release notes.
+@end menu
+
+@node Introduction, Bugs detected by AntiC, , (dir)
+
+@chapter Introduction
+Jlint will check your Java code and find bugs, inconsistencies
+and synchronization problems by doing data flow analysis and building
+lock graph.
+
+Jlint consists of two separate programs performing syntax and semantic 
+verification. As far as Java mostly inherits C/C++ syntax and so 
+inherits most of the problems caused by C syntax, the idea was
+to create common syntax verifier for all C-family languages:
+C, C++, Objective C and Java. This program was named @strong{@emph{AntiC}},
+because it fixes problems with C grammar, which can cause dangerous
+programmer's bugs, undetected by compiler. By using hand-written scanner
+and simple top-down parser, AntiC is able to detect such bugs as 
+suspicious use of operators priorities, absence of break in switch 
+code, wrong assumption about constructions bodies...
+
+Semantic verifier Jlint extracts information from Java class files. 
+As far as Java class file has very well specified and simple format,
+it greatly simplifies Jlint in comparison with source level verifiers, 
+because development of Java grammar parser is not a simple task
+(even through Java grammar is simpler and less ambiguous than C++ grammar).
+Also dealing only with class files, protect Jlint from further Java extensions
+(format of virtual byte instructions is more conservative). By using
+debugging information Jlint can associate reported messages with Java sources.
+
+
+Jlint performs local and global data flow analyses, calculating possible
+values of local variables and catching redundant and suspicious
+calculations. By performing global method invocation analysis, 
+Jlint is able to detect invocation of method with possible "null"
+value of formal parameter and using of this parameter in method
+without check for "null". Jlint also builds lock dependency graph for classes 
+dependencies and uses
+this graph to detect situations, which can cause @emph{deadlock} during 
+multi-threaded program execution. Except deadlocks, Jlint is able
+to detect possible @emph{race condition} problem, when different threads
+can concurrently access the same variables.
+Certainly Jlint can't catch all synchronization problems, but at least it
+can do something, which can save you a lot of time, because 
+synchronization bugs are the most dangerous bugs: non-deterministic,
+and not always reproducible. Unfortunately Java compiler can't help
+you with detecting synchronization bugs, may be Jlint can...
+
+Jlint uses smart approach to message reporting. All messages are 
+grouped in categories, and it is possible to enable or disable reporting
+messages of specific category as well as concrete messages. Jlint can remember
+reported messages and do not report them once again when you run Jlint second
+time. This feature is implemented by means of history file. If you 
+specify @var{-history} option, then before reporting
+a message, Jlint searches in this file if such message was already 
+reported in the past. If so, then no message is reported and programmer will 
+not have to spend time parsing the same messages several times. 
+If message was not found in history file, it is reported and appended
+to history file to eliminate reporting of this message in future.
+Some messages refer to class/method name and are position independent,
+while some messages are reported for specific statement in method's code.
+Messages of second type will not be repeatedly reported only if
+method's source is not changed.
+
+@node Bugs detected by AntiC, Bugs detected by Jlint, Introduction, (dir)
+
+@chapter Bugs detected by AntiC
+
+Input of AntiC should be valid C/C++ or Java program with no syntax errors.
+If there are some syntax errors in the program, AntiC can detect some of them
+and produce error message, but it doesn't try to perform full syntax checking 
+and can't recover after some errors. So in this chapter we discuss only the
+messages produced by AntiC for program without syntax errors. 
+
+@node Bugs in tokens, Operator priorities, , Bugs detected by AntiC
+@section Bugs in tokens
+@subsection Octal digit expected
+Sequence of digits in string or character constant preceded by '\\'
+character contains non-octal digit:
+
+@example
+     printf("\128");    
+@end example
+
+@subsection May be more than three octal digits are specified
+Sequence of digits in string or character constant preceded by '\\'
+character contains more than three digits:
+
+@example  
+    printf("\1234");    
+@end example
+
+@subsection May be more than four hex digits are 
+specified for character constant
+
+String constant contains escape sequence for Unicode character, 
+followed by character, which can be treated as hexadecimal digit:
+
+@example  
+    System.out.println("\uABCDE:");     
+@end example
+
+@subsection May be incorrect escape sequence
+
+Non-standard escape sequence is used in character or string constant:
+
+@example  
+    printf("\x");       
+@end example
+
+@subsection Trigraph sequence inside string
+Some C/C++ compilers still support trigraph sequences of ANSI C and replace
+the following sequences of characters 
+("??=", "??/", "??'", "??(", "??)", "??!", "??") 
+with the characters 
+("#", "\", "^", "[", "]", "|", "{", "}") 
+respectively. This feature may cause unexpected transformation of string 
+constants:
+
+@example 
+    char* p = "???=undefined";
+@end example
+
+@subsection Multi-byte character constants are not portable
+
+Multi-byte character constants are possible in C, but makes program non-portable.
+
+@example 
+    char ch = 'ab';
+@end example
+
+
+@subsection May be 'l' is used instead of '1' at the end of integer constant
+
+It is difficult to distinct lower case letter 'l' and digit '1'. As far as 
+letter 'l' can be used as long modifier at the end of integer constant, 
+it can be mixed with digit. It is better to use upper-case 'L':
+
+@example
+    long l = 0x111111l;
+@end example
+
+
+@node Operators priorities, Statement body, Bugs in tokens, Bugs detected by AntiC
+
+@section Operator priorities
+
+@subsection May be wrong assumption about operators precedence
+
+Several operators with non-intuitive clear precedence are used without
+explicit grouping by parentheses. Sometimes programmer's assumption about 
+operators priorities is not true, and in any case enclosing such operations in 
+parentheses can only increase readability of program. Below is list of some
+suspicious combinations of operators:
+
+@example
+    x & y == z
+    x && y & z
+    x || y = z
+@end example
+
+@subsection May be wrong assumption about logical operators precedence
+
+Priority of logical AND operator is higher than priority of logical OR 
+operator. So AND expression will be evaluated before OR expression even
+if OR precedes AND:
+
+@example
+    x || y && z 
+@end example
+
+@subsection May be wrong assumption about shift operator priority
+
+Priority of shift is smaller than of arithmetic operators but less than 
+of bit manipulation operators. It can cause wrong assumption about operands 
+grouping:
+
+@example
+    x>>y - 1
+    x >> y&7
+@end example
+
+@subsection May be '=' used instead of '=='
+
+Almost all C programmer did this bug, at least once in their life. 
+It very easy to type '=' instead of '==' and not all C compilers
+can detect this situation. Moreover this bug is inherited by Java:
+the only restriction is that types of operands should be boolean:
+
+@example
+    if (x = y) {}
+@end example
+
+@subsection May be skipped parentheses around assign operator
+
+Assign operators have one of the smallest priorities. So if you want to test
+result of assignment operation, you should enclose it in parentheses:
+
+@example
+    if (x>>=1 != 0) {}
+@end example
+
+@subsection May be wrong assumption about bit operation priority
+
+Bit manipulation operators have smaller priority than compare operators.
+If you, for example, extracting bits using bit AND operator, do not
+forget to enclose it with parentheses, otherwise result of the expression
+will be far from your expectation:
+
+@example
+    if (x == y & 1) {}
+@end example
+
+
+@node Statement body, , Operator priorities, Bugs detected by AntiC
+
+@section Statement body
+
+Almost all C statements can contain as its sub-part either single statement or
+block of statements (enclosed by braces). Unnoticed semicolon or wrong 
+alignment can confuse programmer about real statement's body. 
+And compiler can't produce any warnings, because it deals with stream of 
+tokens, without information about code alignment.
+
+
+@subsection May be wrong assumption about loop body
+
+This message is produced if loop body is not enclosed in braces and 
+indentation of the statement following the loop is bigger than of loop
+statement (i.e. it is shifted right):
+
+@example
+while (x != 0) 
+    x >>= 1;
+    n += 1;
+return x;
+@end example
+
+@subsection May be wrong assumption about IF body
+This message is produced if IF body is not enclosed in braces and indentation 
+of the statement following the IF construction is bigger than of IF 
+statement itself (i.e. it is shifted right) or IF body is empty statement 
+(';'):
+
+
+@example
+    if (x > y);
+    {
+        int tmp = x;
+        x = y;
+        y = tmp; 
+    }
+
+    if (x != 0) 
+        x = -x; sign = -1;
+    sqr = x*x;
+@end example 
+
+@subsection May be wrong assumption about ELSE branch association
+
+If there are no braces, then ELSE branch belongs to most inner IF. Sometimes 
+programmers forget about it: 
+
+@example
+    if (rc != 0) 
+        if (perr) *perr = rc;
+    else return Ok;
+@end example
+
+@subsection Suspicious SWITCH without body
+
+Switch statement body is not a block. With great probability it signals 
+about some error in program:
+
+@example
+    switch(j) { 
+      case 1:
+        ...
+      case 2:
+        switch(ch);  
+        {
+          case 'a':
+          case 'b':
+            ...
+        }
+    }
+@end example
+
+@subsection Suspicious CASE/DEFAULT
+
+Case is found  in block not belonging to switch operator. Situations, 
+where such possibility can be used are very rare:
+
+@example
+    switch (n & 3) {
+        do { 
+            default:
+                *dst++ = 0;
+            case 3:
+                *dst++ = *drc++;
+            case 2:
+                *dst++ = *drc++;
+            case 1:
+                *dst++ = *drc++;
+        } while ((n -= 4) > 0;
+    }
+@end example
+
+@subsection Possible miss of BREAK before CASE/DEFAULT
+
+
+AntiC performs some kind of control flow analysis to detect situations, where
+control can be passed from one case branch to another (if programmer
+forget about BREAK statement). Sometimes it is necessary to merge 
+several branches. AntiC doesn't produce this message in following cases:
+
+@enumerate
+@item Several cases point to the same statement:
+@example
+    case '+':
+    case '-':
+      sign = 1;
+      break;
+@end example
+@item Special @code{nobreak} macro is defined and used in switch statement:
+
+@example
+    #define nobreak
+    ...
+    switch (cop) { 
+      case sub:
+        sp[-1] = -sp[1];
+        nobreak;
+      case add:
+        sp[-2] += sp[-1]; 
+        break;
+        ...
+}
+@end example
+
+@item Comment containing words "break" or "fall" is placed before the case:
+
+@example
+    switch (x) { 
+      case do_some_extra_work:
+        ...
+        // fall thru
+      case do_something:
+        ...
+    }
+@end example
+@end enumerate
+
+In all other cases message is produced when control can be passed from
+one switch branch to another:
+
+@example
+    switch (action) { 
+      case op_remove:
+        do_remove(); 
+      case op_insert:
+        do_insert();
+      case op_edit:
+        do_edit();
+    }
+@end example
+
+@node Bugs detected by Jlint, Command line options, Bugs detected by AntiC, (dir)
+
+@chapter Bugs detected by Jlint
+
+There are three main groups of messages produced by Jlint:
+@strong{@emph{synchronization, inheritance}} and @strong{@emph{data flow}}. 
+These groups are distinguished by kind of analysis which is used
+to detect problems, reported in this messages. Each group is in turn divided 
+into several categories, which contains one or more messages. 
+Such scheme of message classification is used to support
+fine-grained selection of reported messages.
+
+Because only categories of message can be disabled, but not separate messages, a short shell script is supplied that will suppress certain warnings that are less important. It should be noted that it will ignore any race conditions for variables. This is because Jlint does not have any notion of "shared reading", so it usually produces too many warnings about such data races to be useful. For some projects, using Jlint's output unfiltered can still be useful.
+
+The shell script is as follows:
+@example
+@include jlint.sh
+@end example
+
+It is probably more easier to run Jlint using those filters, with
+@example
+cd <dir_with_class_files>
+jlint.sh
+@end example
+
+@node Synchronization, Inheritance, , Bugs detected by Jlint
+
+@section Synchronization
+
+Parallel execution of several threads of control requires some 
+synchronization mechanism to avoid access conflicts to shared data. 
+Java approach to synchronization is based on using object monitors, controlled
+by @code{synchronized} language construction. Monitor is always 
+associated with object and prevents concurrent access to the object by using 
+mutual exclusion strategy. Java also supports facilities for waiting and 
+notification of some condition.
+
+Unfortunately, providing these synchronization primitives, Java compiler
+and virtual machine are not able to detect or prevent synchronization problems.
+Synchronization bugs are the most difficult bugs, because of non-deterministic
+behaviour of multi-threaded program. There are two main sources of 
+synchronization problems: deadlocks and race conditions.
+
+Situation in which one or more threads mutually lock each other is called 
+deadlock. Usually the reason of deadlock is inconsistent order of 
+resource locking by different threads. In Java case resources are object 
+monitors and deadlock can be caused by some sequence of method invocations.
+Let's look at the following example of multi-threaded database server:
+
+@example
+    class DatabaseServer { 
+        public TransactionManager transMgr;
+        public ClassManager       classMgr;
+        ...
+    }
+    class TransactionManager { 
+        protected DatabaseServer server;
+
+        public synchronized void commitTransaction(ObjectDesc[] t_objects) {
+            ...
+            for (int i = 0; i < t_objects.length; i++) { 
+                ClassDesc desc = server.classMgr.getClassInfo(t_objects[i]);
+                ...
+            }
+            ...
+        }
+        ...
+   }
+   class ClassManager { 
+        protected DatabaseServer server;
+           
+        public synchronized ClassDesc getClassInfo(ObjectDesc object) { 
+            ...
+        }
+        public synchronized void addClass(ClassDesc desc) { 
+            ObjectDesc t_objects;
+            ...
+            // Organized transaction to insert new class in database
+            server.transMgr.commit_transaction(t_objects);
+        }
+    };
+@end example 
+
+If database server has one thread for each client and one client is committing
+transaction while another client adds new class to database, then deadlock
+can arise. Consider the following sequence:
+
+@enumerate
+@item Client A invokes method @code{TransactionManager.commitTransaction()}. 
+While execution of this method monitor of TransactionManager object is locked.
+
+@item Client B invokes method @code{ClassManager.addClass()} and
+locks monitor of ClassManager object.
+
+@item Method @code{TransactionManager.commitTransaction()} tries to invoke
+method @code{ClassManager.getClassInfo()} but has to wait because this 
+object is locked by another thread.
+
+@item Method @code{ClassManager.addClass()} tries to invoke
+method @code{TransactionManager.commitTransaction()} but has to wait 
+because this object is locked by another thread.
+@end enumerate
+
+So we have deadlock and database server is halted and can't serve any client.
+The reason of this deadlock is loop in locking graph. Let's explain it less 
+formally. We will construct oriented graph G of monitor lock relations.
+As far as locked resource are objects, so vertexes of this graph should be 
+objects. But this analysis can't be done statically, because set of all object
+instances is not known at compile time. So the only kind
+of analysis, which Jlint is able to perform, is analysis of inter-class
+dependencies. So the vertexes of graph G will be classes. More precisely, 
+each class C is represented by two vertexes: vertex C for class itself and 
+vertex C' for metaclass. First kind of vertexes are used for dependencies
+caused by instance methods invocation, and second - by static methods.
+We will add edge (A,B) with mark "foo" to the graph if some synchronized 
+method  @code{foo()} of class B, can be invoked directly or indirectly 
+from  some synchronized method of class A for object other than 
+@code{this}.
+For example for the following classes:
+
+@example
+    class A {
+        public synchronized void f1(B b) { 
+            b.g1();
+            f1();
+            f2();
+        }
+        public void f2(B b) { 
+            b.g2();
+        }
+        public static synchronized void f3() { 
+            B.g3();
+        }
+    }        
+    class B { 
+        public static A ap;
+        public static B bp;
+        public synchronized void g1() { 
+            bp.g1();
+        }
+        public synchronized void g2() { 
+            ap.f1();
+        } 
+        public static synchronized void g3() { 
+            g3();
+        }
+    }
+@end example
+
+
+will add the following edges: 
+
+@example
+      g1
+A  --------> B,  because of invocation of b.g1() from A.f1() 
+
+      g2
+A  --------> B,  because of following call sequence: A.f1 -> A.f2 -> B.g2 
+
+      g3
+A' --------> B', because of invocation of b.g3() from A.f3() 
+
+      g1
+B  --------> B,  loop edge because of recursive call for non-this object in B.g1(). 
+
+      f1
+B  --------> A,  because of invocation of ap.f1() from B.g2()
+@end example
+
+Deadlock is possible only if there is loop in graph G. This condition is 
+necessary, but not enough (presence of loop in graph G doesn't mean that
+program is not correct and deadlock can happen during it's execution). 
+So using this criterion Jlint can produce messages about deadlock probability 
+in case where deadlock is not possible.
+
+As far as task of finding all loops in the graph belongs to the NP class, 
+no efficient algorithm for reporting all such loops exists at this moment.
+To do it work best and fast, Jlint uses restriction for number of loops, which 
+pass through some graph vertex.
+
+There is another source of deadlock - execution of @code{wait()} method.
+This method unlocks monitor of current object and waits until some other thread
+notify it. Both methods @code{wait()} and @code{notify()}
+should be called with monitor locked. When thread is awaken from wait state,
+it tries to re-establish monitor lock and only after it can continue 
+execution. The problem with @code{wait()} is that only one monitor is 
+unlocked. If method executing @code{wait()} was invoked from synchronized
+method of some other object O, monitor of this object O will not be released by
+@code{wait}. If thread, which should notify sleeping thread, needs to
+invoke some synchronized method of object O, we will have deadlock:
+one thread is sleeping and thread, which can awoke it, waits until monitor
+will be unlocked. Jlint is able to detect situations when @code{wait()}
+method is called and more than one monitors are locked.
+
+But deadlock is not the only synchronization problem. Race condition or 
+concurrent access to the same data is more serious problem. 
+Let's look at the following class:
+
+@example
+    class Account { 
+        protected int balance; 
+    
+        public boolean get(int sum) {
+            if (sum > balance) { 
+                balance -= sum;
+                return true;
+            }
+            return false;
+        }
+    }
+@end example
+
+What will happen if several threads are trying to get money from the same 
+account? For example account balance is $100. First thread tries to get 
+$100 from the account - check is ok. Then, before first thread can update
+account balance, second thread tries to perform the same operation.
+Check is ok again! This situation is called @emph{race condition},
+because result depends on "speed" of threads execution.
+
+How can Jlint detect such situations? First of all Jlint builds
+closure of all methods, which can be executed concurrently. The obvious 
+candidates are synchronized methods and method @code{run} of classes
+implemented @code{Runnable} protocol or inherited from 
+@code{Thread} class. Then all other methods, which can be invoked from 
+these methods, are marked as concurrent. This process repeats until no
+more method can be added to concurrent closure. Jlint produces message
+about non-synchronized access only if all of the following conditions
+are true:
+
+@enumerate
+@item Method accessing field is marked as concurrent.
+@item Field is not declared as @code{volatile} or @code{final}. 
+@item Field doesn't belong to @code{this} object of the method.
+@item It is not a field of just created object, which is accessed through local
+variable.
+@item Field can be accessed from methods of different classes.
+@end enumerate
+  
+It is necessary to explain last two items. When object is created and 
+initialized, usually only one thread can access this object through 
+its local variables. So synchronization is not needed in this case.
+The explanation of item 5 is that not all objects, which are accessed by 
+concurrent threads, need to be synchronized (and can't be declared as
+synchronized in some cases to avoid deadlocks). 
+For example consider implementation of database set:
+
+@example
+    class SetMember { 
+        public SetMember next;
+        public SetMember prev;
+    }
+    class SetOwner { 
+        protected SetMember first;
+        protected Setmember last;
+
+        public synchronized void add_first(SetMember mbr) { 
+            if (first == null) { 
+                first = last = mbr;
+                mbr.next = mbr.prev = null;
+            } else { 
+                mbr.next = first;
+                mbr.prev = null;
+                first.prev = mbr;
+                first = mbr;
+            }
+        }
+        public synchronized void add_last(SetMember mbr) {...}
+        public synchronized void remove(SetMember mbr) {...}
+    };
+@end example
+
+In this example @code{next} and @code{prev} components
+of class @code{SetMember} can be accessed only from synchronized
+methods of @code{SetOwner} class, so no access conflict is possible.
+Rule 5 was included to avoid reporting of messages in situations like this.
+
+Rules for detecting synchronization conflicts by Jlint are not finally
+defined, some of them can be refused or replaced, new candidates can be 
+added. The main idea is to detect as much suspicious places as possible, while
+not producing confusing messages for correct code.
+
+
+@subsection Loop @var{id}: invocation of synchronized method @var{name} can cause deadlock
+
+@multitable @columnfractions .5 .5
+@item Message category: @tab @strong{deadlock}
+@item Message code: @tab @strong{sync_loop}
+@end multitable
+
+Loop in class graph G @xref{Synchronization} is
+detected. One such message is produced for each edge of the loop.
+All loops are assigned unique identifier, so it is possible to 
+distinguish messages for edges of one loop from another.
+
+
+@subsection Loop @var{LoopId/PathId}: invocation of method @var{name} forms the loop in class dependency graph
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{deadlock}
+@item Message code: @tab @strong{loop}
+@end multitable
+
+Reported invocation is used in call sequence from synchronized method of class
+A to synchronized method @code{foo()} of class B, 
+so that edge (A,B) is in class graph G 
+(@xref{Synchronization}). 
+If method @code{foo()} is invoked directly, then only previous message
+(sync_loop) is reported. But if call sequence includes some other invocations
+(except invocation of @code{foo()}), then this message is produced for 
+each element of call sequence. If several call paths exist for classes A, B
+and method @code{foo()}, then all of them (but not more than specified
+by @code{MaxShownPaths} parameter) are printed. @var{PathId} 
+identifier is used to group messages for each path.
+
+@subsection Lock @var{a} is requested while holding lock @var{b}, with other thread holding @var{a} and requesting lock @var{b}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{deadlock}
+@item Message code: @tab @strong{lock}
+@end multitable
+
+This is one of the extensions for version 2: checking @code{synchronized} blocks. If, for one class, the locking scheme is such that it could lead to a cycle in the locking graph, this message is shown.
+
+@example
+public void foo() {
+  synchronized (a) {
+    synchronized (b) { }
+  }
+}
+
+public void bar() {
+  synchronized (b) {
+    synchronized (a) { }
+  }
+}
+@end example
+In this example, @code{a} and @code{b} are two objects that are used as locks and are shared between threads. If one thread call @code{foo} while another one calls @code{bar} simultaneously, a deadlock occurs. Jlint does not check whether @code{a} and @code{b} are actually used by several threads. However, if this were not the case, there is no point of using synchronizations on these variables.
+
+@subsection Method wait() can be invoked with monitor of other object locked
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{deadlock}
+@item Message code: @tab @strong{wait}
+@end multitable
+
+At the moment of @code{wait()} method invocations, more than one monitor
+objects are locked by the thread. As far as wait unlocks only one monitor, 
+it can be a reason of deadlock. 
+Successive messages of type @strong{wait_path} specify
+call sequence, which leads to this invocation.
+Monitors can be locked by invocation of a synchronized method or by
+explicit synchronized construction. Jlint handle both of the cases.
+
+The extended Jlint now checks @emph{which} locks are actually owned before issuing an error message. This error message now spans two lines, with the second line saying which locks are owned at that point. (Jlint will still count this as only one message when printing the total message count.) This should greatly facilitate debugging.
+
+
+@subsection Call sequence to method @var{name} can cause deadlock in wait()
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{deadlock}
+@item Message code: @tab @strong{wait_path}
+@end multitable
+
+By the sequence of such messages Jlint informs about possible invocation chain,
+which locks at least two object monitors and is terminated by method
+calling @code{wait()}. As far as @code{wait()} unlocks only one 
+monitor and suspend thread, this can cause deadlock.
+
+
+@subsection Synchronized method @var{name} is overridden by non-synchronized method of derived class @var{name}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{race_condition}
+@item Message code: @tab @strong{nosync}
+@end multitable
+
+Method is declared as synchronized in base class, but is overridden in derived
+class by non-synchronized method. It is not a bug, but suspicious place, 
+because if base method is declared as synchronized, then it is expected that
+this method can be called from concurrent threads and access some critical 
+data. Usually the same is true for derived method, so disappearance of 
+synchronized modifier looks suspiciously. 
+
+@subsection Method @var{name} can be called from different threads and is not synchronized
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{race_condition}
+@item Message code: @tab @strong{concurrent_call}
+@end multitable
+
+Non-synchronized method is invoked from method marked as concurrent for
+object other than @code{this} (for instance methods) or for class,
+which is not base class of caller method class (for static methods). 
+This message is reported only if invocation is not enclosed in synchronized 
+construction and this method also can be invoked from methods of other classes.
+
+
+@subsection Field @var{name} of class 
+@var{name} can be accessed from different threads and is not volatile
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{race_condition}
+@item Message code: @tab @strong{concurrent_access}
+@end multitable
+
+Field is accessed from method marked as concurrent. 
+This message is produced only if:
+
+@enumerate
+@item Field belongs to the object other than 
+@code{this} (for instance methods) or to classes which are not base for 
+class of static method.
+@item Field is not component of object previously created by @code{new}
+and assigned to local variable.
+@item Field is not marked as volatile or final.
+@item Field can be accessed from methods of different classes.
+@end enumerate
+
+@subsection Method @var{name} implementing 'Runnable' interface is not synchronized
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{race_condition}
+@item Message code: @tab @strong{run_nosync}
+@end multitable
+
+Method @code{run()} of class implementing @code{Runnable} interface
+is not declared as synchronized. As far as different threads can be started
+for the same object implementing @code{Runnable} interface, method
+@code{run} can be executed concurrently and is first candidate
+for synchronization.
+
+@subsection Value of lock @var{name} is changed outside synchronization or constructor
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{deadlock}
+@item Message code: @tab @strong{loop_assign}
+@end multitable
+
+@example
+class Foo {
+  Object a = new Object();
+
+  public void bar() {
+    a = new Object();
+    synchronized (a) { }
+  }
+}
+@end example
+
+The initialization of @var{a} (in the declaration, which will be moved into the constructor) is OK; however, changing the value outside any synchronization will make @var{a} useless as a locking variable. Therefore, Jlint will issue a warning for the assignment @code{a = new Object();} in @code{bar}.
+
+@subsection Value of lock @var{name} is changed while (potentially) owning it
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{deadlock}
+@item Message code: @tab @strong{loop_assign2}
+@end multitable
+
+@example
+class Quux {
+  Object a = new Object();
+
+  public void foo() {
+    synchronized (a) {
+      bar();
+    }
+  }
+  
+  public void bar() {
+    a = new Object();
+    /* do something */
+  }
+}
+@end example
+
+In this example, the current thread still holds a lock on @var{a} when it re-initialized that variable (in method @code{bar}). This means that if another thread tried to obtain a lock on the new @var{a}, it can now proceed to do so, because the new value of @var{a} points to a different instance, which makes a synchronization on @var{a} ineffective. Probably this was not expected by the programmer, and this could lead to a potential race condition. The solution to this problem is to include another guard (in this case, @code{synchronized(this)}).
+
+@subsection Method @code{@var{name}.wait()} is called without synchronizing on @var{name}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{wait_nosync}
+@item Message code: @tab @strong{wait_nosync}
+@end multitable
+
+Method @code{wait()} or @code{notify()} is invoked from method, 
+which is not declared as synchronized. It is not surely a bug, because
+monitor can be locked from another method, which directly or indirectly
+invokes current method.
+
+The improved Jlint (version 2) can also check @code{wait} calls to any object, and it will not report an error as long as the lock on @var{name} was obtained within the method that is currently being checked. This greatly reduces the amount of spurious warnings in that category.
+
+@node Inheritance, Data flow, Synchronization, Bugs detected by Jlint
+
+@section Inheritance
+
+This group contains messages, 
+which are caused by problems with class inheritance: such
+as mismatch of methods profiles, components shadowing... As far as Jlint
+deals with Java class file and there is no information about line number
+in source file of class, field or method definition, Jlint can't show
+proper place in source file where class, field or method, which cause the 
+problem, is located. In case of methods, Jlint points to the line corresponds 
+to the first instruction of the method. And for classes and fields, Jlint 
+always refers in message to the first line in source file. Jlint assign
+successive number (starting from 1) for all such message reported sequentially,
+because Emacs skips all messages, reported for the same line, when you go to 
+next message.
+
+@subsection Method @var{name} is not overridden by method with the same name of derived class @var{name}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{not_overridden}
+@item Message code: @tab @strong{not_overridden}
+@end multitable
+
+Derived class contains the method with the same name as in base class, but
+profiles of these methods do not match. More precisely: message is 
+reported when for some method of class A, exists
+method with the same name in derived class B, but there is no method with
+the same name in class B, which is compatible with definition of the method 
+in class A (with the same number and types of parameters). 
+Programmer writing this code may 
+erroneously expect that method in derived class overrides method in base 
+class and that virtual call of method of base class for object of derived 
+class will cause execution method of the derived class.
+
+
+@subsection Component @var{name} in class @var{name} shadows one in base class @var{name}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{field_redefined}
+@item Message code: @tab @strong{field_redefined}
+@end multitable
+
+Field in derived class has the same name as field of some of base classes.
+It can cause some problems because this two fields points to different 
+locations and methods of base class will access one field, while methods
+of derived class (and classes derived from it) will access another field. 
+Sometimes it is what programmer expected, but in any case it will not
+improve readability of program. 
+
+@subsection Local variable @var{name} shadows component of class @var{name}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{shadow_local}
+@item Message code: @tab @strong{shadow_local}
+@end multitable
+
+Local variable of method shadows class component with the same name. 
+As far as it is common practice in constructors to use formal parameters
+with the same name as class components, Jlint detects situations, when
+class field is explicitly accessed by using @code{this}
+reference and doesn't report this message in this case:
+
+@example
+    class A { 
+        public int a;
+        public void f(int a) { 
+            this.a = a; // no message
+        }
+        public int g(int a) { 
+            return a; // message "shadow_local" will be reported
+        }
+    }
+@end example
+            
+
+@subsection Method @code{finalize()} doesn't call @code{super.finalize()}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{super_finalize}
+@item Message code: @tab @strong{super_finalize}
+@end multitable
+
+As it is mentioned in book "The Java Programming Language" by Ken Arnold
+and James Gosling, calling of @code{super.finalize()} from 
+@code{finalize()} is good practice of programming, 
+even if base class doesn't define @code{finalize()} method. 
+This makes class implementations less dependent from each other.
+
+@node Data flow, , Inheritance, Bugs detected by Jlint
+
+@section Data flow
+
+Jlint performs data flow analysis of Java byte code, calculating
+possible ranges of values of expressions and local variables. 
+For integer types, Jlint calculates minimal and maximal value of expression 
+and mask of possibly set bits. For object variables attribute 
+@code{null/not_null} is calculated, selecting variables which value can 
+be @code{null}.
+When value of expression is assigned to variable, 
+these characteristics are copied to correspondent variable descriptor. 
+Jlint handles control transfer instruction in special way: saving,
+modifying, merging or restoring context depending on type of instruction.
+Context in this consists of local variables states (minimal, maximal 
+values and mask) and state of top of the stack (for handling ?: instruction).
+Initially all local integer variable are considered to have minimum and maximum
+properties equal to the range of correspondent type, and mask indicating
+that all bits in this range can be set. Object variables attribute initially
+is set to @code{not_null}. The same characteristics are always used
+for class components, because Jlint is not able to perform full data flow
+analysis (except checking for passing null value to formal parameter of 
+methods). 
+Table below summarizes actions performed by Jlint for handling 
+control transfer instruction:
+
+@multitable @columnfractions .3 .3 .4
+@item Instruction type 
+@tab Correspondent Java construction
+@tab Action
+@item Forward conditional jump
+@tab IF statement
+@tab Save current context. Modify current context in assumption that
+condition is false (no jump). Modify saved context
+in assumption that condition is true (jump takes place)
+
+
+@item Forward unconditional jump
+@tab Start of loop, jump around ELSE branch of IF
+@tab Save current context
+
+@item Backward conditional jump
+@tab Loop statement condition
+@tab Modify context in assumption that condition is false (no jump)
+
+
+@item Backward unconditional jump
+@tab Infinite loop
+@tab Do nothing
+
+
+@item Label of forward jump
+@tab End of IF body or SWITCH case
+@tab If previous instruction is no-pass instruction (return, 
+unconditional jump, throw exception) then restore saved context, 
+otherwise merge current context with saved context (set minimum
+property of integer variable to minimum of this property value 
+in current and saved contexts, maximum - to maximum of
+values in two contexts, and mask as join of masks in two context;
+for object variable - mark it as "may contain null" if it is marked so
+in one of contexts). If label corresponds to switch statement case,
+and switch expression is single local variable, then update
+properties of this variable by setting its minimum and maximum values 
+and mask to value of case selector.
+
+
+@item Label of backward jump
+@tab Start of loop body
+@tab Reset properties of all variables modified between this label
+and backward jump instructions. Reset for integer variables means
+setting minimum property to minimum value of correspondent type, ...
+Reset for object variable clears mark "may contain null".
+
+@end multitable
+
+
+@subsection Method @var{name} can be invoked with NULL as @var{number} parameter and this parameter is used without check for null
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{null_reference}
+@item Message code: @tab @strong{null_param}
+@end multitable
+
+Formal parameter is used in the method without check for null
+(component of object is accessed or method of this object is invoked), while
+this method can be invoked with null as the value of this parameter (detected
+by global data flow analysis). Example:
+
+@example
+    class Node { 
+        protected Node next;
+        protected Node prev;
+        public void link(Node after) { 
+            next = after.next; // Value of 'after' parameter can be null
+            prev = after;
+            after.next = next.prev = this;
+        }
+    }
+    class Container { 
+        public void insert(String key) { 
+            Node after = find(key);
+            if (after == null) { 
+                add(key);
+            }   
+            Node n = new Node(key);
+            n.link(after); // after can be null
+        }
+    }
+@end example
+
+@subsection Value of referenced variable @var{name} may be NULL
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{null_reference}
+@item Message code: @tab @strong{null_var}
+@end multitable
+
+Variable is used in the method without check for null. 
+Jlint detects that referenced variable was previously assigned 
+@code{null} value or was found to be @code{null} in one of 
+control paths in the method.
+
+Jlint can produce this message in some situations, when value of variable
+can not actually be null:
+
+@example
+    public int[] create1nVector(int n) { 
+        int[] v = null;
+        if (n > 0) { 
+            v = new int[n];
+        }
+        for (int i = 0; i &lt; n; i++) { 
+            v[i] = i+1; // message will be reported
+        }
+        return v;
+    }
+@end example
+
+
+@subsection NULL reference can be used
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{null_reference}
+@item Message code: @tab @strong{null_ptr}
+@end multitable
+
+Constant @code{null} is used as left operand of '.' operation:
+
+@example
+    public void printMessage(String msg) { 
+        (msg != null ? new Message(msg) : null).Print();
+    }
+@end example
+
+
+
+@subsection Zero operand for operation
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{zero_operand}
+@item Message code: @tab @strong{zero_operand}
+@end multitable
+
+One of operands of binary operation is zero. 
+This message can be produced for sequence of code like this:
+
+@example
+    int x = 0;
+    x += y;
+@end example
+
+@subsection Result of operation is always 0
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{zero_result}
+@item Message code: @tab @strong{zero_result}
+@end multitable
+
+Jlint detects that for given operands, operation always produces zero
+result. This can be caused by overflow for arithmetic operations or
+by shifting all significant bits in shift operations or clearing all
+bits by bit AND operation.
+
+@subsection Shift with count @var{relation} than @var{integer}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{domain}
+@item Message code: @tab @strong{shift_count}
+@end multitable
+
+This message is reported when minimal value of shift count operand exceeds
+31 for int type and 63 for long type or maximal value of shift count operand 
+is less than 0:
+
+@example
+    if (x > 32) { 
+        y >>= x; // Shift right with count greater than 32
+    }
+@end example
+
+@subsection Shift count range [@var{min,max}] is out of domain
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{domain}
+@item Message code: @tab @strong{shift_count}
+@end multitable
+
+Range of shift count operand is not within [0,31] for int type or
+[0,63] for long type. Jlint doesn't produce this message when
+distance between maximum and minimum values of shift count is greater than 255.
+So this message will not be reported if shift count is just variable
+of integer type:
+
+@example
+    public int foo(int x, int y) { 
+        x >>= y; // no message
+        x >>= 32 - (y & 31); // range of count is [1,32]
+    }
+@end example 
+    
+
+@subsection Range of expression value has no intersection with @var{target} type domain
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{domain}
+@item Message code: @tab @strong{conversion}
+@end multitable
+
+Converted value is out of range of target type. This message can be reported 
+not only for explicit conversions, but also for implicit conversions 
+generated by compiler:
+
+@example
+    int x = 100000;
+    short s = x; // will cause this message
+@end example
+
+
+
+
+@subsection Data can be lost as a result of truncation to @var{type}
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{truncation}
+@item Message code: @tab @strong{truncation}
+@end multitable
+
+This message is reported when significant bits can be lost as a result
+of conversion from large integer type to smaller. Such conversions are 
+always explicitly specified by programmer, so Jlint tries to reduce number of 
+reported messages caused by data truncation. Example below shows when Jlint
+produces this message and when not:
+
+@example
+    public void foo(int x, long y) { 
+        short s = (short)x; // no message
+        char  c = (char)x;  // no message
+        byte  b = (byte)y;  // no message
+        b = (byte)(x & 0xff); // no message
+        b = (byte)c; // no message
+        c = (x & 0xffff); // no message
+        x = (int)(y >>> 32); // no message
+
+
+        b = (byte)(x >> 24);     // truncation
+        s = (int)(x & 0xffff00); // truncation
+        x = (int)(y >>> 1);      // truncation 
+        s = (short)c;            // truncation 
+    }
+@end example
+
+
+@subsection May be type cast is not correctly applied
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{overflow}
+@item Message code: @tab @strong{overflow}
+@end multitable
+
+Result of operation, which has good chance to cause overflow 
+(multiplication, left shift), is converted to long. As far as operation is performed with @code{int} operands, overflow can happen before conversion.
+Overflow can be avoided by conversion of one of operation operands to long, 
+so operation will be performed with @code{long} operands.
+This message is produced not only for explicit type conversion done by 
+programmer, but also for implicit type conversions performed by compiler:
+
+@example
+    public long multiply(int a, int b) { 
+        return a*b; // operands are multiplied as integers 
+                    // and then result will be converted to long
+    }
+@end example
+
+
+@subsection Comparison always produces the same result
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{redundant}
+@item Message code: @tab @strong{same_result}
+@end multitable
+
+Using information about possible ranges of operands values, Jlint can
+make a conclusion, that logical expression is always evaluated to the
+same value (@code{true} or @code{false}):
+
+@example
+     public void foo(int x) { 
+         if (x > 0) { 
+             ...
+             if (x == 0) // always false
+             {
+             }
+         }
+     }
+@end example  
+
+@subsection Compared operands can be equal only when both of them are 0
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{redundant}
+@item Message code: @tab @strong{disjoint_mask}
+@end multitable
+
+By comparing operands masks, Jlint makes a conclusion that 
+operands of @code{==} or @code{!=} operations can be equal 
+only when both of them are zero:
+
+@example
+    public boolean foo(int x, int y) { 
+        return ((x & 1) == y*2); // will be true only for x=y=0 
+    }
+@end example    
+
+
+@subsection Reminder always equal to the first operand
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{redundant}
+@item Message code: @tab @strong{redundant}
+@end multitable
+
+This message is produced for @code{%} operation when right operand
+is either greater either less than zero, and absolute value of left operand
+is less than absolute value of right operand. In this case 
+@code{x % y == x} or @code{x % y == -x}.
+
+
+@subsection Comparison of short with char
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{short_char_cmp}
+@item Message code: @tab @strong{short_char_cmp}
+@end multitable
+
+Comparison of @code{short} operand with @code{char} operand.
+As far as @code{char} type is unsigned, and is converted to 
+@code{int} by filling high half of the word with 0, and 
+@code{short} type is signed and is converted to @code{int} 
+using sign extension, then symbols in range @code{0x8000...0xFFFF}
+will not be considered equal in such comparison:
+
+@example
+     boolean cmp() { 
+        short s = (short)0xabcd;
+        char c = (char)s;
+        return (c == s); // false
+     }
+@end example
+
+
+@subsection Compare strings as object references
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{string_cmp}
+@item Message code: @tab @strong{string_cmp}
+@end multitable
+
+String operands are compared by @code{==} or @code{!=} operator.
+As far as @code{==} returns @code{true} only if operands
+point to the same object, so it can return false for two strings with same 
+contents. The following function will return @code{false}
+in JDK1.1.5:
+
+@example
+    public boolean bug() {
+        return Integer.toString(1) == Integer.toString(1);
+    }
+@end example
+
+
+@subsection Inequality comparison can be replaced with equality comparison
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{weak_cmp}
+@item Message code: @tab @strong{weak_cmp}
+@end multitable
+
+This message is produced in situations when ranges of compared operands
+intersect only in one point. So inequality comparison can be replaced
+with equality comparison. Such message can be caused by error in program,
+when programmer has wrong assumption about ranges of compared operands.
+But even if this inequality comparison is correct, replacing it with
+equality comparison can make code more clear:
+
+@example
+    public void foo(char c, int i) { 
+        if (c &lt;= 0) { // is it a bug ?
+            if ((i & 1) > 0) { // can be replaced with (i & 1) != 0
+                ...
+            } 
+        }  
+    }
+@end example
+
+
+@subsection Switch case constant @var{integer} can't be produced by switch expression
+
+
+@multitable @columnfractions .5 .5 
+@item Message category: @tab @strong{incomp_case}
+@item Message code: @tab @strong{incomp_case}
+@end multitable
+
+Constant in switch case is out of range of switch expression or
+has incompatible bit mask with switch expression:
+
+@example
+    public void select(char ch, int i) { 
+        switch (ch) { 
+          case 1:          
+          case 2:          
+          case 3:          
+            ...
+          case 256: // constant is out of range of switch expression
+        }
+        switch (i & ~1) { 
+          case 0:  
+          case 0xabcde:  
+            ...
+          case 1: // switch expression is always even
+        }
+    }
+@end example
+   
+
+@node Command line options, How to build, Bugs detected by Jlint, (dir)
+
+@chapter Command line options
+
+Both programs (AntiC and Jlint) accept list of files separated by spaces
+in command line. Wildcards are permitted. But unlike Unix, where
+wildcards are substituted by shell, in Windows wildcards are handled
+by program itself and wildcards only in file names (not in path directories)
+are allowed. 
+
+@node AntiC command line options, Jlint command line options, , Command line options
+
+@section AntiC command line options
+
+AntiC supports only one command option: "-java". By default it consider
+input files as C/C++ source. There are very few differences
+(from AntiC point of view) between Java and C++. The differences are mostly 
+with set of tokens and Unicode character constants.
+
+@node Jlint command line options, Jlint messages hierarchy, AntiC command line options, Command line options
+
+@section Jlint command line options
+
+Jlint option can be placed in any position in command line and takes
+effect for verification of all successive files in command line. 
+Option always overrides previous occurrence of the same option. 
+Some options specify parameters of global analysis, which is performed after 
+loading of all files, so only the last occurrence of such options takes 
+effect.
+
+Options are always compared ignoring letters case and @var{'_'}
+symbols. So the following two strings specify the same option:
+@var{-ShadowLocal} and @var{-shadow_local}.
+
+All Jlint options are prefixed by @var{'-'} or @var{'+'}.
+For options, which can be enabled or disabled, @var{'+'} means that option 
+is enabled and @var{'-'} means that option is disabled. 
+For options like @var{source} or @var{help} there is no
+difference between @var{'-'} and @var{'+'}.
+
+@table @samp
+@item -source @emph{@strong{path}} 
+Specifies path to source files. It is necessary to specify this option when
+sources and class files are located in different directories. For example:
+@var{jlint -source /usr/local/jdk1.1.1/src /usr/local/jdk1.1.1/lib/classes.zip}. 
+
+@item -history @emph{@strong{file}} 
+Specifies history file. Jlint will not repeatedly report messages,
+which are present in history file. History file should be available for
+reading/writing and is appended by new messages after each Jlint execution.
+This messages will not be more reported in successive executions of Jlint
+(certainly if @var{-history} options is present and specifies the same 
+history file).
+
+@item -max_shown_paths @emph{@strong{number}} 
+Specifies number of different paths between two vertexes in class graph used
+for detecting possible deadlocks 
+(@xref{Synchronization}). 
+Default value of this parameter is 4.
+Increasing of this value can increase time of verification for complex 
+programs. 
+ 
+@item -help 
+Output list of all options, including message categories. If option
+@var{+verbose} was previously specified, then list of all messages
+is also printed.  
+
+@item (+-)verbose 
+Switch on/off verbose mode. In verbose mode Jlint outputs more information
+about process of verification: names of verified files, warnings about
+absence of debugging information...
+
+@item (+-)@emph{@strong{message_category}} 
+Enable or disable reporting of messages of specified category. 
+It is possible to disable top level category and then enable some 
+sub-categories within this category. And visa-versa it is possible to 
+disable some specific categories within top-level category.
+It is also possible to disable concrete message codes within category.
+Table below describes full hierarchy of messages. By default all categories are
+enabled.
+
+@item (+-)all 
+Enable/disable reporting of all messages. If @var{-all} is specified,
+it is possible to enable reporting of some specific categories of messages.
+For example to output only synchronization messages it is enough to specify
+"@var{-all +synchronization}". 
+
+@item (+-)@emph{@strong{message_code}} 
+Enable or disable reporting of concrete message. 
+Message will be reported if its category is enabled and 
+message code is enabled. If there is only one message code in the 
+category, then names of the category and message code are the same.
+By default all messages are enabled.
+@end table
+
+@node Jlint messages hierarchy, , Jlint command line options, Command line options
+
+@section Jlint messages hierarchy
+@ifhtml 
+<table border="1" align="center">
+<TR>
+<TH>Top level category</TH>
+<TH>subcategory</TH>
+<TH>Message code</TH>
+</TR>
+<TR>
+<TH ROWSPAN=12>Synchronization</TH>
+<TH ROWSPAN=5>deadlock</TH>
+<TD>syncLoop</TD>
+</TR>
+<TR><TD>loop</TD></TR>
+<TR><TD>lock</TD></TR>
+<TR><TD>wait</TD></TR>
+<TR><TD>waitPath</TD></TR>
+<TR>
+<TH ROWSPAN=6>raceCondition</TH>
+<TD>noSync</TD>
+</TR>
+<TR><TD>concurrentCall</TD></TR>
+<TR><TD>concurrentAccess</TD></TR>
+<TR><TD>runNoSync</TD></TR>
+<TR><TD>lockAssign</TD></TR>
+<TR><TD>lockAssign2</TD></TR>
+<TR>
+<TH>waitNoSync</TH><TD>waitNoSync</TD>
+</TR>
+<TR>
+<TH ROWSPAN=4>Inheritance</TH>
+<TH>notOverridden</TH><TD>notOverridden</TD>
+</TR>
+<TR><TH>fieldRedefined</TH><TD>fieldRedefined</TD></TR>
+<TR><TH>shadowLocal</TH><TD>shadowLocal</TD></TR>
+<TR><TH>superFinalize</TH><TD>superFinalize</TD></TR>
+<TR>
+<TH ROWSPAN=17>DataFlow</TH>
+<TH ROWSPAN=3>nullReference</TH><TD>nullParam</TD>
+</TR>
+<TR><TD>nullVar</TD></TR>
+<TR><TD>nullPtr</TD></TR>
+<TR><TH>zeroOperand</TH><TD>zeroOperand</TD></TR>
+<TR><TH>zeroResult</TH><TD>zeroResult</TD></TR>
+<TR><TH ROWSPAN=3>domain</TH><TD>shiftCount</TD></TR>
+<TR><TD>shiftRange</TD></TR>
+<TR><TD>conversion</TD></TR>
+<TR><TH>truncation</TH><TD>truncation</TD></TR>
+<TR><TH>overflow</TH><TD>overflow</TD></TR>
+<TR><TH ROWSPAN=3>redundant</TH><TD>sameResult</TD></TR>
+<TR><TD>disjointMask</TD></TR>
+<TR><TD>noEffect</TD></TR>
+<TR><TH>shortCharCmp</TH><TD>shortCharCmp</TD></TR>
+<TR><TH>stringCmp</TH><TD>stringCmp</TD></TR>
+<TR><TH>weakCmp</TH><TD>weakCmp</TD></TR>
+<TR><TH>incompCase</TH><TD>incompCase</TD></TR>
+</TABLE><P>
+@end ifhtml
+
+@node How to build, Release notes, Command line options, (dir)
+
+@chapter How to build and use Jlint and AntiC
+
+Jlint is written on C++, using almost no operation system dependent code,
+so I hope it will not a problem to compile it on any system with C++ compiler.
+Current release contains makefile for Unix with gcc and for Windows with
+Microsoft Visual C++. In both cases it is enough to execute "make" to build
+"antic" and "jlint" programs. Distributive for Windows already includes 
+executable files.
+
+To use Jlint you need to compile first you Java sources to byte code.
+As far as format of Java class is standard, you can use any available Java
+compiler. It is preferable to make compiler to include debug information
+in compiled classes (line table and local variables mapping). In this case
+Jlint messages will be more detailed. If your are using Sun @strong{javac}
+compiler, required option is @var{-g}. Most of compilers by default
+includes line table, but do not generate local variable table.
+For example free Java compiler @strong{guavac} can't generate it at all.
+Some compilers (like Sun's  @strong{javac}) can't generate line table if 
+optimization is switch on. If you specify @var{-verbose} option to Jlint,
+it will report when it can't find line or local variable table in the class 
+file.
+
+Now Jlint and AntiC produce message in Emacs format: 
+"@var{file:line: message text}".
+So it is possible to walk through these messages in Emacs if you start 
+Jlint or AntiC as compiler. You can change prefix @var{MSG_LOCATION_PREFIX} 
+(defined in 
+@ifhtml
+<a href="types.hh">types.hh</a>
+@end ifhtml
+@file{types.hh}) from @var{"%0s:%1d: "} 
+to one recognized by your favourite editor or IDE. All Jlint messages are
+gathered in file
+@ifhtml
+<a href="jlint.msg">jlint.msg</a>
+@end ifhtml
+@file{jlint.msg}, so you can easily 
+change them (but recompilation is needed).
+
+AntiC also includes in the message position in the line. 
+All AntiC messages are produced
+by function @code{message_at(int line, int coln, char* msg)}, 
+defined in file
+@ifhtml
+<a href="antic.c">antic.c</a>
+@end ifhtml
+@file{antic.c}.
+You can change format of reported messages
+by modifying this function.
+
+@node Release notes, , How to build, (dir)
+
+@chapter Release notes
+
+Jlint is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+MA 02111-1307, USA.
+
+@c Original license (no restrictions):
+@c Jlint is shareware and is distributed with sources and 
+@c without any restrictions.
+@c E-mail support is guaranteed. I will do my best to fix all reported bugs 
+@c and extend Jlint functionality. Any suggestions and comments are welcome.
+@c I will be also very glad if somebody add some more stuff to Jlint or
+@c integrate it with some popular software development tools.
+@c Also modification of texts of reported messages 
+@c in order to make them more clear (sorry, English is not my native language) or 
+@c localization to some other languages are welcome.
+@c It can be also interesting to port Jlint to Java.
+ 
+@c @strong{Look for new version at my homepage}@strong{ | }
+
+@c @strong{E-mail me about bugs and problems}
+
+@ifhtml
+
+<div align="center">
+<h3>Look for a new version</h3>
+<a href="http://artho.com/jlint/">New Jlint page</a><br>
+<A HREF="http://www.ispras.ru/~knizhnik/">Konstantin Knizhnik's homepage</a> (alternative download location); original Jlint page
+
+<h3>E-mail about bugs or problems</h3>
+<a href="mailto:cyrille@artho.com">Cyrille Artho</a> - about new synchronization features (synchronized blocks)<br>
+<A HREF="mailto:knizhnik@cecmow.enet.dec.com">Konstantin Knizhnik</a> - other questions
+</div>
+
+@end ifhtml
+
+@bye
+@c  LocalWords:  texi synch ronization MERCHANTABILITY texinfo readme
+@c  LocalWords:  setfilename uABCDE ch ab boolean tmp sqr rc perr perr Ok dst
+@c  LocalWords:  drc nobreak sp sp DatabaseServer TransactionManager transMgr
+@c  LocalWords:  ClassManager classMgr commitTransaction ObjectDesc ClassDesc
+@c  LocalWords:  desc getClassInfo addClass vertexes metaclass ap bp ok prev lt
+@c  LocalWords:  Runnable SetMember SetOwner Setmember mbr SetMemeber LoopId TR
+@c  LocalWords:  multitable columnfractions PathId MaxShownPaths nosync Quux hh
+@c  LocalWords:  param nVector ptr printMessage msg xff xffff cmp xabcd incomp
+@c  LocalWords:  toString toString xabcde Wildcards ShadowLocal samp max ifhtml
+@c  LocalWords:  subcategory ROWSPAN syncLoop waitPath raceCondition noSync IDE
+@c  LocalWords:  concurrentCall concurrentAccess runNoSync lockAssign noEffect
+@c  LocalWords:  waitNoSync waitNoSync notOverridden notOverridden shadowLocal
+@c  LocalWords:  fieldRedefined fieldRedefined shadowLocal disjointMask weakCmp
+@c  LocalWords:  shortCharCmp shortCharCmp stringCmp stringCmp weakCmp coln div
+@c  LocalWords:  incompCase incompCase english href br Knizhnik's

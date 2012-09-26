@@ -1,0 +1,64 @@
+#!/usr/bin/make -f
+#
+# Sample dpatch rules file. Only example. Nothing else. :)
+# This one uses the new way with dpatch from dpatch 2.x
+
+export DH_COMPAT = 4
+
+CFLAGS = -Wall -g
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+CFLAGS += -O0
+else
+CFLAGS += -O2
+endif
+
+build: build-stamp
+build-stamp: patch
+	@echo "--- Compiling"
+	dh_testdir
+# Do something to build your package here
+	touch build-stamp
+
+clean: clean1 unpatch
+clean1:
+	@echo "--- Cleaning"
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+# Clean your build tree
+
+install: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+# Install it here
+
+# Build architecture-independent files here.
+binary-indep: build install
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+# And all the other dh_* stuff you need for your package.
+
+# And now the simple things for dpatch. Here we only apply/unapply the patches.
+# You can do more things with dpatch, like having patches only applied on
+# a special architecture - see the non-dh version of the sample for this!
+patch: patch-stamp
+patch-stamp:
+	dpatch apply-all
+	dpatch cat-all >patch-stamp
+	touch patch-stamp
+
+unpatch:
+	dpatch deapply-all
+	rm -rf patch-stamp debian/patched
+
+binary: binary-indep binary-arch
+.PHONY: binary clean binary-indep binary-arch build install patch unpatch \
+	clean1
+
+# arch-tag: b125e86e-5880-4af8-9169-5ffb7f24f054

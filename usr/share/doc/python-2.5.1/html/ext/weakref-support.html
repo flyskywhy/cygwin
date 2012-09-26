@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node35.html" />
+<link rel="prev" href="node33.html" />
+<link rel="parent" href="dnt-type-methods.html" />
+<link rel="next" href="node35.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.2.6 Weak Reference Support</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.5 abstract Protocol Support"
+  href="node33.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.7 more Suggestions"
+  href="node35.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node33.html">2.2.5 Abstract Protocol Support</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node35.html">2.2.7 More Suggestions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004260000000000000000"></a><a name="weakref-support"></a>
+<br>
+2.2.6 Weak Reference Support
+</h2>
+
+<p>
+One of the goals of Python's weak-reference implementation is to allow
+any type to participate in the weak reference mechanism without
+incurring the overhead on those objects which do not benefit by weak
+referencing (such as numbers).
+
+<p>
+For an object to be weakly referencable, the extension must include a
+<tt class="ctype">PyObject*</tt> field in the instance structure for the use of the
+weak reference mechanism; it must be initialized to <tt class="constant">NULL</tt> by the
+object's constructor.  It must also set the <tt class="member">tp_weaklistoffset</tt>
+field of the corresponding type object to the offset of the field.
+For example, the instance type is defined with the following
+structure:
+
+<p>
+<div class="verbatim"><pre>
+typedef struct {
+    PyObject_HEAD
+    PyClassObject *in_class;       /* The class object */
+    PyObject      *in_dict;        /* A dictionary */
+    PyObject      *in_weakreflist; /* List of weak references */
+} PyInstanceObject;
+</pre></div>
+
+<p>
+The statically-declared type object for instances is defined this way:
+
+<p>
+<div class="verbatim"><pre>
+PyTypeObject PyInstance_Type = {
+    PyObject_HEAD_INIT(&amp;PyType_Type)
+    0,
+    "module.instance",
+
+    /* Lots of stuff omitted for brevity... */
+
+    Py_TPFLAGS_DEFAULT,                         /* tp_flags */
+    0,                                          /* tp_doc */
+    0,                                          /* tp_traverse */
+    0,                                          /* tp_clear */
+    0,                                          /* tp_richcompare */
+    offsetof(PyInstanceObject, in_weakreflist), /* tp_weaklistoffset */
+};
+</pre></div>
+
+<p>
+The type constructor is responsible for initializing the weak reference
+list to <tt class="constant">NULL</tt>:
+
+<p>
+<div class="verbatim"><pre>
+static PyObject *
+instance_new() {
+    /* Other initialization stuff omitted for brevity */
+
+    self-&gt;in_weakreflist = NULL;
+
+    return (PyObject *) self;
+}
+</pre></div>
+
+<p>
+The only further addition is that the destructor needs to call the
+weak reference manager to clear any weak references.  This should be
+done before any other parts of the destruction have occurred, but is
+only required if the weak reference list is non-<tt class="constant">NULL</tt>:
+
+<p>
+<div class="verbatim"><pre>
+static void
+instance_dealloc(PyInstanceObject *inst)
+{
+    /* Allocate temporaries if needed, but do not begin
+       destruction just yet.
+     */
+
+    if (inst-&gt;in_weakreflist != NULL)
+        PyObject_ClearWeakRefs((PyObject *) inst);
+
+    /* Proceed with object destruction normally. */
+}
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.5 abstract Protocol Support"
+  href="node33.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.7 more Suggestions"
+  href="node35.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node33.html">2.2.5 Abstract Protocol Support</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node35.html">2.2.7 More Suggestions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

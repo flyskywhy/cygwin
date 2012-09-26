@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="typesseq.html" />
+<link rel="prev" href="typesnumeric.html" />
+<link rel="parent" href="types.html" />
+<link rel="next" href="typesseq.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.5 Iterator Types </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.1 bit-string Operations on"
+  href="bitstring-ops.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. built-in Types"
+  href="types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.6 sequence Types "
+  href="typesseq.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="bitstring-ops.html">3.4.1 Bit-string Operations on</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="types.html">3. Built-in Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="typesseq.html">3.6 Sequence Types </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION005500000000000000000"></a><a name="typeiter"></a>
+<br>
+3.5 Iterator Types 
+</h1>
+
+<p>
+
+<span class="versionnote">New in version 2.2.</span>
+
+<a id='l2h-212' xml:id='l2h-212'></a>
+
+<p>
+Python supports a concept of iteration over containers.  This is
+implemented using two distinct methods; these are used to allow
+user-defined classes to support iteration.  Sequences, described below
+in more detail, always support the iteration methods.
+
+<p>
+One method needs to be defined for container objects to provide
+iteration support:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-209' xml:id='l2h-209' class="method">__iter__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return an iterator object.  The object is required to support the
+  iterator protocol described below.  If a container supports
+  different types of iteration, additional methods can be provided to
+  specifically request iterators for those iteration types.  (An
+  example of an object supporting multiple forms of iteration would be
+  a tree structure which supports both breadth-first and depth-first
+  traversal.)  This method corresponds to the <tt class="member">tp_iter</tt> slot of
+  the type structure for Python objects in the Python/C API.
+</dl>
+
+<p>
+The iterator objects themselves are required to support the following
+two methods, which together form the <i class="dfn">iterator protocol</i>:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-210' xml:id='l2h-210' class="method">__iter__</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the iterator object itself.  This is required to allow both
+  containers and iterators to be used with the <tt class="keyword">for</tt> and
+  <tt class="keyword">in</tt> statements.  This method corresponds to the
+  <tt class="member">tp_iter</tt> slot of the type structure for Python objects in
+  the Python/C API.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-211' xml:id='l2h-211' class="method">next</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the next item from the container.  If there are no further
+  items, raise the <tt class="exception">StopIteration</tt> exception.  This method
+  corresponds to the <tt class="member">tp_iternext</tt> slot of the type structure
+  for Python objects in the Python/C API.
+</dl>
+
+<p>
+Python defines several iterator objects to support iteration over
+general and specific sequence types, dictionaries, and other more
+specialized forms.  The specific types are not important beyond their
+implementation of the iterator protocol.
+
+<p>
+The intention of the protocol is that once an iterator's
+<tt class="method">next()</tt> method raises <tt class="exception">StopIteration</tt>, it will
+continue to do so on subsequent calls.  Implementations that
+do not obey this property are deemed broken.  (This constraint
+was added in Python 2.3; in Python 2.2, various iterators are
+broken according to this rule.)
+
+<p>
+Python's generators provide a convenient way to implement the
+iterator protocol.  If a container object's <tt class="method">__iter__()</tt>
+method is implemented as a generator, it will automatically
+return an iterator object (technically, a generator object)
+supplying the <tt class="method">__iter__()</tt> and <tt class="method">next()</tt> methods.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.1 bit-string Operations on"
+  href="bitstring-ops.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. built-in Types"
+  href="types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.6 sequence Types "
+  href="typesseq.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="bitstring-ops.html">3.4.1 Bit-string Operations on</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="types.html">3. Built-in Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="typesseq.html">3.6 Sequence Types </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-338.html" />
+<link rel="prev" href="pep-314.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-338.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4 PEP 328: Absolute and Relative Imports</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3 pep 314: Metadata"
+  href="pep-314.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5 pep 338: Executing"
+  href="pep-338.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-314.html">3 PEP 314: Metadata</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-338.html">5 PEP 338: Executing</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION000500000000000000000"></a><a name="pep-328"></a>
+<br>
+4 PEP 328: Absolute and Relative Imports
+</h1>
+
+<p>
+The simpler part of PEP 328 was implemented in Python 2.4: parentheses
+could now be used to enclose the names imported from a module using
+the <code>from ... import ...</code> statement, making it easier to import
+many different names.
+
+<p>
+The more complicated part has been implemented in Python 2.5:
+importing a module can be specified to use absolute or
+package-relative imports.  The plan is to move toward making absolute
+imports the default in future versions of Python.
+
+<p>
+Let's say you have a package directory like this:
+<div class="verbatim"><pre>
+pkg/
+pkg/__init__.py
+pkg/main.py
+pkg/string.py
+</pre></div>
+
+<p>
+This defines a package named <tt class="module">pkg</tt> containing the
+<tt class="module">pkg.main</tt> and <tt class="module">pkg.string</tt> submodules.  
+
+<p>
+Consider the code in the <span class="file">main.py</span> module.  What happens if it
+executes the statement <code>import string</code>?  In Python 2.4 and
+earlier, it will first look in the package's directory to perform a
+relative import, finds <span class="file">pkg/string.py</span>, imports the contents of
+that file as the <tt class="module">pkg.string</tt> module, and that module is bound
+to the name "<tt class="samp">string</tt>" in the <tt class="module">pkg.main</tt> module's namespace.
+
+<p>
+That's fine if <tt class="module">pkg.string</tt> was what you wanted.  But what if
+you wanted Python's standard <tt class="module">string</tt> module?  There's no clean
+way to ignore <tt class="module">pkg.string</tt> and look for the standard module;
+generally you had to look at the contents of <code>sys.modules</code>, which
+is slightly unclean.   
+Holger Krekel's <tt class="module">py.std</tt> package provides a tidier way to perform
+imports from the standard library, <code>import py ; py.std.string.join()</code>,
+but that package isn't available on all Python installations.
+
+<p>
+Reading code which relies on relative imports is also less clear,
+because a reader may be confused about which module, <tt class="module">string</tt>
+or <tt class="module">pkg.string</tt>, is intended to be used.  Python users soon
+learned not to duplicate the names of standard library modules in the
+names of their packages' submodules, but you can't protect against
+having your submodule's name being used for a new module added in a
+future version of Python.
+
+<p>
+In Python 2.5, you can switch <tt class="keyword">import</tt>'s behaviour to 
+absolute imports using a <code>from __future__ import absolute_import</code>
+directive.  This absolute-import behaviour will become the default in
+a future version (probably Python 2.7).  Once absolute imports 
+are the default, <code>import string</code> will
+always find the standard library's version.
+It's suggested that users should begin using absolute imports as much
+as possible, so it's preferable to begin writing <code>from pkg import
+string</code> in your code.  
+
+<p>
+Relative imports are still possible by adding a leading period 
+to the module name when using the <code>from ... import</code> form:
+
+<p>
+<div class="verbatim"><pre>
+# Import names from pkg.string
+from .string import name1, name2
+# Import pkg.string
+from . import string
+</pre></div>
+
+<p>
+This imports the <tt class="module">string</tt> module relative to the current
+package, so in <tt class="module">pkg.main</tt> this will import <var>name1</var> and
+<var>name2</var> from <tt class="module">pkg.string</tt>.  Additional leading periods
+perform the relative import starting from the parent of the current
+package.  For example, code in the <tt class="module">A.B.C</tt> module can do:
+
+<p>
+<div class="verbatim"><pre>
+from . import D                 # Imports A.B.D
+from .. import E                # Imports A.E
+from ..F import G               # Imports A.F.G
+</pre></div>
+
+<p>
+Leading periods cannot be used with the <code>import <var>modname</var></code> 
+form of the import statement, only the <code>from ... import</code> form.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0328.html"
+        title="Imports: multi-line and Absolute/Relative"
+        >PEP 328, <em>Imports: Multi-Line and Absolute/Relative</em></a>
+    <dd>PEP written by Aahz; implemented by Thomas Wouters.
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://codespeak.net/py/current/doc/index.html"
+        class="url">http://codespeak.net/py/current/doc/index.html</a></dt>
+    <dd>The py library by Holger Krekel, which contains the <tt class="module">py.std</tt> package.</dd>
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3 pep 314: Metadata"
+  href="pep-314.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5 pep 338: Executing"
+  href="pep-338.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-314.html">3 PEP 314: Metadata</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-338.html">5 PEP 338: Executing</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

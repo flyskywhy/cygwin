@@ -1,0 +1,95 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Text and Binary modes</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.61.2"><link rel="home" href="index.html" title="Cygwin User's Guide"><link rel="up" href="using.html" title="Chapter 3. Using Cygwin"><link rel="previous" href="using.html" title="Chapter 3. Using Cygwin"><link rel="next" href="using-filemodes.html" title="File permissions"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Text and Binary modes</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="using.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Using Cygwin</th><td width="20%" align="right"> <a accesskey="n" href="using-filemodes.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="using-textbinary"></a>Text and Binary modes</h2></div></div><div></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4728871"></a>The Issue</h3></div></div><div></div></div><p>On a UNIX system, when an application reads from a file it gets
+exactly what's in the file on disk and the converse is true for writing.
+The situation is different in the DOS/Windows world where a file can
+be opened in one of two modes, binary or text.  In the binary mode the
+system behaves exactly as in UNIX.  However on writing in text mode, a
+NL (\n, ^J) is transformed into the sequence CR (\r, ^M) NL.
+</p><p>This can wreak havoc with the seek/fseek calls since the number
+of bytes actually in the file may differ from that seen by the
+application.</p><p>The mode can be specified explicitly as explained in the Programming
+section below.  In an ideal DOS/Windows world, all programs using lines as
+records (such as <b class="command">bash</b>, <b class="command">make</b>,
+<b class="command">sed</b> ...) would open files (and change the mode of their
+standard input and output) as text.  All other programs (such as
+<b class="command">cat</b>, <b class="command">cmp</b>, <b class="command">tr</b> ...)
+would use binary mode.  In practice with Cygwin, programs that deal
+explicitly with object files specify binary mode (this is the case of
+<b class="command">od</b>, which is helpful to diagnose CR problems).  Most
+other programs (such as <b class="command">cat</b>, <b class="command">cmp</b>,
+<b class="command">tr</b>) use the default mode.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4728961"></a>The default Cygwin behavior</h3></div></div><div></div></div><p>The Cygwin system gives us some flexibility in deciding how files 
+are to be opened when the mode is not specified explicitly. 
+The rules are evolving, this section gives the design goals.</p><div class="orderedlist"><ol type="a"><li><p>If the filename is specified as a POSIX path and it appears to
+reside on a file system that is mounted (i.e.  if its pathname starts
+with a directory displayed by <b class="command">mount</b>), then the
+default is specified by the mount flag.  If the file is a symbolic link,
+the mode of the target file system applies.</p></li><li><p>If the file is specified via a MS-DOS pathname (i.e., it contains a
+backslash or a colon), the default is binary.
+</p></li><li><p>Pipes and non-file devices are opened in binary mode,
+except if the <tt class="envar">CYGWIN</tt> environment variable contains
+<tt class="literal">nobinmode</tt>.</p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning!</h3><p>In b20.1 of 12/98, a file will be opened
+in binary mode if any of the following conditions hold:</p><div class="orderedlist"><ol type="1" compact><li><p>binary mode is specified in the open call</p></li><li><p>the filename is a MS-DOS filename</p></li><li><p>the file resides on a binary mounted partition</p></li><li><p><tt class="envar">CYGWIN</tt> contains <tt class="literal">binmode</tt></p></li><li><p>the file is not a disk file</p></li></ol></div></div></li><li><p> When redirecting, the Cygwin shells uses rules (a-e). For
+these shells the relevant value of <tt class="envar">CYGWIN</tt> is that at the time
+the shell was launched and not that at the time the program is executed.
+Non-Cygwin shells always pipe and redirect with binary mode. With
+non-Cygwin shells the commands <b class="command"> cat filename | program </b>
+and <b class="command"> program &lt; filename </b> are not equivalent when
+<tt class="filename">filename</tt> is on a text-mounted partition. </p></li></ol></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4729122"></a>Example</h3></div></div><div></div></div><p>To illustrate the various rules, we provide scripts to delete CRs
+from files by using the <b class="command">tr</b> program, which can only write
+to standard output. 
+The script</p><pre class="screen">
+
+#!/bin/sh
+# Remove \r from the file given as argument
+tr -d '\r' &lt; "$1" &gt; "$1".nocr
+
+</pre><p> will not work on a text mounted systems because the \r will be 
+reintroduced on writing. However scripts such as </p><pre class="screen">
+
+#!/bin/sh
+# Remove \r from the file given as argument
+tr -d '\r' | gzip | gunzip &gt; "$1".nocr
+
+</pre><p>and the .bat file</p><pre class="screen">
+
+REM Remove \r from the file given as argument
+@echo off
+tr -d \r &lt; %1 &gt; %1.nocr
+
+</pre><p> work fine. In the first case (assuming the pipes are binary)
+we rely on <b class="command">gunzip</b> to set its output to binary mode,
+possibly overriding the mode used by the shell.
+In the second case we rely on the DOS shell to redirect in binary mode.
+</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4729187"></a>Binary or text?</h3></div></div><div></div></div><p>UNIX programs that have been written for maximum portability
+will know the difference between text and binary files and act
+appropriately under Cygwin.  For those programs, the text mode default
+is a good choice.  Programs included in official Cygwin distributions
+should work well in the default mode. </p><p>Text mode makes it much easier to mix files between Cygwin and
+Windows programs, since Windows programs will usually use the CRLF
+format.  Unfortunately you may still have some problems with text
+mode.  First, some of the utilities included with Cygwin do not yet
+specify binary mode when they should.
+Second, you will introduce CRs in text
+files you write, which can cause problems when moving them back to a
+UNIX system. </p><p>If you are mounting a remote file system from a UNIX machine,
+or moving files back and forth to a UNIX machine, you may want to
+access the files in binary mode. The text files found there will normally
+be in UNIX NL format, and you would want any files put there by Cygwin
+programs to be stored in a format understood by UNIX.
+Be sure to remove CRs from all Makefiles and
+shell scripts and make sure that you only edit the files with
+DOS/Windows editors that can cope with and preserve NL terminated lines.
+</p><p>Note that you can decide this on a disk by disk basis (for
+example, mounting local disks in text mode and network disks in binary
+mode).  You can also partition a disk, for example by mounting
+<tt class="filename">c:</tt> in text mode, and <tt class="filename">c:\home</tt>
+in binary mode.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4729242"></a>Programming</h3></div></div><div></div></div><p>In the <tt class="function">open()</tt> function call, binary mode can be
+specified with the flag <tt class="literal">O_BINARY</tt> and text mode with
+<tt class="literal">O_TEXT</tt>. These symbols are defined in
+<tt class="filename">fcntl.h</tt>.</p><p>In the <tt class="function">fopen()</tt> function call, binary mode can be
+specified by adding a <tt class="literal">b</tt> to the mode string. Text mode is specified
+by adding a <tt class="literal">t</tt> to the mode string.</p><p>The mode of a file can be changed by the call
+<tt class="function">setmode(fd,mode)</tt> where <tt class="literal">fd</tt> is a file
+descriptor (an integer) and <tt class="literal">mode</tt> is
+<tt class="literal">O_BINARY</tt> or <tt class="literal">O_TEXT</tt>. The function
+returns <tt class="literal">O_BINARY</tt> or <tt class="literal">O_TEXT</tt> depending
+on the mode before the call, and <tt class="literal">EOF</tt> on error.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="using.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="using.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="using-filemodes.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 3. Using Cygwin </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> File permissions</td></tr></table></div></body></html>

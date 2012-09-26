@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="mixer-device-objects.html" />
+<link rel="prev" href="module-ossaudiodev.html" />
+<link rel="parent" href="module-ossaudiodev.html" />
+<link rel="next" href="mixer-device-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>19.11.1 Audio Device Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.11 ossaudiodev  "
+  href="module-ossaudiodev.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19.11 ossaudiodev  "
+  href="module-ossaudiodev.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.11.2 mixer Device Objects"
+  href="mixer-device-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-ossaudiodev.html">19.11 ossaudiodev  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-ossaudiodev.html">19.11 ossaudiodev  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mixer-device-objects.html">19.11.2 Mixer Device Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00211110000000000000000"></a><a name="ossaudio-device-objects"></a>
+<br>
+19.11.1 Audio Device Objects 
+</h2>
+
+<p>
+Before you can write to or read from an audio device, you must call
+three methods in the correct order:
+
+<ol>
+<li><tt class="method">setfmt()</tt> to set the output format
+</li>
+<li><tt class="method">channels()</tt> to set the number of channels
+</li>
+<li><tt class="method">speed()</tt> to set the sample rate
+</li>
+</ol>
+Alternately, you can use the <tt class="method">setparameters()</tt> method to set all
+three audio parameters at once.  This is more convenient, but may not be
+as flexible in all cases.
+
+<p>
+The audio device objects returned by <tt class="function">open()</tt> define the
+following methods and (read-only) attributes:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4670' xml:id='l2h-4670' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Explicitly close the audio device.  When you are done writing to or
+reading from an audio device, you should explicitly close it.  A closed
+device cannot be used again.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4671' xml:id='l2h-4671' class="method">fileno</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the file descriptor associated with the device.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4672' xml:id='l2h-4672' class="method">read</tt></b>(</nobr></td>
+  <td><var>size</var>)</td></tr></table></dt>
+<dd>
+Read <var>size</var> bytes from the audio input and return them as a Python
+string.  Unlike most <span class="Unix">Unix</span> device drivers, OSS audio devices in
+blocking mode (the default) will block <tt class="function">read()</tt> until the
+entire requested amount of data is available.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4673' xml:id='l2h-4673' class="method">write</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Write the Python string <var>data</var> to the audio device and return the
+number of bytes written.  If the audio device is in blocking mode (the
+default), the entire string is always written (again, this is different
+from usual <span class="Unix">Unix</span> device semantics).  If the device is in non-blocking
+mode, some data may not be written--see <tt class="method">writeall()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4674' xml:id='l2h-4674' class="method">writeall</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Write the entire Python string <var>data</var> to the audio device: waits
+until the audio device is able to accept data, writes as much data as it
+will accept, and repeats until <var>data</var> has been completely written.
+If the device is in blocking mode (the default), this has the same
+effect as <tt class="method">write()</tt>; <tt class="method">writeall()</tt> is only useful in
+non-blocking mode.  Has no return value, since the amount of data
+written is always equal to the amount of data supplied.
+</dl>
+
+<p>
+The following methods each map to exactly one
+<tt class="function">ioctl()</tt> system call.  The correspondence is obvious: for
+example, <tt class="method">setfmt()</tt> corresponds to the <code>SNDCTL_DSP_SETFMT</code>
+ioctl, and <tt class="method">sync()</tt> to <code>SNDCTL_DSP_SYNC</code> (this can be useful
+when consulting the OSS documentation).  If the underlying
+<tt class="function">ioctl()</tt> fails, they all raise <tt class="exception">IOError</tt>.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4675' xml:id='l2h-4675' class="method">nonblock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Put the device into non-blocking mode.  Once in non-blocking mode, there
+is no way to return it to blocking mode.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4676' xml:id='l2h-4676' class="method">getfmts</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a bitmask of the audio output formats supported by the
+soundcard.  Some of the formats supported by OSS are:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Format</th>
+      <th class="left"  >Description</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline">AFMT_MU_LAW</td>
+        <td class="left"  >a logarithmic encoding (used by Sun <code>.au</code> files and
+        <span class="file">/dev/audio</span>)</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_A_LAW</td>
+        <td class="left"  >a logarithmic encoding</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_IMA_ADPCM</td>
+        <td class="left"  >a 4:1 compressed format defined by the Interactive Multimedia
+        Association</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_U8</td>
+        <td class="left"  >Unsigned, 8-bit audio</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_S16_LE</td>
+        <td class="left"  >Signed, 16-bit audio, little-endian byte order (as used by
+        Intel processors)</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_S16_BE</td>
+        <td class="left"  >Signed, 16-bit audio, big-endian byte order (as used by 68k,
+        PowerPC, Sparc)</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_S8</td>
+        <td class="left"  >Signed, 8 bit audio</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_U16_LE</td>
+        <td class="left"  >Unsigned, 16-bit little-endian audio</td></tr>
+    <tr><td class="left"   valign="baseline">AFMT_U16_BE</td>
+        <td class="left"  >Unsigned, 16-bit big-endian audio</td></tr></tbody>
+</table></div>
+Consult the OSS documentation for a full list of audio formats, and note
+that most devices support only a subset of these formats.  Some older
+devices only support <tt class="constant">AFMT_U8</tt>; the most common format used
+today is <tt class="constant">AFMT_S16_LE</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4677' xml:id='l2h-4677' class="method">setfmt</tt></b>(</nobr></td>
+  <td><var>format</var>)</td></tr></table></dt>
+<dd>
+Try to set the current audio format to <var>format</var>--see
+<tt class="method">getfmts()</tt> for a list.  Returns the audio format that the device
+was set to, which may not be the requested format.  May also be used to
+return the current audio format--do this by passing an ``audio format''
+of
+<tt class="constant">AFMT_QUERY</tt>.  
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4678' xml:id='l2h-4678' class="method">channels</tt></b>(</nobr></td>
+  <td><var>nchannels</var>)</td></tr></table></dt>
+<dd>
+Set the number of output channels to <var>nchannels</var>.  A value of 1
+indicates monophonic sound, 2 stereophonic.  Some devices may have more
+than 2 channels, and some high-end devices may not support mono.
+Returns the number of channels the device was set to.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4679' xml:id='l2h-4679' class="method">speed</tt></b>(</nobr></td>
+  <td><var>samplerate</var>)</td></tr></table></dt>
+<dd>
+Try to set the audio sampling rate to <var>samplerate</var> samples per
+second.  Returns the rate actually set.  Most sound devices don't
+support arbitrary sampling rates.  Common rates are:
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Rate</th>
+      <th class="left"  >Description</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline">8000</td>
+        <td class="left"  >default rate for <span class="file">/dev/audio</span></td></tr>
+    <tr><td class="left"   valign="baseline">11025</td>
+        <td class="left"  >speech recording</td></tr>
+    <tr><td class="left"   valign="baseline">22050</td>
+        <td class="left"  ></td></tr>
+    <tr><td class="left"   valign="baseline">44100</td>
+        <td class="left"  >CD quality audio (at 16 bits/sample and 2 channels)</td></tr>
+    <tr><td class="left"   valign="baseline">96000</td>
+        <td class="left"  >DVD quality audio (at 24 bits/sample)</td></tr></tbody>
+</table></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4680' xml:id='l2h-4680' class="method">sync</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Wait until the sound device has played every byte in its buffer.  (This
+happens implicitly when the device is closed.)  The OSS documentation
+recommends closing and re-opening the device rather than using
+<tt class="method">sync()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4681' xml:id='l2h-4681' class="method">reset</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Immediately stop playing or recording and return the device to a
+state where it can accept commands.  The OSS documentation recommends
+closing and re-opening the device after calling <tt class="method">reset()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4682' xml:id='l2h-4682' class="method">post</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Tell the driver that there is likely to be a pause in the output, making
+it possible for the device to handle the pause more intelligently.  You
+might use this after playing a spot sound effect, before waiting for
+user input, or before doing disk I/O.
+</dl>
+
+<p>
+The following convenience methods combine several ioctls, or one ioctl
+and some simple calculations.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4683' xml:id='l2h-4683' class="method">setparameters</tt></b>(</nobr></td>
+  <td><var>format, nchannels, samplerate </var><big>[</big><var>, strict=False</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Set the key audio sampling parameters--sample format, number of
+channels, and sampling rate--in one method call.  <var>format</var>, 
+<var>nchannels</var>, and <var>samplerate</var> should be as specified in the
+<tt class="method">setfmt()</tt>, <tt class="method">channels()</tt>, and <tt class="method">speed()</tt> 
+methods.  If <var>strict</var> is true, <tt class="method">setparameters()</tt> checks to
+see if each parameter was actually set to the requested value, and
+raises <tt class="exception">OSSAudioError</tt> if not.  Returns a tuple (<var>format</var>,
+<var>nchannels</var>, <var>samplerate</var>) indicating the parameter values that
+were actually set by the device driver (i.e., the same as the return
+values of <tt class="method">setfmt()</tt>, <tt class="method">channels()</tt>, and <tt class="method">speed()</tt>).
+
+<p>
+For example,
+<div class="verbatim"><pre>
+  (fmt, channels, rate) = dsp.setparameters(fmt, channels, rate)
+</pre></div>
+is equivalent to
+<div class="verbatim"><pre>
+  fmt = dsp.setfmt(fmt)
+  channels = dsp.channels(channels)
+  rate = dsp.rate(channels)
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4684' xml:id='l2h-4684' class="method">bufsize</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns the size of the hardware buffer, in samples.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4685' xml:id='l2h-4685' class="method">obufcount</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns the number of samples that are in the hardware buffer yet to be
+played.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4686' xml:id='l2h-4686' class="method">obuffree</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns the number of samples that could be queued into the hardware
+buffer to be played without blocking.
+</dl>
+
+<p>
+Audio device objects also support several read-only attributes:
+
+<p>
+<dl><dt><b><tt id='l2h-4687' xml:id='l2h-4687' class="member">closed</tt></b></dt>
+<dd>
+Boolean indicating whether the device has been closed.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4688' xml:id='l2h-4688' class="member">name</tt></b></dt>
+<dd>
+String containing the name of the device file.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4689' xml:id='l2h-4689' class="member">mode</tt></b></dt>
+<dd>
+The I/O mode for the file, either <code>"r"</code>, <code>"rw"</code>, or <code>"w"</code>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.11 ossaudiodev  "
+  href="module-ossaudiodev.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19.11 ossaudiodev  "
+  href="module-ossaudiodev.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.11.2 mixer Device Objects"
+  href="mixer-device-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-ossaudiodev.html">19.11 ossaudiodev  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-ossaudiodev.html">19.11 ossaudiodev  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mixer-device-objects.html">19.11.2 Mixer Device Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

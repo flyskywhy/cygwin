@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="logging-config-fileformat.html" />
+<link rel="prev" href="node425.html" />
+<link rel="parent" href="node425.html" />
+<link rel="next" href="logging-config-fileformat.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.5.10.1 Configuration functions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.10 Configuration"
+  href="node425.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5.10 Configuration"
+  href="node425.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.10.2 configuration file format"
+  href="logging-config-fileformat.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node425.html">14.5.10 Configuration</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node425.html">14.5.10 Configuration</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="logging-config-fileformat.html">14.5.10.2 Configuration file format</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00165101000000000000000"></a><a name="logging-config-api"></a>
+<br>
+14.5.10.1 Configuration functions
+</h3>
+
+<p>
+The following functions configure the logging module. They are located in the
+<tt class="module">logging.config</tt> module.  Their use is optional -- you can configure
+the logging module using these functions or by making calls to the
+main API (defined in <tt class="module">logging</tt> itself) and defining handlers
+which are declared either in <tt class="module">logging</tt> or
+<tt class="module">logging.handlers</tt>.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2963' xml:id='l2h-2963' class="function">fileConfig</tt></b>(</nobr></td>
+  <td><var>fname</var><big>[</big><var>, defaults</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Reads the logging configuration from a ConfigParser-format file named
+<var>fname</var>. This function can be called several times from an application,
+allowing an end user the ability to select from various pre-canned
+configurations (if the developer provides a mechanism to present the
+choices and load the chosen configuration). Defaults to be passed to
+ConfigParser can be specified in the <var>defaults</var> argument.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2964' xml:id='l2h-2964' class="function">listen</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>port</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Starts up a socket server on the specified port, and listens for new
+configurations. If no port is specified, the module's default
+<tt class="constant">DEFAULT_LOGGING_CONFIG_PORT</tt> is used. Logging configurations
+will be sent as a file suitable for processing by <tt class="function">fileConfig()</tt>.
+Returns a <tt class="class">Thread</tt> instance on which you can call <tt class="method">start()</tt>
+to start the server, and which you can <tt class="method">join()</tt> when appropriate.
+To stop the server, call <tt class="function">stopListening()</tt>. To send a configuration
+to the socket, read in the configuration file and send it to the socket
+as a string of bytes preceded by a four-byte length packed in binary using
+struct.<code>pack('&gt;L', n)</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2965' xml:id='l2h-2965' class="function">stopListening</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Stops the listening server which was created with a call to
+<tt class="function">listen()</tt>. This is typically called before calling <tt class="method">join()</tt>
+on the return value from <tt class="function">listen()</tt>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.10 Configuration"
+  href="node425.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5.10 Configuration"
+  href="node425.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.10.2 configuration file format"
+  href="logging-config-fileformat.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node425.html">14.5.10 Configuration</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node425.html">14.5.10 Configuration</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="logging-config-fileformat.html">14.5.10.2 Configuration file format</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

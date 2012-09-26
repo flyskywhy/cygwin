@@ -1,0 +1,691 @@
+Installing DDD					-*- text -*-
+**************
+
+PLEASE NOTE: The compiler required to build DDD has changed as of 3.3.6.
+Be sure to read the instructions below carefully.
+
+For compiling and installing DDD on a system, please follow these
+instructions.
+
+
+Build Requirements
+==================
+
+To build a complete DDD from sources, you need:
+
+   * The GNU C++ compiler (3.1 or later), including a matching
+     C++ I/O runtime library (libstdc++ or libg++).
+
+     Some other C++ compilers have been reported to compile DDD as well;
+     current development is taking place with g++ 3.2.3 and 3.4.0, so that is
+     what we recommend.  Older gcc releases will not work, as they are not
+     nearly ISO C++ conformant.  If you are building with a compiler that
+     is not g++, be sure to read the PROBLEMS file.
+
+   * A M*tif Widget library.  Either
+
+     - LessTif, 0.90 or later, or
+     - OSF/Motif (1.2 or later).
+
+     We recommend to use LessTif 0.92 or later, available from
+     `http://www.lesstif.org/'.  
+
+     Please note: LessTif can be built and installed as M*tif
+     1.2-compatible version and as M*tif 2.0-compatible version.
+     LessTif packages normally install both versions, with one being
+     the default.
+
+     If you use DDD with LessTif 0.92 or later, you can use any of the
+     two LessTif versions.  If you use DDD with an older LessTif
+     version, be sure to use the M*tif-1.2 compatible LessTif version.
+     See `External Packages', below, for details.
+
+     LessTif-0.93.40 is known to work well.
+
+   * The X window library (Xlib) and X toolkit library (Xt), X11R4 or
+     later.  Best results are obtained with X11R6.3 and later.
+
+   * A `make' program.  We recommend GNU make.
+
+
+We also recommend the following (optional) packages:
+
+   * The XPM library (3.2 or later).  The XPM library brings support
+     for multi-color icons and logos.  Without XPM, DDD will use
+     monochrome icons.
+
+   * The Athena Widget library (from X11R5 or later).  Having the
+     Athena Widget library is convenient for supporting panners - a
+     kind of two-dimensional scrollbar.
+
+
+If (and only if) you make changes to the DDD sources, or if you build
+DDD from a CVS archive, you may also need:
+
+   * `automake' (after changes to Makefile templates)
+   * `autoconf' (after changes to configuration files)
+   * `bison' and `flex' (after changes to parser and scanner files)
+   * `makeinfo' (after changes to documentation)
+   * `netpbm' and `pbmplus' packages (after changes to icons)
+   * `fig2dev' and ImageMagick `convert' (after changes to screenshots)
+   * `texi2dvi' and LaTeX (for recreating the PostScript manual)
+   * `epstopdf' and PDFLaTeX (for recreating the PDF manual)
+
+The DDD source package contains several pre-build files, such that you
+should not need any of these programs.  (If your `make' program
+invokes any of the programs above on an unchanged source package, this
+is a potential bug.  Find out what's going on and let us know; use GNU
+make as a workaround.)
+
+
+Execution Requirements
+======================
+
+To run DDD, you need:
+
+   * An X server.  Without X, DDD does not run.
+
+     If you are running a UNIX system, you certainly have X.  
+     X servers are also available for other operating systems.  
+     See `http://www.rahul.net/kenton/xsites.html' for a list.
+
+
+   * A command-line debugger (the so-called `inferior' debugger).
+
+     - To debug binary executables, best results are achieved with
+       GDB, the GNU debugger.  (GDB 4.x is required; we recommend GDB
+       5.0 or later.)  Using GDB, you can debug programs written in C,
+       C++, GNU Java (`guavac'), GNU Ada (`gnat'), GNU Fortran (`g77'),
+       GNU Chill and GNU Modula-2.
+
+       GDB also supports WDB, a GDB variant found on HP-UX systems.
+
+     - As an alternative to GDB, DDD also supports the DBX debugger as
+       found on SUN, Compaq, DEC, AIX, and IRIX systems.  DDD adapts
+       automatically to a wide range of DBX variants.
+
+       Note: In DDD, GDB support is better than DBX support.  Try GDB first.
+
+     - As an alternative to GDB, DDD also supports the `ladebug'
+       debugger as found on some Compaq and DEC systems.  This is useful
+       if you use a compiler that is better supported by `ladebug' than
+       by GDB.
+
+       Note: In DDD, GDB support is better than `ladebug' support.
+       Try GDB first.
+
+     - As another alternative, DDD also supports the XDB debugger as
+       found on HP-UX systems.  XDB usage has been tested for C programs
+       only, but may work for other languages as well.
+
+       Note: In DDD, GDB support is much better than XDB support; in
+       fact, XDB support is no longer maintained.  Try WDB or GDB 4.18
+       or later; these support HP-UX compilers.
+
+     - To debug Java bytecode programs, DDD supports JDB, the Java
+       Debugger, as of JDK 1.1 and later.
+
+       Please note: JDB is more a `proof of concept' than a real
+       debugger.  DDD does its best to overcome JDB's limitations, but
+       if you have an alternative to DDD/JDB, try it first.
+
+     - To debug Python programs, DDD supports PYDB, a PDB extension.
+       PYDB is included in the DDD distribution.
+
+     - To debug Perl programs, DDD supports the Perl debugger as of
+       Perl 5.003 and later.
+
+
+The following recommended helper applications should be in the user path:
+
+   * An X terminal emulator program (`xterm' or likewise).  DDD needs
+     this for running programs in the separate execution window.
+
+   * The GNU `info' program, version 4.0 or later,
+     as well as various info files.
+
+     - `info -f gdb' should show the GDB Manual.  DDD uses this to
+       display the GDB Reference.
+
+     - `info -f ddd' should show the DDD Manual (after installation).
+       DDD uses this to display the DDD Manual.
+
+     - `info -f libc' should show libc documentation.  DDD uses this
+       give online help on the various signals.
+
+   * The `xfontsel' font selection program.  With `xfontsel', you can
+     select fonts interactively.
+
+   * The `gnuplot' program, version 3.5 or later.  DDD uses `gnuplot'
+     to plot array and history data.
+
+
+Basic Installation
+==================
+
+Basically, to build and install DDD from sources, you enter three
+commands:
+
+	$ ./configure
+	$ make
+	$ make install
+
+The `configure' shell script attempts to guess correct values for
+various system-dependent variables used during compilation.  It uses
+those values to create a `Makefile' in each directory of the DDD
+package.  It also creates some `.h' files containing system-dependent
+definitions.  Finally, it creates a shell script `config.status' that
+you can run in the future to recreate the current configuration, a
+file `config.cache' that saves the results of its tests to speed up
+reconfiguring, and a file `config.log' containing compiler output
+(useful mainly for debugging `configure').
+
+If you need to do unusual things to compile the DDD package, please
+try to figure out how `configure' could check whether to do them, and
+mail us diffs or instructions to so they can be considered for the next
+release.  If at some point `config.cache' contains results you don't
+want to keep, you may remove or edit it.
+
+The file `configure.in' is used to create `configure' by a program
+called `autoconf'.  You only need `configure.in' if you want to change
+it or regenerate `configure' using a newer version of `autoconf'.
+
+The simplest way to compile DDD is:
+
+  1. See the DDD WWW page, `http://www.gnu.org/software/ddd/',
+     for recent release notes.
+
+  2. See the file `PROBLEMS' for known problems during build and
+     possible system-specific installation procedures.
+
+  3. If you want to use DDD with LessTif, get a recent LessTif release
+     from `http://www.lesstif.org' and see the local `patches/'
+     subdirectory for patches to be applied.
+
+  4. `cd' to the directory containing the DDD package source code
+     (that is, the directory named `ddd-<release>', _not_ `ddd') and
+     type
+     
+	$ ./configure
+	
+     to configure DDD for your system.  If you're using `csh' on an
+     old version of System V, you might need to type
+
+	% sh ./configure
+
+     instead to prevent `csh' from trying to execute `configure' itself.
+     If you're building DDD on Windows using CYGWIN, type
+     
+	$ bash ./configure
+
+     instead.
+
+     Running `configure' takes awhile.  While running, it prints some
+     messages telling which features it is checking for.
+
+     If `configure' reports an error or some bad result, check the
+     files `config.log' and `ddd/config.log' for diagnostics.
+
+  5. Check the `Makefile', `Ddd', and `config.h' files generated by
+     `configure'.  Most settings should be guessed correctly by the
+     `configure' program.  You may, however, wish to edit the
+     settings, or re-run `configure' with special options.
+
+     Frequently used `configure' options include `--program-prefix=x'
+     to have DDD installed as `xddd' (to avoid confusion with existing
+     `ddd' programs) or the `--with-motif...', `--with-athena...',
+     `--with-x...'  options used to specify the locations of M*tif and
+     Athena widgets or the X libraries.  These and other `configure'
+     options are decribed below.
+
+     If you have multiple library versions installed (for instance,
+     multiple X11 releases or releases from different sources), you
+     may also have to supply their locations.  See `Optional
+     features', below.
+
+  6. Now type
+  
+	$ make
+	
+     to build DDD.  Any modern MAKE flavors should do, but for
+     incremental reconstruction, GNU MAKE is required on most
+     systems.
+
+  7. Building DDD takes awhile.  While DDD is being built, you may
+     wish to read and/or print the documentation shipped with DDD.
+     See the "Documentation" section, below.
+
+  8. Check the `make' output for compiler errors and warnings.
+
+     If you see any compiler errors or warnings, please see the
+     sections `Warnings during build' and `Errors during build', below.
+
+  9. For a simple check before installation, type
+  
+	$ make check
+	
+     This creates a sample C++ program `cxxtest' and then runs DDD
+     on it by invoking `./ddd cxxtest'.  Enjoy!
+
+     You can also invoke DDD directly, but DDD may not be able to
+     locate its resources.  See Step 12, below, for appropriate
+     settings.
+
+ 10. If DDD fails to start because a dynamic library is not found at
+     runtime, re-run `configure' with the `--enable-rpath' option;
+     see `Locating Libraries', below.  Delete ddd (`cd ddd; rm ddd')
+     and repeat Steps 6--9.
+
+ 11. If DDD crashes immediately after startup or after a few
+     interactions, first check your configuration (the output of
+     `./ddd --configuration') for version mismatches.  Also check
+     whether libraries and include files have matching versions.
+
+     Then, see the `PROBLEMS' and `BUGS' files for known problems.  
+     If the problem is not listed, report it to the DDD maintainers
+     <bug-ddd@gnu.org>.  If you need help and assistance, see the DDD
+     WWW page `http://www.gnu.org/software/ddd/' for patches, people,
+     and pointers.
+
+ 12. If you want to use DDD on your own program, please install it
+     first (see the Step 13, below).  If you absolutely *must* run 
+     DDD without installing it, be sure that the following environment
+     variables are properly set:
+
+     - DDD_HOME must point to the top-level source package directory
+       (such that `$DDD_HOME/NEWS' is the DDD news)
+
+     - XUSERFILESEARCHPATH must contain the path of the `Ddd'
+       app-defaults file, where `Ddd' is substituted by `%N'.
+
+     See the DDD invocation in `make check', above, to see typical
+     values of these variables.
+
+ 13. Type
+ 
+	$ make install
+	
+     This installs 
+     - the DDD executable `ddd' in some public place 
+       (usually in `/usr/local/bin/')
+     - the DDD manual page `ddd.1' in `/usr/local/man/man1/'
+     - the DDD info file `ddd.info' in `/usr/local/info/'
+     - the DDD run-time resources into `/usr/local/share/ddd-VERSION/'.
+
+     As an alternative, you can also type
+ 
+	$ make install-strip
+
+     instead.  This installs a `stripped' variant of the DDD
+     executable; this saves space but prevents you from getting
+     detailed diagnostics in case of DDD errors.
+
+     See `Installation Names', below, on how to configure DDD to use
+     other locations and names.
+
+ 14. This distribution also comes with documentation in PostScript,
+     PDF, and HTML format.  You will find these files in the `doc/'
+     subdirectory.  Feel free to install them in some public place.
+
+ 15. If you have a `Ddd' app-defaults file installed from a previous
+     DDD version, this file will _override_ the DDD settings compiled 
+     into DDD and cause major problems.  Remove it.
+
+ 16. Like every good X citizen, DDD comes with an application defaults
+     file, named `ddd/Ddd'.  By default, this file is already installed as
+     a DDD run-time resource (and possibly also compiled into DDD), so you
+     need not install it in the default application defaults directory.
+
+     In fact, we **STRONGLY RECOMMEND** not to install it; there is a
+     whole slew of version-skew problems associated with app-defaults
+     files, which are best avoided by simply not using them.  For
+     details, see Step 15, above, and the comment at the `Ddd' top.
+
+     If you absolutely want to install it (or if you configured DDD
+     such that `Ddd' is not compiled into DDD), copy `Ddd' to a place
+     where app-defaults files are commonly found.
+
+ 17. You can remove the program binaries, libraries and object files
+     from the source directory by typing
+     
+	$ make clean
+
+     (There is also `make mostlyclean', which removes all object
+     files, but keeps the executables.)
+
+     To also remove the Makefiles, the header files containing
+     system-dependent definitions, and `config.status' (all the files
+     that `configure' created), type
+     
+	$ make distclean
+
+     (There is also `make maintainer-clean', which removes *each*
+     derived file included in the DDD distribution - such as LEX and
+     YACC output.  Do not use this unless you know what you're doing.)
+
+ 18. You can remove DDD from your system by typing
+ 
+	$ make uninstall
+
+     This undoes all effects of a previous `make install'.
+
+
+Installation Details
+====================
+
+Compilers and Options
+---------------------
+
+Some systems require unusual options for compilation or linking that
+the `configure' script does not know about.  You can give `configure'
+initial values for variables by setting them in the environment.
+Using a Bourne-compatible shell, you can do that on the command line
+like this:
+
+     CXX=/usr/egcs/bin/g++ CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+
+Or on systems that have the `env' program, you can do it like this:
+
+     env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+
+Options set this way include:
+
+`CC'
+     The name of the C compiler
+
+`CPPFLAGS'
+     Preprocessing flags used by the C and C++ compilers
+
+`CFLAGS'
+     Compilation flags used by the C compiler
+
+`CXX'
+     The name of the C++ compiler
+
+`CXXFLAGS'
+     Compilation flags used by the C++ compiler
+
+`LDFLAGS'
+     Linker flags used by both the C and C++ compiler
+
+
+Using a Different Build Directory
+---------------------------------
+
+You can compile the DDD package in a different directory from the one
+containing the source code.  Doing so allows you to compile it on more
+than one kind of computer at the same time.  To do this, you must use
+a version of `make' that supports the `VPATH' variable, such as GNU
+`make'.  `cd' to the directory where you want the object files and
+executables to go and run the `configure' script.  `configure'
+automatically checks for the source code in the directory that
+`configure' is in and in `..'.
+
+
+Installation Names
+------------------
+
+By default, `make install' will install the DDD files in
+`/usr/local/bin', `/usr/local/man', etc.  You can specify an
+installation prefix other than `/usr/local' by giving `configure' the
+option `--prefix=PATH'.
+
+You can specify separate installation prefixes for architecture-
+specific files and architecture-independent files.  If you give
+`configure' the option `--exec-prefix=PATH', the package will use PATH
+as the prefix for installing programs and libraries.  Documentation
+and other data files will still use the regular prefix.
+
+You can cause DDD to be installed with an extra prefix or suffix on
+its name by giving `configure' the option `--program-prefix=PREFIX' or
+`--program-suffix=SUFFIX'.
+
+
+External Packages
+-----------------
+
+By default, `configure' will configure DDD to use all supported
+external packages available on your system.
+
+In some cases, `configure' may require additional information about
+these packages:
+
+   * `configure' can usually find the X include and library files
+     automatically, but if it doesn't, you can use the `configure'
+     options `--x-includes=DIR' and `--x-libraries=DIR' to specify their
+     locations.  See also `Locating Libraries', below.
+   
+   * If `configure' doesn't find the M*tif include and library files
+     automatically, you can use the `configure' options
+     `--with-motif-includes=DIR' and `--with-motif-libraries=DIR' to
+     specify their locations.  See also `Locating Libraries', below.
+   
+   * If `configure' doesn't find the Athena include and library files
+     automatically, you can use the `configure' options
+     `--with-athena-includes=DIR' and `--with-athena-libraries=DIR' to
+     specify their locations.  See also `Locating Libraries', below.
+   
+   * If `configure' doesn't find the XPM include and library files
+     automatically, you can use the `configure' options
+     `--with-xpm-includes=DIR' and `--with-xpm-libraries=DIR' to specify
+     their locations.  See also `Locating Libraries', below.
+   
+   * If `configure' doesn't find the Readline include and library files
+     automatically, you can use the `configure' options
+     `--with-readline-includes=DIR' and `--with-readline-libraries=DIR'
+     to specify their locations.  See also `Locating Libraries', below.
+   
+   * If `configure' doesn't find the Ncurses include and library files
+     automatically, you can use the `configure' options
+     `--with-ncurses-includes=DIR' and `--with-ncurses-libraries=DIR'
+     to specify their locations.  See also `Locating Libraries', below.
+
+
+You can also configure DDD to _ignore_ some external packages:
+
+   * If you wish to disable Athena widgets and rely on M*tif widgets alone,
+     you can use the `configure' option `--without-athena'.
+   
+   * Likewise, `--without-xpm' disables XPM support.
+   
+   * There is also a `--without-motif' option.  Don't use it; DDD will
+     not compile without M*tif.
+   
+   * If you wish to disable command-line editing on standard input,
+     use `--without-readline'.
+
+
+
+Locating Libraries
+------------------
+
+If one of the libraries to be used with DDD is a dynamic library and
+installed in a non-standard place (that is, in a place where the
+run-time linker cannot find it), you can specify its location
+explicitly.
+
+The option `--enable-rpath=PATH' sets the path of directories to be
+searched for dynamic libraries to PATH (a colon-separated list of
+directories).
+
+For instance, if you have a LessTif library `libXm.so' installed in
+`/you/cannot/find/me/' and a Readline library `libreadline.so'
+installed in `/nobody/knows/i/am/here/', you can specify
+
+    --enable-rpath=/you/cannot/find/me/:/nobody/knows/i/am/here/
+
+to make sure these places are searched for libraries.
+
+Note: `--enable-rpath' must be specified separately from
+`--with-PACKAGE-libraries' and likewise because these are different
+concepts:
+
+   * `--with-PACKAGE-libraries' specifies the place to be searched at
+     _link_ time;
+   
+   * `--enable-rpath' specifies the place to be searched at
+     _execution_ time.
+
+
+
+
+Optional Features
+-----------------
+
+By default, `configure' will configure DDD to use all supported
+optional DDD features.  There are five optional features.
+
+   * You can configure DDD such that the `Ddd' application defaults file
+     will be compiled into the DDD executable.
+   
+     To enable the builtin application defaults file, use the `configure'
+     option `--enable-builtin-app-defaults'.
+   
+   
+   * You can configure DDD such that the DDD manual will be compiled into
+     the DDD executable.
+   
+     To enable the builtin DDD manual, use the `configure' option
+     `--enable-builtin-manual'.
+   
+   
+   * You can configure DDD such that the DDD News will be compiled into
+     the DDD executable.
+   
+     To enable the builtin DDD news, use the `configure' option
+     `--enable-builtin-news'.
+   
+   
+   * You can configure DDD such that the DDD License will be compiled into
+     the DDD executable.
+   
+     To enable the builtin DDD news, use the `configure' option
+     `--enable-builtin-license'.
+   
+   
+   * You can configure DDD such that the DDD VSL library `ddd.vsl' will
+     be compiled into the DDD executable.
+   
+     To enable the builtin VSL library, use the `configure' option
+     `--enable-builtin-vsllib'.
+
+See also `External Packages', above, to disable external packages such
+as the Readline library used for command-line editing on standard input.
+
+
+
+
+Specifying the System Type
+--------------------------
+
+There may be some features `configure' can not figure out
+automatically, but needs to determine by the type of host DDD will run
+on.  Usually `configure' can figure that out, but if it prints a
+message saying it can not guess the host type, give it the
+`--host=TYPE' option.  TYPE can either be a short name for the system
+type, such as `sun4', or a canonical name with three fields:
+
+     CPU-COMPANY-SYSTEM
+
+See the file `config.sub' for the possible values of each field.
+
+
+Sharing Defaults
+----------------
+
+If you want to set default values for `configure' scripts to share,
+you can create a site shell script called `config.site' that gives
+default values for variables like `CC', `cache_file', and `prefix'.
+`configure' looks for `PREFIX/share/config.site' if it exists, then
+`PREFIX/etc/config.site' if it exists.  Or, you can set the
+`CONFIG_SITE' environment variable to the location of the site script.
+A warning: not all `configure' scripts look for a site script.
+
+
+Operation Controls
+------------------
+
+`configure' recognizes the following options to control how it
+operates.
+
+`--cache-file=FILE'
+     Save the results of the tests in FILE instead of `config.cache'.
+     Set FILE to `/dev/null' to disable caching, for debugging
+     `configure'.
+
+`--help'
+     Print a summary of the options to `configure', and exit.
+
+`--quiet'
+`--silent'
+`-q'
+     Do not print messages saying which checks are being made.
+
+`--srcdir=DIR'
+     Look for the DDD source code in directory DIR.  Usually
+     `configure' can determine that directory automatically.
+
+`--version'
+     Print the version of Autoconf used to generate the `configure'
+     script, and exit.
+
+`configure' also accepts some other, not widely useful, options.
+
+
+
+Warnings during build
+---------------------
+
+Normally, DDD should build without any warnings.  If you encounter
+warnings, these may indicate actual problems in DDD code, showing up
+in your particular configuration.
+
+Warnings that can be ignored safely include warnings about code
+not being reached and warnings about unused, uninitialized, or
+shadowed variables.
+
+However, GCC warnings that *must never be ignored* include:
+
+   * `implicit declaration of function F'
+   * `cannot pass objects of type T through `...''
+
+If you encounter such a warning, GCC will generate unusable code.
+Abort compilation and fix the problem.
+
+If you find the warning can be avoided by changing some code or by
+changing the DDD build process, please send a bug report to the DDD
+maintainers <bug-ddd@gnu.org>.  Be sure to include a context
+diff (`diff -c2') between the original and the changed file(s).
+
+
+
+Errors during build
+-------------------
+
+Normally, DDD should build without any errors.  If you encounter
+errors, these indicate serious problems in either DDD code or your
+particular configuration.
+
+The `PROBLEMS' file contains a number of common problems encountered
+during build, as well as fixes and workarounds.  If the problem is not
+listed there, please ask a local expert for help.
+
+If you find the error can be avoided by changing some DDD code or by
+changing the DDD build process, please send a bug report to the DDD
+maintainers <bug-ddd@gnu.org>.  Be sure to include a context
+diff (`diff -c2') between the original and the changed file(s).
+
+
+Documentation
+=============
+
+The DDD Manual, contained in the file `ddd/ddd.texi', is the official
+DDD reference.  
+
+Preformatted versions of the DDD Manual (in info, PostScript, and PDF
+formats) can be found in the `doc/' subdirectory.  A HTML version
+comes in a separate package.  Note that DDD also has various on-line
+facilities.
+
+
+$Id$

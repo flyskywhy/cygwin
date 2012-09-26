@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-sunaudiodev.html" />
+<link rel="parent" href="module-sunaudiodev.html" />
+<link rel="next" href="module-sunaudiodev-constants.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>35.1.1 Audio Device Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="35.1 sunaudiodev  "
+  href="module-sunaudiodev.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="35.1 sunaudiodev  "
+  href="module-sunaudiodev.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="35.2 sunaudiodev  "
+  href="module-sunaudiodev-constants.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-sunaudiodev.html">35.1 sunaudiodev  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sunaudiodev.html">35.1 sunaudiodev  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-sunaudiodev-constants.html">35.2 SUNAUDIODEV  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0037110000000000000000"></a><a name="audio-device-objects"></a>
+<br>
+35.1.1 Audio Device Objects 
+</h2>
+
+<p>
+The audio device objects are returned by <tt class="function">open()</tt> define the
+following methods (except <code>control</code> objects which only provide
+<tt class="method">getinfo()</tt>, <tt class="method">setinfo()</tt>, <tt class="method">fileno()</tt>, and
+<tt class="method">drain()</tt>):
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5738' xml:id='l2h-5738' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method explicitly closes the device. It is useful in situations
+where deleting the object does not immediately close it since there
+are other references to it. A closed device should not be used again.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5739' xml:id='l2h-5739' class="method">fileno</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns the file descriptor associated with the device.  This can be
+used to set up <code>SIGPOLL</code> notification, as described below.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5740' xml:id='l2h-5740' class="method">drain</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method waits until all pending output is processed and then returns.
+Calling this method is often not necessary: destroying the object will
+automatically close the audio device and this will do an implicit drain.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5741' xml:id='l2h-5741' class="method">flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method discards all pending output. It can be used avoid the
+slow response to a user's stop request (due to buffering of up to one
+second of sound).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5742' xml:id='l2h-5742' class="method">getinfo</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method retrieves status information like input and output volume,
+etc. and returns it in the form of
+an audio status object. This object has no methods but it contains a
+number of attributes describing the current device status. The names
+and meanings of the attributes are described in
+<code>&lt;sun/audioio.h&gt;</code> and in the <span class="manpage"><i>audio</i>(7I)</span>
+manual page.  Member names
+are slightly different from their C counterparts: a status object is
+only a single structure. Members of the <tt class="cdata">play</tt> substructure have
+"<tt class="samp">o_</tt>" prepended to their name and members of the <tt class="cdata">record</tt>
+structure have "<tt class="samp">i_</tt>". So, the C member <tt class="cdata">play.sample_rate</tt> is
+accessed as <tt class="member">o_sample_rate</tt>, <tt class="cdata">record.gain</tt> as <tt class="member">i_gain</tt>
+and <tt class="cdata">monitor_gain</tt> plainly as <tt class="member">monitor_gain</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5743' xml:id='l2h-5743' class="method">ibufcount</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method returns the number of samples that are buffered on the
+recording side, i.e. the program will not block on a
+<tt class="function">read()</tt> call of so many samples.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5744' xml:id='l2h-5744' class="method">obufcount</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method returns the number of samples buffered on the playback
+side. Unfortunately, this number cannot be used to determine a number
+of samples that can be written without blocking since the kernel
+output queue length seems to be variable.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5745' xml:id='l2h-5745' class="method">read</tt></b>(</nobr></td>
+  <td><var>size</var>)</td></tr></table></dt>
+<dd>
+This method reads <var>size</var> samples from the audio input and returns
+them as a Python string. The function blocks until enough data is available.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5746' xml:id='l2h-5746' class="method">setinfo</tt></b>(</nobr></td>
+  <td><var>status</var>)</td></tr></table></dt>
+<dd>
+This method sets the audio device status parameters. The <var>status</var>
+parameter is an device status object as returned by <tt class="function">getinfo()</tt> and
+possibly modified by the program.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5747' xml:id='l2h-5747' class="method">write</tt></b>(</nobr></td>
+  <td><var>samples</var>)</td></tr></table></dt>
+<dd>
+Write is passed a Python string containing audio samples to be played.
+If there is enough buffer space free it will immediately return,
+otherwise it will block.
+</dl>
+
+<p>
+The audio device supports asynchronous notification of various events,
+through the SIGPOLL signal.  Here's an example of how you might enable
+this in Python:
+
+<p>
+<div class="verbatim"><pre>
+def handle_sigpoll(signum, frame):
+    print 'I got a SIGPOLL update'
+
+import fcntl, signal, STROPTS
+
+signal.signal(signal.SIGPOLL, handle_sigpoll)
+fcntl.ioctl(audio_obj.fileno(), STROPTS.I_SETSIG, STROPTS.S_MSG)
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="35.1 sunaudiodev  "
+  href="module-sunaudiodev.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="35.1 sunaudiodev  "
+  href="module-sunaudiodev.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="35.2 sunaudiodev  "
+  href="module-sunaudiodev-constants.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-sunaudiodev.html">35.1 sunaudiodev  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sunaudiodev.html">35.1 sunaudiodev  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-sunaudiodev-constants.html">35.2 SUNAUDIODEV  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

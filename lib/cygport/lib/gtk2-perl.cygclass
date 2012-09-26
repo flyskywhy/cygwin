@@ -1,0 +1,61 @@
+################################################################################
+#
+# gtk2-perl.cygclass - functions for building Gtk2-Perl bindings
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: gtk2-perl.cygclass 4305 2008-08-26 09:01:54Z yselkowitz $
+#
+################################################################################
+
+inherit perl
+
+if ! defined CPAN_AUTHOR
+then
+	HOMEPAGE="http://gtk2-perl.sourceforge.net/"
+	SRC_URI="mirror://sourceforge/gtk2-perl/${ORIG_PN}-${PV}.tar.gz"
+fi
+
+USE_MANAGED_MOUNT=1
+
+DEPS_PATH="${PERL_VENDORARCH}/auto/Cairo:${PERL_VENDORARCH}/auto/Glib:${PERL_VENDORARCH}/auto/Gtk2:${PERL_VENDORARCH}/auto/Gnome2/VFS:${PERL_VENDORARCH}/auto/Gnome2/GConf"
+
+gtk2_perl_compile() {
+	perl_compile
+
+	for man3pm in blib/man3/*.3pm
+	do
+		mv ${man3pm} ${man3pm//::/.}
+	done
+}
+
+gtk2_perl_install() {
+	perl_install
+	perl_postinst
+}
+
+src_compile() {
+	lndirs
+	cd ${B}
+	gtk2_perl_compile
+}
+
+src_install() {
+	cd ${B}
+	gtk2_perl_install
+}

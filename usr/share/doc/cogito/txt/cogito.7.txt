@@ -1,0 +1,251 @@
+cogito(7)
+=========
+
+NAME
+----
+cogito - version control system
+
+SYNOPSIS
+--------
+cg-COMMAND <arg>...
+
+DESCRIPTION
+-----------
+
+'Cogito' is a version control system layered on top of the git tree history
+storage system. Amongst some of the noteworthy features, 'Cogito' has support
+for branching, tagging and multiple backends for distributing repositories
+(local files, rsync, HTTP, ssh).
+
+'Cogito' is implemented as a series of 'bash(1)' scripts on top of gitlink:git[7]
+(a content-tracking filesystem) with the goal of providing an interface for
+working with the 'GIT' database in a manner similar to other SCM tools (like
+'CVS', 'BitKeeper' or 'Monotone').
+
+Commands Overview
+-----------------
+
+The 'Cogito' commands can be split into regular commands and advanced commands.
+The regular commands are those used for normal interacting with the repository,
+while the advanced commands can be used for administrating the repository and
+should to some degree be regarded as low-level and in some cases dangerous.
+
+Below an overview of the available commands are listed. For details on
+individual commands, do e.g.
+
+	cg-help cg-log
+
+or
+
+	cg-log --long-help
+
+You can find the quick overview of the most useful commands and concepts in
+gitlink:cg-ref[7].
+
+Regular commands
+~~~~~~~~~~~~~~~~
+
+
+gitlink:cg-add[1]  [-a] [-N] [-r] FILE...::
+	Add new files to the repository
+
+gitlink:cg-branch-add[1]  BRANCH_NAME LOCATION::
+	Add new remote branch
+
+gitlink:cg-branch-chg[1]  BRANCH_NAME NEW_LOCATION::
+	Change an existing remote branch repository URL
+
+gitlink:cg-branch-ls[1] ::
+	List configured remote branches
+
+gitlink:cg-clean[1]  [-d] [-D] [-n] [-q] [-x]::
+	Remove untracked files from the working tree
+
+gitlink:cg-clone[1]  [-l] [-b] [-s] LOCATION [DESTDIR]::
+	Clone a remote repository
+
+gitlink:cg-commit[1]  [-m MESSAGE]... [-e] [-c COMMIT_ID] [OTHER_OPTIONS] [FILE]... [< MESSAGE]::
+	Commit changes in the working tree to the repository
+
+gitlink:cg-diff[1]  [-c] [-m] [-s] [-p] [-r FROM_ID[..TO_ID]] [FILE]...::
+	Show changes in the diff format
+
+gitlink:cg-export[1]  [-r TREE_ID] DESTFILE::
+	Export contents of a particular revision
+
+gitlink:cg-fetch[1]  [-f] [-v] [BRANCH_NAME]::
+	Fetch changes from a remote branch to the local repository
+
+gitlink:cg-help[1]  [-c] [cg-COMMAND | COMMAND]::
+	Show help for Cogito commands
+
+gitlink:cg-init[1]  [-I] [-N] [-e EXCLUDEPATTERN]... [-m MESSAGE]...::
+	Initialize new repository
+
+gitlink:cg-log[1]  [-D DATE] [-r FROM_ID[..TO_ID]] [-d] [-s | --summary] [OTHER_OPTIONS] [FILE]...::
+	Show the list of changes
+
+gitlink:cg-merge[1]  [-n] [-b BASE_COMMIT] [-j] [--squash] [-v] [BRANCH_NAME]::
+	Merge a branch to the current branch
+
+gitlink:cg-merge.orig[1]  [-n] [-b BASE_COMMIT] [-j] [--squash] [-v] [BRANCH_NAME]::
+	Merge a branch to the current branch
+
+gitlink:cg-merge.rej[1] ::
+	
+
+gitlink:cg-mkpatch[1]  [-m] [-s] [-r FROM_ID[..TO_ID] [-d DIRNAME]]::
+	Create a patch from a commit or a series of commits
+
+gitlink:cg-mv[1]  [-f] FILE... DEST::
+	Rename or move files in the repository
+
+gitlink:cg-object-id[1]  [-b | -c | -d | -n | -p | -t] [OBJECT_ID]::
+	Get the SHA1 id of an object associated with the given symbolic id
+
+gitlink:cg-patch[1]  [-c] [-C COMMIT] [-pN] [-R] [-m | -d DIR] [OTHER_OPTIONS] < PATCH::
+	Apply a patch from a file, standard input, or a commit
+
+gitlink:cg-push[1]  [-r LOCAL_BRANCH] [-t TAG]... [REMOTE_BRANCH]...::
+	Push changes to a remote repository
+
+gitlink:cg-reset[1]  [--adds-removes]::
+	Reset the state of the working tree
+
+gitlink:cg-restore[1]  [-f] [-r ID] [FILE]...::
+	Restore files in the working tree to the given state
+
+gitlink:cg-rm[1]  [-a] [-f] [-n] [-r] FILE...::
+	Remove files from the repository
+
+gitlink:cg-seek[1]  [COMMIT_ID]::
+	Seek the working tree to a given commit
+
+gitlink:cg-status[1]  [-g] [[-n] -s STATUS] [-w] [-x] [DIRPATH]::
+	Show status of the repository and your working tree
+
+gitlink:cg-switch[1]  [-f] [-l | -n | -p] [-c | -r COMMIT_ID] BRANCH::
+	Switch the working tree to a different (or new) local branch
+
+gitlink:cg-tag[1]  [-m MESSAGE]... [-e] [-s] [OTHER_OPTIONS] TAG_NAME [OBJECT_ID]::
+	Mark certain commit with a tag
+
+gitlink:cg-tag-ls[1] ::
+	List existing tags
+
+gitlink:cg-tag-show[1]  TAGNAME...::
+	Show information about given tag(s)
+
+gitlink:cg-update[1]  [-f] [--squash] [-v] [BRANCH_NAME]::
+	Fetch and merge changes from a remote repository
+
+gitlink:cg-version[1]  [--lib-dir] [--share-dir]::
+	Show the version of the Cogito toolkit
+
+gitlink:cg-version.in[1]  [--lib-dir] [--share-dir]::
+	Show the version of the Cogito toolkit
+
+Advanced commands
+~~~~~~~~~~~~~~~~~
+
+
+gitlink:cg-admin-cat[1]  [-r TREE_ID] FILE...::
+	Cat file(s) by filename from given tree or revision
+
+gitlink:cg-admin-ls[1]  [-t TREE_ID] [PATH]::
+	List contents of a particular tree in the repository
+
+gitlink:cg-admin-lsobj[1]  [OBJECT_TYPE]::
+	List unpacked objects in the repository
+
+gitlink:cg-admin-rewritehist[1]  [-d TEMPDIR] [-r STARTREV]... [-k KEEPREV]... [FILTERS] DESTBRANCH::
+	Rewrite revision history
+
+gitlink:cg-admin-setuprepo[1]  [-g GROUP] REPOSITORY::
+	Setup a public repository
+
+gitlink:cg-admin-uncommit[1]  [-t] [COMMIT_ID]::
+	Undo a commit or a series of commits
+
+Helper commands
+~~~~~~~~~~~~~~~
+
+There are a few helper commands that are not meant to be used from the command
+line. They provide a library of generic functions used by many of the real
+'Cogito' commands. You can safely ignore them, unless you want to contribute to
+'Cogito' development.
+
+
+cg-Xfetchprogress::
+	Show a cute progressbar for cg-fetch
+
+cg-Xfollowrenames::
+	git rev-list | git diff-tree --stdin following renames
+
+cg-Xlib::
+	Common code shared by the Cogito toolkit
+
+cg-Xmergefile::
+	Merge two revisions of a file
+
+Command Identifiers
+-------------------
+BRANCH_NAME::
+	Indicates a branch name added with the gitlink:cg-branch-add[1] or
+	gitlink:cg-switch[1] commands.
+
+COMMAND::
+	Indicates a 'Cogito' command. The `cg-` prefix is optional.
+
+LOCATION::
+	Indicates a local file path or a URI. See gitlink:cg-branch-add[1] for a
+	list of supported URI schemes.
+
+COMMIT_ID, FROM_ID, TO_ID, BASE_COMMIT::
+	Indicates an ID resolving to a commit. The following expressions can
+	be used interchangeably as IDs:
+	- empty string, 'this' or 'HEAD' (current HEAD)
+	- branch name (as registered with gitlink:cg-branch-add[1])
+	- tag name (as registered with gitlink:cg-tag[1])
+	- date string (as recognized by the 'date' tool)
+	- shortcut object hash (shorted unambiguous hash lead)
+	- commit object hash (as returned by 'cg-object-id -c')
+	- tree object hash (as returned by 'cg-object-id -t')
+
+TAG_NAME::
+	Indicates a free form tag name.
+
+OBJECT_TYPE::
+	Indicates a git object type i.e.: 'blob', 'commit', 'tree' or 'tag'.
+
+USERNAME::
+	Indicates a free form user name.
+
+FILE::
+	Indicates an already existing filename - always relative to the root
+	of the repository.
+
+FILES
+-----
+~/.cgrc::
+	This file is read on startup if `stdout` is a terminal and may
+	contain information about default command line options. Each line
+	consists of a command name and a list of options. Lines not
+	starting with a 'Cogito' command name are ignored. To have
+	`cg-log` and `cg-diff` colorize the output put the following
+	in ~/.cgrc:
+
+		log -c
+		diff -c
+
+	You can prevent Cogito from reading ~/.cgrc by setting the
+	CG_NORC environment variable.
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005.
+
+SEE ALSO
+--------
+Cogito is based on gitlink:git[7]. A quick Cogito reference sheet is in
+gitlink:cg-ref[7]. Cogito homepage is at http://git.or.cz/cogito[].

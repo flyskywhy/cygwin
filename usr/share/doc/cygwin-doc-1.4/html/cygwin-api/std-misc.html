@@ -1,0 +1,43 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Compatibility with Miscellaneous Other Standards</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.61.2"><link rel="home" href="index.html" title="Cygwin API Reference"><link rel="up" href="compatibility.html" title="Chapter 1. Compatibility"><link rel="previous" href="std-posix.html" title="Compatibility with POSIX.1"><link rel="next" href="cygwin-functions.html" title="Chapter 2. Cygwin Functions"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Compatibility with Miscellaneous Other Standards</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="std-posix.html">Prev</a> </td><th width="60%" align="center">Chapter 1. Compatibility</th><td width="20%" align="right"> <a accesskey="n" href="cygwin-functions.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="std-misc"></a>Compatibility with Miscellaneous Other Standards</h2></div></div><div></div></div><p>The following functions are compatible with miscellaneous other
+standards:</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4676445"></a>Networking</h3></div></div><div></div></div><p>(Standardized by POSIX 1.g, which is probably still in draft?)</p><p>accept, bind, connect, getdomainname, gethostbyaddr,
+gethostbyname, getpeername, getprotobyname, getprotobynumber,
+getservbyname, getservbyport, getsockname, getsockopt, herror, htonl,
+htons, inet_addr, inet_makeaddr, inet_netof, inet_ntoa, listen, ntohl,
+ntohs, rcmd, recv, recvfrom, rexec, rresvport, send, sendto,
+setsockopt, shutdown, socket, socketpair</p><p>Of these networking calls, rexec, rcmd and rresvport are
+implemented in MS IP stack but may not be implemented in other
+vendors' stacks. </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4675160"></a>Other</h3></div></div><div></div></div><p>
+
+chroot, closelog, cwait, dlclose, dlerror, dlfork, dlopen, dlsym,
+endgrent, ffs, fstatfs, ftime, get_osfhandle, getdtablesize, getgrent,
+gethostname, getitimer, getmntent, getpagesize, getpgid, getpwent,
+gettimeofday, grantpt, initgroups, ioctl, killpg, login, logout,
+lstat, mknod, memccpy, nice, openlog, pclose, popen, ptsname, putenv,
+random, readv, realpath, regfree, rexec, select, setegid setenv,
+seterrno, seteuid, setitimer, setmntent, setmode, setpassent, setpgrp,
+setpwent, settimeofday, sexecl, sexecle, sexeclp, sexeclpe, sexeclpe,
+sexecp, sexecv, sexecve, sexecvpe, sigpause, spawnl, spawnle, spawnlp,
+spawnlpe, spawnv, spawnve, spawnvp, spawnvpe, srandom, statfs,
+strsignal, strtosigno, swab, syslog, timezone, truncate, ttyslot,
+unlockpt, unsetenv, usleep, utimes, vfork, vhangup, wait3, wait4,
+wcscmp, wcslen, wprintf, writev
+
+</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4675181"></a>Implementation Notes</h3></div></div><div></div></div><p> <tt class="function">initgroups</tt> does nothing</p><p> <tt class="function">chroot</tt>, <tt class="function">mknod</tt>,
+<tt class="function">settimeofday</tt>, and <tt class="function">vhangup</tt>
+always return -1 and sets errno to ENOSYS.</p><p> <tt class="function">nice</tt> allows Cygwin programs to alter their
+current runtime priority through the use of its incr argument.  Cygwin
+processes can be set to IDLE_PRIORITY_CLASS, NORMAL_PRIORITY_CLASS,
+HIGH_PRIORITY_CLASS, or REALTIME_PRIORITY_CLASS with the
+<tt class="function">nice</tt> call.  NORMAL_PRIORITY_CLASS is the
+default.  If you pass a positive number to nice(), then the priority
+level will decrease by one (within the above list of priorities).  A
+negative number would make it increase by one.  It is not possible to
+change it by more than one at a time without making repeated calls.
+An increment above REALTIME_PRIORITY_CLASS results in the process
+staying at that priority.  Likewise, a decrement to
+IDLE_PRIORITY_CLASS has it stay at that priority.  Note that in the
+Win32 API, there are 32 priorities.  So currently we only give access
+to four of these through <tt class="function">nice</tt>.</p><p> <tt class="function">seteuid</tt> and <tt class="function">setegid</tt>
+always return 0 and set errno to
+ENOSYS.</p><p><tt class="function">vfork</tt> just calls
+<tt class="function">fork</tt></p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="std-posix.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="compatibility.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="cygwin-functions.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Compatibility with POSIX.1 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 2. Cygwin Functions</td></tr></table></div></body></html>

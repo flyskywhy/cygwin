@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+#
+# Remove untracked files from the working tree
+# Copyright (c) Pavel Roskin, 2005
+#
+# Cleans file and directories that are not under version control.
+# When run without arguments, files ignored by `cg-status` and directories
+# are not removed.
+#
+# OPTIONS
+# -------
+# -d:: Clean directories
+#	Also clean directories and their contents.
+#
+# -D:: Clean directories more thoroughly
+#	Same as -d but try harder (change permissions first).
+#
+# -n:: Don't actually remove files, just pretend to
+#	Do not actually remove the files, just pretend to do so.
+#
+# -q:: Silence progress reporting
+#	Quiet - don't report what's being cleaned.
+#
+# -x:: Clean files ignored by cg-status
+#	Also clean files ignored by `cg-status`, such as object files.
+
+# Testsuite: Complete (t9400-clean)
+
+USAGE="cg-clean [-d] [-D] [-n] [-q] [-x]"
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+noexclude=
+cleandir=
+cleandirhard=
+quiet=
+rm=rm
+while optparse; do
+	if optparse -d; then
+		cleandir=1
+	elif optparse -D; then
+		cleandir=1
+		cleandirhard=1
+	elif optparse -n; then
+		pretendrm () { echo rm "$@"; }
+		rm="pretendrm"
+	elif optparse -q; then
+		quiet=1
+	elif optparse -x; then
+		noexclude=noexclude
+	else
+		optfail
+	fi
+done
+
+[ ${#ARGS[*]} = 0 ] || usage
+
+cd "${_git_relpath-.}"
+list_untracked_files "$noexclude" squashdirs | tr '\0' '\n' |
+while read -r file; do
+	if [ -d "$file" -a ! -L "$file" ]; then
+		if [ -z "$cleandir" ]; then
+			echo "Not removing $file"
+			continue
+		fi
+		[ "$quiet" ] || echo "Removing $file"
+		if [ "$cleandirhard" ]; then
+			chmod -R 700 "$file"
+		fi
+		$rm -rf -- "$file"
+		if [ -e "$file" -o -L "$file" ]; then
+			echo "Cannot remove $file"
+		fi
+	elif [ -e "$file" -o -L "$file" ]; then
+		[ "$quiet" ] || echo "Removing $file"
+		"$rm" -f -- "$file"
+		# rm would complain itself on failure
+	else
+		echo "File $file has disappeared!"
+	fi
+done

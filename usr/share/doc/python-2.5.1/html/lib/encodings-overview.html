@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="standard-encodings.html" />
+<link rel="prev" href="codec-base-classes.html" />
+<link rel="parent" href="module-codecs.html" />
+<link rel="next" href="standard-encodings.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.8.2 Encodings and Unicode</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.8.1.7 streamrecoder Objects"
+  href="stream-recoder-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4.8 codecs  "
+  href="module-codecs.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.8.3 standard Encodings"
+  href="standard-encodings.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="stream-recoder-objects.html">4.8.1.7 StreamRecoder Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-codecs.html">4.8 codecs  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="standard-encodings.html">4.8.3 Standard Encodings</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION006820000000000000000"></a><a name="encodings-overview"></a>
+<br>
+4.8.2 Encodings and Unicode
+</h2>
+
+<p>
+Unicode strings are stored internally as sequences of codepoints (to
+be precise as <tt class="ctype">Py_UNICODE</tt> arrays). Depending on the way Python is
+compiled (either via <b class="programopt">--enable-unicode=ucs2</b> or 
+<b class="programopt">--enable-unicode=ucs4</b>, with the former being the default)
+<tt class="ctype">Py_UNICODE</tt> is either a 16-bit or
+32-bit data type. Once a Unicode object is used outside of CPU and
+memory, CPU endianness and how these arrays are stored as bytes become
+an issue. Transforming a unicode object into a sequence of bytes is
+called encoding and recreating the unicode object from the sequence of
+bytes is known as decoding. There are many different methods for how this
+transformation can be done (these methods are also called encodings).
+The simplest method is to map the codepoints 0-255 to the bytes
+<code>0x0</code>-<code>0xff</code>. This means that a unicode object that contains 
+codepoints above <code>U+00FF</code> can't be encoded with this method (which 
+is called <code>'latin-1'</code> or <code>'iso-8859-1'</code>).
+<tt class="function">unicode.encode()</tt> will raise a <tt class="exception">UnicodeEncodeError</tt>
+that looks like this: "<tt class="samp">UnicodeEncodeError: 'latin-1' codec can't
+encode character u'\u1234' in position 3: ordinal not in range(256)</tt>".
+
+<p>
+There's another group of encodings (the so called charmap encodings)
+that choose a different subset of all unicode code points and how
+these codepoints are mapped to the bytes <code>0x0</code>-<code>0xff.</code>
+To see how this is done simply open e.g. <span class="file">encodings/cp1252.py</span>
+(which is an encoding that is used primarily on Windows).
+There's a string constant with 256 characters that shows you which 
+character is mapped to which byte value.
+
+<p>
+All of these encodings can only encode 256 of the 65536 (or 1114111)
+codepoints defined in unicode. A simple and straightforward way that
+can store each Unicode code point, is to store each codepoint as two
+consecutive bytes. There are two possibilities: Store the bytes in big
+endian or in little endian order. These two encodings are called
+UTF-16-BE and UTF-16-LE respectively. Their disadvantage is that if
+e.g. you use UTF-16-BE on a little endian machine you will always have
+to swap bytes on encoding and decoding. UTF-16 avoids this problem:
+Bytes will always be in natural endianness. When these bytes are read
+by a CPU with a different endianness, then bytes have to be swapped
+though. To be able to detect the endianness of a UTF-16 byte sequence,
+there's the so called BOM (the "Byte Order Mark"). This is the Unicode
+character <code>U+FEFF</code>. This character will be prepended to every UTF-16
+byte sequence. The byte swapped version of this character (<code>0xFFFE</code>) is
+an illegal character that may not appear in a Unicode text. So when
+the first character in an UTF-16 byte sequence appears to be a <code>U+FFFE</code>
+the bytes have to be swapped on decoding. Unfortunately upto Unicode
+4.0 the character <code>U+FEFF</code> had a second purpose as a "<tt class="samp">ZERO WIDTH
+NO-BREAK SPACE</tt>": A character that has no width and doesn't allow a
+word to be split. It can e.g. be used to give hints to a ligature
+algorithm. With Unicode 4.0 using <code>U+FEFF</code> as a "<tt class="samp">ZERO WIDTH NO-BREAK
+SPACE</tt>" has been deprecated (with <code>U+2060</code> ("<tt class="samp">WORD JOINER</tt>") assuming
+this role). Nevertheless Unicode software still must be able to handle
+<code>U+FEFF</code> in both roles: As a BOM it's a device to determine the storage
+layout of the encoded bytes, and vanishes once the byte sequence has
+been decoded into a Unicode string; as a "<tt class="samp">ZERO WIDTH NO-BREAK SPACE</tt>"it's a normal character that will be decoded like any other.
+
+<p>
+There's another encoding that is able to encoding the full range of
+Unicode characters: UTF-8. UTF-8 is an 8-bit encoding, which means
+there are no issues with byte order in UTF-8. Each byte in a UTF-8
+byte sequence consists of two parts: Marker bits (the most significant
+bits) and payload bits. The marker bits are a sequence of zero to six
+1 bits followed by a 0 bit. Unicode characters are encoded like this
+(with x being payload bits, which when concatenated give the Unicode
+character):
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Range</th>
+      <th class="left"  >Encoding</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><code>U-00000000</code> ... <code>U-0000007F</code></td>
+        <td class="left"  >0xxxxxxx</td></tr>
+    <tr><td class="left"   valign="baseline"><code>U-00000080</code> ... <code>U-000007FF</code></td>
+        <td class="left"  >110xxxxx 10xxxxxx</td></tr>
+    <tr><td class="left"   valign="baseline"><code>U-00000800</code> ... <code>U-0000FFFF</code></td>
+        <td class="left"  >1110xxxx 10xxxxxx 10xxxxxx</td></tr>
+    <tr><td class="left"   valign="baseline"><code>U-00010000</code> ... <code>U-001FFFFF</code></td>
+        <td class="left"  >11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</td></tr>
+    <tr><td class="left"   valign="baseline"><code>U-00200000</code> ... <code>U-03FFFFFF</code></td>
+        <td class="left"  >111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx</td></tr>
+    <tr><td class="left"   valign="baseline"><code>U-04000000</code> ... <code>U-7FFFFFFF</code></td>
+        <td class="left"  >1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx</td></tr></tbody>
+</table></div>
+
+<p>
+The least significant bit of the Unicode character is the rightmost x
+bit.
+
+<p>
+As UTF-8 is an 8-bit encoding no BOM is required and any <code>U+FEFF</code>
+character in the decoded Unicode string (even if it's the first
+character) is treated as a "<tt class="samp">ZERO WIDTH NO-BREAK SPACE</tt>".
+
+<p>
+Without external information it's impossible to reliably determine
+which encoding was used for encoding a Unicode string. Each charmap
+encoding can decode any random byte sequence. However that's not
+possible with UTF-8, as UTF-8 byte sequences have a structure that
+doesn't allow arbitrary byte sequence. To increase the reliability
+with which a UTF-8 encoding can be detected, Microsoft invented a
+variant of UTF-8 (that Python 2.5 calls <code>"utf-8-sig"</code>) for its Notepad
+program: Before any of the Unicode characters is written to the file,
+a UTF-8 encoded BOM (which looks like this as a byte sequence: <code>0xef</code>,
+<code>0xbb</code>, <code>0xbf</code>) is written. As it's rather improbable that any
+charmap encoded file starts with these byte values (which would e.g. map to
+
+<p>
+LATIN SMALL LETTER I WITH DIAERESIS 
+<br>
+RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK 
+<br>
+INVERTED QUESTION MARK
+
+<p>
+in iso-8859-1), this increases the probability that a utf-8-sig
+encoding can be correctly guessed from the byte sequence. So here the
+BOM is not used to be able to determine the byte order used for
+generating the byte sequence, but as a signature that helps in
+guessing the encoding. On encoding the utf-8-sig codec will write
+<code>0xef</code>, <code>0xbb</code>, <code>0xbf</code> as the first three bytes to the file.
+On decoding utf-8-sig will skip those three bytes if they appear as the
+first three bytes in the file.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.8.1.7 streamrecoder Objects"
+  href="stream-recoder-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4.8 codecs  "
+  href="module-codecs.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.8.3 standard Encodings"
+  href="standard-encodings.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="stream-recoder-objects.html">4.8.1.7 StreamRecoder Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-codecs.html">4.8 codecs  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="standard-encodings.html">4.8.3 Standard Encodings</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

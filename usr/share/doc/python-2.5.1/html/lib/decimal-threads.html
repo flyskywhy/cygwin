@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="decimal-recipes.html" />
+<link rel="prev" href="decimal-notes.html" />
+<link rel="parent" href="module-decimal.html" />
+<link rel="next" href="decimal-recipes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.6 Working with threads </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.5.2 special values"
+  href="node131.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.7 Recipes"
+  href="decimal-recipes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node131.html">6.3.5.2 Special values</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-recipes.html">6.3.7 Recipes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION008360000000000000000"></a><a name="decimal-threads"></a>
+<br>
+6.3.6 Working with threads 
+</h2>
+
+<p>
+The <tt class="function">getcontext()</tt> function accesses a different <tt class="class">Context</tt>
+object for each thread.  Having separate thread contexts means that threads
+may make changes (such as <code>getcontext.prec=10</code>) without interfering with
+other threads.
+
+<p>
+Likewise, the <tt class="function">setcontext()</tt> function automatically assigns its target
+to the current thread.
+
+<p>
+If <tt class="function">setcontext()</tt> has not been called before <tt class="function">getcontext()</tt>,
+then <tt class="function">getcontext()</tt> will automatically create a new context for use
+in the current thread.
+
+<p>
+The new context is copied from a prototype context called
+<var>DefaultContext</var>. To control the defaults so that each thread will use the
+same values throughout the application, directly modify the
+<var>DefaultContext</var> object. This should be done <em>before</em> any threads are
+started so that there won't be a race condition between threads calling
+<tt class="function">getcontext()</tt>. For example:
+
+<p>
+<div class="verbatim"><pre>
+# Set applicationwide defaults for all threads about to be launched
+DefaultContext.prec = 12
+DefaultContext.rounding = ROUND_DOWN
+DefaultContext.traps = ExtendedContext.traps.copy()
+DefaultContext.traps[InvalidOperation] = 1
+setcontext(DefaultContext)
+
+# Afterwards, the threads can be started
+t1.start()
+t2.start()
+t3.start()
+ . . .
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.5.2 special values"
+  href="node131.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.7 Recipes"
+  href="decimal-recipes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node131.html">6.3.5.2 Special values</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-recipes.html">6.3.7 Recipes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

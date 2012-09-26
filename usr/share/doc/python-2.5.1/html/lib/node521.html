@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node522.html" />
+<link rel="prev" href="module-resource.html" />
+<link rel="parent" href="module-resource.html" />
+<link rel="next" href="node522.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>16.13.1 Resource Limits</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="16.13 resource  "
+  href="module-resource.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="16.13 resource  "
+  href="module-resource.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16.13.2 resource Usage"
+  href="node522.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-resource.html">16.13 resource  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-resource.html">16.13 resource  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node522.html">16.13.2 Resource Usage</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00181310000000000000000">
+16.13.1 Resource Limits</a>
+</h2>
+
+<p>
+Resources usage can be limited using the <tt class="function">setrlimit()</tt> function
+described below. Each resource is controlled by a pair of limits: a
+soft limit and a hard limit. The soft limit is the current limit, and
+may be lowered or raised by a process over time. The soft limit can
+never exceed the hard limit. The hard limit can be lowered to any
+value greater than the soft limit, but not raised. (Only processes with
+the effective UID of the super-user can raise a hard limit.)
+
+<p>
+The specific resources that can be limited are system dependent. They
+are described in the <span class="manpage"><i>getrlimit</i>(2)</span> man page.  The resources
+listed below are supported when the underlying operating system
+supports them; resources which cannot be checked or controlled by the
+operating system are not defined in this module for those platforms.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3592' xml:id='l2h-3592' class="function">getrlimit</tt></b>(</nobr></td>
+  <td><var>resource</var>)</td></tr></table></dt>
+<dd>
+  Returns a tuple <code>(<var>soft</var>, <var>hard</var>)</code> with the current
+  soft and hard limits of <var>resource</var>. Raises <tt class="exception">ValueError</tt> if
+  an invalid resource is specified, or <tt class="exception">error</tt> if the
+  underlying system call fails unexpectedly.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3593' xml:id='l2h-3593' class="function">setrlimit</tt></b>(</nobr></td>
+  <td><var>resource, limits</var>)</td></tr></table></dt>
+<dd>
+  Sets new limits of consumption of <var>resource</var>. The <var>limits</var>
+  argument must be a tuple <code>(<var>soft</var>, <var>hard</var>)</code> of two
+  integers describing the new limits. A value of <code>-1</code> can be used to
+  specify the maximum possible upper limit.
+
+<p>
+Raises <tt class="exception">ValueError</tt> if an invalid resource is specified,
+  if the new soft limit exceeds the hard limit, or if a process tries
+  to raise its hard limit (unless the process has an effective UID of
+  super-user).  Can also raise <tt class="exception">error</tt> if the underlying
+  system call fails.
+</dl>
+
+<p>
+These symbols define resources whose consumption can be controlled
+using the <tt class="function">setrlimit()</tt> and <tt class="function">getrlimit()</tt> functions
+described below. The values of these symbols are exactly the constants
+used by C programs.
+
+<p>
+The <span class="Unix">Unix</span> man page for <span class="manpage"><i>getrlimit</i>(2)</span> lists the available
+resources.  Note that not all systems use the same symbol or same
+value to denote the same resource.  This module does not attempt to
+mask platform differences -- symbols not defined for a platform will
+not be available from this module on that platform.
+
+<p>
+<dl><dt><b><tt id='l2h-3594' xml:id='l2h-3594'>RLIMIT_CORE</tt></b></dt>
+<dd>
+  The maximum size (in bytes) of a core file that the current process
+  can create.  This may result in the creation of a partial core file
+  if a larger core would be required to contain the entire process
+  image.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3595' xml:id='l2h-3595'>RLIMIT_CPU</tt></b></dt>
+<dd>
+  The maximum amount of processor time (in seconds) that a process can
+  use. If this limit is exceeded, a <tt class="constant">SIGXCPU</tt> signal is sent to
+  the process. (See the <tt class="module"><a href="module-signal.html">signal</a></tt> module documentation for
+  information about how to catch this signal and do something useful,
+  e.g. flush open files to disk.)
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3596' xml:id='l2h-3596'>RLIMIT_FSIZE</tt></b></dt>
+<dd>
+  The maximum size of a file which the process may create.  This only
+  affects the stack of the main thread in a multi-threaded process.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3597' xml:id='l2h-3597'>RLIMIT_DATA</tt></b></dt>
+<dd>
+  The maximum size (in bytes) of the process's heap.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3598' xml:id='l2h-3598'>RLIMIT_STACK</tt></b></dt>
+<dd>
+  The maximum size (in bytes) of the call stack for the current
+  process.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3599' xml:id='l2h-3599'>RLIMIT_RSS</tt></b></dt>
+<dd>
+  The maximum resident set size that should be made available to the
+  process.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3600' xml:id='l2h-3600'>RLIMIT_NPROC</tt></b></dt>
+<dd>
+  The maximum number of processes the current process may create.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3601' xml:id='l2h-3601'>RLIMIT_NOFILE</tt></b></dt>
+<dd>
+  The maximum number of open file descriptors for the current
+  process.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3602' xml:id='l2h-3602'>RLIMIT_OFILE</tt></b></dt>
+<dd>
+  The BSD name for <tt class="constant">RLIMIT_NOFILE</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3603' xml:id='l2h-3603'>RLIMIT_MEMLOCK</tt></b></dt>
+<dd>
+  The maximum address space which may be locked in memory.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3604' xml:id='l2h-3604'>RLIMIT_VMEM</tt></b></dt>
+<dd>
+  The largest area of mapped memory which the process may occupy.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3605' xml:id='l2h-3605'>RLIMIT_AS</tt></b></dt>
+<dd>
+  The maximum area (in bytes) of address space which may be taken by
+  the process.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="16.13 resource  "
+  href="module-resource.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="16.13 resource  "
+  href="module-resource.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16.13.2 resource Usage"
+  href="node522.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-resource.html">16.13 resource  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-resource.html">16.13 resource  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node522.html">16.13.2 Resource Usage</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

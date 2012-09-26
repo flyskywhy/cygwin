@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-wsgiref.validate.html" />
+<link rel="prev" href="module-wsgiref.headers.html" />
+<link rel="parent" href="module-wsgiref.html" />
+<link rel="next" href="module-wsgiref.validate.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.4.3 wsgiref.simple_server - a simple WSGI HTTP server</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.2 wsgiref.headers - WSGI"
+  href="module-wsgiref.headers.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.4 wsgiref.validate - WSGI"
+  href="module-wsgiref.validate.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.headers.html">18.4.2 wsgiref.headers - WSGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.validate.html">18.4.4 wsgiref.validate - WSGI</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020430000000000000000">
+18.4.3 <tt class="module">wsgiref.simple_server</tt> - a simple WSGI HTTP server</a>
+</h2>
+<a name="module-wsgiref.simpleserver"></a>
+<p>
+This module implements a simple HTTP server (based on
+<tt class="module">BaseHTTPServer</tt>) that serves WSGI applications.  Each server
+instance serves a single WSGI application on a given host and port.  If
+you want to serve multiple applications on a single host and port, you
+should create a WSGI application that parses <code>PATH_INFO</code> to select
+which application to invoke for each request.  (E.g., using the
+<tt class="function">shift_path_info()</tt> function from <tt class="module">wsgiref.util</tt>.)
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3852' xml:id='l2h-3852' class="function">make_server</tt></b>(</nobr></td>
+  <td><var>host, port, app
+</var><big>[</big><var>, server_class=<tt class="class">WSGIServer</tt> </var><big>[</big><var>,
+handler_class=<tt class="class">WSGIRequestHandler</tt></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Create a new WSGI server listening on <var>host</var> and <var>port</var>,
+accepting connections for <var>app</var>.  The return value is an instance of
+the supplied <var>server_class</var>, and will process requests using the
+specified <var>handler_class</var>.  <var>app</var> must be a WSGI application
+object, as defined by <a class="rfc" id='rfcref-102695' xml:id='rfcref-102695'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.
+
+<p>
+Example usage:
+<div class="verbatim"><pre>from wsgiref.simple_server import make_server, demo_app
+
+httpd = make_server('', 8000, demo_app)
+print "Serving HTTP on port 8000..."
+
+# Respond to requests until process is killed
+httpd.serve_forever()
+
+# Alternative: serve one request, then exit
+##httpd.handle_request()
+</pre></div>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3853' xml:id='l2h-3853' class="function">demo_app</tt></b>(</nobr></td>
+  <td><var>environ, start_response</var>)</td></tr></table></dt>
+<dd>
+This function is a small but complete WSGI application that
+returns a text page containing the message ``Hello world!''
+and a list of the key/value pairs provided in the
+<var>environ</var> parameter.  It's useful for verifying that a WSGI server
+(such as <tt class="module">wsgiref.simple_server</tt>) is able to run a simple WSGI
+application correctly.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3854' xml:id='l2h-3854' class="class">WSGIServer</tt></b>(</nobr></td>
+  <td><var>server_address, RequestHandlerClass</var>)</td></tr></table></dt>
+<dd>
+Create a <tt class="class">WSGIServer</tt> instance.  <var>server_address</var> should be
+a <code>(host,port)</code> tuple, and <var>RequestHandlerClass</var> should be
+the subclass of <tt class="class">BaseHTTPServer.BaseHTTPRequestHandler</tt> that will
+be used to process requests.
+
+<p>
+You do not normally need to call this constructor, as the
+<tt class="function">make_server()</tt> function can handle all the details for you.
+
+<p>
+<tt class="class">WSGIServer</tt> is a subclass
+of <tt class="class">BaseHTTPServer.HTTPServer</tt>, so all of its methods (such as
+<tt class="method">serve_forever()</tt> and <tt class="method">handle_request()</tt>) are available.
+<tt class="class">WSGIServer</tt> also provides these WSGI-specific methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3855' xml:id='l2h-3855' class="method">set_app</tt></b>(</nobr></td>
+  <td><var>application</var>)</td></tr></table></dt>
+<dd>
+Sets the callable <var>application</var> as the WSGI application that will
+receive requests.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3856' xml:id='l2h-3856' class="method">get_app</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns the currently-set application callable.
+</dl>
+
+<p>
+Normally, however, you do not need to use these additional methods, as
+<tt class="method">set_app()</tt> is normally called by <tt class="function">make_server()</tt>, and
+the <tt class="method">get_app()</tt> exists mainly for the benefit of request handler
+instances.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3857' xml:id='l2h-3857' class="class">WSGIRequestHandler</tt></b>(</nobr></td>
+  <td><var>request, client_address, server</var>)</td></tr></table></dt>
+<dd>
+Create an HTTP handler for the given <var>request</var> (i.e. a socket),
+<var>client_address</var> (a <code>(<var>host</var>,<var>port</var>)</code> tuple), and
+<var>server</var> (<tt class="class">WSGIServer</tt> instance).
+
+<p>
+You do not need to create instances of this class directly; they are
+automatically created as needed by <tt class="class">WSGIServer</tt> objects.  You
+can, however, subclass this class and supply it as a <var>handler_class</var>
+to the <tt class="function">make_server()</tt> function.  Some possibly relevant
+methods for overriding in subclasses:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3858' xml:id='l2h-3858' class="method">get_environ</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns a dictionary containing the WSGI environment for a request.  The
+default implementation copies the contents of the <tt class="class">WSGIServer</tt>
+object's <tt class="member">base_environ</tt> dictionary attribute and then adds
+various headers derived from the HTTP request.  Each call to this method
+should return a new dictionary containing all of the relevant CGI
+environment variables as specified in <a class="rfc" id='rfcref-102697' xml:id='rfcref-102697'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3859' xml:id='l2h-3859' class="method">get_stderr</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the object that should be used as the <code>wsgi.errors</code> stream.
+The default implementation just returns <code>sys.stderr</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3860' xml:id='l2h-3860' class="method">handle</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Process the HTTP request.  The default implementation creates a handler
+instance using a <tt class="module">wsgiref.handlers</tt> class to implement the actual
+WSGI application interface.
+</dl>
+
+<p>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.2 wsgiref.headers - WSGI"
+  href="module-wsgiref.headers.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.4 wsgiref.validate - WSGI"
+  href="module-wsgiref.validate.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.headers.html">18.4.2 wsgiref.headers - WSGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.validate.html">18.4.4 wsgiref.validate - WSGI</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

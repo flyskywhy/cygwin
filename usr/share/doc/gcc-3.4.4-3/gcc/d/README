@@ -1,0 +1,327 @@
+D Front End for GCC - Release 0.12.1
+
+Last update: June 5, 2005
+Supported Systems
+
+    * GCC 3.3.x, 3.4.x
+    * Linux (tested on Red Hat 7.2, 8)
+    * Mac OS X 10.3.x
+    * FreeBSD 5.2.1
+    * Cygwin
+    * MinGW
+    * AIX (test on 5.1)
+
+Similar versions should work and other Unix platforms may work.  Although
+the compiler will probably work on most 32-bit architectures, the D runtime
+library will still need to be updated to support them.
+
+Downloads
+
+    * Main package (Release 0.12.1)
+      http://home.earthlink.net/~dvdfrdmn/d/gdc-0.12.1.tgz
+      http://home.earthlink.net/~dvdfrdmn/d/gdc-0.12.1.tar.bz2
+    * Build Instructions
+      http://home.earthlink.net/~dvdfrdmn/d/INSTALL.html
+      (or see INSTALL included in the main package)
+
+    * Patch for DMDScript 1.05
+      http://home.earthlink.net/~dvdfrdmn/d/dmdscript-1.05-gdc.diff
+
+Links
+
+    * This Project -- http://home.earthlink.net/~dvdfrdmn/d
+    * The D Programming Language -- http://www.digitalmars.com/d/
+    * D Links Page -- http://digitalmars.com/d/dlinks.html
+    * The D.gnu newsgroup -- news://news.digitalmars.com/D.gnu
+    * For general D discussion, the digitalmars.D and
+      digitalmars.D.bugs newsgroups
+    * The GNU Compiler Collection -- http://gcc.gnu.org/
+
+Contact
+David Friedman
+e-mail: d3rdclsmail <at> earthlink.net
+
+Status
+
+Known Issues
+    * See the DStress (http://svn.kuehne.cn/dstress/www/dstress.html)
+      page for known failing cases.
+    * Debugging information may have a few problems.  In any case, GDB does
+      not support D name mangling.
+    * Templates on Mac OS X.  The stock compiler doesn't support one-only
+      linkage.  Apple's version does support it, but this release will
+      not work with that.  Templates on Mac OS X.  The stock compiler
+      doesn't support one-only linkage.  Apple's version does support
+      it, but this release will not work with that.  There are a
+      number of ways to deal with this.  See the -femit-templates
+      option below.
+    * Complex floating point operations may not work the same as DMD.
+    * Some math functions behave differently due to the 80-bit real issue
+      and not being able to access x86 floating-point hardware.  Some
+      std.math unit tests will fail because of this.
+    * In order to prevent nested synchronized statements from deadlocking,
+      pthread recursive mutexes are used.  This can cause starvation
+      problems on Linux.  I will try the "error-checking" type mutex.
+    * Volatile statements may not always do the right thing.
+    * Delegates that refer to nested functions are not valid after the
+      parent function returns.
+    * Because of a problem on AIX, the linker will pull in more
+      modules than needed (including recls.)
+      See: http://groups-beta.google.com/groups?hl=en&q=%22large+executables+on+AIX%22&qt_s=Search
+    * Some C libraries (Cygwin, MinGW, AIX) don't handle
+      floating-point formatting and parsing in a standard way.
+
+
+Known Differences from DMD
+
+    * The type of _argptr in variadic functions is the target-specific
+      va_list type.  The only portable way to use _argptr is the
+      std.stdarg.va_arg template.
+    * In assembler code, direct access to parameters in naked
+      functions works differently.  Frame relative addressing through
+      [ESP+4] does work the same way.
+    * Currently, GDC uses the C calling convention for all functions
+      except those declared extern (Windows).
+    * GDC allows catches in try blocks.
+    * pragma(lib) is not supported.
+    * Some targets do not have a distinct extended floating-point
+      type.  On these targets, real and double are the same size.
+
+Inline Assembler Notes
+
+    * Getting GCC to respect the "naked" attribute is difficult.  It
+      is recommended that you use only assembler statements in a naked
+      function.
+    * Jumps from assembler statements will not run cleanups (auto and
+      finally)
+    * Frame relative addressing (e.g., myvar[EBP]) in the assembler
+      doesn't work with optimization turned on.
+
+Usage
+
+The compiler driver is named 'gdc' and accepts the standard GCC
+options.  There is also a script named 'dmd' which has the same interface
+as the Digital Mars dmd.
+
+The mapping from DMD options to GCC is as follows:
+-c
+	-c
+-d
+	-fdeprecated
+-debug[=<arg>]
+	-fdebug[=<arg>]
+-g
+	-g
+-inline
+	-finline-functions
+-I<path>
+	-I <path>
+-L<path>
+	-Wl,<arg>
+-O
+	-O3 without inlining (may not be equivalent)
+-od<dir>
+	no equivalent; use the wrapper script
+-of<file> 	-o <file>
+-op<dir>
+	no equivalent; use the wrapper script
+-profile
+	(see the GCC manual for profiling options)
+-quiet
+	no equivalent
+-release
+	-frelease
+-unittest
+	-funittest
+-version=<arg>
+	-fversion=<arg>
+-w
+	-Wall
+
+Other options:
+-f[no-]bounds-check
+	Controls array bounds checking
+
+-femit-templates[=normal|private|all|none|auto]
+-f[no-]emit-templates
+	Controls whether or not template code is emitted.
+
+    "normal"  Emit templates, expecting multiple copies to be merged by
+              linker.
+    "private" Emit templates, but make them private to the translation
+              unit.  The executable will have multiple copies of code
+              and data.
+    "all"     Emit all template instances with public visibility.  Do
+	      this even if they would not normally be emitted.
+    "none"    Do not emit templates at all.
+    "auto"    For targets that support templates, the "normal" mode is
+    	      used.  Otherwise, the "private" mode is used.
+
+    "none" and -fno-emit-templates are synonyms.
+    "auto" and -femit-templates are synonyms.
+
+-fall-sources
+	For each source file on the command line, semantically process each
+	file preceding it.  Use this if compilation errors occur due to
+	complicated circular module references.  This will slow compilation
+	noticeably.
+
+-fdump-source
+	Dump decoded UTF-8 text and source from HTML to <source>.utf-8
+	and <source>.d.utf-8.
+
+Changes
+
+0.12.1:
+
+    *  Fixes
+          o Compilation errors and crashes with -fpic
+          o Crashes with interfaces on Cygwin/MinGW
+          o Support the -mno-cygwin option
+
+0.12:
+
+    *  Fixes
+          o Various problems building MinGW in MSYS
+          o Mango "endless output"
+          o Build problems with gcc 3.4.1
+          o Various problems revealed by dmdscript
+          o Error message now go to standard error
+          o DStress catch_01, catch_02, new_04, switch_19, throw_02, and others.
+    * Improvements
+          o Updated to DMD 0.125
+          o New target: AIX
+          o GDC and DMD versions are reported with "gcc --version"
+          o Take advantage of DMD template improvements on
+    * Changes
+          o std.c.unix is now std.c.unix.unix
+          o The runtime library is now "libgphobos" to avoid conflicts with DMD.
+          o The dmd wrapper script...
+                + Is now named "gdmd".
+                + Looks for gdc in its own directory instead of searching the path
+                + Requires a comma after the "-q" option.
+
+
+0.11:
+
+    * Fixes
+          o Reversed structure compare
+          o Correct meaning of '-L' option in wrapper script
+          o Static data GC bug on Linux
+    * Improvements
+          o Updated to DMD 0.121
+          o New target: MingGW
+          o Included Anders F Bjšrklund's man pages.
+          o It is now possible to build a cross-compiler.  Only MingGW
+            is supported out-of-the-box, however.
+
+0.11pre1:
+
+    * Fixes
+          o Incorrect/missing thunks
+          o Problems when the C char type is unsigned
+          o Side effects in void type return expressions
+          o Calling a particular static ancestor method.
+          o Install of /etc/c/zlib.d
+          o Support for built-in function security patch.
+          o More...
+    * Improvements
+          o Updated to DMD 0.113
+          o Phobos is now built as target library (i.e., no need for a
+            separate build step)
+          o Boehm-gc is no longer used and the Java package is no
+            longer required.
+          o Inline assembler for x86 (there are some limitations --
+            these need to be documented)
+          o Included Anders Bjšrklund's patches to enable the use of
+            frameworks on Darwin.
+          o On Darwin, D object code can be linked with the system
+            gcc.  Likewise, gdc can link C++ object code built by the
+            system g++.
+          o Improved support for alternate C main functions (see
+            d/phobos/internal/{cmain.d,rundmain.d})
+    * Notes
+          o The gdc driver no longer accepts D source files without
+            the ".d" extension.  The dmd wrapper script still supports
+            this.
+
+0.10:
+
+    * Fixes
+          o Complex number comparisons with NAN operands
+          o Cleaned up Phobos installation.
+          o Non-virtual method calls
+          o Code generation with -mpowerpc64
+          o Break in labeled switch statement
+    * Improvements
+          o Updated to DMD 0.110
+          o Applied Thomas KŸhne's and Anders Bjšrklund's HTML patches.
+          o Added Thomas KŸhne's "dump source" code
+          o Phobos Makefile now supports the DESTDIR variable
+
+0.9:
+
+    * Fixes
+          o Detect use of non-static methods in a static context
+          o Enumerated types are signed by default
+          o Anders Bjšrklund's patch for HTML infinite looping
+          o va_start is now a template.
+          o Delegate expressions for struct methods now work
+          o bswap uses unsigned right shift
+          o Fixed several problems with the dmd script
+          o Fixed crash when compiling with debug information
+          o Handle referenes to instance variables without "this"
+          o Fixed ICE for interfaces with multiple inheritence
+          o Fix id.h dependcy so concurrent make will work
+    * Improvements
+          o Updated to DMD 0.109
+    *  Notes
+          o The (undocumented) BitsPer{Pointer,Word} version
+            identifiers are now prefixed with "GNU_"
+          o Private declarations are now exported from object files
+
+0.8:
+    *  Fixes
+          o std.loader module is now enabled
+          o Proper casting from complex and imaginary types
+          o Diagnostics are now GCC-style
+          o Exceptions don't leak memory anymore
+          o The gdc command processes ".html" as D source files.
+          o ICE for classes declared in a function
+          o ICE on empty "if" statement
+          o Test for existence of "execvpe", "fwide", and "fputwc" before
+            using them
+          o Corrected floating point "min_10_exp" properties
+          o std.date.getLocalTZA returns a correct values
+          o Using gdc to link with C++ should now just need "-lstdc++"
+    * Improvements
+          o Debugging information is vastly improved
+          o DLLs can be built on Cygwin
+    * Notes
+          o "DigitalMars" is not longer defined as a version symbol
+
+1g:
+
+    * Fixes
+          o Various debugging information problems
+          o Report more errors and warning with correct line numbers
+          o Registers are now put on the stack for garbage collection
+          o Signed/unsigned expression semantics should match DMD now
+
+    * Improvements
+          o Update to DMD 0.102
+          o Templates are handled better on targets without template support
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA

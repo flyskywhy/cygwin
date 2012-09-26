@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-raising-errors-in-callback.html" />
+<link rel="prev" href="optparse-defining-callback-option.html" />
+<link rel="parent" href="optparse-option-callbacks.html" />
+<link rel="next" href="optparse-raising-errors-in-callback.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.4.2 How callbacks are called</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.4.1 defining a callback"
+  href="optparse-defining-callback-option.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.4.3 raising errors in"
+  href="optparse-raising-errors-in-callback.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-defining-callback-option.html">14.3.4.1 Defining a callback</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-raising-errors-in-callback.html">14.3.4.3 Raising errors in</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016342000000000000000"></a><a name="optparse-how-callbacks-called"></a>
+<br>
+14.3.4.2 How callbacks are called
+</h3>
+
+<p>
+All callbacks are called as follows:
+<div class="verbatim"><pre>
+func(option, opt_str, value, parser, *args, **kwargs)
+</pre></div>
+
+<p>
+where
+<dl>
+<dt><strong><code>option</code></strong></dt>
+<dd>is the Option instance that's calling the callback
+</dd>
+<dt><strong><code>opt_str</code></strong></dt>
+<dd>is the option string seen on the command-line that's triggering the
+callback.  (If an abbreviated long option was used, <code>opt_str</code> will
+be the full, canonical option string--e.g. if the user puts
+<code>"-foo"</code> on the command-line as an abbreviation for
+<code>"-foobar"</code>, then <code>opt_str</code> will be <code>"-foobar"</code>.)
+</dd>
+<dt><strong><code>value</code></strong></dt>
+<dd>is the argument to this option seen on the command-line.  <tt class="module">optparse</tt> will
+only expect an argument if <tt class="member">type</tt> is set; the type of <code>value</code>
+will be the type implied by the option's type.  If <tt class="member">type</tt> for this
+option is <code>None</code> (no argument expected), then <code>value</code> will be
+<code>None</code>.  If <code>nargs</code> &gt; 1, <code>value</code> will be a tuple of values of
+the appropriate type.
+</dd>
+<dt><strong><code>parser</code></strong></dt>
+<dd>is the OptionParser instance driving the whole thing, mainly
+useful because you can access some other interesting data through
+its instance attributes:
+<dl>
+<dt><strong><code>parser.largs</code></strong></dt>
+<dd>the current list of leftover arguments, ie. arguments that have
+been consumed but are neither options nor option arguments.
+Feel free to modify <code>parser.largs</code>, e.g. by adding more
+arguments to it.  (This list will become <code>args</code>, the second
+return value of <tt class="method">parse_args()</tt>.)
+</dd>
+<dt><strong><code>parser.rargs</code></strong></dt>
+<dd>the current list of remaining arguments, ie. with <code>opt_str</code> and
+<code>value</code> (if applicable) removed, and only the arguments
+following them still there.  Feel free to modify
+<code>parser.rargs</code>, e.g. by consuming more arguments.
+</dd>
+<dt><strong><code>parser.values</code></strong></dt>
+<dd>the object where option values are by default stored (an
+instance of optparse.OptionValues).  This lets callbacks use the
+same mechanism as the rest of <tt class="module">optparse</tt> for storing option values;
+you don't need to mess around with globals or closures.  You can
+also access or modify the value(s) of any options already
+encountered on the command-line.
+</dd>
+</dl>
+</dd>
+<dt><strong><code>args</code></strong></dt>
+<dd>is a tuple of arbitrary positional arguments supplied via the
+<code>callback_args</code> option attribute.
+</dd>
+<dt><strong><code>kwargs</code></strong></dt>
+<dd>is a dictionary of arbitrary keyword arguments supplied via
+<code>callback_kwargs</code>.
+</dd>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.4.1 defining a callback"
+  href="optparse-defining-callback-option.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.4.3 raising errors in"
+  href="optparse-raising-errors-in-callback.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-defining-callback-option.html">14.3.4.1 Defining a callback</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-raising-errors-in-callback.html">14.3.4.3 Raising errors in</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

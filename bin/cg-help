@@ -1,0 +1,176 @@
+#!/usr/bin/env bash
+#
+# Show help for Cogito commands
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes an optional argument describing the command to show the help for.
+# The command can be specified either as 'COMMAND' or 'cg-COMMAND'.
+# If the argument is left out an overview of all the Cogito commands will
+# be shown.
+#
+# Note, short help for a command is also available by passing `--help` or
+# `-h` to the command. The complete command manual is shown when passing
+# `--long-help` (and is the same as doing "`cg-help command`").
+#
+# OPTIONS
+# -------
+# -c::	Colorize
+#	Colorize the output. You can customize the colors using the
+#	$CG_COLORS environment variable (see below).
+#
+# ENVIRONMENT VARIABLES
+# ---------------------
+# PAGER::
+#	The pager to display log information in, defaults to `less`.
+#
+# PAGER_FLAGS::
+#	Flags to pass to the pager.
+#
+# CG_COLORS::
+#	Colon-separated list of 'name=color' pairs, where name is
+#	one of helpcopy, helpusage, helpsection, helplitem, helpcgcmd,
+#	helpcode, helpempth, default, and value is an ECMA-48 SGR
+#	sequence (see e.g. console_codes(4)).
+#
+# CG_COLORS_AUTO::
+#	Even if -c was passed or specified in ~/.cgrc, if this option
+#	is set, use colors only when the output is a terminal and it
+#	supports colors.
+#
+# CG_LESS::
+#	This is what the $LESS environment variable value will be set
+#	to before invoking $PAGER. It defaults to $LESS concatenated
+#	with the `R` flag to allow displaying of colorized output.
+#
+# CONFIGURATION VARIABLES
+# -----------------------
+# The following GIT configuration file variables are recognized:
+#
+# help.usecolor::
+#	If enabled, colorify the output like with -c if the output
+#	is a terminal.
+
+# Testsuite: TODO
+
+USAGE="cg-help [-c] [cg-COMMAND | COMMAND]"
+_git_repo_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+setup_colors()
+{
+	local C="helpcopy=34:helpusage=33"
+	C="$C:helpsection=35:helplitem=33"
+	C="$C:helpcgcmd=32:helpcode=36"
+	C="$C:helpempth=31"
+	C="$C:default=0"
+	colorify_setup "$C"
+
+	apply_colors="
+	s/^\(-.*\)::.*/$colhelplitem\1$coldefault:/
+	s/^\(.*\)::/$colhelplitem\1$coldefault:/
+	s/\`\(cg-[a-z-]*\)\`/$colhelpcgcmd\1$coldefault/g
+	s/\`\([^\`]*\)\`/$colhelpcode&$coldefault/g
+	s/[^A-Z0-9a-z_-]\$ .*/$colhelpcode&$coldefault/g
+	s/'\([^ ]*\)'/$colhelpemph&$coldefault/g
+	s/'\(-[A-Z0-9a-z_-]* [^']*\)'/$colhelpemph&$coldefault/g
+	s/^Usage: .*/$colhelpusage&$coldefault/
+	/^[A-Z -_]*/,/^---*$/s/^[A-Z -_]*\$/$colhelpsection&$coldefault/
+	s/^Copyright .*/$colhelpcopy&$coldefault/
+	"
+}
+
+print_command_listing()
+{
+	width="$(IFS=$'\n'; echo "$*" | column_width "$bin_path/" 25)"
+	for command in "$@"; do
+		[ -f "$command" ] || continue
+		if [ -L "$command" ]; then
+			tg="$(readlink "$command")"
+			# Skip symlinks within the same directory, those are
+			# aliases; symlinks to elsewhere are permitted since
+			# they may be created by some weirder packaging sys.
+			[ z"${tg#*/}" != z"$tg" ] || continue
+		fi
+		cmdname="${command#$bin_path/}"
+
+		shortdesc="$(sed -n 'n;n;p;q' <"$command")"
+		# Some minimal sanity check that we didn't pick up some
+		# random binary named cg-*
+		[ "${shortdesc:0:1}" = "#" ] || continue
+		columns_print '' t- "$cmdname" $width "  ${shortdesc:2}"
+	done
+}
+
+colorize() {
+	sed -e "$apply_colors" | pager
+}
+
+
+colors=
+apply_colors=
+while optparse; do
+	if optparse -c; then
+		colors=1
+	else
+		optfail
+	fi
+done
+
+colorify_detect "$colors" help && setup_colors
+bin_path="$(dirname "$0")"
+
+
+if [ "$ARGS" = "admin" ]; then
+	echo "The advanced (low-level, dangerous, or administrative) commands:"
+	IFS=$'\n' print_command_listing $(ls "$bin_path"/cg-admin*)
+	exit
+elif [ "$ARGS" = "branch" ]; then
+	echo "The branch commands family:"
+	IFS=$'\n' print_command_listing $(ls "$bin_path"/cg-branch*)
+	exit
+elif [ "$ARGS" = "tag" ]; then
+	echo "The tag commands family:"
+	IFS=$'\n' print_command_listing $(ls "$bin_path"/cg-tag*)
+	exit
+elif [ "$ARGS" ]; then
+	cmd="$(echo "${ARGS[0]}" | sed 's/^cg-//')"
+	print_help long "$cmd" | colorize
+	[ "${PIPESTATUS[0]}" -eq 0 ] && exit
+	echo "cg-help: no help available for command \"${ARGS[0]}\""
+	echo "Call cg-help without any arguments for the list of available commands"
+	exit 1
+fi
+
+
+REGULAR_COMMANDS="$(ls "$bin_path"/cg-* | grep -v /cg-X | grep -v /cg-admin | grep -v /cg-branch | grep -v /cg-tag)"
+# TODO: Some uberevil `column` tricks...
+BRANCH_COMMANDS="$(ls "$bin_path"/cg-branch* | sed 's#.*/##' | tr '\n' ' ')"
+TAG_COMMANDS="$(ls "$bin_path"/cg-tag* | sed 's#.*/##' | tr '\n' ' ')"
+ADVANCED_COMMANDS="$(ls "$bin_path"/cg-admin-* | sed 's#.*/##' | tr '\n' ' ')"
+
+IFS=$'\n' colorize <<__END__
+The Cogito version control system  $(cg-version)
+
+Available regular commands:
+$(print_command_listing $REGULAR_COMMANDS)
+
+Special command families:
+	cg-help admin   ($ADVANCED_COMMANDS)
+	cg-help branch  ($BRANCH_COMMANDS)
+	cg-help tag     ($TAG_COMMANDS)
+
+These expressions can be used interchangeably as "ID"s:
+	empty string, "this" or "HEAD" (current HEAD)
+	branch name (as registered with cg-branch-add)
+	tag name (as registered with cg-tag)
+	date string (as recognized by the date tool)
+	shortcut hash (shorted unambiguous hash lead)
+	commit object hash (as returned by cg-object-id -c)
+	tree object hash (accepted only by some commands)
+
+For details on individual commands, do e.g.:
+	cg-help cg-log
+	cg-log --long-help
+(both variants are equivalent)
+__END__

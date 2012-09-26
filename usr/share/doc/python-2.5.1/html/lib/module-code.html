@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-codeop.html" />
+<link rel="prev" href="custominterp.html" />
+<link rel="parent" href="custominterp.html" />
+<link rel="next" href="interpreter-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>27.1 code -- Interpreter base classes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="27. custom Python Interpreters"
+  href="custominterp.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="27. custom Python Interpreters"
+  href="custominterp.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="27.1.1 interactive Interpreter Objects"
+  href="interpreter-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="custominterp.html">27. Custom Python Interpreters</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="custominterp.html">27. Custom Python Interpreters</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="interpreter-objects.html">27.1.1 Interactive Interpreter Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0029100000000000000000">
+27.1 <tt class="module">code</tt> --
+         Interpreter base classes</a>
+</h1>
+<a name="module-code"></a>
+<p>
+
+<p>
+The <code>code</code> module provides facilities to implement
+read-eval-print loops in Python.  Two classes and convenience
+functions are included which can be used to build applications which
+provide an interactive interpreter prompt.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5313' xml:id='l2h-5313' class="class">InteractiveInterpreter</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>locals</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This class deals with parsing and interpreter state (the user's
+namespace); it does not deal with input buffering or prompting or
+input file naming (the filename is always passed in explicitly).
+The optional <var>locals</var> argument specifies the dictionary in
+which code will be executed; it defaults to a newly created
+dictionary with key <code>'__name__'</code> set to <code>'__console__'</code>
+and key <code>'__doc__'</code> set to <code>None</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5314' xml:id='l2h-5314' class="class">InteractiveConsole</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>locals</var><big>[</big><var>, filename</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Closely emulate the behavior of the interactive Python interpreter.
+This class builds on <tt class="class">InteractiveInterpreter</tt> and adds
+prompting using the familiar <code>sys.ps1</code> and <code>sys.ps2</code>, and
+input buffering.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5315' xml:id='l2h-5315' class="function">interact</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>banner</var><big>[</big><var>,
+                           readfunc</var><big>[</big><var>, local</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Convenience function to run a read-eval-print loop.  This creates a
+new instance of <tt class="class">InteractiveConsole</tt> and sets <var>readfunc</var>
+to be used as the <tt class="method">raw_input()</tt> method, if provided.  If
+<var>local</var> is provided, it is passed to the
+<tt class="class">InteractiveConsole</tt> constructor for use as the default
+namespace for the interpreter loop.  The <tt class="method">interact()</tt> method
+of the instance is then run with <var>banner</var> passed as the banner
+to use, if provided.  The console object is discarded after use.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5316' xml:id='l2h-5316' class="function">compile_command</tt></b>(</nobr></td>
+  <td><var>source</var><big>[</big><var>,
+                                  filename</var><big>[</big><var>, symbol</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This function is useful for programs that want to emulate Python's
+interpreter main loop (a.k.a. the read-eval-print loop).  The tricky
+part is to determine when the user has entered an incomplete command
+that can be completed by entering more text (as opposed to a
+complete command or a syntax error).  This function
+<em>almost</em> always makes the same decision as the real interpreter
+main loop.
+
+<p>
+<var>source</var> is the source string; <var>filename</var> is the optional
+filename from which source was read, defaulting to <code>'&lt;input&gt;'</code>;
+and <var>symbol</var> is the optional grammar start symbol, which should
+be either <code>'single'</code> (the default) or <code>'eval'</code>.
+
+<p>
+Returns a code object (the same as <code>compile(<var>source</var>,
+<var>filename</var>, <var>symbol</var>)</code>) if the command is complete and
+valid; <code>None</code> if the command is incomplete; raises
+<tt class="exception">SyntaxError</tt> if the command is complete and contains a
+syntax error, or raises <tt class="exception">OverflowError</tt> or
+<tt class="exception">ValueError</tt> if the command contains an invalid literal.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="interpreter-objects.html">27.1.1 Interactive Interpreter Objects</a>
+<li><a href="console-objects.html">27.1.2 Interactive Console Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="27. custom Python Interpreters"
+  href="custominterp.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="27. custom Python Interpreters"
+  href="custominterp.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="27.1.1 interactive Interpreter Objects"
+  href="interpreter-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="custominterp.html">27. Custom Python Interpreters</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="custominterp.html">27. Custom Python Interpreters</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="interpreter-objects.html">27.1.1 Interactive Interpreter Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

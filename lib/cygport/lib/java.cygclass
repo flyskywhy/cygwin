@@ -1,0 +1,127 @@
+################################################################################
+#
+# java.cygclass - functions for creating GNU Classpath based Java packages
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2007 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: java.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+# prevent Win32 Java interference
+unset CLASSPATH
+
+JAR=/usr/bin/fastjar
+JAVA=/usr/bin/jamvm
+JAVAC=/usr/bin/jikes
+JAVADOC=/usr/bin/gjdoc
+# FIXME: gjavah doesn't work
+JAVAH=/usr/bin/gcjh
+GCJ=/usr/bin/gcj
+
+JAR_PATH=${JAR}
+JAVA_PATH=${JAVA}
+JAVAC_PATH=${JAVAC}
+JAVADOC_PATH=${JAVADOC}
+JAVAH_PATH=${JAVAH}
+GCJ_PATH=${GCJ}
+
+#GLIBJ_JAR=/usr/share/classpath/glibj.zip
+
+JAVA_HOME=/usr
+JAVA_DIR=/usr/share/java
+JAVADOC_DIR=${JAVADOC_DIR:-/usr/share/javadoc/${PN#java-}}
+
+CYGCONF_ARGS+=" JAVA=${JAVA} JAVAC=${JAVAC} JAVADOC=${JAVADOC} JAVAH=${JAVAH} JAR=${JAR}"
+
+dojar() {
+	dodir ${JAVA_DIR}
+
+	for i
+	do
+		if [ -e ${i} ]
+		then
+			/bin/install -m0644 ${i} ${D}${JAVA_DIR} || error "dojava ${i} failed"
+		else
+			error "dojava: ${i}: file not found"
+		fi
+	done
+}
+alias dojava='dojar'
+
+newjar() {
+	if (( $# != 2 ))
+	then
+		error "newjava: requires exactly two arguments"
+	fi
+
+	dodir ${JAVA_DIR}
+
+	for i
+	do
+		if [ -e ${i} ]
+		then
+			/bin/install -m0644 ${i} ${D}${JAVA_DIR}/${2} || error "newjava: install ${i} failed"
+		else
+			error "newjava: ${i}: file not found"
+		fi
+	done
+}
+alias newjava='newjar'
+
+dojavadoc() {
+	if (( $# != 1 ))
+	then
+		error "dojavadoc: requires exactly one argument"
+	fi
+
+	dodir ${JAVADOC_DIR}
+
+	for d
+	do
+		if [ -d ${d} ]
+		then
+			cp -r ${d}/* ${D}${JAVADOC_DIR} || error "dojavadoc ${d} failed"
+		else
+			error "dojavadoc: ${d}: file not found"
+		fi
+	done
+}
+
+java_wrapper() {
+	local jcommand
+	local jwrapper
+
+	if (( $# != 2 ))
+	then
+		error "java_wrapper requires exactly two arguments"
+	fi
+
+	jwrapper="${1}"
+	jcommand="${2}"
+
+	dodir /usr/bin
+
+	if [ -f ${D}/usr/bin/${jwrapper} ]
+	then
+		error "java_wrapper: /usr/bin/${jwrapper} in the way"
+	fi
+
+	echo -e "#!/bin/sh\nexec ${JAVA} ${jcommand} \"\$@\"" > ${D}/usr/bin/${jwrapper}
+	chmod +x ${D}/usr/bin/${jwrapper}
+}

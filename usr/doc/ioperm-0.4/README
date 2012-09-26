@@ -1,0 +1,63 @@
+$Id: README,v 1.11 2003/01/28 19:17:17 telka Exp $
+
+ioperm support for Cygwin
+=========================
+
+This software adds support for ioperm()/iopl() functions to Cygwin. This
+support includes sys/io.h and sys/perm.h header files (not included in
+Cygwin by default) together with development and runtime libraries.
+
+ioperm package is free software, covered by the GNU General Public License,
+and you are welcome to change it and/or distribute copies of it under certain
+conditions. There is absolutely no warranty for ioperm. Please read COPYING
+file for more info.
+
+Warning: Current release of this software may decrease your system security
+on Windows NT/2000/XP because enables access to system I/O ports for all
+processes, including non-privileged. If you are not sure, please do not use it
+on Windows NT/2000/XP.
+
+
+Download
+--------
+
+Source tarball is available from ioperm homepage:
+http://openwince.sourceforge.net/ioperm/
+
+
+Build & install steps
+---------------------
+
+For complete informations see INSTALL file. Here are quick install steps:
+
+1. Download and unpack source tarball.
+2. Run ./configure script. Optional parameter "--prefix=/usr" is recommended.
+3. Run `make`.
+4. Run `make install`.
+5. Install (activate) ioperm.sys driver using `ioperm -i`.
+   This is required only for Windows NT/2000/XP.
+6. Run `tests/spkrtest`. This is optional step.
+
+
+ioperm.sys driver
+-----------------
+
+ioperm.sys driver is required for using ioperm()/iopl() functions with
+Windows NT/2000/XP. The driver is not required for Windows 95/98/Me.
+
+ioperm.sys must be installed manually using command `ioperm -i`.
+For driver uninstallation, please run `ioperm -u`.
+
+
+Programming
+-----------
+
+To use ioperm()/iopl() functions in your Cygwin program, please link your
+executable with libioperm.a (-lioperm parameter for linker) or use autoconf
+package (see next paragraph).
+
+If you want to write a portable program between Linux and Cygwin, the best way
+is to use autoconf package. Then please add this line into your configure.in
+or configure.ac file:
+
+AC_SEARCH_LIBS([ioperm], [ioperm])

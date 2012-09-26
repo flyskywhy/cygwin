@@ -1,0 +1,2145 @@
+This is guile-procedures.txt, produced by makeinfo version 4.7 from
+guile-procedures.texi.
+
+   acons
+
+ -- Scheme Procedure: acons key value alist
+     Add a new key-value pair to ALIST.  A new pair is created whose
+     car is KEY and whose cdr is VALUE, and the pair is consed onto
+     ALIST, and the new list is returned.  This function is _not_
+     destructive; ALIST is not modified.
+
+   sloppy-assq
+
+ -- Scheme Procedure: sloppy-assq key alist
+     Behaves like `assq' but does not do any error checking.
+     Recommended only for use in Guile internals.
+
+   sloppy-assv
+
+ -- Scheme Procedure: sloppy-assv key alist
+     Behaves like `assv' but does not do any error checking.
+     Recommended only for use in Guile internals.
+
+   sloppy-assoc
+
+ -- Scheme Procedure: sloppy-assoc key alist
+     Behaves like `assoc' but does not do any error checking.
+     Recommended only for use in Guile internals.
+
+   assq
+
+ -- Scheme Procedure: assq key alist
+ -- Scheme Procedure: assv key alist
+ -- Scheme Procedure: assoc key alist
+     Fetch the entry in ALIST that is associated with KEY.  To decide
+     whether the argument KEY matches a particular entry in ALIST,
+     `assq' compares keys with `eq?', `assv' uses `eqv?' and `assoc'
+     uses `equal?'.  If KEY cannot be found in ALIST (according to
+     whichever equality predicate is in use), then return `#f'.  These
+     functions return the entire alist entry found (i.e. both the key
+     and the value).
+
+   assv
+
+ -- Scheme Procedure: assv key alist
+     Behaves like `assq' but uses `eqv?' for key comparison.
+
+   assoc
+
+ -- Scheme Procedure: assoc key alist
+     Behaves like `assq' but uses `equal?' for key comparison.
+
+   assq-ref
+
+ -- Scheme Procedure: assq-ref alist key
+ -- Scheme Procedure: assv-ref alist key
+ -- Scheme Procedure: assoc-ref alist key
+     Like `assq', `assv' and `assoc', except that only the value
+     associated with KEY in ALIST is returned.  These functions are
+     equivalent to
+
+          (let ((ent (ASSOCIATOR KEY ALIST)))
+            (and ent (cdr ent)))
+
+     where ASSOCIATOR is one of `assq', `assv' or `assoc'.
+
+   assv-ref
+
+ -- Scheme Procedure: assv-ref alist key
+     Behaves like `assq-ref' but uses `eqv?' for key comparison.
+
+   assoc-ref
+
+ -- Scheme Procedure: assoc-ref alist key
+     Behaves like `assq-ref' but uses `equal?' for key comparison.
+
+   assq-set!
+
+ -- Scheme Procedure: assq-set! alist key val
+ -- Scheme Procedure: assv-set! alist key value
+ -- Scheme Procedure: assoc-set! alist key value
+     Reassociate KEY in ALIST with VALUE: find any existing ALIST entry
+     for KEY and associate it with the new VALUE.  If ALIST does not
+     contain an entry for KEY, add a new one.  Return the (possibly
+     new) alist.
+
+     These functions do not attempt to verify the structure of ALIST,
+     and so may cause unusual results if passed an object that is not an
+     association list.
+
+   assv-set!
+
+ -- Scheme Procedure: assv-set! alist key val
+     Behaves like `assq-set!' but uses `eqv?' for key comparison.
+
+   assoc-set!
+
+ -- Scheme Procedure: assoc-set! alist key val
+     Behaves like `assq-set!' but uses `equal?' for key comparison.
+
+   assq-remove!
+
+ -- Scheme Procedure: assq-remove! alist key
+ -- Scheme Procedure: assv-remove! alist key
+ -- Scheme Procedure: assoc-remove! alist key
+     Delete the first entry in ALIST associated with KEY, and return
+     the resulting alist.
+
+   assv-remove!
+
+ -- Scheme Procedure: assv-remove! alist key
+     Behaves like `assq-remove!' but uses `eqv?' for key comparison.
+
+   assoc-remove!
+
+ -- Scheme Procedure: assoc-remove! alist key
+     Behaves like `assq-remove!' but uses `equal?' for key comparison.
+
+   make-arbiter
+
+ -- Scheme Procedure: make-arbiter name
+     Return an object of type arbiter and name NAME. Its state is
+     initially unlocked.  Arbiters are a way to achieve process
+     synchronization.
+
+   try-arbiter
+
+ -- Scheme Procedure: try-arbiter arb
+     Return `#t' and lock the arbiter ARB if the arbiter was unlocked.
+     Otherwise, return `#f'.
+
+   release-arbiter
+
+ -- Scheme Procedure: release-arbiter arb
+     Return `#t' and unlock the arbiter ARB if the arbiter was locked.
+     Otherwise, return `#f'.
+
+   async
+
+ -- Scheme Procedure: async thunk
+     Create a new async for the procedure THUNK.
+
+   system-async
+
+ -- Scheme Procedure: system-async thunk
+     Create a new async for the procedure THUNK.  Also add it to the
+     system's list of active async objects.
+
+   async-mark
+
+ -- Scheme Procedure: async-mark a
+     Mark the async A for future execution.
+
+   system-async-mark
+
+ -- Scheme Procedure: system-async-mark a
+     Mark the async A for future execution.
+
+   run-asyncs
+
+ -- Scheme Procedure: run-asyncs list_of_a
+     Execute all thunks from the asyncs of the list LIST_OF_A.
+
+   noop
+
+ -- Scheme Procedure: noop . args
+     Do nothing.  When called without arguments, return `#f', otherwise
+     return the first argument.
+
+   unmask-signals
+
+ -- Scheme Procedure: unmask-signals
+     Unmask signals. The returned value is not specified.
+
+   mask-signals
+
+ -- Scheme Procedure: mask-signals
+     Mask signals. The returned value is not specified.
+
+   display-error
+
+ -- Scheme Procedure: display-error stack port subr message args rest
+     Display an error message to the output port PORT.  STACK is the
+     saved stack for the error, SUBR is the name of the procedure in
+     which the error occurred and MESSAGE is the actual error message,
+     which may contain formatting instructions. These will format the
+     arguments in the list ARGS accordingly.  REST is currently ignored.
+
+   display-application
+
+ -- Scheme Procedure: display-application frame [port [indent]]
+     Display a procedure application FRAME to the output port PORT.
+     INDENT specifies the indentation of the output.
+
+   display-backtrace
+
+ -- Scheme Procedure: display-backtrace stack port [first [depth]]
+     Display a backtrace to the output port PORT. STACK is the stack to
+     take the backtrace from, FIRST specifies where in the stack to
+     start and DEPTH how much frames to display. Both FIRST and DEPTH
+     can be `#f', which means that default values will be used.
+
+   backtrace
+
+ -- Scheme Procedure: backtrace
+     Display a backtrace of the stack saved by the last error to the
+     current output port.
+
+   not
+
+ -- Scheme Procedure: not x
+     Return `#t' iff X is `#f', else return `#f'.
+
+   boolean?
+
+ -- Scheme Procedure: boolean? obj
+     Return `#t' iff OBJ is either `#t' or `#f'.
+
+   char?
+
+ -- Scheme Procedure: char? x
+     Return `#t' iff X is a character, else `#f'.
+
+   char=?
+
+ -- Scheme Procedure: char=? x y
+     Return `#t' iff X is the same character as Y, else `#f'.
+
+   char<?
+
+ -- Scheme Procedure: char<? x y
+     Return `#t' iff X is less than Y in the ASCII sequence, else `#f'.
+
+   char<=?
+
+ -- Scheme Procedure: char<=? x y
+     Return `#t' iff X is less than or equal to Y in the ASCII
+     sequence, else `#f'.
+
+   char>?
+
+ -- Scheme Procedure: char>? x y
+     Return `#t' iff X is greater than Y in the ASCII sequence, else
+     `#f'.
+
+   char>=?
+
+ -- Scheme Procedure: char>=? x y
+     Return `#t' iff X is greater than or equal to Y in the ASCII
+     sequence, else `#f'.
+
+   char-ci=?
+
+ -- Scheme Procedure: char-ci=? x y
+     Return `#t' iff X is the same character as Y ignoring case, else
+     `#f'.
+
+   char-ci<?
+
+ -- Scheme Procedure: char-ci<? x y
+     Return `#t' iff X is less than Y in the ASCII sequence ignoring
+     case, else `#f'.
+
+   char-ci<=?
+
+ -- Scheme Procedure: char-ci<=? x y
+     Return `#t' iff X is less than or equal to Y in the ASCII sequence
+     ignoring case, else `#f'.
+
+   char-ci>?
+
+ -- Scheme Procedure: char-ci>? x y
+     Return `#t' iff X is greater than Y in the ASCII sequence ignoring
+     case, else `#f'.
+
+   char-ci>=?
+
+ -- Scheme Procedure: char-ci>=? x y
+     Return `#t' iff X is greater than or equal to Y in the ASCII
+     sequence ignoring case, else `#f'.
+
+   char-alphabetic?
+
+ -- Scheme Procedure: char-alphabetic? chr
+     Return `#t' iff CHR is alphabetic, else `#f'.  Alphabetic means
+     the same thing as the isalpha C library function.
+
+   char-numeric?
+
+ -- Scheme Procedure: char-numeric? chr
+     Return `#t' iff CHR is numeric, else `#f'.  Numeric means the same
+     thing as the isdigit C library function.
+
+   char-whitespace?
+
+ -- Scheme Procedure: char-whitespace? chr
+     Return `#t' iff CHR is whitespace, else `#f'.  Whitespace means
+     the same thing as the isspace C library function.
+
+   char-upper-case?
+
+ -- Scheme Procedure: char-upper-case? chr
+     Return `#t' iff CHR is uppercase, else `#f'.  Uppercase means the
+     same thing as the isupper C library function.
+
+   char-lower-case?
+
+ -- Scheme Procedure: char-lower-case? chr
+     Return `#t' iff CHR is lowercase, else `#f'.  Lowercase means the
+     same thing as the islower C library function.
+
+   char-is-both?
+
+ -- Scheme Procedure: char-is-both? chr
+     Return `#t' iff CHR is either uppercase or lowercase, else `#f'.
+     Uppercase and lowercase are as defined by the isupper and islower
+     C library functions.
+
+   char->integer
+
+ -- Scheme Procedure: char->integer chr
+     Return the number corresponding to ordinal position of CHR in the
+     ASCII sequence.
+
+   integer->char
+
+ -- Scheme Procedure: integer->char n
+     Return the character at position N in the ASCII sequence.
+
+   char-upcase
+
+ -- Scheme Procedure: char-upcase chr
+     Return the uppercase character version of CHR.
+
+   char-downcase
+
+ -- Scheme Procedure: char-downcase chr
+     Return the lowercase character version of CHR.
+
+   debug-options-interface
+
+ -- Scheme Procedure: debug-options-interface [setting]
+     Option interface for the debug options. Instead of using this
+     procedure directly, use the procedures `debug-enable',
+     `debug-disable', `debug-set!' and `debug-options'.
+
+   with-traps
+
+ -- Scheme Procedure: with-traps thunk
+     Call THUNK with traps enabled.
+
+   memoized?
+
+ -- Scheme Procedure: memoized? obj
+     Return `#t' if OBJ is memoized.
+
+   unmemoize
+
+ -- Scheme Procedure: unmemoize m
+     Unmemoize the memoized expression M,
+
+   memoized-environment
+
+ -- Scheme Procedure: memoized-environment m
+     Return the environment of the memoized expression M.
+
+   procedure-name
+
+ -- Scheme Procedure: procedure-name proc
+     Return the name of the procedure PROC
+
+   procedure-source
+
+ -- Scheme Procedure: procedure-source proc
+     Return the source of the procedure PROC.
+
+   procedure-environment
+
+ -- Scheme Procedure: procedure-environment proc
+     Return the environment of the procedure PROC.
+
+   local-eval
+
+ -- Scheme Procedure: local-eval exp [env]
+     Evaluate EXP in its environment.  If ENV is supplied, it is the
+     environment in which to evaluate EXP.  Otherwise, EXP must be a
+     memoized code object (in which case, its environment is implicit).
+
+   debug-object?
+
+ -- Scheme Procedure: debug-object? obj
+     Return `#t' if OBJ is a debug object.
+
+   c-registered-modules
+
+ -- Scheme Procedure: c-registered-modules
+     Return a list of the object code modules that have been imported
+     into the current Guile process.  Each element of the list is a
+     pair whose car is the name of the module, and whose cdr is the
+     function handle for that module's initializer function.  The name
+     is the string that has been passed to scm_register_module_xxx.
+
+   c-clear-registered-modules
+
+ -- Scheme Procedure: c-clear-registered-modules
+     Destroy the list of modules registered with the current Guile
+     process.  The return value is unspecified.  *Warning:* this
+     function does not actually unlink or deallocate these modules, but
+     only destroys the records of which modules have been loaded.  It
+     should therefore be used only by module bookkeeping operations.
+
+   dynamic-link
+
+ -- Scheme Procedure: dynamic-link filename
+     Open the dynamic library called FILENAME.  A library handle
+     representing the opened library is returned; this handle should be
+     used as the DOBJ argument to the following functions.
+
+   dynamic-object?
+
+ -- Scheme Procedure: dynamic-object? obj
+     Return `#t' if OBJ is a dynamic library handle, or `#f' otherwise.
+
+   dynamic-unlink
+
+ -- Scheme Procedure: dynamic-unlink dobj
+     Unlink the indicated object file from the application.  The
+     argument DOBJ must have been obtained by a call to `dynamic-link'.
+     After `dynamic-unlink' has been called on DOBJ, its content is no
+     longer accessible.
+
+   dynamic-func
+
+ -- Scheme Procedure: dynamic-func name dobj
+     Search the dynamic object DOBJ for the C function indicated by the
+     string NAME and return some Scheme handle that can later be used
+     with `dynamic-call' to actually call the function.
+
+     Regardless whether your C compiler prepends an underscore `_' to
+     the global names in a program, you should *not* include this
+     underscore in FUNCTION.  Guile knows whether the underscore is
+     needed or not and will add it when necessary.
+
+   dynamic-call
+
+ -- Scheme Procedure: dynamic-call func dobj
+     Call the C function indicated by FUNC and DOBJ.  The function is
+     passed no arguments and its return value is ignored.  When
+     FUNCTION is something returned by `dynamic-func', call that
+     function and ignore DOBJ.  When FUNC is a string , look it up in
+     DYNOBJ; this is equivalent to
+          (dynamic-call (dynamic-func FUNC DOBJ #f))
+
+     Interrupts are deferred while the C function is executing (with
+     `SCM_DEFER_INTS'/`SCM_ALLOW_INTS').
+
+   dynamic-args-call
+
+ -- Scheme Procedure: dynamic-args-call func dobj args
+     Call the C function indicated by FUNC and DOBJ, just like
+     `dynamic-call', but pass it some arguments and return its return
+     value.  The C function is expected to take two arguments and
+     return an `int', just like `main':
+          int c_func (int argc, char **argv);
+
+     The parameter ARGS must be a list of strings and is converted into
+     an array of `char *'.  The array is passed in ARGV and its size in
+     ARGC.  The return value is converted to a Scheme number and
+     returned from the call to `dynamic-args-call'.
+
+   dynamic-wind
+
+ -- Scheme Procedure: dynamic-wind in_guard thunk out_guard
+     All three arguments must be 0-argument procedures.  IN_GUARD is
+     called, then THUNK, then OUT_GUARD.
+
+     If, any time during the execution of THUNK, the continuation of
+     the `dynamic_wind' expression is escaped non-locally, OUT_GUARD is
+     called.  If the continuation of the dynamic-wind is re-entered,
+     IN_GUARD is called.  Thus IN_GUARD and OUT_GUARD may be called any
+     number of times.
+          (define x 'normal-binding)
+          => x
+          (define a-cont  (call-with-current-continuation
+          		  (lambda (escape)
+          		     (let ((old-x x))
+          		       (dynamic-wind
+          			  ;; in-guard:
+          			  ;;
+          			  (lambda () (set! x 'special-binding))
+
+          			  ;; thunk
+          			  ;;
+          		 	  (lambda () (display x) (newline)
+          				     (call-with-current-continuation escape)
+          				     (display x) (newline)
+          				     x)
+
+          			  ;; out-guard:
+          			  ;;
+          			  (lambda () (set! x old-x)))))))
+
+          ;; Prints:
+          special-binding
+          ;; Evaluates to:
+          => a-cont
+          x
+          => normal-binding
+          (a-cont #f)
+          ;; Prints:
+          special-binding
+          ;; Evaluates to:
+          => a-cont  ;; the value of the (define a-cont...)
+          x
+          => normal-binding
+          a-cont
+          => special-binding
+
+   environment?
+
+ -- Scheme Procedure: environment? obj
+     Return `#t' if OBJ is an environment, or `#f' otherwise.
+
+   environment-bound?
+
+ -- Scheme Procedure: environment-bound? env sym
+     Return `#t' if SYM is bound in ENV, or `#f' otherwise.
+
+   environment-ref
+
+ -- Scheme Procedure: environment-ref env sym
+     Return the value of the location bound to SYM in ENV. If SYM is
+     unbound in ENV, signal an `environment:unbound' error.
+
+   environment-fold
+
+ -- Scheme Procedure: environment-fold env proc init
+     Iterate over all the bindings in ENV, accumulating some value.
+     For each binding in ENV, apply PROC to the symbol bound, its
+     value, and the result from the previous application of PROC.  Use
+     INIT as PROC's third argument the first time PROC is applied.  If
+     ENV contains no bindings, this function simply returns INIT.  If
+     ENV binds the symbol sym1 to the value val1, sym2 to val2, and so
+     on, then this procedure computes:
+            (proc sym1 val1
+                  (proc sym2 val2
+                        ...
+                        (proc symn valn
+                              init)))
+     Each binding in ENV will be processed exactly once.
+     `environment-fold' makes no guarantees about the order in which
+     the bindings are processed.  Here is a function which, given an
+     environment, constructs an association list representing that
+     environment's bindings, using environment-fold:
+            (define (environment->alist env)
+              (environment-fold env
+                                (lambda (sym val tail)
+                                  (cons (cons sym val) tail))
+                                '()))
+
+   environment-define
+
+ -- Scheme Procedure: environment-define env sym val
+     Bind SYM to a new location containing VAL in ENV. If SYM is
+     already bound to another location in ENV and the binding is
+     mutable, that binding is replaced.  The new binding and location
+     are both mutable. The return value is unspecified.  If SYM is
+     already bound in ENV, and the binding is immutable, signal an
+     `environment:immutable-binding' error.
+
+   environment-undefine
+
+ -- Scheme Procedure: environment-undefine env sym
+     Remove any binding for SYM from ENV. If SYM is unbound in ENV, do
+     nothing.  The return value is unspecified.  If SYM is already
+     bound in ENV, and the binding is immutable, signal an
+     `environment:immutable-binding' error.
+
+   environment-set!
+
+ -- Scheme Procedure: environment-set! env sym val
+     If ENV binds SYM to some location, change that location's value to
+     VAL.  The return value is unspecified.  If SYM is not bound in
+     ENV, signal an `environment:unbound' error.  If ENV binds SYM to
+     an immutable location, signal an `environment:immutable-location'
+     error.
+
+   environment-cell
+
+ -- Scheme Procedure: environment-cell env sym for_write
+     Return the value cell which ENV binds to SYM, or `#f' if the
+     binding does not live in a value cell.  The argument FOR-WRITE
+     indicates whether the caller intends to modify the variable's
+     value by mutating the value cell.  If the variable is immutable,
+     then `environment-cell' signals an
+     `environment:immutable-location' error.  If SYM is unbound in ENV,
+     signal an `environment:unbound' error.  If you use this function,
+     you should consider using `environment-observe', to be notified
+     when SYM gets re-bound to a new value cell, or becomes undefined.
+
+   environment-observe
+
+ -- Scheme Procedure: environment-observe env proc
+     Whenever ENV's bindings change, apply PROC to ENV.  This function
+     returns an object, token, which you can pass to
+     `environment-unobserve' to remove PROC from the set of procedures
+     observing ENV.  The type and value of token is unspecified.
+
+   environment-observe-weak
+
+ -- Scheme Procedure: environment-observe-weak env proc
+     This function is the same as environment-observe, except that the
+     reference ENV retains to PROC is a weak reference. This means
+     that, if there are no other live, non-weak references to PROC, it
+     will be garbage-collected, and dropped from ENV's list of
+     observing procedures.
+
+   environment-unobserve
+
+ -- Scheme Procedure: environment-unobserve token
+     Cancel the observation request which returned the value TOKEN.
+     The return value is unspecified.  If a call `(environment-observe
+     env proc)' returns TOKEN, then the call `(environment-unobserve
+     token)' will cause PROC to no longer be called when ENV's bindings
+     change.
+
+   make-leaf-environment
+
+ -- Scheme Procedure: make-leaf-environment
+     Create a new leaf environment, containing no bindings.  All
+     bindings and locations created in the new environment will be
+     mutable.
+
+   leaf-environment?
+
+ -- Scheme Procedure: leaf-environment? object
+     Return `#t' if object is a leaf environment, or `#f' otherwise.
+
+   make-eval-environment
+
+ -- Scheme Procedure: make-eval-environment local imported
+     Return a new environment object eval whose bindings are the union
+     of the bindings in the environments LOCAL and IMPORTED, with
+     bindings from LOCAL taking precedence. Definitions made in eval
+     are placed in LOCAL.  Applying `environment-define' or
+     `environment-undefine' to eval has the same effect as applying the
+     procedure to LOCAL.  Note that eval incorporates LOCAL and
+     IMPORTED by reference: If, after creating eval, the program
+     changes the bindings of LOCAL or IMPORTED, those changes will be
+     visible in eval.  Since most Scheme evaluation takes place in eval
+     environments, they transparently cache the bindings received from
+     LOCAL and IMPORTED. Thus, the first time the program looks up a
+     symbol in eval, eval may make calls to LOCAL or IMPORTED to find
+     their bindings, but subsequent references to that symbol will be
+     as fast as references to bindings in finite environments.  In
+     typical use, LOCAL will be a finite environment, and IMPORTED will
+     be an import environment
+
+   eval-environment?
+
+ -- Scheme Procedure: eval-environment? object
+     Return `#t' if object is an eval environment, or `#f' otherwise.
+
+   eval-environment-local
+
+ -- Scheme Procedure: eval-environment-local env
+     Return the local environment of eval environment ENV.
+
+   eval-environment-set-local!
+
+ -- Scheme Procedure: eval-environment-set-local! env local
+     Change ENV's local environment to LOCAL.
+
+   eval-environment-imported
+
+ -- Scheme Procedure: eval-environment-imported env
+     Return the imported environment of eval environment ENV.
+
+   eval-environment-set-imported!
+
+ -- Scheme Procedure: eval-environment-set-imported! env imported
+     Change ENV's imported environment to IMPORTED.
+
+   make-import-environment
+
+ -- Scheme Procedure: make-import-environment imports conflict_proc
+     Return a new environment IMP whose bindings are the union of the
+     bindings from the environments in IMPORTS; IMPORTS must be a list
+     of environments. That is, IMP binds a symbol to a location when
+     some element of IMPORTS does.  If two different elements of
+     IMPORTS have a binding for the same symbol, the CONFLICT-PROC is
+     called with the following parameters:  the import environment, the
+     symbol and the list of the imported environments that bind the
+     symbol.  If the CONFLICT-PROC returns an environment ENV, the
+     conflict is considered as resolved and the binding from ENV is
+     used.  If the CONFLICT-PROC returns some non-environment object,
+     the conflict is considered unresolved and the symbol is treated as
+     unspecified in the import environment.  The checking for conflicts
+     may be performed lazily, i. e. at the moment when a value or
+     binding for a certain symbol is requested instead of the moment
+     when the environment is created or the bindings of the imports
+     change.  All bindings in IMP are immutable. If you apply
+     `environment-define' or `environment-undefine' to IMP, Guile will
+     signal an  `environment:immutable-binding' error. However, notice
+     that the set of bindings in IMP may still change, if one of its
+     imported environments changes.
+
+   import-environment?
+
+ -- Scheme Procedure: import-environment? object
+     Return `#t' if object is an import environment, or `#f' otherwise.
+
+   import-environment-imports
+
+ -- Scheme Procedure: import-environment-imports env
+     Return the list of environments imported by the import environment
+     ENV.
+
+   import-environment-set-imports!
+
+ -- Scheme Procedure: import-environment-set-imports! env imports
+     Change ENV's list of imported environments to IMPORTS, and check
+     for conflicts.
+
+   make-export-environment
+
+ -- Scheme Procedure: make-export-environment private signature
+     Return a new environment EXP containing only those bindings in
+     private whose symbols are present in SIGNATURE. The PRIVATE
+     argument must be an environment.
+
+     The environment EXP binds symbol to location when ENV does, and
+     symbol is exported by SIGNATURE.
+
+     SIGNATURE is a list specifying which of the bindings in PRIVATE
+     should be visible in EXP. Each element of SIGNATURE should be a
+     list of the form:   (symbol attribute ...)  where each attribute
+     is one of the following:
+    the symbol `mutable-location'
+          EXP should treat the   location bound to symbol as mutable.
+          That is, EXP   will pass calls to `environment-set!' or
+          `environment-cell' directly through to private.
+
+    the symbol `immutable-location'
+          EXP should treat   the location bound to symbol as immutable.
+          If the program   applies `environment-set!' to EXP and
+          symbol, or   calls `environment-cell' to obtain a writable
+          value   cell, `environment-set!' will signal an
+          `environment:immutable-location' error. Note that, even   if
+          an export environment treats a location as immutable, the
+          underlying environment may treat it as mutable, so its
+          value may change.
+     It is an error for an element of signature to specify both
+     `mutable-location' and `immutable-location'. If neither is
+     specified, `immutable-location' is assumed.
+
+     As a special case, if an element of signature is a lone symbol
+     SYM, it is equivalent to an element of the form `(sym)'.
+
+     All bindings in EXP are immutable. If you apply
+     `environment-define' or `environment-undefine' to EXP, Guile will
+     signal an `environment:immutable-binding' error. However, notice
+     that the set of bindings in EXP may still change, if the bindings
+     in private change.
+
+   export-environment?
+
+ -- Scheme Procedure: export-environment? object
+     Return `#t' if object is an export environment, or `#f' otherwise.
+
+   export-environment-private
+
+ -- Scheme Procedure: export-environment-private env
+     Return the private environment of export environment ENV.
+
+   export-environment-set-private!
+
+ -- Scheme Procedure: export-environment-set-private! env private
+     Change the private environment of export environment ENV.
+
+   export-environment-signature
+
+ -- Scheme Procedure: export-environment-signature env
+     Return the signature of export environment ENV.
+
+   export-environment-set-signature!
+
+ -- Scheme Procedure: export-environment-set-signature! env signature
+     Change the signature of export environment ENV.
+
+   eq?
+
+ -- Scheme Procedure: eq? x y
+     Return `#t' iff X references the same object as Y.  `eq?' is
+     similar to `eqv?' except that in some cases it is capable of
+     discerning distinctions finer than those detectable by `eqv?'.
+
+   eqv?
+
+ -- Scheme Procedure: eqv? x y
+     The `eqv?' procedure defines a useful equivalence relation on
+     objects.  Briefly, it returns `#t' if X and Y should normally be
+     regarded as the same object.  This relation is left slightly open
+     to interpretation, but works for comparing immediate integers,
+     characters, and inexact numbers.
+
+   equal?
+
+ -- Scheme Procedure: equal? x y
+     Return `#t' iff X and Y are recursively `eqv?' equivalent.
+     `equal?' recursively compares the contents of pairs, vectors, and
+     strings, applying `eqv?' on other objects such as numbers and
+     symbols.  A rule of thumb is that objects are generally `equal?'
+     if they print the same.  `equal?' may fail to terminate if its
+     arguments are circular data structures.
+
+   scm-error
+
+ -- Scheme Procedure: scm-error key subr message args data
+     Raise an error with key KEY.  SUBR can be a string naming the
+     procedure associated with the error, or `#f'.  MESSAGE is the
+     error message string, possibly containing `~S' and `~A' escapes.
+     When an error is reported, these are replaced by formatting the
+     corresponding members of ARGS: `~A' (was `%s' in older versions of
+     Guile) formats using `display' and `~S' (was `%S') formats using
+     `write'.  DATA is a list or `#f' depending on KEY: if KEY is
+     `system-error' then it should be a list containing the Unix
+     `errno' value; If KEY is `signal' then it should be a list
+     containing the Unix signal number; otherwise it will usually be
+     `#f'.
+
+   strerror
+
+ -- Scheme Procedure: strerror err
+     Return the Unix error message corresponding to ERR, which must be
+     an integer value.
+
+   apply:nconc2last
+
+ -- Scheme Procedure: apply:nconc2last lst
+     Given a list (ARG1 ... ARGS), this function conses the ARG1 ...
+     arguments onto the front of ARGS, and returns the resulting list.
+     Note that ARGS is a list; thus, the argument to this function is a
+     list whose last element is a list.  Note: Rather than do new
+     consing, `apply:nconc2last' destroys its argument, so use with
+     care.
+
+   force
+
+ -- Scheme Procedure: force x
+     If the promise X has not been computed yet, compute and return X,
+     otherwise just return the previously computed value.
+
+   promise?
+
+ -- Scheme Procedure: promise? obj
+     Return true if OBJ is a promise, i.e. a delayed computation (*note
+     Delayed evaluation: (r5rs.info)Delayed evaluation.).
+
+   cons-source
+
+ -- Scheme Procedure: cons-source xorig x y
+     Create and return a new pair whose car and cdr are X and Y.  Any
+     source properties associated with XORIG are also associated with
+     the new pair.
+
+   copy-tree
+
+ -- Scheme Procedure: copy-tree obj
+     Recursively copy the data tree that is bound to OBJ, and return a
+     pointer to the new data structure.  `copy-tree' recurses down the
+     contents of both pairs and vectors (since both cons cells and
+     vector cells may point to arbitrary objects), and stops recursing
+     when it hits any other object.
+
+   primitive-eval
+
+ -- Scheme Procedure: primitive-eval exp
+     Evaluate EXP in the top-level environment specified by the current
+     module.
+
+   eval
+
+ -- Scheme Procedure: eval exp module
+     Evaluate EXP, a list representing a Scheme expression, in the
+     top-level environment specified by MODULE.  While EXP is evaluated
+     (using `primitive-eval'), MODULE is made the current module.  The
+     current module is reset to its previous value when EVAL returns.
+
+   eval2
+
+ -- Scheme Procedure: eval2 obj env_thunk
+     Evaluate EXP, a Scheme expression, in the environment designated
+     by LOOKUP, a symbol-lookup function.  Do not use this version of
+     eval, it does not play well with the module system.  Use `eval' or
+     `primitive-eval' instead.
+
+   eval-options-interface
+
+ -- Scheme Procedure: eval-options-interface [setting]
+     Option interface for the evaluation options. Instead of using this
+     procedure directly, use the procedures `eval-enable',
+     `eval-disable', `eval-set!' and `eval-options'.
+
+   evaluator-traps-interface
+
+ -- Scheme Procedure: evaluator-traps-interface [setting]
+     Option interface for the evaluator trap options.
+
+   defined?
+
+ -- Scheme Procedure: defined? sym [env]
+     Return `#t' if SYM is defined in the lexical environment ENV.
+     When ENV is not specified, look in the top-level environment as
+     defined by the current module.
+
+   map-in-order
+
+ -- Scheme Procedure: map-in-order
+     implemented by the C function "scm_map"
+
+   self-evaluating?
+
+ -- Scheme Procedure: self-evaluating? obj
+     Return #t for objects which Guile considers self-evaluating
+
+   load-extension
+
+ -- Scheme Procedure: load-extension lib init
+     Load and initialize the extension designated by LIB and INIT.
+     When there is no pre-registered function for LIB/INIT, this is
+     equivalent to
+
+          (dynamic-call INIT (dynamic-link LIB))
+
+     When there is a pre-registered function, that function is called
+     instead.
+
+     Normally, there is no pre-registered function.  This option exists
+     only for situations where dynamic linking is unavailable or
+     unwanted.  In that case, you would statically link your program
+     with the desired library, and register its init function right
+     after Guile has been initialized.
+
+     LIB should be a string denoting a shared library without any file
+     type suffix such as ".so".  The suffix is provided automatically.
+     It should also not contain any directory components.  Libraries
+     that implement Guile Extensions should be put into the normal
+     locations for shared libraries.  We recommend to use the naming
+     convention libguile-bla-blum for a extension related to a module
+     `(bla blum)'.
+
+     The normal way for a extension to be used is to write a small
+     Scheme file that defines a module, and to load the extension into
+     this module.  When the module is auto-loaded, the extension is
+     loaded as well.  For example,
+
+          (define-module (bla blum))
+
+          (load-extension "libguile-bla-blum" "bla_init_blum")
+
+   program-arguments
+
+ -- Scheme Procedure: program-arguments
+ -- Scheme Procedure: command-line
+     Return the list of command line arguments passed to Guile, as a
+     list of strings.  The list includes the invoked program name,
+     which is usually `"guile"', but excludes switches and parameters
+     for command line options like `-e' and `-l'.
+
+   make-fluid
+
+ -- Scheme Procedure: make-fluid
+     Return a newly created fluid.  Fluids are objects of a certain
+     type (a smob) that can hold one SCM value per dynamic root.  That
+     is, modifications to this value are only visible to code that
+     executes within the same dynamic root as the modifying code.  When
+     a new dynamic root is constructed, it inherits the values from its
+     parent.  Because each thread executes in its own dynamic root, you
+     can use fluids for thread local storage.
+
+   fluid?
+
+ -- Scheme Procedure: fluid? obj
+     Return `#t' iff OBJ is a fluid; otherwise, return `#f'.
+
+   fluid-ref
+
+ -- Scheme Procedure: fluid-ref fluid
+     Return the value associated with FLUID in the current dynamic
+     root.  If FLUID has not been set, then return `#f'.
+
+   fluid-set!
+
+ -- Scheme Procedure: fluid-set! fluid value
+     Set the value associated with FLUID in the current dynamic root.
+
+   with-fluids*
+
+ -- Scheme Procedure: with-fluids* fluids values thunk
+     Set FLUIDS to VALUES temporary, and call THUNK.  FLUIDS must be a
+     list of fluids and VALUES must be the same number of their values
+     to be applied.  Each substitution is done one after another.
+     THUNK must be a procedure with no argument.
+
+   setvbuf
+
+ -- Scheme Procedure: setvbuf port mode [size]
+     Set the buffering mode for PORT.  MODE can be:
+    `_IONBF'
+          non-buffered
+
+    `_IOLBF'
+          line buffered
+
+    `_IOFBF'
+          block buffered, using a newly allocated buffer of SIZE bytes.
+          If SIZE is omitted, a default size will be used.
+
+   file-port?
+
+ -- Scheme Procedure: file-port? obj
+     Determine whether OBJ is a port that is related to a file.
+
+   open-file
+
+ -- Scheme Procedure: open-file filename mode
+     Open the file whose name is FILENAME, and return a port
+     representing that file.  The attributes of the port are determined
+     by the MODE string.  The way in which this is interpreted is
+     similar to C stdio.  The first character must be one of the
+     following:
+    `r'
+          Open an existing file for input.
+
+    `w'
+          Open a file for output, creating it if it doesn't already
+          exist or removing its contents if it does.
+
+    `a'
+          Open a file for output, creating it if it doesn't already
+          exist.  All writes to the port will go to the end of the file.
+          The "append mode" can be turned off while the port is in use
+          *note fcntl: Ports and File Descriptors.
+     The following additional characters can be appended:
+    `+'
+          Open the port for both input and output.  E.g., `r+': open an
+          existing file for both input and output.
+
+    `0'
+          Create an "unbuffered" port.  In this case input and output
+          operations are passed directly to the underlying port
+          implementation without additional buffering.  This is likely
+          to slow down I/O operations.  The buffering mode can be
+          changed while a port is in use *note setvbuf: Ports and File
+          Descriptors.
+
+    `l'
+          Add line-buffering to the port.  The port output buffer will
+          be automatically flushed whenever a newline character is
+          written.
+     In theory we could create read/write ports which were buffered in
+     one direction only.  However this isn't included in the current
+     interfaces.  If a file cannot be opened with the access requested,
+     `open-file' throws an exception.
+
+   gc-stats
+
+ -- Scheme Procedure: gc-stats
+     Return an association list of statistics about Guile's current use
+     of storage.
+
+   object-address
+
+ -- Scheme Procedure: object-address obj
+     Return an integer that for the lifetime of OBJ is uniquely
+     returned by this function for OBJ
+
+   gc
+
+ -- Scheme Procedure: gc
+     Scans all of SCM objects and reclaims for further use those that
+     are no longer accessible.
+
+   %compute-slots
+
+ -- Scheme Procedure: %compute-slots class
+     Return a list consisting of the names of all slots belonging to
+     class CLASS, i. e. the slots of CLASS and of all of its
+     superclasses.
+
+   get-keyword
+
+ -- Scheme Procedure: get-keyword key l default_value
+     Determine an associated value for the keyword KEY from the list L.
+     The list L has to consist of an even number of elements, where,
+     starting with the first, every second element is a keyword,
+     followed by its associated value.  If L does not hold a value for
+     KEY, the value DEFAULT_VALUE is returned.
+
+   %initialize-object
+
+ -- Scheme Procedure: %initialize-object obj initargs
+     Initialize the object OBJ with the given arguments INITARGS.
+
+   %prep-layout!
+
+ -- Scheme Procedure: %prep-layout! class
+
+   %inherit-magic!
+
+ -- Scheme Procedure: %inherit-magic! class dsupers
+
+   instance?
+
+ -- Scheme Procedure: instance? obj
+     Return `#t' if OBJ is an instance.
+
+   class-name
+
+ -- Scheme Procedure: class-name obj
+     Return the class name of OBJ.
+
+   class-direct-supers
+
+ -- Scheme Procedure: class-direct-supers obj
+     Return the direct superclasses of the class OBJ.
+
+   class-direct-slots
+
+ -- Scheme Procedure: class-direct-slots obj
+     Return the direct slots of the class OBJ.
+
+   class-direct-subclasses
+
+ -- Scheme Procedure: class-direct-subclasses obj
+     Return the direct subclasses of the class OBJ.
+
+   class-direct-methods
+
+ -- Scheme Procedure: class-direct-methods obj
+     Return the direct methods of the class OBJ
+
+   class-precedence-list
+
+ -- Scheme Procedure: class-precedence-list obj
+     Return the class precedence list of the class OBJ.
+
+   class-slots
+
+ -- Scheme Procedure: class-slots obj
+     Return the slot list of the class OBJ.
+
+   class-environment
+
+ -- Scheme Procedure: class-environment obj
+     Return the environment of the class OBJ.
+
+   generic-function-name
+
+ -- Scheme Procedure: generic-function-name obj
+     Return the name of the generic function OBJ.
+
+   generic-function-methods
+
+ -- Scheme Procedure: generic-function-methods obj
+     Return the methods of the generic function OBJ.
+
+   method-generic-function
+
+ -- Scheme Procedure: method-generic-function obj
+     Return the generic function for the method OBJ.
+
+   method-specializers
+
+ -- Scheme Procedure: method-specializers obj
+     Return specializers of the method OBJ.
+
+   method-procedure
+
+ -- Scheme Procedure: method-procedure obj
+     Return the procedure of the method OBJ.
+
+   accessor-method-slot-definition
+
+ -- Scheme Procedure: accessor-method-slot-definition obj
+     Return the slot definition of the accessor OBJ.
+
+   %tag-body
+
+ -- Scheme Procedure: %tag-body body
+     Internal GOOPS magic--don't use this function!
+
+   make-unbound
+
+ -- Scheme Procedure: make-unbound
+     Return the unbound value.
+
+   unbound?
+
+ -- Scheme Procedure: unbound? obj
+     Return `#t' if OBJ is unbound.
+
+   assert-bound
+
+ -- Scheme Procedure: assert-bound value obj
+     Return VALUE if it is bound, and invoke the SLOT-UNBOUND method of
+     OBJ if it is not.
+
+   @assert-bound-ref
+
+ -- Scheme Procedure: @assert-bound-ref obj index
+     Like `assert-bound', but use INDEX for accessing the value from
+     OBJ.
+
+   %fast-slot-ref
+
+ -- Scheme Procedure: %fast-slot-ref obj index
+     Return the slot value with index INDEX from OBJ.
+
+   %fast-slot-set!
+
+ -- Scheme Procedure: %fast-slot-set! obj index value
+     Set the slot with index INDEX in OBJ to VALUE.
+
+   slot-ref-using-class
+
+ -- Scheme Procedure: slot-ref-using-class class obj slot_name
+
+   slot-set-using-class!
+
+ -- Scheme Procedure: slot-set-using-class! class obj slot_name value
+
+   slot-bound-using-class?
+
+ -- Scheme Procedure: slot-bound-using-class? class obj slot_name
+
+   slot-exists-using-class?
+
+ -- Scheme Procedure: slot-exists-using-class? class obj slot_name
+
+   slot-ref
+
+ -- Scheme Procedure: slot-ref obj slot_name
+     Return the value from OBJ's slot with the name SLOT_NAME.
+
+   slot-set!
+
+ -- Scheme Procedure: slot-set! obj slot_name value
+     Set the slot named SLOT_NAME of OBJ to VALUE.
+
+   slot-bound?
+
+ -- Scheme Procedure: slot-bound? obj slot_name
+     Return `#t' if the slot named SLOT_NAME of OBJ is bound.
+
+   slot-exists?
+
+ -- Scheme Procedure: slot-exists? obj slot_name
+     Return `#t' if OBJ has a slot named SLOT_NAME.
+
+   %allocate-instance
+
+ -- Scheme Procedure: %allocate-instance class initargs
+     Create a new instance of class CLASS and initialize it from the
+     arguments INITARGS.
+
+   %set-object-setter!
+
+ -- Scheme Procedure: %set-object-setter! obj setter
+
+   %modify-instance
+
+ -- Scheme Procedure: %modify-instance old new
+
+   %modify-class
+
+ -- Scheme Procedure: %modify-class old new
+
+   %invalidate-class
+
+ -- Scheme Procedure: %invalidate-class class
+
+   %invalidate-method-cache!
+
+ -- Scheme Procedure: %invalidate-method-cache! gf
+
+   generic-capability?
+
+ -- Scheme Procedure: generic-capability? proc
+
+   enable-primitive-generic!
+
+ -- Scheme Procedure: enable-primitive-generic! . subrs
+
+   primitive-generic-generic
+
+ -- Scheme Procedure: primitive-generic-generic subr
+
+   make
+
+ -- Scheme Procedure: make . args
+     Make a new object.  ARGS must contain the class and all necessary
+     initialization information.
+
+   find-method
+
+ -- Scheme Procedure: find-method . l
+
+   %method-more-specific?
+
+ -- Scheme Procedure: %method-more-specific? m1 m2 targs
+
+   %goops-loaded
+
+ -- Scheme Procedure: %goops-loaded
+     Announce that GOOPS is loaded and perform initialization on the C
+     level which depends on the loaded GOOPS modules.
+
+   make-guardian
+
+ -- Scheme Procedure: make-guardian [greedy_p]
+     Create a new guardian.  A guardian protects a set of objects from
+     garbage collection, allowing a program to apply cleanup or other
+     actions.
+
+     `make-guardian' returns a procedure representing the guardian.
+     Calling the guardian procedure with an argument adds the argument
+     to the guardian's set of protected objects.  Calling the guardian
+     procedure without an argument returns one of the protected objects
+     which are ready for garbage collection, or `#f' if no such object
+     is available.  Objects which are returned in this way are removed
+     from the guardian.
+
+     `make-guardian' takes one optional argument that says whether the
+     new guardian should be greedy or sharing.  If there is any chance
+     that any object protected by the guardian may be resurrected, then
+     you should make the guardian greedy (this is the default).
+
+     See R. Kent Dybvig, Carl Bruggeman, and David Eby (1993)
+     "Guardians in a Generation-Based Garbage Collector".  ACM SIGPLAN
+     Conference on Programming Language Design and Implementation, June
+     1993.
+
+     (the semantics are slightly different at this point, but the paper
+     still (mostly) accurately describes the interface).
+
+   guardian-destroyed?
+
+ -- Scheme Procedure: guardian-destroyed? guardian
+     Return `#t' if GUARDIAN has been destroyed, otherwise `#f'.
+
+   guardian-greedy?
+
+ -- Scheme Procedure: guardian-greedy? guardian
+     Return `#t' if GUARDIAN is a greedy guardian, otherwise `#f'.
+
+   destroy-guardian!
+
+ -- Scheme Procedure: destroy-guardian! guardian
+     Destroys GUARDIAN, by making it impossible to put any more objects
+     in it or get any objects from it.  It also unguards any objects
+     guarded by GUARDIAN.
+
+   hashq
+
+ -- Scheme Procedure: hashq key size
+     Determine a hash value for KEY that is suitable for lookups in a
+     hashtable of size SIZE, where `eq?' is used as the equality
+     predicate.  The function returns an integer in the range 0 to SIZE
+     - 1.  Note that `hashq' may use internal addresses.  Thus two
+     calls to hashq where the keys are `eq?' are not guaranteed to
+     deliver the same value if the key object gets garbage collected in
+     between.  This can happen, for example with symbols: `(hashq 'foo
+     n) (gc) (hashq 'foo n)' may produce two different values, since
+     `foo' will be garbage collected.
+
+   hashv
+
+ -- Scheme Procedure: hashv key size
+     Determine a hash value for KEY that is suitable for lookups in a
+     hashtable of size SIZE, where `eqv?' is used as the equality
+     predicate.  The function returns an integer in the range 0 to SIZE
+     - 1.  Note that `(hashv key)' may use internal addresses.  Thus
+     two calls to hashv where the keys are `eqv?' are not guaranteed to
+     deliver the same value if the key object gets garbage collected in
+     between.  This can happen, for example with symbols: `(hashv 'foo
+     n) (gc) (hashv 'foo n)' may produce two different values, since
+     `foo' will be garbage collected.
+
+   hash
+
+ -- Scheme Procedure: hash key size
+     Determine a hash value for KEY that is suitable for lookups in a
+     hashtable of size SIZE, where `equal?' is used as the equality
+     predicate.  The function returns an integer in the range 0 to SIZE
+     - 1.
+
+   hashq-get-handle
+
+ -- Scheme Procedure: hashq-get-handle table key
+     This procedure returns the `(key . value)' pair from the hash
+     table TABLE.  If TABLE does not hold an associated value for KEY,
+     `#f' is returned.  Uses `eq?' for equality testing.
+
+   hashq-create-handle!
+
+ -- Scheme Procedure: hashq-create-handle! table key init
+     This function looks up KEY in TABLE and returns its handle.  If
+     KEY is not already present, a new handle is created which
+     associates KEY with INIT.
+
+   hashq-ref
+
+ -- Scheme Procedure: hashq-ref table key [dflt]
+     Look up KEY in the hash table TABLE, and return the value (if any)
+     associated with it.  If KEY is not found, return DEFAULT (or `#f'
+     if no DEFAULT argument is supplied).  Uses `eq?' for equality
+     testing.
+
+   hashq-set!
+
+ -- Scheme Procedure: hashq-set! table key val
+     Find the entry in TABLE associated with KEY, and store VALUE
+     there. Uses `eq?' for equality testing.
+
+   hashq-remove!
+
+ -- Scheme Procedure: hashq-remove! table key
+     Remove KEY (and any value associated with it) from TABLE.  Uses
+     `eq?' for equality tests.
+
+   hashv-get-handle
+
+ -- Scheme Procedure: hashv-get-handle table key
+     This procedure returns the `(key . value)' pair from the hash
+     table TABLE.  If TABLE does not hold an associated value for KEY,
+     `#f' is returned.  Uses `eqv?' for equality testing.
+
+   hashv-create-handle!
+
+ -- Scheme Procedure: hashv-create-handle! table key init
+     This function looks up KEY in TABLE and returns its handle.  If
+     KEY is not already present, a new handle is created which
+     associates KEY with INIT.
+
+   hashv-ref
+
+ -- Scheme Procedure: hashv-ref table key [dflt]
+     Look up KEY in the hash table TABLE, and return the value (if any)
+     associated with it.  If KEY is not found, return DEFAULT (or `#f'
+     if no DEFAULT argument is supplied).  Uses `eqv?' for equality
+     testing.
+
+   hashv-set!
+
+ -- Scheme Procedure: hashv-set! table key val
+     Find the entry in TABLE associated with KEY, and store VALUE
+     there. Uses `eqv?' for equality testing.
+
+   hashv-remove!
+
+ -- Scheme Procedure: hashv-remove! table key
+     Remove KEY (and any value associated with it) from TABLE.  Uses
+     `eqv?' for equality tests.
+
+   hash-get-handle
+
+ -- Scheme Procedure: hash-get-handle table key
+     This procedure returns the `(key . value)' pair from the hash
+     table TABLE.  If TABLE does not hold an associated value for KEY,
+     `#f' is returned.  Uses `equal?' for equality testing.
+
+   hash-create-handle!
+
+ -- Scheme Procedure: hash-create-handle! table key init
+     This function looks up KEY in TABLE and returns its handle.  If
+     KEY is not already present, a new handle is created which
+     associates KEY with INIT.
+
+   hash-ref
+
+ -- Scheme Procedure: hash-ref table key [dflt]
+     Look up KEY in the hash table TABLE, and return the value (if any)
+     associated with it.  If KEY is not found, return DEFAULT (or `#f'
+     if no DEFAULT argument is supplied).  Uses `equal?' for equality
+     testing.
+
+   hash-set!
+
+ -- Scheme Procedure: hash-set! table key val
+     Find the entry in TABLE associated with KEY, and store VALUE
+     there. Uses `equal?' for equality testing.
+
+   hash-remove!
+
+ -- Scheme Procedure: hash-remove! table key
+     Remove KEY (and any value associated with it) from TABLE.  Uses
+     `equal?' for equality tests.
+
+   hashx-get-handle
+
+ -- Scheme Procedure: hashx-get-handle hash assoc table key
+     This behaves the same way as the corresponding `-get-handle'
+     function, but uses HASH as a hash function and ASSOC to compare
+     keys.  `hash' must be a function that takes two arguments, a key
+     to be hashed and a table size.  `assoc' must be an associator
+     function, like `assoc', `assq' or `assv'.
+
+   hashx-create-handle!
+
+ -- Scheme Procedure: hashx-create-handle! hash assoc table key init
+     This behaves the same way as the corresponding `-create-handle'
+     function, but uses HASH as a hash function and ASSOC to compare
+     keys.  `hash' must be a function that takes two arguments, a key
+     to be hashed and a table size.  `assoc' must be an associator
+     function, like `assoc', `assq' or `assv'.
+
+   hashx-ref
+
+ -- Scheme Procedure: hashx-ref hash assoc table key [dflt]
+     This behaves the same way as the corresponding `ref' function, but
+     uses HASH as a hash function and ASSOC to compare keys.  `hash'
+     must be a function that takes two arguments, a key to be hashed
+     and a table size.  `assoc' must be an associator function, like
+     `assoc', `assq' or `assv'.
+
+     By way of illustration, `hashq-ref table key' is equivalent to
+     `hashx-ref hashq assq table key'.
+
+   hashx-set!
+
+ -- Scheme Procedure: hashx-set! hash assoc table key val
+     This behaves the same way as the corresponding `set!' function,
+     but uses HASH as a hash function and ASSOC to compare keys.
+     `hash' must be a function that takes two arguments, a key to be
+     hashed and a table size.  `assoc' must be an associator function,
+     like `assoc', `assq' or `assv'.
+
+     By way of illustration, `hashq-set! table key' is equivalent to
+     `hashx-set!  hashq assq table key'.
+
+   hash-fold
+
+ -- Scheme Procedure: hash-fold proc init table
+     An iterator over hash-table elements.  Accumulates and returns a
+     result by applying PROC successively.  The arguments to PROC are
+     "(key value prior-result)" where key and value are successive
+     pairs from the hash table TABLE, and prior-result is either INIT
+     (for the first application of PROC) or the return value of the
+     previous application of PROC.  For example, `(hash-fold acons '()
+     tab)' will convert a hash table into an a-list of key-value pairs.
+
+   make-hook
+
+ -- Scheme Procedure: make-hook [n_args]
+     Create a hook for storing procedure of arity N_ARGS.  N_ARGS
+     defaults to zero.  The returned value is a hook object to be used
+     with the other hook procedures.
+
+   hook?
+
+ -- Scheme Procedure: hook? x
+     Return `#t' if X is a hook, `#f' otherwise.
+
+   hook-empty?
+
+ -- Scheme Procedure: hook-empty? hook
+     Return `#t' if HOOK is an empty hook, `#f' otherwise.
+
+   add-hook!
+
+ -- Scheme Procedure: add-hook! hook proc [append_p]
+     Add the procedure PROC to the hook HOOK. The procedure is added to
+     the end if APPEND_P is true, otherwise it is added to the front.
+     The return value of this procedure is not specified.
+
+   remove-hook!
+
+ -- Scheme Procedure: remove-hook! hook proc
+     Remove the procedure PROC from the hook HOOK.  The return value of
+     this procedure is not specified.
+
+   reset-hook!
+
+ -- Scheme Procedure: reset-hook! hook
+     Remove all procedures from the hook HOOK.  The return value of
+     this procedure is not specified.
+
+   run-hook
+
+ -- Scheme Procedure: run-hook hook . args
+     Apply all procedures from the hook HOOK to the arguments ARGS.
+     The order of the procedure application is first to last.  The
+     return value of this procedure is not specified.
+
+   hook->list
+
+ -- Scheme Procedure: hook->list hook
+     Convert the procedure list of HOOK to a list.
+
+   ftell
+
+ -- Scheme Procedure: ftell fd_port
+     Return an integer representing the current position of FD/PORT,
+     measured from the beginning.  Equivalent to:
+
+          (seek port 0 SEEK_CUR)
+
+   redirect-port
+
+ -- Scheme Procedure: redirect-port old new
+     This procedure takes two ports and duplicates the underlying file
+     descriptor from OLD-PORT into NEW-PORT.  The current file
+     descriptor in NEW-PORT will be closed.  After the redirection the
+     two ports will share a file position and file status flags.
+
+     The return value is unspecified.
+
+     Unexpected behaviour can result if both ports are subsequently used
+     and the original and/or duplicate ports are buffered.
+
+     This procedure does not have any side effects on other ports or
+     revealed counts.
+
+   dup->fdes
+
+ -- Scheme Procedure: dup->fdes fd_or_port [fd]
+     Return a new integer file descriptor referring to the open file
+     designated by FD_OR_PORT, which must be either an open file port
+     or a file descriptor.
+
+   dup2
+
+ -- Scheme Procedure: dup2 oldfd newfd
+     A simple wrapper for the `dup2' system call.  Copies the file
+     descriptor OLDFD to descriptor number NEWFD, replacing the
+     previous meaning of NEWFD.  Both OLDFD and NEWFD must be integers.
+     Unlike for dup->fdes or primitive-move->fdes, no attempt is made
+     to move away ports which are using NEWFD.  The return value is
+     unspecified.
+
+   fileno
+
+ -- Scheme Procedure: fileno port
+     Return the integer file descriptor underlying PORT.  Does not
+     change its revealed count.
+
+   isatty?
+
+ -- Scheme Procedure: isatty? port
+     Return `#t' if PORT is using a serial non-file device, otherwise
+     `#f'.
+
+   fdopen
+
+ -- Scheme Procedure: fdopen fdes modes
+     Return a new port based on the file descriptor FDES.  Modes are
+     given by the string MODES.  The revealed count of the port is
+     initialized to zero.  The modes string is the same as that
+     accepted by *Note open-file: File Ports.
+
+   primitive-move->fdes
+
+ -- Scheme Procedure: primitive-move->fdes port fd
+     Moves the underlying file descriptor for PORT to the integer value
+     FDES without changing the revealed count of PORT.  Any other ports
+     already using this descriptor will be automatically shifted to new
+     descriptors and their revealed counts reset to zero.  The return
+     value is `#f' if the file descriptor already had the required
+     value or `#t' if it was moved.
+
+   fdes->ports
+
+ -- Scheme Procedure: fdes->ports fd
+     Return a list of existing ports which have FDES as an underlying
+     file descriptor, without changing their revealed counts.
+
+   make-keyword-from-dash-symbol
+
+ -- Scheme Procedure: make-keyword-from-dash-symbol symbol
+     Make a keyword object from a SYMBOL that starts with a dash.
+
+   keyword?
+
+ -- Scheme Procedure: keyword? obj
+     Return `#t' if the argument OBJ is a keyword, else `#f'.
+
+   keyword-dash-symbol
+
+ -- Scheme Procedure: keyword-dash-symbol keyword
+     Return the dash symbol for KEYWORD.  This is the inverse of
+     `make-keyword-from-dash-symbol'.
+
+   nil-cons
+
+ -- Scheme Procedure: nil-cons x y
+     Create a new cons cell with X as the car and Y as the cdr, but
+     convert Y to Scheme's end-of-list if it is a LISP nil.
+
+   nil-car
+
+ -- Scheme Procedure: nil-car x
+     Return the car of X, but convert it to LISP nil if it is Scheme's
+     end-of-list.
+
+   nil-cdr
+
+ -- Scheme Procedure: nil-cdr x
+     Return the cdr of X, but convert it to LISP nil if it is Scheme's
+     end-of-list.
+
+   null
+
+ -- Scheme Procedure: null x
+     Return LISP's `t' if X is nil in the LISP sense, return LISP's nil
+     otherwise.
+
+   nil-eq
+
+ -- Scheme Procedure: nil-eq x y
+     Compare X and Y and return LISP's t if they are `eq?', return
+     LISP's nil otherwise.
+
+   list
+
+ -- Scheme Procedure: list . objs
+     Return a list containing OBJS, the arguments to `list'.
+
+   list*
+
+ -- Scheme Procedure: list*
+     implemented by the C function "scm_cons_star"
+
+   cons*
+
+ -- Scheme Procedure: cons* arg . rest
+     Like `list', but the last arg provides the tail of the constructed
+     list, returning `(cons ARG1 (cons ARG2 (cons ... ARGN)))'.
+     Requires at least one argument.  If given one argument, that
+     argument is returned as result.  This function is called `list*'
+     in some other Schemes and in Common LISP.
+
+   null?
+
+ -- Scheme Procedure: null? x
+     Return `#t' iff X is the empty list, else `#f'.
+
+   list?
+
+ -- Scheme Procedure: list? x
+     Return `#t' iff X is a proper list, else `#f'.
+
+   length
+
+ -- Scheme Procedure: length lst
+     Return the number of elements in list LST.
+
+   append
+
+ -- Scheme Procedure: append . args
+     Return a list consisting of the elements the lists passed as
+     arguments.
+          (append '(x) '(y))          =>  (x y)
+          (append '(a) '(b c d))      =>  (a b c d)
+          (append '(a (b)) '((c)))    =>  (a (b) (c))
+     The resulting list is always newly allocated, except that it
+     shares structure with the last list argument.  The last argument
+     may actually be any object; an improper list results if the last
+     argument is not a proper list.
+          (append '(a b) '(c . d))    =>  (a b c . d)
+          (append '() 'a)             =>  a
+
+   append!
+
+ -- Scheme Procedure: append! . lists
+     A destructive version of `append' (*note Pairs and Lists:
+     (r5rs)Pairs and Lists.).  The cdr field of each list's final pair
+     is changed to point to the head of the next list, so no consing is
+     performed.  Return a pointer to the mutated list.
+
+   last-pair
+
+ -- Scheme Procedure: last-pair lst
+     Return a pointer to the last pair in LST, signalling an error if
+     LST is circular.
+
+   reverse
+
+ -- Scheme Procedure: reverse lst
+     Return a new list that contains the elements of LST but in reverse
+     order.
+
+   reverse!
+
+ -- Scheme Procedure: reverse! lst [new_tail]
+     A destructive version of `reverse' (*note Pairs and Lists:
+     (r5rs)Pairs and Lists.).  The cdr of each cell in LST is modified
+     to point to the previous list element.  Return a pointer to the
+     head of the reversed list.
+
+     Caveat: because the list is modified in place, the tail of the
+     original list now becomes its head, and the head of the original
+     list now becomes the tail.  Therefore, the LST symbol to which the
+     head of the original list was bound now points to the tail.  To
+     ensure that the head of the modified list is not lost, it is wise
+     to save the return value of `reverse!'
+
+   list-ref
+
+ -- Scheme Procedure: list-ref list k
+     Return the Kth element from LIST.
+
+   list-set!
+
+ -- Scheme Procedure: list-set! list k val
+     Set the Kth element of LIST to VAL.
+
+   list-cdr-ref
+
+ -- Scheme Procedure: list-cdr-ref
+     implemented by the C function "scm_list_tail"
+
+   list-tail
+
+ -- Scheme Procedure: list-tail lst k
+ -- Scheme Procedure: list-cdr-ref lst k
+     Return the "tail" of LST beginning with its Kth element.  The
+     first element of the list is considered to be element 0.
+
+     `list-tail' and `list-cdr-ref' are identical.  It may help to
+     think of `list-cdr-ref' as accessing the Kth cdr of the list, or
+     returning the results of cdring K times down LST.
+
+   list-cdr-set!
+
+ -- Scheme Procedure: list-cdr-set! list k val
+     Set the Kth cdr of LIST to VAL.
+
+   list-head
+
+ -- Scheme Procedure: list-head lst k
+     Copy the first K elements from LST into a new list, and return it.
+
+   list-copy
+
+ -- Scheme Procedure: list-copy lst
+     Return a (newly-created) copy of LST.
+
+   sloppy-memq
+
+ -- Scheme Procedure: sloppy-memq x lst
+     This procedure behaves like `memq', but does no type or error
+     checking.  Its use is recommended only in writing Guile internals,
+     not for high-level Scheme programs.
+
+   sloppy-memv
+
+ -- Scheme Procedure: sloppy-memv x lst
+     This procedure behaves like `memv', but does no type or error
+     checking.  Its use is recommended only in writing Guile internals,
+     not for high-level Scheme programs.
+
+   sloppy-member
+
+ -- Scheme Procedure: sloppy-member x lst
+     This procedure behaves like `member', but does no type or error
+     checking.  Its use is recommended only in writing Guile internals,
+     not for high-level Scheme programs.
+
+   memq
+
+ -- Scheme Procedure: memq x lst
+     Return the first sublist of LST whose car is `eq?' to X where the
+     sublists of LST are the non-empty lists returned by `(list-tail
+     LST K)' for K less than the length of LST.  If X does not occur in
+     LST, then `#f' (not the empty list) is returned.
+
+   memv
+
+ -- Scheme Procedure: memv x lst
+     Return the first sublist of LST whose car is `eqv?' to X where the
+     sublists of LST are the non-empty lists returned by `(list-tail
+     LST K)' for K less than the length of LST.  If X does not occur in
+     LST, then `#f' (not the empty list) is returned.
+
+   member
+
+ -- Scheme Procedure: member x lst
+     Return the first sublist of LST whose car is `equal?' to X where
+     the sublists of LST are the non-empty lists returned by
+     `(list-tail LST K)' for K less than the length of LST.  If X does
+     not occur in LST, then `#f' (not the empty list) is returned.
+
+   delq!
+
+ -- Scheme Procedure: delq! item lst
+ -- Scheme Procedure: delv! item lst
+ -- Scheme Procedure: delete! item lst
+     These procedures are destructive versions of `delq', `delv' and
+     `delete': they modify the pointers in the existing LST rather than
+     creating a new list.  Caveat evaluator: Like other destructive
+     list functions, these functions cannot modify the binding of LST,
+     and so cannot be used to delete the first element of LST
+     destructively.
+
+   delv!
+
+ -- Scheme Procedure: delv! item lst
+     Destructively remove all elements from LST that are `eqv?' to ITEM.
+
+   delete!
+
+ -- Scheme Procedure: delete! item lst
+     Destructively remove all elements from LST that are `equal?' to
+     ITEM.
+
+   delq
+
+ -- Scheme Procedure: delq item lst
+     Return a newly-created copy of LST with elements `eq?' to ITEM
+     removed.  This procedure mirrors `memq': `delq' compares elements
+     of LST against ITEM with `eq?'.
+
+   delv
+
+ -- Scheme Procedure: delv item lst
+     Return a newly-created copy of LST with elements `eqv?'  to ITEM
+     removed.  This procedure mirrors `memv': `delv' compares elements
+     of LST against ITEM with `eqv?'.
+
+   delete
+
+ -- Scheme Procedure: delete item lst
+     Return a newly-created copy of LST with elements `equal?'  to ITEM
+     removed.  This procedure mirrors `member': `delete' compares
+     elements of LST against ITEM with `equal?'.
+
+   delq1!
+
+ -- Scheme Procedure: delq1! item lst
+     Like `delq!', but only deletes the first occurrence of ITEM from
+     LST.  Tests for equality using `eq?'.  See also `delv1!' and
+     `delete1!'.
+
+   delv1!
+
+ -- Scheme Procedure: delv1! item lst
+     Like `delv!', but only deletes the first occurrence of ITEM from
+     LST.  Tests for equality using `eqv?'.  See also `delq1!' and
+     `delete1!'.
+
+   delete1!
+
+ -- Scheme Procedure: delete1! item lst
+     Like `delete!', but only deletes the first occurrence of ITEM from
+     LST.  Tests for equality using `equal?'.  See also `delq1!' and
+     `delv1!'.
+
+   primitive-load
+
+ -- Scheme Procedure: primitive-load filename
+     Load the file named FILENAME and evaluate its contents in the
+     top-level environment. The load paths are not searched; FILENAME
+     must either be a full pathname or be a pathname relative to the
+     current directory.  If the  variable `%load-hook' is defined, it
+     should be bound to a procedure that will be called before any code
+     is loaded.  See the documentation for `%load-hook' later in this
+     section.
+
+   %package-data-dir
+
+ -- Scheme Procedure: %package-data-dir
+     Return the name of the directory where Scheme packages, modules and
+     libraries are kept.  On most Unix systems, this will be
+     `/usr/local/share/guile'.
+
+   %library-dir
+
+ -- Scheme Procedure: %library-dir
+     Return the directory where the Guile Scheme library files are
+     installed.  E.g., may return "/usr/share/guile/1.3.5".
+
+   %site-dir
+
+ -- Scheme Procedure: %site-dir
+     Return the directory where the Guile site files are installed.
+     E.g., may return "/usr/share/guile/site".
+
+   parse-path
+
+ -- Scheme Procedure: parse-path path [tail]
+     Parse PATH, which is expected to be a colon-separated string, into
+     a list and return the resulting list with TAIL appended. If PATH
+     is `#f', TAIL is returned.
+
+   search-path
+
+ -- Scheme Procedure: search-path path filename [extensions]
+     Search PATH for a directory containing a file named FILENAME. The
+     file must be readable, and not a directory.  If we find one,
+     return its full filename; otherwise, return `#f'.  If FILENAME is
+     absolute, return it unchanged.  If given, EXTENSIONS is a list of
+     strings; for each directory in PATH, we search for FILENAME
+     concatenated with each EXTENSION.
+
+   %search-load-path
+
+ -- Scheme Procedure: %search-load-path filename
+     Search %LOAD-PATH for the file named FILENAME, which must be
+     readable by the current user.  If FILENAME is found in the list of
+     paths to search or is an absolute pathname, return its full
+     pathname.  Otherwise, return `#f'.  Filenames may have any of the
+     optional extensions in the `%load-extensions' list;
+     `%search-load-path' will try each extension automatically.
+
+   primitive-load-path
+
+ -- Scheme Procedure: primitive-load-path filename
+     Search %LOAD-PATH for the file named FILENAME and load it into the
+     top-level environment.  If FILENAME is a relative pathname and is
+     not found in the list of search paths, an error is signalled.
+
+   read-and-eval!
+
+ -- Scheme Procedure: read-and-eval! [port]
+     Read a form from PORT (standard input by default), and evaluate it
+     (memoizing it in the process) in the top-level environment.  If no
+     data is left to be read from PORT, an `end-of-file' error is
+     signalled.
+
+   procedure->syntax
+
+ -- Scheme Procedure: procedure->syntax code
+     Return a "macro" which, when a symbol defined to this value
+     appears as the first symbol in an expression, returns the result
+     of applying CODE to the expression and the environment.
+
+   procedure->macro
+
+ -- Scheme Procedure: procedure->macro code
+     Return a "macro" which, when a symbol defined to this value
+     appears as the first symbol in an expression, evaluates the result
+     of applying CODE to the expression and the environment.  For
+     example:
+
+          (define trace
+            (procedure->macro
+             (lambda (x env) `(set! ,(cadr x) (tracef ,(cadr x) ',(cadr x))))))
+
+          (trace foo) == (set! foo (tracef foo 'foo)).
+
+   procedure->memoizing-macro
+
+ -- Scheme Procedure: procedure->memoizing-macro code
+     Return a "macro" which, when a symbol defined to this value
+     appears as the first symbol in an expression, evaluates the result
+     of applying CODE to the expression and the environment.
+
+     `procedure->memoizing-macro' is the same as `procedure->macro',
+     except that the expression returned by CODE replaces the original
+     macro expression in the memoized form of the containing code.
+
+   macro?
+
+ -- Scheme Procedure: macro? obj
+     Return `#t' if OBJ is a regular macro, a memoizing macro or a
+     syntax transformer.
+
+   macro-type
+
+ -- Scheme Procedure: macro-type m
+     Return one of the symbols `syntax', `macro' or `macro!', depending
+     on whether M is a syntax transformer, a regular macro, or a
+     memoizing macro, respectively.  If M is not a macro, `#f' is
+     returned.
+
+   macro-name
+
+ -- Scheme Procedure: macro-name m
+     Return the name of the macro M.
+
+   macro-transformer
+
+ -- Scheme Procedure: macro-transformer m
+     Return the transformer of the macro M.
+
+   current-module
+
+ -- Scheme Procedure: current-module
+     Return the current module.
+
+   set-current-module
+
+ -- Scheme Procedure: set-current-module module
+     Set the current module to MODULE and return the previous current
+     module.
+
+   interaction-environment
+
+ -- Scheme Procedure: interaction-environment
+     Return a specifier for the environment that contains
+     implementation-defined bindings, typically a superset of those
+     listed in the report.  The intent is that this procedure will
+     return the environment in which the implementation would evaluate
+     expressions dynamically typed by the user.
+
+   env-module
+
+ -- Scheme Procedure: env-module env
+     Return the module of ENV, a lexical environment.
+
+   standard-eval-closure
+
+ -- Scheme Procedure: standard-eval-closure module
+     Return an eval closure for the module MODULE.
+
+   standard-interface-eval-closure
+
+ -- Scheme Procedure: standard-interface-eval-closure module
+     Return a interface eval closure for the module MODULE. Such a
+     closure does not allow new bindings to be added.
+
+   %get-pre-modules-obarray
+
+ -- Scheme Procedure: %get-pre-modules-obarray
+     Return the obarray that is used for all new bindings before the
+     module system is booted.  The first call to `set-current-module'
+     will boot the module system.
+
+   exact?
+
+ -- Scheme Procedure: exact? x
+     Return `#t' if X is an exact number, `#f' otherwise.
+
+   odd?
+
+ -- Scheme Procedure: odd? n
+     Return `#t' if N is an odd number, `#f' otherwise.
+
+   even?
+
+ -- Scheme Procedure: even? n
+     Return `#t' if N is an even number, `#f' otherwise.
+

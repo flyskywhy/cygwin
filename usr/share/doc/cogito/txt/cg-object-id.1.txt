@@ -1,0 +1,77 @@
+cg-object-id(1)
+===============
+
+NAME
+----
+cg-object-id - get the sha1 id of an object associated with the given symbolic id
+
+SYNOPSIS
+--------
+cg-object-id [-b | -c | -d | -n | -p | -t] [OBJECT_ID]
+
+DESCRIPTION
+-----------
+Resolves a given symbolic id to the raw SHA1 id (or a symbolic
+description when passed the '-d' parameter). The symbolic id can be
+an SHA1 id, a unique starting segment of an existing SHA1 id, a ref
+name, date, empty string, etc. See the 'COMMIT_ID' description in
+cogito(7) for the full list.
+
+Normally, you do not use this command directly (except with the '-d'
+parameter), but it is used in other Cogito scripts to resolve passed
+object identifiers. If the ID is not provided, HEAD is assumed.  The
+default behavior is to show the commit ID, but you should always
+explicitly write '-c' if using this in a script.
+
+OPTIONS
+-------
+
+--
+-b::
+	Get name of the current branch.
+
+-c::
+	Get ID of commit matching the object ID (error out if it is not
+	a commit). This is the default if you do not pass any parameter
+	as well, but that is only for the human usage. For clarity, all
+	scripted usage of cg-object-id should use -c explicitly if it
+	wants a commit.
+
+-d::
+	Get a commit description in form of a short string. It shows the
+	most recent tag in past of the commit and if it is not the commit
+	itself, it appends first few chars of the commit id to id. See
+	`git describe`(1) for details.
+
+-n::
+	Normalize only - don't check the object type.
+
+-p::
+	Get ID of the first parent commit of a given revision or HEAD.
+	NOTE: Multiple SHA1s separated by newlines will be returned for
+	commits with multiple parents.
+
+-t::
+	Get ID of tree associated with given commit or HEAD.
+
+OBJECT_ID::
+	An ID resolving to a commit.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-object-id[1].
+--
+
+
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, Pavel Roskin, Philip Pokorny  2005
+
+SEE ALSO
+--------
+cg-object-id is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

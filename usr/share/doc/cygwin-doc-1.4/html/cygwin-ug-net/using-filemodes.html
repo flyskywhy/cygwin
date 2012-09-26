@@ -1,0 +1,23 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>File permissions</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.61.2"><link rel="home" href="index.html" title="Cygwin User's Guide"><link rel="up" href="using.html" title="Chapter 3. Using Cygwin"><link rel="previous" href="using-textbinary.html" title="Text and Binary modes"><link rel="next" href="using-specialnames.html" title="Special filenames"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">File permissions</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="using-textbinary.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Using Cygwin</th><td width="20%" align="right"> <a accesskey="n" href="using-specialnames.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="using-filemodes"></a>File permissions</h2></div></div><div></div></div><p>On Windows 9x systems, files are always readable, and Cygwin uses the
+native read-only mode to determine if they are writable. Files are
+considered to be executable if the filename ends with .bat, .com or .exe, or
+if its content starts with #!. Consequently <b class="command">chmod</b> can
+only affect the "w" mode, it silently ignores actions involving the other
+modes.  This means that <b class="command">ls -l</b>
+needs to open and read files. It can thus be relatively slow.</p><p>Under NT, file permissions default to the same behavior as Windows
+9x but there is optional functionality in Cygwin that can make file
+systems behave more like on UNIX systems.  This is turned on by adding
+the "ntea" option to the <tt class="envar">CYGWIN</tt> environment variable.</p><p>When the "ntea" feature is activated, Cygwin will start with basic
+permissions as determined above, but can store POSIX file permissions in NT
+Extended Attributes.  This feature works quite well on NTFS partitions
+because the attributes can be stored sensibly inside the normal NTFS
+filesystem structure.  However, on a FAT partition, NT stores extended
+attributes in a flat file at the root of the partition called <tt class="filename">EA
+DATA. SF</tt>.  This file can grow to extremely large sizes if you
+have a large number of files on the partition in question, slowing the
+system to a crawl.  In addition, the <tt class="filename">EA DATA. SF</tt> file
+can only be deleted outside of Windows because of its "in use" status.  For
+these reasons, the use of NT Extended Attributes is off by default in
+Cygwin.  Finally, note that specifying "ntea" in <tt class="envar">CYGWIN</tt> has no
+effect under Windows 9x. </p><p>Under NT, the test "[ -w filename]" is only true if filename is
+writable across the board, e.g. <b class="command">chmod +w filename</b>. </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="using-textbinary.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="using.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="using-specialnames.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Text and Binary modes </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Special filenames</td></tr></table></div></body></html>

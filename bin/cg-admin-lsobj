@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# List unpacked objects in the repository
+# Copyright (c) Randy Dunlap, 2005
+# Copyright (c) Petr Baudis, 2005
+#
+# Lists IDs of all the objects of a given type found in the dircache.
+# Takes the object type as the first parameter, defaults to all objects.
+#
+# WARNING! This command does not list packed objects, so its usefulness
+# is rather limited right now. That's a big TODO.
+#
+# The possible object types are:
+#
+# blob::
+#	This object is a pure storage object containing some user data.
+#
+# commit::
+#	This object ties directory hierarchies together into a DAG
+#	of revisions.
+#
+# tree::
+#	This object is an object that ties one or more `blob` objects
+#	into a directory structure.
+#
+# tag::
+#	This object ties a symbolic release tag to an object in the
+#	database.
+#
+# See the git README for more information about the object types.
+#
+# EXAMPLE USAGE
+# -------------
+# Oh, I was messing with my HEADs and lost few commits, where on the earth
+# could they be...?
+#
+#	for i in `cg-admin-lsobj commit | cut -f 1`; do
+#		echo -e "\n==================\nme $i"; cat-file commit $i;
+#	done
+
+# Testsuite: TODO
+
+USAGE="cg-admin-lsobj [OBJECT_TYPE]"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+target="${ARGS[0]}"
+
+
+subdir="$_git_objects"
+
+for high in 0 1 2 3 4 5 6 7 8 9 a b c d e f ; do
+	for low in 0 1 2 3 4 5 6 7 8 9 a b c d e f ; do
+		top=$high$low
+
+		for f in "$subdir/$top"/*; do
+			if [ ! -r "$f" ]; then
+				continue
+			fi
+			base="$(basename "$f")"
+			type="$(git cat-file -t "$top$base")"
+			if [ ! "$target" ] || [ "$target" == "$type" ]; then
+				echo -e "$top$base\t$type"
+			fi
+		done
+	done
+done
+
+exit 0

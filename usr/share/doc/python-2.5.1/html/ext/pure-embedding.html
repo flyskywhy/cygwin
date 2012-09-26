@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="extending-with-embedding.html" />
+<link rel="prev" href="lower-level-embedding.html" />
+<link rel="parent" href="embedding.html" />
+<link rel="next" href="extending-with-embedding.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.3 Pure Embedding </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.2 beyond Very High"
+  href="lower-level-embedding.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. embedding Python in"
+  href="embedding.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.4 extending Embedded Python"
+  href="extending-with-embedding.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="lower-level-embedding.html">5.2 Beyond Very High</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="embedding.html">5. Embedding Python in</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="extending-with-embedding.html">5.4 Extending Embedded Python</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION007300000000000000000"></a><a name="pure-embedding"></a>
+<br>
+5.3 Pure Embedding
+         
+</h1>
+
+<p>
+The first program aims to execute a function in a Python
+script. Like in the section about the very high level interface,
+the Python interpreter does not directly interact with the
+application (but that will change in the next section).
+
+<p>
+The code to run a function defined in a Python script is:
+
+<p>
+<div class="verbatim">
+<pre>#include &lt;Python.h&gt;
+
+int
+main(int argc, char *argv[])
+{
+    PyObject *pName, *pModule, *pDict, *pFunc;
+    PyObject *pArgs, *pValue;
+    int i;
+
+    if (argc &lt; 3) {
+        fprintf(stderr,"Usage: call pythonfile funcname [args]\n");
+        return 1;
+    }
+
+    Py_Initialize();
+    pName = PyString_FromString(argv[1]);
+    /* Error checking of pName left out */
+
+    pModule = PyImport_Import(pName);
+    Py_DECREF(pName);
+
+    if (pModule != NULL) {
+        pFunc = PyObject_GetAttrString(pModule, argv[2]);
+        /* pFunc is a new reference */
+
+        if (pFunc &amp;&amp; PyCallable_Check(pFunc)) {
+            pArgs = PyTuple_New(argc - 3);
+            for (i = 0; i &lt; argc - 3; ++i) {
+                pValue = PyInt_FromLong(atoi(argv[i + 3]));
+                if (!pValue) {
+                    Py_DECREF(pArgs);
+                    Py_DECREF(pModule);
+                    fprintf(stderr, "Cannot convert argument\n");
+                    return 1;
+                }
+                /* pValue reference stolen here: */
+                PyTuple_SetItem(pArgs, i, pValue);
+            }
+            pValue = PyObject_CallObject(pFunc, pArgs);
+            Py_DECREF(pArgs);
+            if (pValue != NULL) {
+                printf("Result of call: %ld\n", PyInt_AsLong(pValue));
+                Py_DECREF(pValue);
+            }
+            else {
+                Py_DECREF(pFunc);
+                Py_DECREF(pModule);
+                PyErr_Print();
+                fprintf(stderr,"Call failed\n");
+                return 1;
+            }
+        }
+        else {
+            if (PyErr_Occurred())
+                PyErr_Print();
+            fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
+        }
+        Py_XDECREF(pFunc);
+        Py_DECREF(pModule);
+    }
+    else {
+        PyErr_Print();
+        fprintf(stderr, "Failed to load \"%s\"\n", argv[1]);
+        return 1;
+    }
+    Py_Finalize();
+    return 0;
+}
+</pre>
+<div class="footer">
+<a href="run-func.txt" type="text/plain">Download as text (original file name: <span class="file">run-func.c</span>).</a>
+</div></div>
+
+<p>
+This code loads a Python script using <code>argv[1]</code>, and calls the
+function named in <code>argv[2]</code>.  Its integer arguments are the other
+values of the <code>argv</code> array.  If you compile and link this
+program (let's call the finished executable <b class="program">call</b>), and use
+it to execute a Python script, such as:
+
+<p>
+<div class="verbatim"><pre>
+def multiply(a,b):
+    print "Will compute", a, "times", b
+    c = 0
+    for i in range(0, a):
+        c = c + b
+    return c
+</pre></div>
+
+<p>
+then the result should be:
+
+<p>
+<div class="verbatim"><pre>
+$ call multiply multiply 3 2
+Will compute 3 times 2
+Result of call: 6
+</pre></div> 
+<p>
+Although the program is quite large for its functionality, most of the
+code is for data conversion between Python and C, and for error
+reporting.  The interesting part with respect to embedding Python
+starts with
+
+<p>
+<div class="verbatim"><pre>
+    Py_Initialize();
+    pName = PyString_FromString(argv[1]);
+    /* Error checking of pName left out */
+    pModule = PyImport_Import(pName);
+</pre></div>
+
+<p>
+After initializing the interpreter, the script is loaded using
+<tt class="cfunction">PyImport_Import()</tt>.  This routine needs a Python string
+as its argument, which is constructed using the
+<tt class="cfunction">PyString_FromString()</tt> data conversion routine.
+
+<p>
+<div class="verbatim"><pre>
+    pFunc = PyObject_GetAttrString(pModule, argv[2]);
+    /* pFunc is a new reference */
+
+    if (pFunc &amp;&amp; PyCallable_Check(pFunc)) {
+        ...
+    }
+    Py_XDECREF(pFunc);
+</pre></div>
+
+<p>
+Once the script is loaded, the name we're looking for is retrieved
+using <tt class="cfunction">PyObject_GetAttrString()</tt>.  If the name exists, and
+the object returned is callable, you can safely assume that it is a
+function.  The program then proceeds by constructing a tuple of
+arguments as normal.  The call to the Python function is then made
+with:
+
+<p>
+<div class="verbatim"><pre>
+    pValue = PyObject_CallObject(pFunc, pArgs);
+</pre></div>
+
+<p>
+Upon return of the function, <code>pValue</code> is either <tt class="constant">NULL</tt> or it
+contains a reference to the return value of the function.  Be sure to
+release the reference after examining the value.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.2 beyond Very High"
+  href="lower-level-embedding.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. embedding Python in"
+  href="embedding.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.4 extending Embedded Python"
+  href="extending-with-embedding.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="lower-level-embedding.html">5.2 Beyond Very High</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="embedding.html">5. Embedding Python in</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="extending-with-embedding.html">5.4 Extending Embedded Python</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

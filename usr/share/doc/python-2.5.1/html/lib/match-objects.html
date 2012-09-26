@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node49.html" />
+<link rel="prev" href="re-objects.html" />
+<link rel="parent" href="module-re.html" />
+<link rel="next" href="node49.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.2.5 Match Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.2.4 regular Expression Objects"
+  href="re-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4.2 re  "
+  href="module-re.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.2.6 Examples"
+  href="node49.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="re-objects.html">4.2.4 Regular Expression Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-re.html">4.2 re  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node49.html">4.2.6 Examples</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION006250000000000000000"></a><a name="match-objects"></a>
+<br>
+4.2.5 Match Objects 
+</h2>
+
+<p>
+<tt class="class">MatchObject</tt> instances support the following methods and
+attributes:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-425' xml:id='l2h-425' class="method">expand</tt></b>(</nobr></td>
+  <td><var>template</var>)</td></tr></table></dt>
+<dd>
+ Return the string obtained by doing backslash substitution on the
+template string <var>template</var>, as done by the <tt class="method">sub()</tt> method.
+Escapes such as "<tt class="samp">\n</tt>" are converted to the appropriate
+characters, and numeric backreferences ("<tt class="samp">\1</tt>", "<tt class="samp">\2</tt>") and
+named backreferences ("<tt class="samp">\g&lt;1&gt;</tt>", "<tt class="samp">\g&lt;name&gt;</tt>") are replaced
+by the contents of the corresponding group.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-426' xml:id='l2h-426' class="method">group</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>group1, ...</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns one or more subgroups of the match.  If there is a single
+argument, the result is a single string; if there are
+multiple arguments, the result is a tuple with one item per argument.
+Without arguments, <var>group1</var> defaults to zero (the whole match
+is returned).
+If a <var>groupN</var> argument is zero, the corresponding return value is the
+entire matching string; if it is in the inclusive range [1..99], it is
+the string matching the corresponding parenthesized group.  If a
+group number is negative or larger than the number of groups defined
+in the pattern, an <tt class="exception">IndexError</tt> exception is raised.
+If a group is contained in a part of the pattern that did not match,
+the corresponding result is <code>None</code>.  If a group is contained in a
+part of the pattern that matched multiple times, the last match is
+returned.
+
+<p>
+If the regular expression uses the <tt class="regexp">(?P&lt;<var>name</var>&gt;...)</tt> syntax,
+the <var>groupN</var> arguments may also be strings identifying groups by
+their group name.  If a string argument is not used as a group name in
+the pattern, an <tt class="exception">IndexError</tt> exception is raised.
+
+<p>
+A moderately complicated example:
+
+<p>
+<div class="verbatim"><pre>
+m = re.match(r"(?P&lt;int&gt;\d+)\.(\d*)", '3.14')
+</pre></div>
+
+<p>
+After performing this match, <code>m.group(1)</code> is <code>'3'</code>, as is
+<code>m.group('int')</code>, and <code>m.group(2)</code> is <code>'14'</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-427' xml:id='l2h-427' class="method">groups</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>default</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a tuple containing all the subgroups of the match, from 1 up to
+however many groups are in the pattern.  The <var>default</var> argument is
+used for groups that did not participate in the match; it defaults to
+<code>None</code>.  (Incompatibility note: in the original Python 1.5
+release, if the tuple was one element long, a string would be returned
+instead.  In later versions (from 1.5.1 on), a singleton tuple is
+returned in such cases.)
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-428' xml:id='l2h-428' class="method">groupdict</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>default</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a dictionary containing all the <em>named</em> subgroups of the
+match, keyed by the subgroup name.  The <var>default</var> argument is
+used for groups that did not participate in the match; it defaults to
+<code>None</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-429' xml:id='l2h-429' class="method">start</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>group</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-430' xml:id='l2h-430' class="method">end</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>group</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>Return the indices of the start and end of the substring
+matched by <var>group</var>; <var>group</var> defaults to zero (meaning the whole
+matched substring).
+Return <code>-1</code> if <var>group</var> exists but
+did not contribute to the match.  For a match object
+<var>m</var>, and a group <var>g</var> that did contribute to the match, the
+substring matched by group <var>g</var> (equivalent to
+<code><var>m</var>.group(<var>g</var>)</code>) is
+
+<p>
+<div class="verbatim"><pre>
+m.string[m.start(g):m.end(g)]
+</pre></div>
+
+<p>
+Note that
+<code>m.start(<var>group</var>)</code> will equal <code>m.end(<var>group</var>)</code> if
+<var>group</var> matched a null string.  For example, after <code><var>m</var> =
+re.search('b(c?)', 'cba')</code>, <code><var>m</var>.start(0)</code> is 1,
+<code><var>m</var>.end(0)</code> is 2, <code><var>m</var>.start(1)</code> and
+<code><var>m</var>.end(1)</code> are both 2, and <code><var>m</var>.start(2)</code> raises
+an <tt class="exception">IndexError</tt> exception.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-431' xml:id='l2h-431' class="method">span</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>group</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+For <tt class="class">MatchObject</tt> <var>m</var>, return the 2-tuple
+<code>(<var>m</var>.start(<var>group</var>), <var>m</var>.end(<var>group</var>))</code>.
+Note that if <var>group</var> did not contribute to the match, this is
+<code>(-1, -1)</code>.  Again, <var>group</var> defaults to zero.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-432' xml:id='l2h-432' class="member">pos</tt></b></dt>
+<dd>
+The value of <var>pos</var> which was passed to the <tt class="function">search()</tt> or
+<tt class="function">match()</tt> method of the <tt class="class">RegexObject</tt>.  This is the
+index into the string at which the RE engine started looking for a
+match.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-433' xml:id='l2h-433' class="member">endpos</tt></b></dt>
+<dd>
+The value of <var>endpos</var> which was passed to the <tt class="function">search()</tt>
+or <tt class="function">match()</tt> method of the <tt class="class">RegexObject</tt>.  This is the
+index into the string beyond which the RE engine will not go.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-434' xml:id='l2h-434' class="member">lastindex</tt></b></dt>
+<dd>
+The integer index of the last matched capturing group, or <code>None</code>
+if no group was matched at all. For example, the expressions
+<tt class="regexp">(a)b</tt>, <tt class="regexp">((a)(b))</tt>, and <tt class="regexp">((ab))</tt> will have
+<code>lastindex == 1</code> if applied to the string <code>'ab'</code>,
+while the expression <tt class="regexp">(a)(b)</tt> will have <code>lastindex == 2</code>,
+if applied to the same string.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-435' xml:id='l2h-435' class="member">lastgroup</tt></b></dt>
+<dd>
+The name of the last matched capturing group, or <code>None</code> if the
+group didn't have a name, or if no group was matched at all.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-436' xml:id='l2h-436' class="member">re</tt></b></dt>
+<dd>
+The regular expression object whose <tt class="method">match()</tt> or
+<tt class="method">search()</tt> method produced this <tt class="class">MatchObject</tt> instance.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-437' xml:id='l2h-437' class="member">string</tt></b></dt>
+<dd>
+The string passed to <tt class="function">match()</tt> or <tt class="function">search()</tt>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.2.4 regular Expression Objects"
+  href="re-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4.2 re  "
+  href="module-re.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.2.6 Examples"
+  href="node49.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="re-objects.html">4.2.4 Regular Expression Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-re.html">4.2 re  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node49.html">4.2.6 Examples</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

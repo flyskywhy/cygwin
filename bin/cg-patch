@@ -1,0 +1,585 @@
+#!/usr/bin/env bash
+#
+# Apply a patch from a file, standard input, or a commit
+# Copyright (c) Petr Baudis, 2005
+#
+# Apply a patch in a manner similar to the 'patch' tool, but while also
+# handling the Git extensions to the diff format: file mode changes, file
+# renames, distinguishing removal of files and empty files, etc. Newly
+# created files are automatically `cg-add`ed and removed files are
+# `cg-rm`oved.
+#
+# `cg-patch` can also automatically commit the applied patches and extract
+# patches from existing commits, therefore effectively enabling you to
+# 'cherrypick' certain changes from a different branch.
+#
+# In comparison with the 'git apply' tool, `cg-patch` will also apply
+# fuzzy patches.
+#
+# OPTIONS
+# -------
+# -c:: Automatically commit the patch
+#	Automatically extract the commit message and authorship information
+#	(if provided) from the patch and commit it after applying it
+#	successfully.
+#
+# -C COMMIT:: Cherry-pick the given commit
+#	Instead of applying a patch from stdin, apply and commit the patch
+#	introduced by the given commit. This is basically an extension of
+#	`cg-commit -c`, it also applies the commit diff.
+#
+#	In combination with '-R', this does the opposite - it will revert
+#	the given commit and then try to commit a revert commit - it will
+#	prefill the headline and open the commit editor for you to write
+#	further details.
+#
+#	Note that even though this is functionally equivalent to the
+#	cherry-picking concept present in other version control systems,
+#	this does not play very well together with regular merges and if
+#	you both cherry-pick and merge between two branches, the picking
+#	may increase the number of conflicts you will get when merging.
+#
+# -d DIRNAME:: Apply all patches in directory
+#	Instead of applying a patch from stdin, apply and separately commit
+#	all patches in the specified directory. This can be used to import
+#	a range of patches made by `cg-mkpatch -d`. Implies '-c'.
+#
+# -e:: Edit commit message before committing
+#	Edit the commit message before performing a commit. Makes sense
+#	only with '-c' or other options implying '-c' (e.g. '-m').
+#
+# -m:: Apply patches in a mailbox
+#	Applies series of patches in a mailbox fed to the command's
+#	standard input. Implies '-c'.
+#
+# -pN:: Strip path to the level N
+#	Strip path of filenames in the diff to the level N. This works
+#	exactly the same as in the `patch` tool except that the default
+#	strip level is not infinite but 1 (or more if you are in a
+#	subdirectory; in short, `cg-diff | cg-patch -R` and such always
+#	works).
+#
+# -R:: Apply in reverse
+#	Apply the patch in reverse (therefore effectively unapply it).
+#	Implies '-e' except when the input is not a tty.
+#
+# --resolved:: Resume -d or -m after conflicts were resolved
+#	In case the patch series application failed in the middle and
+#	you resolved the situation, running cg-patch with with the '-d' or '-m'
+#	argument as well as '--resolved' will cause it to pick up where it
+#	dropped off and go on applying. (This includes committing the failed
+#	patch; do not commit it on your own!) (For '-m', you don't need to
+#	feed the mailbox on stdin anymore.)
+#
+# -s, --signoff[=STRING]:: Automatically append a sign off line
+#	Add Signed-off-by line at the end of the commit message when
+#	autocommitting (-c, -C, -d or -m). Optionally, specify the exact name
+#	and email to sign off with by passing:
+#	`--signoff="Author Name <user@example.com>"`.
+#
+# -u:: Assume unified diff instead of GIT diff
+#	Make `cg-patch` assume the patch on the input is a classic unified
+#	diff instead of a diff produced by GIT or Cogito. This means only
+#	that file adds and removals will be recorded even if the patch file
+#	does not explicitly describe them. Use this if the patch was not
+#	produced by `cg-diff` or similar but by a traditional `diff` tool.
+#
+# Takes the diff on stdin (unless specified otherwise).
+
+# Testsuite: TODO
+
+USAGE="cg-patch [-c] [-C COMMIT] [-pN] [-R] [-m | -d DIR] [OTHER_OPTIONS] < PATCH"
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+set -m # Force enable job control for our patch+wait pair
+
+redzone_reset()
+{
+	redzone=
+	origmode=
+	newmode=
+	op=
+}
+
+strip_path()
+{
+	read -r path
+	if [ x"$path" = x"/dev/null" ]; then
+		echo "$path"
+		return
+	fi
+	echo "$path" | sed 's#^\([^/]*/\)\{'$strip'\}##'
+}
+
+redzone_border()
+{
+	[ "$redzone" ] || return
+
+	if [ $strip -gt 0 ] && [ x"$file1" != x"/dev/null" ] &&
+	   [ x"$(echo "$file1" | strip_path)" = x"$file1" ]; then
+		echo "$file1: too shallow a filename for -p$strip, ignoring" >&2
+		return
+	fi
+	if [ $strip -gt 0 ] && [ x"$file2" != x"/dev/null" ] &&
+	   [ x"$(echo "$file2" | strip_path)" = x"$file2" ]; then
+		echo "$file2: too shallow a filename for -p$strip, ignoring" >&2
+		return
+	fi
+
+	local sfile1="${file1#*/}" sfile2="${file2#*/}"
+	if [ $strip -gt 1 ] && [ x"$file1" != x"/dev/null" ] &&
+	   [ "$_git_relpath" ] && [ x"${sfile1#$_git_relpath}" = x"$sfile1" ]; then
+		warn "$file1 was not located in your current subdirectory before stripping"
+	fi
+	if [ $strip -gt 1 ] && [ x"$file2" != x"/dev/null" ] &&
+	   [ "$_git_relpath" ] && [ x"${sfile2#$_git_relpath}" = x"$sfile2" ] &&
+	   [ x"$file2" != x"$file1" ]; then
+		warn "$file2 was not located in your current subdirectory before stripping"
+	fi
+
+	if [ "$op" = "rename" ]; then
+		if ! [ "$reverse" ]; then
+			mvfrom="$(echo "$file1" | strip_path)"
+			mvto="$(echo "$file2" | strip_path)"
+		else
+			mvfrom="$(echo "$file2" | strip_path)"
+			mvto="$(echo "$file1" | strip_path)"
+		fi
+		if [ -e "$mvto" ]; then
+			echo "$file1: rename destination $file2 already exists, NOT RENAMING" >&2
+			return
+		fi
+		# FIXME: Remove stale empty directories related to $mvfrom
+		case $mvto in */*) mkdir -p "${mvto%/*}";; esac
+		mv "$mvfrom" "$mvto"
+	fi
+	if [ "$op" = "delete" -o "$op" = "rename" ]; then
+		torm="$(echo "$file1" | strip_path)"
+		if ! [ "$reverse" ]; then
+			(git ls-files | fgrep -qx "$torm") && echo -ne "rm\0$torm\0"
+			if [ "$op" != "rename" ]; then
+				redzone_reset
+				return
+			fi
+		else
+			(git ls-files | fgrep -qx "$torm") || echo -ne "add\0$torm\0"
+		fi
+	fi
+	if [ "$op" = "add" -o "$op" = "rename" ]; then
+		toadd="$(echo "$file2" | strip_path)"
+		if ! [ "$reverse" ]; then
+			(git ls-files | fgrep -qx "$toadd") || echo -ne "add\0$toadd\0"
+		else
+			(git ls-files | fgrep -qx "$toadd") && echo -ne "rm\0$toadd\0"
+			if [ "$op" != "rename" ]; then
+				redzone_reset
+				return
+			fi
+		fi
+	fi
+
+	if [ "$origmode" != "$newmode" ]; then
+		if ! [ "$reverse" ]; then
+			tocm=$(echo "$file2" | strip_path)
+			mode="$newmode"
+		else
+			tocm=$(echo "$file1" | strip_path)
+			mode="$origmode"
+		fi
+		echo -ne "cm\0 $mode\000$tocm\0"
+	fi
+
+	redzone_reset
+}
+
+
+lookover_patch()
+{
+	local file="$1" where="$2"
+	local author="$(sed -n '/^\(---\|-- \)$/,$p' < "$file" | sed -n '/^author /p')"
+	[ "$author" ] || warn "no author info found$where, assuming your authorship"
+	eval "$(echo "$author" | pick_author)"
+}
+
+commit_patch()
+{
+	local file="$1"
+	local -a ciargs=()
+	[ -z "$signoff" ] || ciargs[${#ciargs[@]}]="$signoff"
+	[ -z "$edit" ] || ciargs[${#ciargs[@]}]="$edit"
+	# FIXME: -e is broken, it won't pre-fill the message
+	sed '/^\(---\|-- \|diff --git .*\)$/,$d' < "$file" | cg-commit "${ciargs[@]}"
+}
+
+resume_filter()
+{
+	sed "0,/\/$(echo "$lastpatch" | sed 's#/#\\/#g')$/d"
+}
+
+
+parse_mail_info()
+{
+	local patch="$1"
+	while read line; do
+		case $line in
+		Author:*)
+			export GIT_AUTHOR_NAME="${line#* }";;
+		Email:*)
+			export GIT_AUTHOR_EMAIL="${line#* }";;
+		Date:*)
+			export GIT_AUTHOR_DATE="${line#* }";;
+		Subject:*)
+			mi_subj="${line#* }";;
+		esac
+	done <"$resume/i/$patch"
+}
+
+# Assuming that parse_mail_info() has been already ran on the patch.
+commit_mail_patch()
+{
+	local patch="$1"
+	local -a ciargs=()
+	[ -z "$signoff" ] || ciargs[${#ciargs[@]}]="$signoff"
+	[ -z "$edit" ] || ciargs[${#ciargs[@]}]="$edit"
+	cg-commit -m"$mi_subj" -M"$resume/m/$patch" "${ciargs[@]}"
+}
+
+
+patchargs=()
+commitid=
+commit=
+mbox=
+commitdir=
+strip=$((1+$(echo "$_git_relpath" | tr -cd / | wc -c)))
+reverse=
+resolved=
+signoff=
+edit=
+unidiff=
+while optparse; do
+	if optparse -C=; then
+		commitid="$(cg-object-id -c "$OPTARG")" || exit 1
+		commitparent="$(cg-object-id -p "$commitid")" || exit 1
+		[ -z "$commitparent" ] && die "cannot pick initial commit"
+		[ "$(echo "$commitparent" | wc -l)" -gt 1 ] &&
+			die "refusing to pick merge commits"
+
+	elif optparse -c; then
+		commit=1
+
+	elif optparse -d=; then
+		commitdir="$(echo "$OPTARG" | sed 's,/*$,,')"
+		[ -d "$commitdir" ] || die "$commitdir: not a directory"
+
+	elif optparse -m; then
+		mbox=1
+
+	elif optparse -p=; then
+		strip="$OPTARG"
+		[ -n "$(echo "$strip" | tr -d 0-9)" ] &&
+			die "the -p argument must be numeric"
+		patchargs[${#patchargs[@]}]="-p$strip"
+
+	elif optparse --resolved; then
+		resolved=1
+
+	elif optparse -R; then
+		reverse=1
+		patchargs[${#patchargs[@]}]="-R"
+
+	elif optparse -s || optparse --signoff; then
+		[ "$signoff" ] || signoff="--signoff=$(git var GIT_AUTHOR_IDENT | sed 's/> .*/>/')"
+
+	elif optparse --signoff=; then
+		signoff="--signoff=$OPTARG"
+
+	elif optparse -e; then
+		edit="-e"
+
+	elif optparse -u; then
+		unidiff=1
+		patchargs[${#patchargs[@]}]="-u"
+
+	else
+		optfail
+	fi
+done
+
+
+[ "$resolved" ] && [ -z "$commitdir" ] && [ -z "$mbox" ] &&
+	die "--resolved can be passed only with -d"
+
+
+if [ "$commitid" ] || [ "$commit" ] || [ "$commitdir" ] || [ "$mbox" ]; then
+	[ "$_git_relpath" ] && die "must be ran from project root"
+
+	if [ "$commitid" ]; then
+		[ "$unidiff" ] && die "-u does not make sense here"
+		[ $strip -ne 1 ] && die "-p does not make sense here"
+
+		files="$(mktemp -t gitpatch.XXXXXX)"
+		git diff-tree -m -r "$commitparent" "$commitid" | cut -f 2- >"$files"
+		if [ -n "$(git diff-index -m -r HEAD | cut -f 2- | join "$files" -)" ]; then
+			rm "$files"
+			die "cherry-pick blocked by local changes"
+		fi
+		eval "afiles=($(cat "$files" | sed -e 's/"\|\\/\\&/g' -e 's/^.*$/"&"/'))"
+		rm "$files"
+
+		ciargs=()
+		if ! [ "$reverse" ]; then
+			ciargs=(-c "$commitid")
+		else
+			ciargs=(-m "Revert ${commitid:0:12}")
+			if tty -s; then
+				ciargs[${#ciargs[@]}]="-e"
+			fi
+			reverse=-R
+		fi
+		[ -z "$signoff" ] || ciargs[${#ciargs[@]}]="$signoff"
+		[ -z "$edit" ] || ciargs[${#ciargs[@]}]="$edit"
+
+		if ! cg-diff -p -r "$commitid" | cg-patch "${patchargs[@]}"; then
+			echo "Cherry-picking $commitid failed, please fix up the rejects." >&2
+			echo "You can use cg-commit -c $commitid to commit afterwards (that will" >&2
+			echo "reuse the commit message and authorship); throw in -e to add own comments." >&2
+			exit 1
+		fi
+		cg-commit "${ciargs[@]}" "${afiles[@]}"
+	fi
+
+	if [ "$commit" ]; then
+		[ "$reverse" ] && die "cannot do -R here"
+
+		[ "$(git diff-index -m -r HEAD)" ] &&
+			die "cannot auto-commit patches when the tree has local changes"
+		file="$(mktemp -t gitpatch.XXXXXX)"
+		cat >"$file"
+		lookover_patch "$file"
+		cg-patch "${patchargs[@]}" <"$file" || exit 1
+		commit_patch "$file"
+		rm "$file"
+	fi
+
+	if [ "$commitdir" ]; then
+		[ "$reverse" ] && die "cannot do -R here"
+
+		resume="$commitdir/.cg-patch-resume"
+		if [ -s "$resume" ]; then
+			if [ ! "$resolved" ]; then
+				echo "cg-patch: previous import in progress" >&2
+				echo "Use --resolved to resume after conflicts." >&2
+				echo "Cancel the resume by deleting $resume" >&2
+				exit 1
+			fi
+
+			echo "Resuming import of $commitdir:"
+			filter=resume_filter
+
+			lastpatch="$(cat "$resume")"
+			echo "* $lastpatch"
+			commit_patch "$commitdir/$lastpatch"
+			rm -f "$resume"
+
+		elif ! git update-index --refresh >/dev/null || [ "$(git diff-index -m -r HEAD)" ]; then
+			die "cannot auto-commit patches when the tree has local changes"
+
+		else
+			echo "Importing $commitdir:"
+			filter=cat
+		fi
+
+		find "$commitdir" -name '[0-9]*-*' | sort | "$filter" | \
+		while read -r file; do
+			echo "* ${file#$commitdir/}"
+			lookover_patch "$file" " in $file"
+			if ! cg-patch "${patchargs[@]}" < "$file"; then
+				echo "${file#$commitdir/}" > "$resume"
+				echo "cg-patch: conflicts during import" >&2
+				echo "Rerun cg-patch with the -d... --resolved arguments to resume after resolving them." >&2
+				echo "Cancel the resume by deleting $resume" >&2
+				exit 1
+			fi
+			commit_patch "$file"
+		done
+	fi
+
+	if [ "$mbox" ]; then
+		[ "$reverse" ] && die "cannot do -R here"
+
+		resume="$_git/info/cg-patch-mresume"
+		if [ -d "$resume" ]; then
+			if [ ! "$resolved" ]; then
+				echo "cg-patch: previous import in progress" >&2
+				echo "Use --resolved to resume after conflicts." >&2
+				echo "Cancel the resume by deleting $resume" >&2
+				exit 1
+			fi
+
+			echo "Resuming import of mailbox:"
+
+			lastpatch="$(cat "$resume/last")"
+			parse_mail_info "$lastpatch"
+			echo
+			echo "* $lastpatch $mi_subj"
+			commit_mail_patch "$lastpatch"
+			rm "$resume/a/$lastpatch"
+
+		elif ! git update-index --refresh >/dev/null || [ "$(git diff-index -m -r HEAD)" ]; then
+			die "cannot auto-commit patches when the tree has local changes"
+
+		else
+			echo "Importing mailbox:"
+			mkdir -p "$resume" || exit 1
+			mkdir -p "$resume/a"
+			mkdir -p "$resume/i"
+			mkdir -p "$resume/m"
+			mkdir -p "$resume/p"
+			git mailsplit -o"$resume/a" >/dev/null
+		fi
+
+		for patch in "$resume"/a/*; do
+			patch="${patch#$resume/a/}"
+			[ "$patch" = "*" ] && break # Out of patches
+			echo "$patch" >"$resume/last"
+			git mailinfo "$resume/m/$patch" "$resume/p/$patch" \
+				<"$resume/a/$patch" >"$resume/i/$patch"
+			parse_mail_info "$patch"
+			echo
+			echo "* $patch $mi_subj"
+			if ! cg-patch "${patchargs[@]}" < "$resume/p/$patch"; then
+				echo "cg-patch: conflicts during import" >&2
+				echo "Rerun cg-patch with the -m --resolved arguments to resume after resolving them." >&2
+				echo "Cancel the resume by deleting $resume" >&2
+				exit 1
+			fi
+			commit_mail_patch "$patch"
+			rm "$resume/a/$patch"
+		done
+
+		rm -r "$resume"
+	fi
+
+	exit
+fi
+
+
+# We want to run patch in the subdirectory and at any rate protect other
+# parts of the tree from inadverent pollution.
+[ -n "$_git_relpath" ] && cd "$_git_relpath"
+
+
+[ "$unidiff" ] && newsfile="$(mktemp -t gitapply.XXXXXX)"
+gonefile="$(mktemp -t gitapply.XXXXXX)"
+todo="$(mktemp -t gitapply.XXXXXX)"
+patchout="$(mktemp -t gitapply.XXXXXX)"
+patchfifo="$(mktemp -t gitapply.XXXXXX)"
+rm "$patchfifo" && mkfifo -m 600 "$patchfifo"
+
+[ "$unidiff" ] && git ls-files --others >"$newsfile"
+git ls-files --deleted >"$gonefile"
+
+# patch file removal behaviour cannot be sensibly controlled, so we
+# just handle it all ourselves.
+patch_args="-p$strip -N"
+[ "$reverse" ] && patch_args="$patch_args -R"
+patch $patch_args <"$patchfifo" >"$patchout" 2>&1 &
+
+tee "$patchfifo" | {
+	redzone_reset
+
+	while read -r line; do
+		if [ "${line:0:10}" = "diff --git" ]; then
+			redzone_border
+
+			# The diff line is fundamentally unsafe wrt. spaces,
+			# nothing we can do here.
+			cmd="$(echo "$line" | sed 's/^diff --git //')"
+			# TODO: Simplify.
+			file1="$(bash -c 'echo $1' padding $cmd)"
+			file2="$(bash -c 'echo $2' padding $cmd)"
+
+			redzone=1
+			continue
+		fi
+
+		if [ "$redzone" ] && [ "${line#[nodcr]}" != "$line" ]; then
+			# Copy support is impossible without complete rewrite
+			# since we need to copy _first_ then apply the patch
+			# to the copy.
+			meta="$(echo "$line" | sed -ne '
+				s/^deleted file mode \([0-9]*\).*$/D-\1/p
+				s/^old mode \([0-9]*\).*$/-\1/p
+				s/^new file mode \([0-9]*\).*$/A+\1/p
+				s/^new mode \([0-9]*\).*$/+\1/p
+				s/^rename from /RD/p
+				s/^rename to /RA/p
+			')"
+			if [ "${meta:0:1}" = "D" ]; then
+				op=delete
+				meta="${meta:1}"
+			elif [ "${meta:0:1}" = "A" ]; then
+				op=add
+				meta="${meta:1}"
+			fi
+			if [ "${meta:0:1}" = "-" ]; then
+				origmode="${meta:1}"
+			elif [ "${meta:0:1}" = "+" ]; then
+				newmode="${meta:1}"
+			fi
+			# We will reset file1 and file2 since we have them
+			# in whitespace-safe form here.
+			if [ "${meta:0:2}" = "RD" ]; then
+				op=rename
+				file1="a/${meta:2}"
+			elif [ "${meta:0:2}" = "RA" ]; then
+				op=rename
+				file2="b/${meta:2}"
+			fi
+			continue
+		fi
+	done
+	redzone_border
+} >$todo
+
+wait %1; ret=$?
+cat "$patchout"
+
+IFS=$'\n' emptyfiles=($(git ls-files --deleted | join -v 2 "$gonefile" -))
+if [ "$unidiff" ]; then
+	[ "${emptyfiles[*]}" ] && cg-rm "${emptyfiles[@]}"
+	IFS=$'\n' freshfiles=($(git ls-files --others | join -v 2 "$newsfile" -))
+	[ "${freshfiles[*]}" ] && cg-add "${freshfiles[@]}"
+else
+	# Now we just recreate all the supposedly deleted files and
+	# kill only those who really are gone.
+	#
+	# This is done on the assumption that we are never going to have
+	# too many files deleted in the first place anyway.
+	[ "${emptyfiles[*]}" ] && touch "${emptyfiles[@]}"
+fi
+
+cat "$todo" | xargs -0 bash -c '
+while [ "$1" ]; do
+	op="$1"; shift;
+	case "$op" in
+	"add") cg-add "$1"; shift;;
+	"rm")  cg-rm -f "$1"; shift;;
+	"cm")
+		mode="$1"; shift
+		# $mode contains leading space due to echo braindamage
+		if [ "${mode:(-3):1}" = "7" ]; then
+			mask="$(printf %o $((8#777&~8#$(umask))))"
+		else
+			mask="$(printf %o $((8#666&~8#$(umask))))"
+		fi
+		chmod "$mask" "$1"; shift;;
+	esac
+done
+' padding
+
+rm "$patchfifo" "$todo" "$gonefile" "$patchout"
+[ "$unidiff" ] && rm "$newsfile"
+
+exit $ret

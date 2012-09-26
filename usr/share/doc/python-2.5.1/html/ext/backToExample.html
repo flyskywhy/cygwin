@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="methodTable.html" />
+<link rel="prev" href="errors.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="methodTable.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.3 Back to the Example
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.2 Intermezzo: errors and"
+  href="errors.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.4 the Module's Method"
+  href="methodTable.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="errors.html">1.2 Intermezzo: Errors and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="methodTable.html">1.4 The Module's Method</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION003300000000000000000"></a><a name="backToExample"></a>
+<br>
+1.3 Back to the Example
+         
+</h1>
+
+<p>
+Going back to our example function, you should now be able to
+understand this statement:
+
+<p>
+<div class="verbatim"><pre>
+    if (!PyArg_ParseTuple(args, "s", &amp;command))
+        return NULL;
+</pre></div>
+
+<p>
+It returns <tt class="constant">NULL</tt> (the error indicator for functions returning
+object pointers) if an error is detected in the argument list, relying
+on the exception set by <tt class="cfunction">PyArg_ParseTuple()</tt>.  Otherwise the
+string value of the argument has been copied to the local variable
+<tt class="cdata">command</tt>.  This is a pointer assignment and you are not supposed
+to modify the string to which it points (so in Standard C, the variable
+<tt class="cdata">command</tt> should properly be declared as "<tt class="samp">const char
+*command</tt>").
+
+<p>
+The next statement is a call to the <span class="Unix">Unix</span> function
+<tt class="cfunction">system()</tt>, passing it the string we just got from
+<tt class="cfunction">PyArg_ParseTuple()</tt>:
+
+<p>
+<div class="verbatim"><pre>
+    sts = system(command);
+</pre></div>
+
+<p>
+Our <tt class="function">spam.system()</tt> function must return the value of
+<tt class="cdata">sts</tt> as a Python object.  This is done using the function
+<tt class="cfunction">Py_BuildValue()</tt>, which is something like the inverse of
+<tt class="cfunction">PyArg_ParseTuple()</tt>: it takes a format string and an
+arbitrary number of C values, and returns a new Python object.
+More info on <tt class="cfunction">Py_BuildValue()</tt> is given later.
+
+<p>
+<div class="verbatim"><pre>
+    return Py_BuildValue("i", sts);
+</pre></div>
+
+<p>
+In this case, it will return an integer object.  (Yes, even integers
+are objects on the heap in Python!)
+
+<p>
+If you have a C function that returns no useful argument (a function
+returning <tt class="ctype">void</tt>), the corresponding Python function must return
+<code>None</code>.   You need this idiom to do so (which is implemented by the
+Py_RETURN_NONE macro):
+
+<p>
+<div class="verbatim"><pre>
+    Py_INCREF(Py_None);
+    return Py_None;
+</pre></div>
+
+<p>
+<tt class="cdata">Py_None</tt> is the C name for the special Python object
+<code>None</code>.  It is a genuine Python object rather than a <tt class="constant">NULL</tt>
+pointer, which means ``error'' in most contexts, as we have seen.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.2 Intermezzo: errors and"
+  href="errors.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.4 the Module's Method"
+  href="methodTable.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="errors.html">1.2 Intermezzo: Errors and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="methodTable.html">1.4 The Module's Method</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

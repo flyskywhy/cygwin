@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="processControl.html" />
+<link rel="prev" href="utilities.html" />
+<link rel="parent" href="utilities.html" />
+<link rel="next" href="processControl.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.1 Operating System Utilities </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5. Utilities"
+  href="utilities.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. Utilities"
+  href="utilities.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.2 process Control"
+  href="processControl.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="utilities.html">5. Utilities</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="utilities.html">5. Utilities</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="processControl.html">5.2 Process Control</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION007100000000000000000"></a><a name="os"></a>
+<br>
+5.1 Operating System Utilities 
+</h1>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-158' xml:id='l2h-158' class="cfunction">Py_FdIsInteractive</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>)</td></tr></table></dt>
+<dd>
+  Return true (nonzero) if the standard I/O file <var>fp</var> with name
+  <var>filename</var> is deemed interactive.  This is the case for files
+  for which "<tt class="samp">isatty(fileno(<var>fp</var>))</tt>" is true.  If the global
+  flag <tt class="cdata">Py_InteractiveFlag</tt> is true, this function also returns
+  true if the <var>filename</var> pointer is <tt class="constant">NULL</tt> or if the name is
+  equal to one of the strings <code>'&lt;stdin&gt;'</code> or <code>'???'</code>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>long&nbsp;<b><tt id='l2h-159' xml:id='l2h-159' class="cfunction">PyOS_GetLastModificationTime</tt></b>(</nobr></td><td>char *<var>filename</var>)</td></tr></table></dt>
+<dd>
+  Return the time of last modification of the file <var>filename</var>.
+  The result is encoded in the same way as the timestamp returned by
+  the standard C library function <tt class="cfunction">time()</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>void&nbsp;<b><tt id='l2h-160' xml:id='l2h-160' class="cfunction">PyOS_AfterFork</tt></b>(</nobr></td><td>)</td></tr></table></dt>
+<dd>
+  Function to update some internal state after a process fork; this
+  should be called in the new process if the Python interpreter will
+  continue to be used.  If a new executable is loaded into the new
+  process, this function does not need to be called.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-161' xml:id='l2h-161' class="cfunction">PyOS_CheckStack</tt></b>(</nobr></td><td>)</td></tr></table></dt>
+<dd>
+  Return true when the interpreter runs out of stack space.  This is a
+  reliable check, but is only available when <tt class="constant">USE_STACKCHECK</tt>
+  is defined (currently on Windows using the Microsoft Visual C++
+  compiler).  <tt class="constant">USE_STACKCHECK</tt> will be
+  defined automatically; you should never change the definition in
+  your own code.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyOS_sighandler_t&nbsp;<b><tt id='l2h-162' xml:id='l2h-162' class="cfunction">PyOS_getsig</tt></b>(</nobr></td><td>int <var>i</var>)</td></tr></table></dt>
+<dd>
+  Return the current signal handler for signal <var>i</var>.  This is a
+  thin wrapper around either <tt class="cfunction">sigaction()</tt> or
+  <tt class="cfunction">signal()</tt>.  Do not call those functions directly!
+  <tt class="ctype">PyOS_sighandler_t</tt> is a typedef alias for <tt class="ctype">void
+  (*)(int)</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyOS_sighandler_t&nbsp;<b><tt id='l2h-163' xml:id='l2h-163' class="cfunction">PyOS_setsig</tt></b>(</nobr></td><td>int <var>i</var>, PyOS_sighandler_t <var>h</var>)</td></tr></table></dt>
+<dd>
+  Set the signal handler for signal <var>i</var> to be <var>h</var>; return the
+  old signal handler.  This is a thin wrapper around either
+  <tt class="cfunction">sigaction()</tt> or <tt class="cfunction">signal()</tt>.  Do not call those
+  functions directly!  <tt class="ctype">PyOS_sighandler_t</tt> is a typedef alias
+  for <tt class="ctype">void (*)(int)</tt>.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5. Utilities"
+  href="utilities.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. Utilities"
+  href="utilities.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.2 process Control"
+  href="processControl.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="utilities.html">5. Utilities</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="utilities.html">5. Utilities</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="processControl.html">5.2 Process Control</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

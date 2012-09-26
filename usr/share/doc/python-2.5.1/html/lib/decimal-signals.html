@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="decimal-notes.html" />
+<link rel="prev" href="decimal-decimal.html" />
+<link rel="parent" href="module-decimal.html" />
+<link rel="next" href="decimal-notes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.4 Signals </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.3 context objects"
+  href="decimal-decimal.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-decimal.html">6.3.3 Context objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION008340000000000000000"></a><a name="decimal-signals"></a>
+<br>
+6.3.4 Signals 
+</h2>
+
+<p>
+Signals represent conditions that arise during computation.
+Each corresponds to one context flag and one context trap enabler.
+
+<p>
+The context flag is incremented whenever the condition is encountered.
+After the computation, flags may be checked for informational
+purposes (for instance, to determine whether a computation was exact).
+After checking the flags, be sure to clear all flags before starting
+the next computation.
+
+<p>
+If the context's trap enabler is set for the signal, then the condition
+causes a Python exception to be raised.  For example, if the
+<tt class="class">DivisionByZero</tt> trap is set, then a <tt class="exception">DivisionByZero</tt>
+exception is raised upon encountering the condition.
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1025' xml:id='l2h-1025' class="class">Clamped</tt></b>
+<dd>
+    Altered an exponent to fit representation constraints.
+
+<p>
+Typically, clamping occurs when an exponent falls outside the context's
+    <tt class="member">Emin</tt> and <tt class="member">Emax</tt> limits.  If possible, the exponent is
+    reduced to fit by adding zeroes to the coefficient.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1026' xml:id='l2h-1026' class="class">DecimalException</tt></b>
+<dd>
+    Base class for other signals and a subclass of
+    <tt class="exception">ArithmeticError</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1027' xml:id='l2h-1027' class="class">DivisionByZero</tt></b>
+<dd>
+    Signals the division of a non-infinite number by zero.
+
+<p>
+Can occur with division, modulo division, or when raising a number to a
+    negative power.  If this signal is not trapped, returns
+    <tt class="constant">Infinity</tt> or <tt class="constant">-Infinity</tt> with the sign determined by
+    the inputs to the calculation.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1028' xml:id='l2h-1028' class="class">Inexact</tt></b>
+<dd>
+    Indicates that rounding occurred and the result is not exact.
+
+<p>
+Signals when non-zero digits were discarded during rounding. The rounded
+    result is returned.  The signal flag or trap is used to detect when
+    results are inexact.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1029' xml:id='l2h-1029' class="class">InvalidOperation</tt></b>
+<dd>
+    An invalid operation was performed.
+
+<p>
+Indicates that an operation was requested that does not make sense.
+    If not trapped, returns <tt class="constant">NaN</tt>.  Possible causes include:
+
+<p>
+<div class="verbatim"><pre>
+        Infinity - Infinity
+        0 * Infinity
+        Infinity / Infinity
+        x % 0
+        Infinity % x
+        x._rescale( non-integer )
+        sqrt(-x) and x &gt; 0
+        0 ** 0
+        x ** (non-integer)
+        x ** Infinity
+</pre></div>    
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1030' xml:id='l2h-1030' class="class">Overflow</tt></b>
+<dd>
+    Numerical overflow.
+
+<p>
+Indicates the exponent is larger than <tt class="member">Emax</tt> after rounding has
+    occurred.  If not trapped, the result depends on the rounding mode, either
+    pulling inward to the largest representable finite number or rounding
+    outward to <tt class="constant">Infinity</tt>.  In either case, <tt class="class">Inexact</tt> and
+    <tt class="class">Rounded</tt> are also signaled.   
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1031' xml:id='l2h-1031' class="class">Rounded</tt></b>
+<dd>
+    Rounding occurred though possibly no information was lost.
+
+<p>
+Signaled whenever rounding discards digits; even if those digits are
+    zero (such as rounding <tt class="constant">5.00</tt> to <tt class="constant">5.0</tt>).   If not
+    trapped, returns the result unchanged.  This signal is used to detect
+    loss of significant digits.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1032' xml:id='l2h-1032' class="class">Subnormal</tt></b>
+<dd>
+    Exponent was lower than <tt class="member">Emin</tt> prior to rounding.
+
+<p>
+Occurs when an operation result is subnormal (the exponent is too small).
+    If not trapped, returns the result unchanged.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1033' xml:id='l2h-1033' class="class">Underflow</tt></b>
+<dd>
+    Numerical underflow with result rounded to zero.
+
+<p>
+Occurs when a subnormal result is pushed to zero by rounding.
+    <tt class="class">Inexact</tt> and <tt class="class">Subnormal</tt> are also signaled.
+</dl>
+
+<p>
+The following table summarizes the hierarchy of signals:
+
+<p>
+<div class="verbatim"><pre>    
+    exceptions.ArithmeticError(exceptions.StandardError)
+        DecimalException
+            Clamped
+            DivisionByZero(DecimalException, exceptions.ZeroDivisionError)
+            Inexact
+                Overflow(Inexact, Rounded)
+                Underflow(Inexact, Rounded, Subnormal)
+            InvalidOperation
+            Rounded
+            Subnormal
+</pre></div>            
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.3 context objects"
+  href="decimal-decimal.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.5 floating Point Notes"
+  href="decimal-notes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-decimal.html">6.3.3 Context objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-notes.html">6.3.5 Floating Point Notes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

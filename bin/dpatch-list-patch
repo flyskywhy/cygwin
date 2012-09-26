@@ -1,0 +1,46 @@
+#! /bin/sh
+## dpatch-list-patch -- List available patches
+## (C) 2003 Junichi Uekawa <dancer@debian.org>
+##
+## Released under the terms of the GNU GPLv2.
+
+## Move to likely debian dir
+while ! test -d ./debian -o "$(pwd)" = "/" ; do
+	cd ..;
+done
+
+## Setup defaults
+DPLP_SRCDIR=$(pwd)
+
+## Parse commandline
+dplp_usage ()
+{
+	echo "dpatch-list-patch, list available patches"
+	echo "   usage: dpatch-list-patch [-s|--sourcedir s]"
+}
+
+TEMP=$(getopt -n dpatch-list-patch -l help,sourcedir: -- +hs: "$@")
+
+eval set -- ${TEMP}
+
+while test "$1" != "--"; do
+	case $1 in
+		-s|--sourcedir)
+			shift
+			DPLP_SRCDIR=$1
+			;;
+		-h|--help)
+			dplp_usage
+			exit 0
+			;;
+	esac
+	shift
+done
+
+echo "Patches that would be applied:"
+
+cd ${DPLP_SRCDIR}
+
+dpatch cat-all
+
+# arch-tag: fbd2892f-32fc-4a37-9a4d-8a0772ace95c

@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node350.html" />
+<link rel="prev" href="sqlite3-Types.html" />
+<link rel="parent" href="module-sqlite3.html" />
+<link rel="next" href="node350.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.13.5 Controlling Transactions </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.4.4 default adapters and"
+  href="node348.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13 sqlite3  "
+  href="module-sqlite3.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.6 using pysqlite efficiently"
+  href="node350.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node348.html">13.13.4.4 Default adapters and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sqlite3.html">13.13 sqlite3  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node350.html">13.13.6 Using pysqlite efficiently</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00151350000000000000000"></a><a name="sqlite3-Controlling-Transactions"></a>
+<br>
+13.13.5 Controlling Transactions 
+</h2>
+
+<p>
+By default, the <tt class="module">sqlite3</tt> module opens transactions implicitly before a Data Modification Language (DML) 
+statement (i.e. INSERT/UPDATE/DELETE/REPLACE), and commits transactions implicitly
+before a non-DML, non-query statement (i. e. anything other than
+SELECT/INSERT/UPDATE/DELETE/REPLACE).
+
+<p>
+So if you are within a transaction and issue a command like <code>CREATE TABLE
+...</code>, <code>VACUUM</code>, <code>PRAGMA</code>, the <tt class="module">sqlite3</tt> module will commit implicitly
+before executing that command. There are two reasons for doing that. The first
+is that some of these commands don't work within transactions. The other reason
+is that pysqlite needs to keep track of the transaction state (if a transaction
+is active or not).
+
+<p>
+You can control which kind of "BEGIN" statements pysqlite implicitly executes
+(or none at all) via the <var>isolation_level</var> parameter to the
+<tt class="function">connect</tt> call, or via the <tt class="member">isolation_level</tt> property of
+connections.
+
+<p>
+If you want <strong>autocommit mode</strong>, then set <tt class="member">isolation_level</tt> to None.
+
+<p>
+Otherwise leave it at its default, which will result in a plain "BEGIN"
+statement, or set it to one of SQLite's supported isolation levels: DEFERRED,
+IMMEDIATE or EXCLUSIVE.
+
+<p>
+As the <tt class="module">sqlite3</tt> module needs to keep track of the transaction state, you should
+not use <code>OR ROLLBACK</code> or <code>ON CONFLICT ROLLBACK</code> in your SQL. Instead,
+catch the <tt class="exception">IntegrityError</tt> and call the <tt class="method">rollback</tt> method of
+the connection yourself.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.4.4 default adapters and"
+  href="node348.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13 sqlite3  "
+  href="module-sqlite3.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.6 using pysqlite efficiently"
+  href="node350.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node348.html">13.13.4.4 Default adapters and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sqlite3.html">13.13 sqlite3  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node350.html">13.13.6 Using pysqlite efficiently</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

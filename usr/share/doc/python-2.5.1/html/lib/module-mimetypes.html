@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-MimeWriter.html" />
+<link rel="prev" href="module-mimetools.html" />
+<link rel="parent" href="netdata.html" />
+<link rel="next" href="mimetypes-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.6 mimetypes -- Map filenames to MIME types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.1 additional Methods of"
+  href="mimetools-message-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.6.1 mimetypes Objects"
+  href="mimetypes-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mimetools-message-objects.html">7.5.1 Additional Methods of</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mimetypes-objects.html">7.6.1 MimeTypes Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION009600000000000000000">
+7.6 <tt class="module">mimetypes</tt> --
+         Map filenames to MIME types</a>
+</h1>
+
+<p>
+<a name="module-mimetypes"></a>
+
+<p>
+<a id='l2h-1506' xml:id='l2h-1506'></a>
+<p>
+The <tt class="module">mimetypes</tt> module converts between a filename or URL and
+the MIME type associated with the filename extension.  Conversions are
+provided from filename to MIME type and from MIME type to filename
+extension; encodings are not supported for the latter conversion.
+
+<p>
+The module provides one class and a number of convenience functions.
+The functions are the normal interface to this module, but some
+applications may be interested in the class as well.
+
+<p>
+The functions described below provide the primary interface for this
+module.  If the module has not been initialized, they will call
+<tt class="function">init()</tt> if they rely on the information <tt class="function">init()</tt>
+sets up.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1507' xml:id='l2h-1507' class="function">guess_type</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, strict</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Guess the type of a file based on its filename or URL, given by
+<var>filename</var>.  The return value is a tuple <code>(<var>type</var>,
+<var>encoding</var>)</code> where <var>type</var> is <code>None</code> if the type can't be
+guessed (missing or unknown suffix) or a string of the form
+<code>'<var>type</var>/<var>subtype</var>'</code>, usable for a MIME
+<span class="mailheader">content-type:</span> header<a id='l2h-1508' xml:id='l2h-1508'></a>.
+
+<p>
+<var>encoding</var> is <code>None</code> for no encoding or the name of the
+program used to encode (e.g. <b class="program">compress</b> or <b class="program">gzip</b>).
+The encoding is suitable for use as a <span class="mailheader">Content-Encoding:</span>
+header, <em>not</em> as a <span class="mailheader">Content-Transfer-Encoding:</span> header.
+The mappings are table driven.  Encoding suffixes are case sensitive;
+type suffixes are first tried case sensitively, then case
+insensitively.
+
+<p>
+Optional <var>strict</var> is a flag specifying whether the list of known
+MIME types is limited to only the official types <a class="ulink" href="http://www.isi.edu/in-notes/iana/assignments/media-types"
+  >registered
+with IANA</a>
+are recognized.  When <var>strict</var> is true (the default), only the
+IANA types are supported; when <var>strict</var> is false, some additional
+non-standard but commonly used MIME types are also recognized.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1509' xml:id='l2h-1509' class="function">guess_all_extensions</tt></b>(</nobr></td>
+  <td><var>type</var><big>[</big><var>, strict</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Guess the extensions for a file based on its MIME type, given by
+<var>type</var>.
+The return value is a list of strings giving all possible filename extensions,
+including the leading dot ("<tt class="character">.</tt>").  The extensions are not guaranteed
+to have been associated with any particular data stream, but would be mapped
+to the MIME type <var>type</var> by <tt class="function">guess_type()</tt>.
+
+<p>
+Optional <var>strict</var> has the same meaning as with the
+<tt class="function">guess_type()</tt> function.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1510' xml:id='l2h-1510' class="function">guess_extension</tt></b>(</nobr></td>
+  <td><var>type</var><big>[</big><var>, strict</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Guess the extension for a file based on its MIME type, given by
+<var>type</var>.
+The return value is a string giving a filename extension, including the
+leading dot ("<tt class="character">.</tt>").  The extension is not guaranteed to have been
+associated with any particular data stream, but would be mapped to the 
+MIME type <var>type</var> by <tt class="function">guess_type()</tt>.  If no extension can
+be guessed for <var>type</var>, <code>None</code> is returned.
+
+<p>
+Optional <var>strict</var> has the same meaning as with the
+<tt class="function">guess_type()</tt> function.
+</dl>
+
+<p>
+Some additional functions and data items are available for controlling
+the behavior of the module.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1511' xml:id='l2h-1511' class="function">init</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>files</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Initialize the internal data structures.  If given, <var>files</var> must
+be a sequence of file names which should be used to augment the
+default type map.  If omitted, the file names to use are taken from
+<tt class="constant">knownfiles</tt>.  Each file named in <var>files</var> or
+<tt class="constant">knownfiles</tt> takes precedence over those named before it.
+Calling <tt class="function">init()</tt> repeatedly is allowed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1512' xml:id='l2h-1512' class="function">read_mime_types</tt></b>(</nobr></td>
+  <td><var>filename</var>)</td></tr></table></dt>
+<dd>
+Load the type map given in the file <var>filename</var>, if it exists.  The 
+type map is returned as a dictionary mapping filename extensions,
+including the leading dot ("<tt class="character">.</tt>"), to strings of the form
+<code>'<var>type</var>/<var>subtype</var>'</code>.  If the file <var>filename</var> does
+not exist or cannot be read, <code>None</code> is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1513' xml:id='l2h-1513' class="function">add_type</tt></b>(</nobr></td>
+  <td><var>type, ext</var><big>[</big><var>, strict</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Add a mapping from the mimetype <var>type</var> to the extension <var>ext</var>.
+When the extension is already known, the new type will replace the old
+one. When the type is already known the extension will be added
+to the list of known extensions.
+
+<p>
+When <var>strict</var> is the mapping will added to the official
+MIME types, otherwise to the non-standard ones.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1514' xml:id='l2h-1514'>inited</tt></b></dt>
+<dd>
+Flag indicating whether or not the global data structures have been
+initialized.  This is set to true by <tt class="function">init()</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1515' xml:id='l2h-1515'>knownfiles</tt></b></dt>
+<dd>
+List of type map file names commonly installed.  These files are
+typically named <span class="file">mime.types</span> and are installed in different
+locations by different packages.<a id='l2h-1521' xml:id='l2h-1521'></a>
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1516' xml:id='l2h-1516'>suffix_map</tt></b></dt>
+<dd>
+Dictionary mapping suffixes to suffixes.  This is used to allow
+recognition of encoded files for which the encoding and the type are
+indicated by the same extension.  For example, the <span class="file">.tgz</span>
+extension is mapped to <span class="file">.tar.gz</span> to allow the encoding and type
+to be recognized separately.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1517' xml:id='l2h-1517'>encodings_map</tt></b></dt>
+<dd>
+Dictionary mapping filename extensions to encoding types.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1518' xml:id='l2h-1518'>types_map</tt></b></dt>
+<dd>
+Dictionary mapping filename extensions to MIME types.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1519' xml:id='l2h-1519'>common_types</tt></b></dt>
+<dd>
+Dictionary mapping filename extensions to non-standard, but commonly
+found MIME types.
+</dd></dl>
+
+<p>
+The <tt class="class">MimeTypes</tt> class may be useful for applications which may
+want more than one MIME-type database:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1520' xml:id='l2h-1520' class="class">MimeTypes</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>filenames</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  This class represents a MIME-types database.  By default, it
+  provides access to the same database as the rest of this module.
+  The initial database is a copy of that provided by the module, and
+  may be extended by loading additional <span class="file">mime.types</span>-style files
+  into the database using the <tt class="method">read()</tt> or <tt class="method">readfp()</tt>
+  methods.  The mapping dictionaries may also be cleared before
+  loading additional data if the default data is not desired.
+
+<p>
+The optional <var>filenames</var> parameter can be used to cause
+  additional files to be loaded ``on top'' of the default database.
+
+<p>
+
+<span class="versionnote">New in version 2.2.</span>
+
+</dl>
+
+<p>
+An example usage of the module:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import mimetypes
+&gt;&gt;&gt; mimetypes.init()
+&gt;&gt;&gt; mimetypes.knownfiles
+['/etc/mime.types', '/etc/httpd/mime.types', ... ]
+&gt;&gt;&gt; mimetypes.suffix_map['.tgz']
+'.tar.gz'
+&gt;&gt;&gt; mimetypes.encodings_map['.gz']
+'gzip'
+&gt;&gt;&gt; mimetypes.types_map['.tgz']
+'application/x-tar-gz'
+</pre></div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="mimetypes-objects.html">7.6.1 MimeTypes Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.1 additional Methods of"
+  href="mimetools-message-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.6.1 mimetypes Objects"
+  href="mimetypes-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mimetools-message-objects.html">7.5.1 Additional Methods of</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mimetypes-objects.html">7.6.1 MimeTypes Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

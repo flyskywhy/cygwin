@@ -1,0 +1,490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="countingRefs.html" />
+<link rel="prev" href="intro.html" />
+<link rel="parent" href="api.html" />
+<link rel="next" href="countingRefs.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2. The Very High Level Layer </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.5 debugging Builds"
+  href="debugging.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python/C api Reference Manual"
+  href="api.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3. reference Counting"
+  href="countingRefs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="debugging.html">1.5 Debugging Builds</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api.html">Python/C API Reference Manual</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="countingRefs.html">3. Reference Counting</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION004000000000000000000"></a><a name="veryhigh"></a>
+<br>
+2. The Very High Level Layer 
+</h1>
+
+<p>
+The functions in this chapter will let you execute Python source code
+given in a file or a buffer, but they will not let you interact in a
+more detailed way with the interpreter.
+
+<p>
+Several of these functions accept a start symbol from the grammar as a 
+parameter.  The available start symbols are <tt class="constant">Py_eval_input</tt>,
+<tt class="constant">Py_file_input</tt>, and <tt class="constant">Py_single_input</tt>.  These are
+described following the functions which accept them as parameters.
+
+<p>
+Note also that several of these functions take <tt class="ctype">FILE*</tt>
+parameters.  On particular issue which needs to be handled carefully
+is that the <tt class="ctype">FILE</tt> structure for different C libraries can be
+different and incompatible.  Under Windows (at least), it is possible
+for dynamically linked extensions to actually use different libraries,
+so care should be taken that <tt class="ctype">FILE*</tt> parameters are only passed
+to these functions if it is certain that they were created by the same
+library that the Python runtime is using.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-48' xml:id='l2h-48' class="cfunction">Py_Main</tt></b>(</nobr></td><td>int <var>argc</var>, char **<var>argv</var>)</td></tr></table></dt>
+<dd>
+  The main program for the standard interpreter.  This is made
+  available for programs which embed Python.  The <var>argc</var> and
+  <var>argv</var> parameters should be prepared exactly as those which are
+  passed to a C program's <tt class="cfunction">main()</tt> function.  It is
+  important to note that the argument list may be modified (but the
+  contents of the strings pointed to by the argument list are not).
+  The return value will be the integer passed to the
+  <tt class="function">sys.exit()</tt> function, <code>1</code> if the interpreter exits
+  due to an exception, or <code>2</code> if the parameter list does not
+  represent a valid Python command line.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-49' xml:id='l2h-49' class="cfunction">PyRun_AnyFile</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_AnyFileExFlags()</tt>
+  below, leaving <var>closeit</var> set to <code>0</code> and <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-50' xml:id='l2h-50' class="cfunction">PyRun_AnyFileFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                           PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_AnyFileExFlags()</tt>
+  below, leaving the <var>closeit</var> argument set to <code>0</code>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-51' xml:id='l2h-51' class="cfunction">PyRun_AnyFileEx</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                        int <var>closeit</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_AnyFileExFlags()</tt>
+  below, leaving the <var>flags</var> argument set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-52' xml:id='l2h-52' class="cfunction">PyRun_AnyFileExFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                             int <var>closeit</var>,
+                                             PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+  If <var>fp</var> refers to a file associated with an interactive device
+  (console or terminal input or <span class="Unix">Unix</span> pseudo-terminal), return the
+  value of <tt class="cfunction">PyRun_InteractiveLoop()</tt>, otherwise return the
+  result of <tt class="cfunction">PyRun_SimpleFile()</tt>.  If <var>filename</var> is
+  <tt class="constant">NULL</tt>, this function uses <code>"???"</code> as the filename.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-53' xml:id='l2h-53' class="cfunction">PyRun_SimpleString</tt></b>(</nobr></td><td>const char *<var>command</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_SimpleStringFlags()</tt>
+  below, leaving the <var>PyCompilerFlags*</var> argument set to NULL.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-54' xml:id='l2h-54' class="cfunction">PyRun_SimpleStringFlags</tt></b>(</nobr></td><td>const char *<var>command</var>,
+                                                PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+  Executes the Python source code from <var>command</var> in the
+  <tt class="module">__main__</tt> module according to the <var>flags</var> argument.
+  If <tt class="module">__main__</tt> does not already exist, it is created.  Returns
+  <code>0</code> on success or <code>-1</code> if an exception was raised.  If there
+  was an error, there is no way to get the exception information.
+  For the meaning of <var>flags</var>, see below.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-55' xml:id='l2h-55' class="cfunction">PyRun_SimpleFile</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_SimpleFileExFlags()</tt>
+  below, leaving <var>closeit</var> set to <code>0</code> and <var>flags</var> set to
+  <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-56' xml:id='l2h-56' class="cfunction">PyRun_SimpleFileFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                              PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_SimpleFileExFlags()</tt>
+  below, leaving <var>closeit</var> set to <code>0</code>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-57' xml:id='l2h-57' class="cfunction">PyRun_SimpleFileEx</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                           int <var>closeit</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_SimpleFileExFlags()</tt>
+  below, leaving <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-58' xml:id='l2h-58' class="cfunction">PyRun_SimpleFileExFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                                int <var>closeit</var>,
+                                                PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+  Similar to <tt class="cfunction">PyRun_SimpleStringFlags()</tt>, but the Python source
+  code is read from <var>fp</var> instead of an in-memory string.
+  <var>filename</var> should be the name of the file.  If <var>closeit</var> is
+  true, the file is closed before PyRun_SimpleFileExFlags returns.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-59' xml:id='l2h-59' class="cfunction">PyRun_InteractiveOne</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_InteractiveOneFlags()</tt>
+  below, leaving <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-60' xml:id='l2h-60' class="cfunction">PyRun_InteractiveOneFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>,
+                                                  const char *<var>filename</var>,
+                                                  PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+  Read and execute a single statement from a file associated with an
+  interactive device according to the <var>flags</var> argument.  If
+  <var>filename</var> is <tt class="constant">NULL</tt>, <code>"???"</code> is used instead.  The user will
+  be prompted using <code>sys.ps1</code> and <code>sys.ps2</code>.  Returns <code>0</code>
+  when the input was executed successfully, <code>-1</code> if there was an
+  exception, or an error code from the <span class="file">errcode.h</span> include file
+  distributed as part of Python if there was a parse error.  (Note that
+  <span class="file">errcode.h</span> is not included by <span class="file">Python.h</span>, so must be included
+  specifically if needed.)
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-61' xml:id='l2h-61' class="cfunction">PyRun_InteractiveLoop</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyRun_InteractiveLoopFlags()</tt>
+  below, leaving <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-62' xml:id='l2h-62' class="cfunction">PyRun_InteractiveLoopFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>, 
+                                                   const char *<var>filename</var>,
+                                                   PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+  Read and execute statements from a file associated with an
+  interactive device until EOF is reached.  If <var>filename</var> is
+  <tt class="constant">NULL</tt>, <code>"???"</code> is used instead.  The user will be prompted
+  using <code>sys.ps1</code> and <code>sys.ps2</code>.  Returns <code>0</code> at EOF.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>struct _node*&nbsp;<b><tt id='l2h-63' xml:id='l2h-63' class="cfunction">PyParser_SimpleParseString</tt></b>(</nobr></td><td>const char *<var>str</var>,
+                                                             int <var>start</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to
+  <tt class="cfunction">PyParser_SimpleParseStringFlagsFilename()</tt> below, leaving 
+  <var>filename</var> set to <tt class="constant">NULL</tt> and <var>flags</var> set to <code>0</code>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>struct _node*&nbsp;<b><tt id='l2h-64' xml:id='l2h-64' class="cfunction">PyParser_SimpleParseStringFlags</tt></b>(</nobr></td><td>
+                                 const char *<var>str</var>, int <var>start</var>, int <var>flags</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to
+  <tt class="cfunction">PyParser_SimpleParseStringFlagsFilename()</tt> below, leaving 
+  <var>filename</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>struct _node*&nbsp;<b><tt id='l2h-65' xml:id='l2h-65' class="cfunction">PyParser_SimpleParseStringFlagsFilename</tt></b>(</nobr></td><td>
+                                 const char *<var>str</var>, const char *<var>filename</var>,
+                                 int <var>start</var>, int <var>flags</var>)</td></tr></table></dt>
+<dd>
+  Parse Python source code from <var>str</var> using the start token
+  <var>start</var> according to the <var>flags</var> argument.  The result can
+  be used to create a code object which can be evaluated efficiently.
+  This is useful if a code fragment must be evaluated many times.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>struct _node*&nbsp;<b><tt id='l2h-66' xml:id='l2h-66' class="cfunction">PyParser_SimpleParseFile</tt></b>(</nobr></td><td>FILE *<var>fp</var>,
+                                 const char *<var>filename</var>, int <var>start</var>)</td></tr></table></dt>
+<dd>
+  This is a simplified interface to <tt class="cfunction">PyParser_SimpleParseFileFlags()</tt>
+  below, leaving <var>flags</var> set to <code>0</code>
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>struct _node*&nbsp;<b><tt id='l2h-67' xml:id='l2h-67' class="cfunction">PyParser_SimpleParseFileFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>,
+                                 const char *<var>filename</var>, int <var>start</var>, int <var>flags</var>)</td></tr></table></dt>
+<dd>
+  Similar to <tt class="cfunction">PyParser_SimpleParseStringFlagsFilename()</tt>, but
+  the Python source code is read from <var>fp</var> instead of an in-memory
+  string.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-68' xml:id='l2h-68' class="cfunction">PyRun_String</tt></b>(</nobr></td><td>const char *<var>str</var>, int <var>start</var>,
+                                           PyObject *<var>globals</var>,
+                                           PyObject *<var>locals</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  This is a simplified interface to <tt class="cfunction">PyRun_StringFlags()</tt> below,
+  leaving <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-69' xml:id='l2h-69' class="cfunction">PyRun_StringFlags</tt></b>(</nobr></td><td>const char *<var>str</var>, int <var>start</var>,
+                                                PyObject *<var>globals</var>,
+                                                PyObject *<var>locals</var>,
+                                                PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Execute Python source code from <var>str</var> in the context specified
+  by the dictionaries <var>globals</var> and <var>locals</var> with the compiler
+  flags specified by <var>flags</var>.  The parameter <var>start</var> specifies
+  the start token that should be used to parse the source code.
+
+<p>
+Returns the result of executing the code as a Python object, or
+  <tt class="constant">NULL</tt> if an exception was raised.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-70' xml:id='l2h-70' class="cfunction">PyRun_File</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                         int <var>start</var>, PyObject *<var>globals</var>,
+                                         PyObject *<var>locals</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  This is a simplified interface to <tt class="cfunction">PyRun_FileExFlags()</tt> below,
+  leaving <var>closeit</var> set to <code>0</code> and <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-71' xml:id='l2h-71' class="cfunction">PyRun_FileEx</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                         int <var>start</var>, PyObject *<var>globals</var>,
+                                         PyObject *<var>locals</var>, int <var>closeit</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  This is a simplified interface to <tt class="cfunction">PyRun_FileExFlags()</tt> below,
+  leaving <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-72' xml:id='l2h-72' class="cfunction">PyRun_FileFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                         int <var>start</var>, PyObject *<var>globals</var>,
+                                         PyObject *<var>locals</var>,
+                                         PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  This is a simplified interface to <tt class="cfunction">PyRun_FileExFlags()</tt> below,
+  leaving <var>closeit</var> set to <code>0</code>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-73' xml:id='l2h-73' class="cfunction">PyRun_FileExFlags</tt></b>(</nobr></td><td>FILE *<var>fp</var>, const char *<var>filename</var>,
+                                                int <var>start</var>, PyObject *<var>globals</var>,
+                                                PyObject *<var>locals</var>, int <var>closeit</var>,
+                                                PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Similar to <tt class="cfunction">PyRun_StringFlags()</tt>, but the Python source code is
+  read from <var>fp</var> instead of an in-memory string.
+  <var>filename</var> should be the name of the file.
+  If <var>closeit</var> is true, the file is closed before
+  <tt class="cfunction">PyRun_FileExFlags()</tt> returns.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-74' xml:id='l2h-74' class="cfunction">Py_CompileString</tt></b>(</nobr></td><td>const char *<var>str</var>,
+                                               const char *<var>filename</var>,
+                                               int <var>start</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  This is a simplified interface to <tt class="cfunction">Py_CompileStringFlags()</tt> below,
+  leaving <var>flags</var> set to <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-75' xml:id='l2h-75' class="cfunction">Py_CompileStringFlags</tt></b>(</nobr></td><td>const char *<var>str</var>,
+                                                    const char *<var>filename</var>,
+                                                    int <var>start</var>,
+                                                    PyCompilerFlags *<var>flags</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Parse and compile the Python source code in <var>str</var>, returning the
+  resulting code object.  The start token is given by <var>start</var>;
+  this can be used to constrain the code which can be compiled and should
+  be <tt class="constant">Py_eval_input</tt>, <tt class="constant">Py_file_input</tt>, or
+  <tt class="constant">Py_single_input</tt>.  The filename specified by
+  <var>filename</var> is used to construct the code object and may appear
+  in tracebacks or <tt class="exception">SyntaxError</tt> exception messages.  This
+  returns <tt class="constant">NULL</tt> if the code cannot be parsed or compiled.
+</dd></dl>
+
+<p>
+<dl><dt>int <b><tt id='l2h-76' xml:id='l2h-76' class="cdata">Py_eval_input</tt></b></dt>
+<dd>
+  The start symbol from the Python grammar for isolated expressions;
+  for use with
+  <tt class="cfunction">Py_CompileString()</tt><a id='l2h-81' xml:id='l2h-81'></a>.
+</dd></dl>
+
+<p>
+<dl><dt>int <b><tt id='l2h-77' xml:id='l2h-77' class="cdata">Py_file_input</tt></b></dt>
+<dd>
+  The start symbol from the Python grammar for sequences of statements
+  as read from a file or other source; for use with
+  <tt class="cfunction">Py_CompileString()</tt><a id='l2h-82' xml:id='l2h-82'></a>.  This is
+  the symbol to use when compiling arbitrarily long Python source code.
+</dd></dl>
+
+<p>
+<dl><dt>int <b><tt id='l2h-78' xml:id='l2h-78' class="cdata">Py_single_input</tt></b></dt>
+<dd>
+  The start symbol from the Python grammar for a single statement; for
+  use with <tt class="cfunction">Py_CompileString()</tt><a id='l2h-83' xml:id='l2h-83'></a>.
+  This is the symbol used for the interactive interpreter loop.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-79' xml:id='l2h-79'>struct PyCompilerFlags</a></tt></b></dt>
+<dd>
+  This is the structure used to hold compiler flags.  In cases where
+  code is only being compiled, it is passed as <code>int flags</code>, and in
+  cases where code is being executed, it is passed as
+  <code>PyCompilerFlags *flags</code>.  In this case, <code>from __future__
+  import</code> can modify <var>flags</var>.
+
+<p>
+Whenever <code>PyCompilerFlags *flags</code> is <tt class="constant">NULL</tt>, <tt class="member">cf_flags</tt>
+  is treated as equal to <code>0</code>, and any modification due to
+  <code>from __future__ import</code> is discarded.
+<div class="verbatim"><pre>
+struct PyCompilerFlags {
+    int cf_flags;
+}
+</pre></div>
+</dl>
+
+<p>
+<dl><dt>int <b><tt id='l2h-80' xml:id='l2h-80' class="cdata">CO_FUTURE_DIVISION</tt></b></dt>
+<dd>
+  This bit can be set in <var>flags</var> to cause division operator <code>/</code>
+  to be interpreted as ``true division'' according to <a class="rfc" id='rfcref-14009' xml:id='rfcref-14009'
+href="http://www.python.org/peps/pep-0238.html">PEP 238</a>.
+</dd></dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.5 debugging Builds"
+  href="debugging.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python/C api Reference Manual"
+  href="api.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3. reference Counting"
+  href="countingRefs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="debugging.html">1.5 Debugging Builds</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api.html">Python/C API Reference Manual</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="countingRefs.html">3. Reference Counting</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,73 @@
+To do
+=====
+
+* (1) Make code 64 bit clean by adding more type casts. E.g.
+  void *p;
+  int i;
+  p = (void *) (ptrword) i;
+  where ptrword is derived from a ./configure script.
+
+* (1) Restructuring/rewriting of the data structures: Some
+  classes are poorly designed, and in general the given
+  framework is inadequate for a more powerful analysis (such
+  as the analysis of lock sets when calls from one class
+  to another class are made).
+
+* (2) Context merging (return, exceptions, if, while, for)
+  to eliminate some spurious warnings. See section [full-control-flow-analysis].
+
+* (2) Suppressing unnecessary warnings for variables and
+  methods that are read-only. A resource that is shared
+  for reading is a very common scenario in real software.
+  Therefore, Jlint should suppress a warning about concurrent
+  variable or method accesses if the following conditions
+  hold:
+
+  Shared-read variables: The variable is not
+    accessed outside the constructor or synchronized(this)
+    blocks.
+
+  Shared-read methods: The method does not
+    access fields that are not shared for reading (according
+    to the definition above).
+
+* (2) Adding a check for "const
+  methods" (as in C++): In C++, a method which
+  is declared const may not change the this instance or
+  any const (final) fields. As a consequence of that, calls
+  to non-const methods and the usage of const fields as
+  non-const arguments (in method calls) are forbidden. This
+  is one of the few areas where C++ is more type safe than
+  Java. Adding such a check to Jlint (const annotations
+  could be stored in a template) should not be very hard,
+  and would be a minor extension of "shared-read
+  methods" (see above).
+
+* (2) Full analysis of lock sets across method/class boundaries
+  for wait and notify calls.
+
+* (2) Checking the visibility of object instances in other
+  threads: A non-synchronized method where the callee instance
+  is not visible outside the current thread (e.g. as a local
+  variable) can be called without any danger of race conditions.
+  In such cases, a warning should be omitted. Verifying
+  this requires evaluating accessor information.
+
+* (2) Fixing the fault in the warning selection switches:
+  right now, switching warnings on and off based on their
+  message code produces an empty output.
+
+* (2) Improving verbosity/information content of some (existing)
+  warnings.
+
+* (2) Adding an improved selectability for warnings, e.g.
+  by a severity level or likelihood.
+
+* (3) Support for locks on classes (getClass) in synchronizations.
+
+* (3) Eliminating spurious warnings where implicit synchronization
+  exists (e.g. streams).
+
+* (3) Texinfo documentation: fixing old spelling and grammar
+  mistakes from version 1.11, better Texinfo tagging of
+  text (e.g. @var), full @node tree for document.

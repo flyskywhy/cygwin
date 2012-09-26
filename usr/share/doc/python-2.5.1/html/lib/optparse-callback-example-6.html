@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="optparse-callback-example-5.html" />
+<link rel="parent" href="optparse-option-callbacks.html" />
+<link rel="next" href="optparse-extending-optparse.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.4.9 Callback example 6: variable arguments</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.4.8 callback example 5:"
+  href="optparse-callback-example-5.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.5 extending optparse"
+  href="optparse-extending-optparse.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-callback-example-5.html">14.3.4.8 Callback example 5:</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-extending-optparse.html">14.3.5 Extending optparse</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016349000000000000000"></a><a name="optparse-callback-example-6"></a>
+<br>
+14.3.4.9 Callback example 6: variable arguments
+</h3>
+
+<p>
+Things get hairy when you want an option to take a variable number of
+arguments.  For this case, you must write a callback, as <tt class="module">optparse</tt> doesn't
+provide any built-in capabilities for it.  And you have to deal with
+certain intricacies of conventional <span class="Unix">Unix</span> command-line parsing that <tt class="module">optparse</tt>
+normally handles for you.  In particular, callbacks should implement
+the conventional rules for bare <code>"-"</code> and <code>"-"</code> arguments:
+
+<ul>
+<li> 
+either <code>"-"</code> or <code>"-"</code> can be option arguments
+
+<p>
+</li>
+<li> 
+bare <code>"-"</code> (if not the argument to some option): halt command-line
+processing and discard the <code>"-"</code>
+
+<p>
+</li>
+<li> 
+bare <code>"-"</code> (if not the argument to some option): halt command-line
+processing but keep the <code>"-"</code> (append it to <code>parser.largs</code>)
+
+<p>
+</li>
+</ul>
+
+<p>
+If you want an option that takes a variable number of arguments, there
+are several subtle, tricky issues to worry about.  The exact
+implementation you choose will be based on which trade-offs you're
+willing to make for your application (which is why <tt class="module">optparse</tt> doesn't support
+this sort of thing directly).
+
+<p>
+Nevertheless, here's a stab at a callback for an option with variable
+arguments:
+<div class="verbatim"><pre>
+def vararg_callback(option, opt_str, value, parser):
+    assert value is None
+    done = 0
+    value = []
+    rargs = parser.rargs
+    while rargs:
+        arg = rargs[0]
+
+        # Stop if we hit an arg like "--foo", "-a", "-fx", "--file=f",
+        # etc.  Note that this also stops on "-3" or "-3.0", so if
+        # your option takes numeric values, you will need to handle
+        # this.
+        if ((arg[:2] == "--" and len(arg) &gt; 2) or
+            (arg[:1] == "-" and len(arg) &gt; 1 and arg[1] != "-")):
+            break
+        else:
+            value.append(arg)
+            del rargs[0]
+
+     setattr(parser.values, option.dest, value)
+
+[...]
+parser.add_option("-c", "--callback",
+                  action="callback", callback=varargs)
+</pre></div>
+
+<p>
+The main weakness with this particular implementation is that negative
+numbers in the arguments following <code>"-c"</code> will be interpreted as
+further options (probably causing an error), rather than as arguments to
+<code>"-c"</code>.  Fixing this is left as an exercise for the reader.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.4.8 callback example 5:"
+  href="optparse-callback-example-5.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.4 option Callbacks"
+  href="optparse-option-callbacks.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.5 extending optparse"
+  href="optparse-extending-optparse.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-callback-example-5.html">14.3.4.8 Callback example 5:</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-option-callbacks.html">14.3.4 Option Callbacks</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-extending-optparse.html">14.3.5 Extending optparse</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

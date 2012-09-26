@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-marshal.html" />
+<link rel="prev" href="module-copyreg.html" />
+<link rel="parent" href="persistence.html" />
+<link rel="next" href="node327.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.4 shelve -- Python object persistence</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.3 copy_reg  "
+  href="module-copyreg.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.4.1 Restrictions"
+  href="node327.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-copyreg.html">13.3 copy_reg  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node327.html">13.4.1 Restrictions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0015400000000000000000">
+13.4 <tt class="module">shelve</tt> --
+         Python object persistence</a>
+</h1>
+
+<p>
+<a name="module-shelve"></a>
+
+<p>
+A ``shelf'' is a persistent, dictionary-like object.  The difference
+with ``dbm'' databases is that the values (not the keys!) in a shelf
+can be essentially arbitrary Python objects -- anything that the
+<tt class="module"><a href="module-pickle.html">pickle</a></tt> module can handle.  This includes most class
+instances, recursive data types, and objects containing lots of shared 
+sub-objects.  The keys are ordinary strings.
+<a id='l2h-2489' xml:id='l2h-2489'></a>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2487' xml:id='l2h-2487' class="function">open</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>,flag='c'</var><big>[</big><var>,protocol=<code>None</code></var><big>[</big><var>,writeback=<code>False</code></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open a persistent dictionary.  The filename specified is the base filename
+for the underlying database.  As a side-effect, an extension may be added to
+the filename and more than one file may be created.  By default, the
+underlying database file is opened for reading and writing.  The optional
+<var>flag</var> parameter has the same interpretation as the <var>flag</var>
+parameter of <tt class="function">anydbm.open</tt>.  
+
+<p>
+By default, version 0 pickles are used to serialize values. 
+The version of the pickle protocol can be specified with the
+<var>protocol</var> parameter. 
+<span class="versionnote">Changed in version 2.3:
+The <var>protocol</var>
+parameter was added.</span>
+
+<p>
+By default, mutations to persistent-dictionary mutable entries are not
+automatically written back.  If the optional <var>writeback</var> parameter
+is set to <var>True</var>, all entries accessed are cached in memory, and
+written back at close time; this can make it handier to mutate mutable
+entries in the persistent dictionary, but, if many entries are
+accessed, it can consume vast amounts of memory for the cache, and it
+can make the close operation very slow since all accessed entries are
+written back (there is no way to determine which accessed entries are
+mutable, nor which ones were actually mutated).
+
+<p>
+</dl>
+
+<p>
+Shelve objects support all methods supported by dictionaries.  This eases
+the transition from dictionary based scripts to those requiring persistent
+storage.
+
+<p>
+One additional method is supported:
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2488' xml:id='l2h-2488' class="method">sync</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Write back all entries in the cache if the shelf was opened with
+<var>writeback</var> set to <var>True</var>. Also empty the cache and synchronize
+the persistent dictionary on disk, if feasible.  This is called automatically
+when the shelf is closed with <tt class="method">close()</tt>.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node327.html">13.4.1 Restrictions</a>
+<li><a href="node328.html">13.4.2 Example</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.3 copy_reg  "
+  href="module-copyreg.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.4.1 Restrictions"
+  href="node327.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-copyreg.html">13.3 copy_reg  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node327.html">13.4.1 Restrictions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

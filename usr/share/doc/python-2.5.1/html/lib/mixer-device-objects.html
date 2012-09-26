@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="ossaudio-device-objects.html" />
+<link rel="parent" href="module-ossaudiodev.html" />
+<link rel="next" href="tkinter.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>19.11.2 Mixer Device Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.11.1 audio Device Objects"
+  href="ossaudio-device-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19.11 ossaudiodev  "
+  href="module-ossaudiodev.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="20. graphical User Interfaces"
+  href="tkinter.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ossaudio-device-objects.html">19.11.1 Audio Device Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-ossaudiodev.html">19.11 ossaudiodev  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="tkinter.html">20. Graphical User Interfaces</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00211120000000000000000"></a><a name="mixer-device-objects"></a>
+<br>
+19.11.2 Mixer Device Objects 
+</h2>
+
+<p>
+The mixer object provides two file-like methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4690' xml:id='l2h-4690' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method closes the open mixer device file.  Any further attempts to
+use the mixer after this file is closed will raise an <tt class="exception">IOError</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4691' xml:id='l2h-4691' class="method">fileno</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns the file handle number of the open mixer device file.
+</dl>
+
+<p>
+The remaining methods are specific to audio mixing:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4692' xml:id='l2h-4692' class="method">controls</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method returns a bitmask specifying the available mixer controls
+(``Control'' being a specific mixable ``channel'', such as
+<tt class="constant">SOUND_MIXER_PCM</tt> or <tt class="constant">SOUND_MIXER_SYNTH</tt>).  This
+bitmask indicates a subset of all available mixer controls--the
+<tt class="constant">SOUND_MIXER_*</tt> constants defined at module level.  To determine if,
+for example, the current mixer object supports a PCM mixer, use the
+following Python code:
+
+<p>
+<div class="verbatim"><pre>
+mixer=ossaudiodev.openmixer()
+if mixer.controls() &amp; (1 &lt;&lt; ossaudiodev.SOUND_MIXER_PCM):
+    # PCM is supported
+    ... code ...
+</pre></div>
+
+<p>
+For most purposes, the <tt class="constant">SOUND_MIXER_VOLUME</tt> (master volume) and
+<tt class="constant">SOUND_MIXER_PCM</tt> controls should suffice--but code that uses the
+mixer should be flexible when it comes to choosing mixer controls.  On
+the Gravis Ultrasound, for example, <tt class="constant">SOUND_MIXER_VOLUME</tt> does not
+exist.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4693' xml:id='l2h-4693' class="method">stereocontrols</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns a bitmask indicating stereo mixer controls.  If a bit is set,
+the corresponding control is stereo; if it is unset, the control is
+either monophonic or not supported by the mixer (use in combination with
+<tt class="method">controls()</tt> to determine which).
+
+<p>
+See the code example for the <tt class="method">controls()</tt> function for an example
+of getting data from a bitmask.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4694' xml:id='l2h-4694' class="method">reccontrols</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns a bitmask specifying the mixer controls that may be used to
+record.  See the code example for <tt class="method">controls()</tt> for an example of
+reading from a bitmask.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4695' xml:id='l2h-4695' class="method">get</tt></b>(</nobr></td>
+  <td><var>control</var>)</td></tr></table></dt>
+<dd>
+Returns the volume of a given mixer control.  The returned volume is a
+2-tuple <code>(left_volume,right_volume)</code>.  Volumes are specified as
+numbers from 0 (silent) to 100 (full volume).  If the control is
+monophonic, a 2-tuple is still returned, but both volumes are
+the same.
+
+<p>
+Raises <tt class="exception">OSSAudioError</tt> if an invalid control was is specified,
+or <tt class="exception">IOError</tt> if an unsupported control is specified.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4696' xml:id='l2h-4696' class="method">set</tt></b>(</nobr></td>
+  <td><var>control, (left, right)</var>)</td></tr></table></dt>
+<dd>
+Sets the volume for a given mixer control to <code>(left,right)</code>.
+<code>left</code> and <code>right</code> must be ints and between 0 (silent) and 100
+(full volume).  On success, the new volume is returned as a 2-tuple.
+Note that this may not be exactly the same as the volume specified,
+because of the limited resolution of some soundcard's mixers.
+
+<p>
+Raises <tt class="exception">OSSAudioError</tt> if an invalid mixer control was
+specified, or if the specified volumes were out-of-range.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4697' xml:id='l2h-4697' class="method">get_recsrc</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This method returns a bitmask indicating which control(s) are
+currently being used as a recording source.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4698' xml:id='l2h-4698' class="method">set_recsrc</tt></b>(</nobr></td>
+  <td><var>bitmask</var>)</td></tr></table></dt>
+<dd>
+Call this function to specify a recording source.  Returns a bitmask
+indicating the new recording source (or sources) if successful; raises
+<tt class="exception">IOError</tt> if an invalid source was specified.  To set the current
+recording source to the microphone input:
+
+<p>
+<div class="verbatim"><pre>
+mixer.setrecsrc (1 &lt;&lt; ossaudiodev.SOUND_MIXER_MIC)
+</pre></div>
+</dl>
+
+<p>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19.11.1 audio Device Objects"
+  href="ossaudio-device-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19.11 ossaudiodev  "
+  href="module-ossaudiodev.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="20. graphical User Interfaces"
+  href="tkinter.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ossaudio-device-objects.html">19.11.1 Audio Device Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-ossaudiodev.html">19.11 ossaudiodev  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="tkinter.html">20. Graphical User Interfaces</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

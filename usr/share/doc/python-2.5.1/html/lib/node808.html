@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="node807.html" />
+<link rel="parent" href="module-timeit.html" />
+<link rel="next" href="module-trace.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>25.9.2 Examples</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.9.1 command Line Interface"
+  href="node807.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25.9 timeit  "
+  href="module-timeit.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.10 trace  "
+  href="module-trace.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node807.html">25.9.1 Command Line Interface</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-timeit.html">25.9 timeit  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-trace.html">25.10 trace  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0027920000000000000000">
+25.9.2 Examples</a>
+</h2>
+
+<p>
+Here are two example sessions (one using the command line, one using
+the module interface) that compare the cost of using
+<tt class="function">hasattr()</tt> vs. <tt class="keyword">try</tt>/<tt class="keyword">except</tt> to test for
+missing and present object attributes.
+
+<p>
+<div class="verbatim"><pre>
+% timeit.py 'try:' '  str.__nonzero__' 'except AttributeError:' '  pass'
+100000 loops, best of 3: 15.7 usec per loop
+% timeit.py 'if hasattr(str, "__nonzero__"): pass'
+100000 loops, best of 3: 4.26 usec per loop
+% timeit.py 'try:' '  int.__nonzero__' 'except AttributeError:' '  pass'
+1000000 loops, best of 3: 1.43 usec per loop
+% timeit.py 'if hasattr(int, "__nonzero__"): pass'
+100000 loops, best of 3: 2.23 usec per loop
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import timeit
+&gt;&gt;&gt; s = """\
+... try:
+...     str.__nonzero__
+... except AttributeError:
+...     pass
+... """
+&gt;&gt;&gt; t = timeit.Timer(stmt=s)
+&gt;&gt;&gt; print "%.2f usec/pass" % (1000000 * t.timeit(number=100000)/100000)
+17.09 usec/pass
+&gt;&gt;&gt; s = """\
+... if hasattr(str, '__nonzero__'): pass
+... """
+&gt;&gt;&gt; t = timeit.Timer(stmt=s)
+&gt;&gt;&gt; print "%.2f usec/pass" % (1000000 * t.timeit(number=100000)/100000)
+4.85 usec/pass
+&gt;&gt;&gt; s = """\
+... try:
+...     int.__nonzero__
+... except AttributeError:
+...     pass
+... """
+&gt;&gt;&gt; t = timeit.Timer(stmt=s)
+&gt;&gt;&gt; print "%.2f usec/pass" % (1000000 * t.timeit(number=100000)/100000)
+1.97 usec/pass
+&gt;&gt;&gt; s = """\
+... if hasattr(int, '__nonzero__'): pass
+... """
+&gt;&gt;&gt; t = timeit.Timer(stmt=s)
+&gt;&gt;&gt; print "%.2f usec/pass" % (1000000 * t.timeit(number=100000)/100000)
+3.15 usec/pass
+</pre></div>
+
+<p>
+To give the <tt class="module">timeit</tt> module access to functions you
+define, you can pass a <code>setup</code> parameter which contains an import
+statement:
+
+<p>
+<div class="verbatim"><pre>
+def test():
+    "Stupid test function"
+    L = []
+    for i in range(100):
+        L.append(i)
+
+if __name__=='__main__':
+    from timeit import Timer
+    t = Timer("test()", "from __main__ import test")
+    print t.timeit()
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.9.1 command Line Interface"
+  href="node807.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25.9 timeit  "
+  href="module-timeit.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.10 trace  "
+  href="module-trace.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node807.html">25.9.1 Command Line Interface</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-timeit.html">25.9 timeit  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-trace.html">25.10 trace  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

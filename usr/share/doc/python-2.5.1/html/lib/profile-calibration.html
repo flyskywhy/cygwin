@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node801.html" />
+<link rel="prev" href="profile-limits.html" />
+<link rel="parent" href="profile.html" />
+<link rel="next" href="node801.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>25.6 Calibration </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.5 Limitations"
+  href="profile-limits.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.7 extensions  "
+  href="node801.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="profile-limits.html">25.5 Limitations</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node801.html">25.7 Extensions  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0027600000000000000000"></a><a name="profile-calibration"></a>
+<br>
+25.6 Calibration 
+</h1>
+
+<p>
+The profiler of the <tt class="module">profile</tt> module subtracts a constant from each
+event handling time to compensate for the overhead of calling the time
+function, and socking away the results.  By default, the constant is 0.
+The following procedure can
+be used to obtain a better constant for a given platform (see discussion
+in section Limitations above).
+
+<p>
+<div class="verbatim"><pre>
+import profile
+pr = profile.Profile()
+for i in range(5):
+    print pr.calibrate(10000)
+</pre></div>
+
+<p>
+The method executes the number of Python calls given by the argument,
+directly and again under the profiler, measuring the time for both.
+It then computes the hidden overhead per profiler event, and returns
+that as a float.  For example, on an 800 MHz Pentium running
+Windows 2000, and using Python's time.clock() as the timer,
+the magical number is about 12.5e-6.
+
+<p>
+The object of this exercise is to get a fairly consistent result.
+If your computer is <em>very</em> fast, or your timer function has poor
+resolution, you might have to pass 100000, or even 1000000, to get
+consistent results.
+
+<p>
+When you have a consistent answer,
+there are three ways you can use it:<a name="tex2html189"
+  href="#foot75790"><sup>25.2</sup></a>
+<p>
+<div class="verbatim"><pre>
+import profile
+
+# 1. Apply computed bias to all Profile instances created hereafter.
+profile.Profile.bias = your_computed_bias
+
+# 2. Apply computed bias to a specific Profile instance.
+pr = profile.Profile()
+pr.bias = your_computed_bias
+
+# 3. Specify computed bias in instance constructor.
+pr = profile.Profile(bias=your_computed_bias)
+</pre></div>
+
+<p>
+If you have a choice, you are better off choosing a smaller constant, and
+then your results will ``less often'' show up as negative in profile
+statistics.
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot75790">... it:</a><A
+ href="profile-calibration.html#tex2html189"><sup>25.2</sup></a></dt>
+<dd>Prior to Python 2.2, it
+  was necessary to edit the profiler source code to embed the bias as
+  a literal number.  You still can, but that method is no longer
+  described, because no longer needed.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.5 Limitations"
+  href="profile-limits.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.7 extensions  "
+  href="node801.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="profile-limits.html">25.5 Limitations</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node801.html">25.7 Extensions  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

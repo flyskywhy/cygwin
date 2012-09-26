@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="node657.html" />
+<link rel="parent" href="module-xmlrpclib.html" />
+<link rel="next" href="module-SimpleXMLRPCServer.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.24.9 Example of Client Usage </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.24.8 convenience Functions"
+  href="node657.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.24 xmlrpclib  "
+  href="module-xmlrpclib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.25 simplexmlrpcserver  "
+  href="module-SimpleXMLRPCServer.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node657.html">18.24.8 Convenience Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-xmlrpclib.html">18.24 xmlrpclib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-SimpleXMLRPCServer.html">18.25 SimpleXMLRPCServer  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00202490000000000000000"></a><a name="xmlrpc-client-example"></a>
+<br>
+18.24.9 Example of Client Usage 
+</h2>
+
+<p>
+<div class="verbatim"><pre>
+# simple test program (from the XML-RPC specification)
+from xmlrpclib import ServerProxy, Error
+
+# server = ServerProxy("http://localhost:8000") # local server
+server = ServerProxy("http://betty.userland.com")
+
+print server
+
+try:
+    print server.examples.getStateName(41)
+except Error, v:
+    print "ERROR", v
+</pre></div>
+
+<p>
+To access an XML-RPC server through a proxy, you need to define 
+a custom transport.  The following example, 
+written by NoboNobo, shows how:
+
+<p>
+<div class="verbatim"><pre>
+import xmlrpclib, httplib
+
+class ProxiedTransport(xmlrpclib.Transport):
+    def set_proxy(self, proxy):
+        self.proxy = proxy
+    def make_connection(self, host):
+        self.realhost = host
+	h = httplib.HTTP(self.proxy)
+	return h
+    def send_request(self, connection, handler, request_body):
+        connection.putrequest("POST", 'http://%s%s' % (self.realhost, handler))
+    def send_host(self, connection, host):
+        connection.putheader('Host', self.realhost)
+
+p = ProxiedTransport()
+p.set_proxy('proxy-server:8080')
+server = xmlrpclib.Server('http://time.xmlrpc.com/RPC2', transport=p)
+print server.currentTime.getCurrentTime()
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.24.8 convenience Functions"
+  href="node657.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.24 xmlrpclib  "
+  href="module-xmlrpclib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.25 simplexmlrpcserver  "
+  href="module-SimpleXMLRPCServer.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node657.html">18.24.8 Convenience Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-xmlrpclib.html">18.24 xmlrpclib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-SimpleXMLRPCServer.html">18.25 SimpleXMLRPCServer  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

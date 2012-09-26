@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-hmac.html" />
+<link rel="prev" href="crypto.html" />
+<link rel="parent" href="crypto.html" />
+<link rel="next" href="module-hmac.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>10.1 hashlib -- Secure hashes and message digests</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10. cryptographic Services"
+  href="crypto.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. cryptographic Services"
+  href="crypto.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.2 hmac  "
+  href="module-hmac.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="crypto.html">10. Cryptographic Services</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="crypto.html">10. Cryptographic Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-hmac.html">10.2 hmac  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0012100000000000000000">
+10.1 <tt class="module">hashlib</tt> --
+         Secure hashes and message digests</a>
+</h1>
+
+<p>
+<a name="module-hashlib"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+<a id='l2h-2137' xml:id='l2h-2137'></a>
+
+<p>
+This module implements a common interface to many different secure hash and
+message digest algorithms.  Included are the FIPS secure hash algorithms SHA1,
+SHA224, SHA256, SHA384, and SHA512 (defined in FIPS 180-2) as well as RSA's MD5
+algorithm (defined in Internet <a class="rfc" id='rfcref-100429' xml:id='rfcref-100429'
+href="http://www.faqs.org/rfcs/rfc1321.html">RFC 1321</a>).
+The terms secure hash and message digest are interchangeable.  Older
+algorithms were called message digests.  The modern term is secure hash.
+
+<p>
+<span class="warning"><b class="label">Warning:</b>
+Some algorithms have known hash collision weaknesses, see the FAQ at the end.</span>
+
+<p>
+There is one constructor method named for each type of <i class="dfn">hash</i>.  All return
+a hash object with the same simple interface.
+For example: use <tt class="function">sha1()</tt> to create a SHA1 hash object.
+You can now feed this object with arbitrary strings using the <tt class="method">update()</tt>
+method.  At any point you can ask it for the <i class="dfn">digest</i> of the concatenation
+of the strings fed to it so far using the <tt class="method">digest()</tt> or
+<tt class="method">hexdigest()</tt> methods.
+
+<p>
+Constructors for hash algorithms that are always present in this module are
+<tt class="function">md5()</tt>, <tt class="function">sha1()</tt>, <tt class="function">sha224()</tt>, <tt class="function">sha256()</tt>,
+<tt class="function">sha384()</tt>, and <tt class="function">sha512()</tt>.  Additional algorithms may also
+be available depending upon the OpenSSL library that Python uses on your platform.
+<a id='l2h-2138' xml:id='l2h-2138'></a>
+
+<p>
+For example, to obtain the digest of the string <code>'Nobody inspects
+the spammish repetition'</code>:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import hashlib
+&gt;&gt;&gt; m = hashlib.md5()
+&gt;&gt;&gt; m.update("Nobody inspects")
+&gt;&gt;&gt; m.update(" the spammish repetition")
+&gt;&gt;&gt; m.digest()
+'\xbbd\x9c\x83\xdd\x1e\xa5\xc9\xd9\xde\xc9\xa1\x8d\xf0\xff\xe9'
+</pre></div>
+
+<p>
+More condensed:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; hashlib.sha224("Nobody inspects the spammish repetition").hexdigest()
+'a4337bc45a8fc544c03f52dc550cd6e1e87021bc896588bd79e901e2'
+</pre></div>
+
+<p>
+A generic <tt class="function">new()</tt> constructor that takes the string name of the
+desired algorithm as its first parameter also exists to allow access to the
+above listed hashes as well as any other algorithms that your OpenSSL library
+may offer.  The named constructors are much faster than <tt class="function">new()</tt> and
+should be preferred.
+
+<p>
+Using <tt class="function">new()</tt> with an algorithm provided by OpenSSL:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; h = hashlib.new('ripemd160')
+&gt;&gt;&gt; h.update("Nobody inspects the spammish repetition")
+&gt;&gt;&gt; h.hexdigest()
+'cc4a5ce1b3df48aec5d22d1f16b894a0b894eccc'
+</pre></div>
+
+<p>
+The following values are provided as constant attributes of the hash objects
+returned by the constructors:
+
+<p>
+<dl><dt><b><tt id='l2h-2132' xml:id='l2h-2132'>digest_size</tt></b></dt>
+<dd>
+  The size of the resulting digest in bytes.
+</dd></dl>
+
+<p>
+A hash object has the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2133' xml:id='l2h-2133' class="method">update</tt></b>(</nobr></td>
+  <td><var>arg</var>)</td></tr></table></dt>
+<dd>
+Update the hash object with the string <var>arg</var>.  Repeated calls are
+equivalent to a single call with the concatenation of all the
+arguments: <code>m.update(a); m.update(b)</code> is equivalent to
+<code>m.update(a+b)</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2134' xml:id='l2h-2134' class="method">digest</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the digest of the strings passed to the <tt class="method">update()</tt>
+method so far.  This is a string of <tt class="member">digest_size</tt> bytes which may
+contain non-ASCII characters, including null bytes.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2135' xml:id='l2h-2135' class="method">hexdigest</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Like <tt class="method">digest()</tt> except the digest is returned as a string of
+double length, containing only hexadecimal digits.  This may 
+be used to exchange the value safely in email or other non-binary
+environments.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2136' xml:id='l2h-2136' class="method">copy</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a copy (``clone'') of the hash object.  This can be used to
+efficiently compute the digests of strings that share a common initial
+substring.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-hmac.html">hmac</a></tt>:</b>
+    <dd>A module to generate message authentication codes using hashes.
+  </dl>
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-base64.html">base64</a></tt>:</b>
+    <dd>Another way to encode binary hashes for non-binary environments.
+  </dl>
+  <dl compact="compact" class="seeurl">
+    <dt><a href="http://csrc.nist.gov/publications/fips/fips180-2/fips180-2.pdf"
+        class="url">http://csrc.nist.gov/publications/fips/fips180-2/fips180-2.pdf</a></dt>
+    <dd>The FIPS 180-2 publication on Secure Hash Algorithms.</dd>
+  </dl>
+  <dl compact="compact" class="seeurl">
+    <dt><a href="http://www.cryptography.com/cnews/hash.html"
+        class="url">http://www.cryptography.com/cnews/hash.html</a></dt>
+    <dd>Hash Collision FAQ with information on which algorithms have known issues and
+   what that means regarding their use.</dd>
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10. cryptographic Services"
+  href="crypto.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. cryptographic Services"
+  href="crypto.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.2 hmac  "
+  href="module-hmac.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="crypto.html">10. Cryptographic Services</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="crypto.html">10. Cryptographic Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-hmac.html">10.2 hmac  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

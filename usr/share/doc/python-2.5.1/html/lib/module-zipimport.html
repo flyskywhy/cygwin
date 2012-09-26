@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-pkgutil.html" />
+<link rel="prev" href="module-imp.html" />
+<link rel="parent" href="modules.html" />
+<link rel="next" href="zipimporter-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>29.2 zipimport -- Import modules from Zip archives</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="29.1.1 Examples"
+  href="examples-imp.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="29. importing Modules"
+  href="modules.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="29.2.1 zipimporter Objects"
+  href="zipimporter-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="examples-imp.html">29.1.1 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="modules.html">29. Importing Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="zipimporter-objects.html">29.2.1 zipimporter Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0031200000000000000000">
+29.2 <tt class="module">zipimport</tt> --
+         Import modules from Zip archives</a>
+</h1>
+
+<p>
+<a name="module-zipimport"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+This module adds the ability to import Python modules (<span class="file">*.py</span>,
+<span class="file">*.py[co]</span>) and packages from ZIP-format archives. It is usually
+not needed to use the <tt class="module">zipimport</tt> module explicitly; it is
+automatically used by the builtin <tt class="keyword">import</tt> mechanism for
+<code>sys.path</code> items that are paths to ZIP archives.
+
+<p>
+Typically, <code>sys.path</code> is a list of directory names as strings.  This
+module also allows an item of <code>sys.path</code> to be a string naming a ZIP
+file archive. The ZIP archive can contain a subdirectory structure to
+support package imports, and a path within the archive can be specified to
+only import from a subdirectory.  For example, the path
+<span class="file">/tmp/example.zip/lib/</span> would only import from the
+<span class="file">lib/</span> subdirectory within the archive.
+
+<p>
+Any files may be present in the ZIP archive, but only files <span class="file">.py</span> and
+<span class="file">.py[co]</span> are available for import.  ZIP import of dynamic modules
+(<span class="file">.pyd</span>, <span class="file">.so</span>) is disallowed. Note that if an archive only
+contains <span class="file">.py</span> files, Python will not attempt to modify the archive
+by adding the corresponding <span class="file">.pyc</span> or <span class="file">.pyo</span> file, meaning that
+if a ZIP archive doesn't contain <span class="file">.pyc</span> files, importing may be rather
+slow.
+
+<p>
+Using the built-in <tt class="function">reload()</tt> function will
+fail if called on a module loaded from a ZIP archive; it is unlikely that
+<tt class="function">reload()</tt> would be needed, since this would imply that the ZIP
+has been altered during runtime.
+
+<p>
+The available attributes of this module are:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-5387' xml:id='l2h-5387' class="exception">ZipImportError</tt></b></dt>
+<dd>
+  Exception raised by zipimporter objects. It's a subclass of
+  <tt class="exception">ImportError</tt>, so it can be caught as <tt class="exception">ImportError</tt>,
+  too.
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5388' xml:id='l2h-5388' class="class">zipimporter</tt></b>
+<dd>
+  The class for importing ZIP files.  See
+  ``<em class="citetitle"
+ >zipimporter Objects</em>'' (section <a href="zipimporter-objects.html#zipimporter-objects">29.2.1</a>)
+  for constructor details.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://www.pkware.com/business_and_developers/developer/appnote/"
+        >PKZIP Application Note</a></em></dt>
+    <dd>Documentation on the ZIP file format by
+            Phil Katz, the creator of the format and algorithms used.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0273.html"
+        title="Import modules from zip Archives"
+        >PEP 0273, <em>Import Modules from Zip Archives</em></a>
+    <dd>Written by James C.
+          Ahlstrom, who also provided an implementation. Python 2.3
+          follows the specification in PEP 273, but uses an
+          implementation written by Just van Rossum that uses the import
+          hooks described in PEP 302.
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0302.html"
+        title="New import Hooks"
+        >PEP 0302, <em>New Import Hooks</em></a>
+    <dd>The PEP to add the import hooks that help
+          this module work.
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="zipimporter-objects.html">29.2.1 zipimporter Objects</a>
+<li><a href="node853.html">29.2.2 Examples</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="29.1.1 Examples"
+  href="examples-imp.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="29. importing Modules"
+  href="modules.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="29.2.1 zipimporter Objects"
+  href="zipimporter-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="examples-imp.html">29.1.1 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="modules.html">29. Importing Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="zipimporter-objects.html">29.2.1 zipimporter Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

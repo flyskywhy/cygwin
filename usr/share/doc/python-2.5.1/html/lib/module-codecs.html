@@ -1,0 +1,514 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-unicodedata.html" />
+<link rel="prev" href="module-textwrap.html" />
+<link rel="parent" href="strings.html" />
+<link rel="next" href="codec-base-classes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.8 codecs -- Codec registry and base classes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.7 textwrap  "
+  href="module-textwrap.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.8.1 codec Base Classes"
+  href="codec-base-classes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-textwrap.html">4.7 textwrap  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="codec-base-classes.html">4.8.1 Codec Base Classes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006800000000000000000">
+4.8 <tt class="module">codecs</tt> --
+         Codec registry and base classes</a>
+</h1>
+
+<p>
+<a name="module-codecs"></a>
+
+<p>
+<a id='l2h-526' xml:id='l2h-526'></a>
+<a id='l2h-503' xml:id='l2h-503'></a><a id='l2h-504' xml:id='l2h-504'></a><a id='l2h-527' xml:id='l2h-527'></a>
+<a id='l2h-505' xml:id='l2h-505'></a>
+<p>
+This module defines base classes for standard Python codecs (encoders
+and decoders) and provides access to the internal Python codec
+registry which manages the codec and error handling lookup process.
+
+<p>
+It defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-506' xml:id='l2h-506' class="function">register</tt></b>(</nobr></td>
+  <td><var>search_function</var>)</td></tr></table></dt>
+<dd>
+Register a codec search function. Search functions are expected to
+take one argument, the encoding name in all lower case letters, and
+return a <tt class="class">CodecInfo</tt> object having the following attributes:
+
+<p>
+
+<ul>
+<li><code>name</code> The name of the encoding;
+</li>
+<li><code>encoder</code> The stateless encoding function;
+</li>
+<li><code>decoder</code> The stateless decoding function;
+</li>
+<li><code>incrementalencoder</code> An incremental encoder class or factory function;
+</li>
+<li><code>incrementaldecoder</code> An incremental decoder class or factory function;
+</li>
+<li><code>streamwriter</code> A stream writer class or factory function;
+</li>
+<li><code>streamreader</code> A stream reader class or factory function.
+</li>
+</ul>
+
+<p>
+The various functions or classes take the following arguments:
+
+<p>
+<var>encoder</var> and <var>decoder</var>: These must be functions or methods
+  which have the same interface as the
+  <tt class="method">encode()</tt>/<tt class="method">decode()</tt> methods of Codec instances (see
+  Codec Interface). The functions/methods are expected to work in a
+  stateless mode.
+
+<p>
+<var>incrementalencoder</var> and <var>incrementalencoder</var>: These have to be
+  factory functions providing the following interface:
+
+<p>
+<code>factory(<var>errors</var>='strict')</code>
+
+<p>
+The factory functions must return objects providing the interfaces
+  defined by the base classes <tt class="class">IncrementalEncoder</tt> and
+  <tt class="class">IncrementalEncoder</tt>, respectively. Incremental codecs can maintain
+  state.
+
+<p>
+<var>streamreader</var> and <var>streamwriter</var>: These have to be
+  factory functions providing the following interface:
+
+<p>
+<code>factory(<var>stream</var>, <var>errors</var>='strict')</code>
+
+<p>
+The factory functions must return objects providing the interfaces
+  defined by the base classes <tt class="class">StreamWriter</tt> and
+  <tt class="class">StreamReader</tt>, respectively. Stream codecs can maintain
+  state.
+
+<p>
+Possible values for errors are <code>'strict'</code> (raise an exception
+  in case of an encoding error), <code>'replace'</code> (replace malformed
+  data with a suitable replacement marker, such as "<tt class="character">?</tt>"),
+  <code>'ignore'</code> (ignore malformed data and continue without further
+  notice), <code>'xmlcharrefreplace'</code> (replace with the appropriate XML
+  character reference (for encoding only)) and <code>'backslashreplace'</code>
+  (replace with backslashed escape sequences (for encoding only)) as
+  well as any other error handling name defined via
+  <tt class="function">register_error()</tt>.
+
+<p>
+In case a search function cannot find a given encoding, it should
+return <code>None</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-507' xml:id='l2h-507' class="function">lookup</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+Looks up the codec info in the Python codec registry and returns a
+<tt class="class">CodecInfo</tt> object as defined above.
+
+<p>
+Encodings are first looked up in the registry's cache. If not found,
+the list of registered search functions is scanned. If no <tt class="class">CodecInfo</tt>
+object is found, a <tt class="exception">LookupError</tt> is raised. Otherwise, the
+<tt class="class">CodecInfo</tt> object is stored in the cache and returned to the caller.
+</dl>
+
+<p>
+To simplify access to the various codecs, the module provides these
+additional functions which use <tt class="function">lookup()</tt> for the codec
+lookup:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-508' xml:id='l2h-508' class="function">getencoder</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+Look up the codec for the given encoding and return its encoder
+function.
+
+<p>
+Raises a <tt class="exception">LookupError</tt> in case the encoding cannot be found.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-509' xml:id='l2h-509' class="function">getdecoder</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+Look up the codec for the given encoding and return its decoder
+function.
+
+<p>
+Raises a <tt class="exception">LookupError</tt> in case the encoding cannot be found.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-510' xml:id='l2h-510' class="function">getincrementalencoder</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+Look up the codec for the given encoding and return its incremental encoder
+class or factory function.
+
+<p>
+Raises a <tt class="exception">LookupError</tt> in case the encoding cannot be found or the
+codec doesn't support an incremental encoder.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-511' xml:id='l2h-511' class="function">getincrementaldecoder</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+Look up the codec for the given encoding and return its incremental decoder
+class or factory function.
+
+<p>
+Raises a <tt class="exception">LookupError</tt> in case the encoding cannot be found or the
+codec doesn't support an incremental decoder.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-512' xml:id='l2h-512' class="function">getreader</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+Look up the codec for the given encoding and return its StreamReader
+class or factory function.
+
+<p>
+Raises a <tt class="exception">LookupError</tt> in case the encoding cannot be found.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-513' xml:id='l2h-513' class="function">getwriter</tt></b>(</nobr></td>
+  <td><var>encoding</var>)</td></tr></table></dt>
+<dd>
+Look up the codec for the given encoding and return its StreamWriter
+class or factory function.
+
+<p>
+Raises a <tt class="exception">LookupError</tt> in case the encoding cannot be found.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-514' xml:id='l2h-514' class="function">register_error</tt></b>(</nobr></td>
+  <td><var>name, error_handler</var>)</td></tr></table></dt>
+<dd>
+Register the error handling function <var>error_handler</var> under the
+name <var>name</var>. <var>error_handler</var> will be called during encoding
+and decoding in case of an error, when <var>name</var> is specified as the
+errors parameter.
+
+<p>
+For encoding <var>error_handler</var> will be called with a
+<tt class="exception">UnicodeEncodeError</tt> instance, which contains information about
+the location of the error. The error handler must either raise this or
+a different exception or return a tuple with a replacement for the
+unencodable part of the input and a position where encoding should
+continue. The encoder will encode the replacement and continue encoding
+the original input at the specified position. Negative position values
+will be treated as being relative to the end of the input string. If the
+resulting position is out of bound an <tt class="exception">IndexError</tt> will be raised.
+
+<p>
+Decoding and translating works similar, except <tt class="exception">UnicodeDecodeError</tt>
+or <tt class="exception">UnicodeTranslateError</tt> will be passed to the handler and
+that the replacement from the error handler will be put into the output
+directly.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-515' xml:id='l2h-515' class="function">lookup_error</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+Return the error handler previously registered under the name <var>name</var>.
+
+<p>
+Raises a <tt class="exception">LookupError</tt> in case the handler cannot be found.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-516' xml:id='l2h-516' class="function">strict_errors</tt></b>(</nobr></td>
+  <td><var>exception</var>)</td></tr></table></dt>
+<dd>
+Implements the <code>strict</code> error handling.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-517' xml:id='l2h-517' class="function">replace_errors</tt></b>(</nobr></td>
+  <td><var>exception</var>)</td></tr></table></dt>
+<dd>
+Implements the <code>replace</code> error handling.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-518' xml:id='l2h-518' class="function">ignore_errors</tt></b>(</nobr></td>
+  <td><var>exception</var>)</td></tr></table></dt>
+<dd>
+Implements the <code>ignore</code> error handling.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-519' xml:id='l2h-519' class="function">xmlcharrefreplace_errors_errors</tt></b>(</nobr></td>
+  <td><var>exception</var>)</td></tr></table></dt>
+<dd>
+Implements the <code>xmlcharrefreplace</code> error handling.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-520' xml:id='l2h-520' class="function">backslashreplace_errors_errors</tt></b>(</nobr></td>
+  <td><var>exception</var>)</td></tr></table></dt>
+<dd>
+Implements the <code>backslashreplace</code> error handling.
+</dl>
+
+<p>
+To simplify working with encoded files or stream, the module
+also defines these utility functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-521' xml:id='l2h-521' class="function">open</tt></b>(</nobr></td>
+  <td><var>filename, mode</var><big>[</big><var>, encoding</var><big>[</big><var>,
+                       errors</var><big>[</big><var>, buffering</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open an encoded file using the given <var>mode</var> and return
+a wrapped version providing transparent encoding/decoding.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+The wrapped version will only accept the object format
+defined by the codecs, i.e. Unicode objects for most built-in
+codecs.  Output is also codec-dependent and will usually be Unicode as
+well.</span>
+
+<p>
+<var>encoding</var> specifies the encoding which is to be used for the
+file.
+
+<p>
+<var>errors</var> may be given to define the error handling. It defaults
+to <code>'strict'</code> which causes a <tt class="exception">ValueError</tt> to be raised
+in case an encoding error occurs.
+
+<p>
+<var>buffering</var> has the same meaning as for the built-in
+<tt class="function">open()</tt> function.  It defaults to line buffered.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-522' xml:id='l2h-522' class="function">EncodedFile</tt></b>(</nobr></td>
+  <td><var>file, input</var><big>[</big><var>,
+                              output</var><big>[</big><var>, errors</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a wrapped version of file which provides transparent
+encoding translation.
+
+<p>
+Strings written to the wrapped file are interpreted according to the
+given <var>input</var> encoding and then written to the original file as
+strings using the <var>output</var> encoding. The intermediate encoding will
+usually be Unicode but depends on the specified codecs.
+
+<p>
+If <var>output</var> is not given, it defaults to <var>input</var>.
+
+<p>
+<var>errors</var> may be given to define the error handling. It defaults to
+<code>'strict'</code>, which causes <tt class="exception">ValueError</tt> to be raised in case
+an encoding error occurs.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-523' xml:id='l2h-523' class="function">iterencode</tt></b>(</nobr></td>
+  <td><var>iterable, encoding</var><big>[</big><var>, errors</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Uses an incremental encoder to iteratively encode the input provided by
+<var>iterable</var>. This function is a generator. <var>errors</var> (as well as
+any other keyword argument) is passed through to the incremental encoder.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-524' xml:id='l2h-524' class="function">iterdecode</tt></b>(</nobr></td>
+  <td><var>iterable, encoding</var><big>[</big><var>, errors</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Uses an incremental decoder to iteratively decode the input provided by
+<var>iterable</var>. This function is a generator. <var>errors</var> (as well as
+any other keyword argument) is passed through to the incremental encoder.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+The module also provides the following constants which are useful
+for reading and writing to platform dependent files:
+
+<p>
+<dl><dt><b><tt id='l2h-525' xml:id='l2h-525'>BOM</tt></b></dt>
+<dd>
+<dt><b><tt id='l2h-528' xml:id='l2h-528'>BOM_BE</tt></b></dt><dd>
+<dt><b><tt id='l2h-529' xml:id='l2h-529'>BOM_LE</tt></b></dt><dd>
+<dt><b><tt id='l2h-530' xml:id='l2h-530'>BOM_UTF8</tt></b></dt><dd>
+<dt><b><tt id='l2h-531' xml:id='l2h-531'>BOM_UTF16</tt></b></dt><dd>
+<dt><b><tt id='l2h-532' xml:id='l2h-532'>BOM_UTF16_BE</tt></b></dt><dd>
+<dt><b><tt id='l2h-533' xml:id='l2h-533'>BOM_UTF16_LE</tt></b></dt><dd>
+<dt><b><tt id='l2h-534' xml:id='l2h-534'>BOM_UTF32</tt></b></dt><dd>
+<dt><b><tt id='l2h-535' xml:id='l2h-535'>BOM_UTF32_BE</tt></b></dt><dd>
+<dt><b><tt id='l2h-536' xml:id='l2h-536'>BOM_UTF32_LE</tt></b></dt><dd>
+These constants define various encodings of the Unicode byte order mark
+(BOM) used in UTF-16 and UTF-32 data streams to indicate the byte order
+used in the stream or file and in UTF-8 as a Unicode signature.
+<tt class="constant">BOM_UTF16</tt> is either <tt class="constant">BOM_UTF16_BE</tt> or
+<tt class="constant">BOM_UTF16_LE</tt> depending on the platform's native byte order,
+<tt class="constant">BOM</tt> is an alias for <tt class="constant">BOM_UTF16</tt>, <tt class="constant">BOM_LE</tt>
+for <tt class="constant">BOM_UTF16_LE</tt> and <tt class="constant">BOM_BE</tt> for <tt class="constant">BOM_UTF16_BE</tt>.
+The others represent the BOM in UTF-8 and UTF-32 encodings.
+</dd></dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="codec-base-classes.html">4.8.1 Codec Base Classes</a>
+<ul>
+<li><a href="codec-objects.html">4.8.1.1 Codec Objects</a>
+<li><a href="incremental-encoder-objects.html">4.8.1.2 IncrementalEncoder Objects</a>
+<li><a href="incremental-decoder-objects.html">4.8.1.3 IncrementalDecoder Objects</a>
+<li><a href="stream-writer-objects.html">4.8.1.4 StreamWriter Objects</a>
+<li><a href="stream-reader-objects.html">4.8.1.5 StreamReader Objects</a>
+<li><a href="stream-reader-writer.html">4.8.1.6 StreamReaderWriter Objects</a>
+<li><a href="stream-recoder-objects.html">4.8.1.7 StreamRecoder Objects</a>
+</ul>
+<li><a href="encodings-overview.html">4.8.2 Encodings and Unicode</a>
+<li><a href="standard-encodings.html">4.8.3 Standard Encodings</a>
+<li><a href="module-encodings.idna.html">4.8.4 <tt class="module">encodings.idna</tt> --
+            Internationalized Domain Names in Applications</a>
+<li><a href="module-encodings.utf-8-sig.html">4.8.5 <tt class="module">encodings.utf_8_sig</tt> --
+             UTF-8 codec with BOM signature</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.7 textwrap  "
+  href="module-textwrap.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. string Services"
+  href="strings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.8.1 codec Base Classes"
+  href="codec-base-classes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-textwrap.html">4.7 textwrap  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="strings.html">4. String Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="codec-base-classes.html">4.8.1 Codec Base Classes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

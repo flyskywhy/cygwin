@@ -1,0 +1,180 @@
+Binutils README
+Collated by Chris Faylor
+
+New in binutils-20080624-2
+Refresh from CVS.  Add a bugfix patch from Alan Modra for a problem
+discovered by Yaakov Selkowitz. This corrects a problem with
+"nm -C" not removing leading underscores.
+
+The cygwin mailing list discussion is here:
+http://cygwin.com/ml/cygwin/2008-06/threads.html#00505
+
+New in 20060709-1
+Refresh from CVS.
+
+New in 20050813-1:
+Refresh from CVS to pick up a fix for ld which caused a section in the Cygwin
+DLL to be incorrectly sized.
+
+New in 20050610-1:
+Refresh from CVS to pick up a fix for ld which
+caused it to keep too many file descriptors open.
+
+Also includes a minor patch to make sure that dlls which use auto-image
+base do not tromp on the cygwin DLL.
+
+New in 20050608-1:
+Fix problem with noload (usually debug) sections which are actually
+loaded into memory by Windows.
+
+New in 20050520-1:
+Standard refresh.  Seems to fix a strip SEGV caused by trying to strip
+an archive file which contains an archive file.  Also contains a
+dlltool patch from Yitzchak Scott-Thoennes to fix problems with
+dlltool and CRs in input files.
+
+New in 20041229-1:
+Refreshed to grab Danny Smith's change which allows specifying console
+mode when building dlls.
+
+New in 20041228-1
+Standard refresh.
+
+A notable patch:
+http://sources.redhat.com/ml/binutils/2004-09/msg00232.html
+
+New in 20040725-2
+Make --enable-runtime-pseudo-reloc the default again.
+
+New in 20040725-1
+Standard refresh.
+
+Adds weak symbols for dlls, courtesy of Aaron W. LaFramboise.
+Dwarf2 support is now possible for binutils.  gdb and gcc should
+follow soon.
+
+New in 20040302-1
+Just a refresh.
+
+Fixes for dllwrap and autoimport.
+dlltool now creates temporary files which will not collide with
+other simultaneous uses.
+
+New in 20030901-1
+Just a refresh.
+
+Notable changes:
+
+Adds the ability to use exports from an executable and the ability to
+create a separate file holding debug info.
+
+Fixed dlltool so that the tmp files it creates are unique, allowing
+"make -jN" to operate successfully when building import libraries.
+
+libcygwin.a is treated as a "special" library so that globals from this
+library are not reexported.
+
+New in 20030307-1:
+Just a refresh from sources.redhat.com with one minor change from Chuck Wilson
+to make the --enable-runtime-pseudo-reloc the default.
+
+New in 20021117-1:
+
+A refresh from sources.redhat.com.
+A notable change is the addition of Egor Duda's --enable-runtime-pseudo-reloc
+option which allows almost transparent linking of dll's without the need
+of an import file.
+
+New in 20021107-1:
+
+A refresh from sources.redhat.com.
+
+Also, uses 128 bit alignment which is apparently required for Java.
+
+New in 20020826-1:
+
+Just a refresh from sources.redhat.com.
+
+New in 20020706-2:
+
+Fastcall support from Eric Kohl.
+
+New in 20020706-1:
+
+Removed experimental increased default alignment from coff-i386.c.
+This caused strange problems running constructors.
+
+New in 20020630-2:
+
+This document is just a place to keep track of various issues
+related to the '--enable-auto-import' feature of recent
+(20010802 and newer) binutils on cygwin.
+
+Quoting from various mail messages:
+
+From: Charles Wilson
+To: cygwin-apps@cygwin.com
+Subject: Re: binutils request
+Date: Thu, 06 Jun 2002 11:09:20 -0400
+
+Default handling of --enable-auto-import has changed slightly.  In the
+earlier cygwin release of binutils, --enable-auto-import was the
+default, and ld would issue warnings whenever variables from DLLs were
+auto-imported.  Also, in the past if you explicitly specified
+"--enable-auto-import", the behavior was the same: auto-import was
+activated, and warnings were generated.
+
+In this new release, auto-import is still enabled by default.  Whenever
+variables from DLLs are auto-imported, ld issues an info_msg (not a
+warning).  However, if you explicitly specify "--enable-auto-import",
+then those info_msgs are suppressed.
+
+--Chuck
+
+			-- )*(--)*(--)*( --
+
+From: Ralf Habacker
+To: <cygwin-apps@cygwin.com>
+Subject: RE: binutils request
+Date: Thu, 6 Jun 2002 18:44:25 +0200
+
+   * pe-dll.cc (autofilter_symbolprefixlist): don't export
+      reimported functions.
+     (make_one): let create only _nm_.. for data symbols
+
+
+			-- )*(--)*(--)*( --
+
+From: Danny Smith
+To: cygwin-apps@cygwin.com
+Subject: Re: binutils request
+Date: Fri, 7 Jun 2002 07:02:37 +1000 (EST)
+
+from ld.texinfo
+
+@kindex --exclude-libs
+@item --exclude-libs @var{lib},@var{lib},...
+Specifies a list of archive libraries from which symbols should not be
+automatically
+exported. The library names may be delimited by commas or colons.  Specifying
+@code{--exclude-libs ALL} excludes symbols in all archive libraries from
+automatic export. Symbols explicitly listed in a .def file are still exported,
+regardless of this option.
+
+			-- )*(--)*(--)*( --
+
+From: Danny Smith
+To: cygwin-apps@cygwin.com
+Subject: Re: binutils request
+Date: Fri, 7 Jun 2002 09:06:56 +1000 (EST)
+
+Two other fixes in official sources, from ReactOs group:
+
+Many fixes to windres, specifically to dialog boxes and menus.
+
+The addition of checksums to pe headers.
+
+			-- )*(--)*(--)*( --
+
+Plus, of course various and sundry binutils changes from Nick Clifton and
+other binutils maintainers.

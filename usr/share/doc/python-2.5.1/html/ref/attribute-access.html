@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="metaclasses.html" />
+<link rel="prev" href="customization.html" />
+<link rel="parent" href="specialnames.html" />
+<link rel="next" href="new-style-attribute-access.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.4.2 Customizing attribute access</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.1 basic customization"
+  href="customization.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.2.1 more attribute access"
+  href="new-style-attribute-access.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="customization.html">3.4.1 Basic customization</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="new-style-attribute-access.html">3.4.2.1 More attribute access</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION005420000000000000000"></a><a name="attribute-access"></a>
+<br>
+3.4.2 Customizing attribute access
+</h2>
+
+<p>
+The following methods can be defined to customize the meaning of
+attribute access (use of, assignment to, or deletion of <code>x.name</code>)
+for class instances.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-211' xml:id='l2h-211' class="method">__getattr__</tt></b>(</nobr></td>
+  <td><var>self, name</var>)</td></tr></table></dt>
+<dd>
+Called when an attribute lookup has not found the attribute in the
+usual places (i.e. it is not an instance attribute nor is it found in
+the class tree for <code>self</code>).  <code>name</code> is the attribute name.
+This method should return the (computed) attribute value or raise an
+<tt class="exception">AttributeError</tt> exception.
+
+<p>
+Note that if the attribute is found through the normal mechanism,
+<tt class="method">__getattr__()</tt> is not called.  (This is an intentional
+asymmetry between <tt class="method">__getattr__()</tt> and <tt class="method">__setattr__()</tt>.)
+This is done both for efficiency reasons and because otherwise
+<tt class="method">__setattr__()</tt> would have no way to access other attributes of
+the instance.  Note that at least for instance variables, you can fake
+total control by not inserting any values in the instance attribute
+dictionary (but instead inserting them in another object).  See the
+<tt class="method">__getattribute__()</tt> method below for a way to actually get
+total control in new-style classes.
+<a id='l2h-213' xml:id='l2h-213'></a></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-214' xml:id='l2h-214' class="method">__setattr__</tt></b>(</nobr></td>
+  <td><var>self, name, value</var>)</td></tr></table></dt>
+<dd>
+Called when an attribute assignment is attempted.  This is called
+instead of the normal mechanism (i.e. store the value in the instance
+dictionary).  <var>name</var> is the attribute name, <var>value</var> is the
+value to be assigned to it.
+
+<p>
+If <tt class="method">__setattr__()</tt> wants to assign to an instance attribute, it 
+should not simply execute "<tt class="samp">self.<var>name</var> = value</tt>" -- this
+would cause a recursive call to itself.  Instead, it should insert the
+value in the dictionary of instance attributes, e.g.,
+"<tt class="samp">self.__dict__[<var>name</var>] = value</tt>".  For new-style classes,
+rather than accessing the instance dictionary, it should call the base
+class method with the same name, for example,
+"<tt class="samp">object.__setattr__(self, name, value)</tt>".
+<a id='l2h-216' xml:id='l2h-216'></a></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-217' xml:id='l2h-217' class="method">__delattr__</tt></b>(</nobr></td>
+  <td><var>self, name</var>)</td></tr></table></dt>
+<dd>
+Like <tt class="method">__setattr__()</tt> but for attribute deletion instead of
+assignment.  This should only be implemented if "<tt class="samp">del
+obj.<var>name</var></tt>" is meaningful for the object.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="new-style-attribute-access.html">3.4.2.1 More attribute access for new-style classes</a>
+<li><a href="descriptors.html">3.4.2.2 Implementing Descriptors</a>
+<li><a href="descriptor-invocation.html">3.4.2.3 Invoking Descriptors</a>
+<li><a href="slots.html">3.4.2.4 __slots__</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.4.1 basic customization"
+  href="customization.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.4 special method names"
+  href="specialnames.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4.2.1 more attribute access"
+  href="new-style-attribute-access.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="customization.html">3.4.1 Basic customization</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="specialnames.html">3.4 Special method names</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="new-style-attribute-access.html">3.4.2.1 More attribute access</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

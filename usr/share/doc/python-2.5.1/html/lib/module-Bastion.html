@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-rexec.html" />
+<link rel="parent" href="restricted.html" />
+<link rel="next" href="modules.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>28.2 Bastion -- Restricting access to objects</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="28.1.3 an example"
+  href="node846.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="28. restricted Execution"
+  href="restricted.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="29. importing Modules"
+  href="modules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node846.html">28.1.3 An example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="restricted.html">28. Restricted Execution</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="modules.html">29. Importing Modules</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0030200000000000000000">
+28.2 <tt class="module">Bastion</tt> --
+         Restricting access to objects</a>
+</h1>
+
+<p>
+<a name="module-Bastion"></a>
+
+<span class="versionnote">Changed in version 2.3:
+Disabled module.</span>
+
+<p>
+<div class="warning"><b class="label">Warning:</b>
+
+  The documentation has been left in place to help in reading old code
+  that uses the module.
+</div>
+
+<p>
+According to the dictionary, a bastion is ``a fortified area or
+position'', or ``something that is considered a stronghold.''  It's a
+suitable name for this module, which provides a way to forbid access
+to certain attributes of an object.  It must always be used with the
+<tt class="module"><a href="module-rexec.html">rexec</a></tt> module, in order to allow restricted-mode programs
+access to certain safe attributes of an object, while denying access
+to other, unsafe attributes.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5352' xml:id='l2h-5352' class="function">Bastion</tt></b>(</nobr></td>
+  <td><var>object</var><big>[</big><var>, filter</var><big>[</big><var>,
+                          name</var><big>[</big><var>, class</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Protect the object <var>object</var>, returning a bastion for the
+object.  Any attempt to access one of the object's attributes will
+have to be approved by the <var>filter</var> function; if the access is
+denied an <tt class="exception">AttributeError</tt> exception will be raised.
+
+<p>
+If present, <var>filter</var> must be a function that accepts a string
+containing an attribute name, and returns true if access to that
+attribute will be permitted; if <var>filter</var> returns false, the access
+is denied.  The default filter denies access to any function beginning
+with an underscore ("<tt class="character">_</tt>").  The bastion's string representation
+will be "<tt class="samp">&lt;Bastion for <var>name</var>&gt;</tt>" if a value for
+<var>name</var> is provided; otherwise, "<tt class="samp">repr(<var>object</var>)</tt>" will be
+used.
+
+<p>
+<var>class</var>, if present, should be a subclass of <tt class="class">BastionClass</tt>; 
+see the code in <span class="file">bastion.py</span> for the details.  Overriding the
+default <tt class="class">BastionClass</tt> will rarely be required.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5353' xml:id='l2h-5353' class="class">BastionClass</tt></b>(</nobr></td>
+  <td><var>getfunc, name</var>)</td></tr></table></dt>
+<dd>
+Class which actually implements bastion objects.  This is the default
+class used by <tt class="function">Bastion()</tt>.  The <var>getfunc</var> parameter is a
+function which returns the value of an attribute which should be
+exposed to the restricted execution environment when called with the
+name of the attribute as the only parameter.  <var>name</var> is used to
+construct the <tt class="function">repr()</tt> of the <tt class="class">BastionClass</tt> instance.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="28.1.3 an example"
+  href="node846.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="28. restricted Execution"
+  href="restricted.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="29. importing Modules"
+  href="modules.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node846.html">28.1.3 An example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="restricted.html">28. Restricted Execution</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="modules.html">29. Importing Modules</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

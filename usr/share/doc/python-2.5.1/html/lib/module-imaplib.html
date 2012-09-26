@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-nntplib.html" />
+<link rel="prev" href="module-poplib.html" />
+<link rel="parent" href="internet.html" />
+<link rel="next" href="imap4-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.11 imaplib -- IMAP4 protocol client</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.10.2 pop3 Example"
+  href="pop3-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.11.1 imap4 Objects"
+  href="imap4-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pop3-example.html">18.10.2 POP3 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="imap4-objects.html">18.11.1 IMAP4 Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00201100000000000000000">
+18.11 <tt class="module">imaplib</tt> --
+         IMAP4 protocol client</a>
+</h1>
+
+<p>
+<a name="module-imaplib"></a>
+
+<p>
+<a id='l2h-4102' xml:id='l2h-4102'></a><a id='l2h-4103' xml:id='l2h-4103'></a><a id='l2h-4104' xml:id='l2h-4104'></a>
+<p>
+This module defines three classes, <tt class="class">IMAP4</tt>, <tt class="class">IMAP4_SSL</tt>
+and <tt class="class">IMAP4_stream</tt>, which encapsulate a
+connection to an IMAP4 server and implement a large subset of the
+IMAP4rev1 client protocol as defined in <a class="rfc" id='rfcref-103045' xml:id='rfcref-103045'
+href="http://www.faqs.org/rfcs/rfc2060.html">RFC 2060</a>. It is backward
+compatible with IMAP4 (<a class="rfc" id='rfcref-103047' xml:id='rfcref-103047'
+href="http://www.faqs.org/rfcs/rfc1730.html">RFC 1730</a>) servers, but note that the
+"<tt class="samp">STATUS</tt>" command is not supported in IMAP4.
+
+<p>
+Three classes are provided by the <tt class="module">imaplib</tt> module,
+<tt class="class">IMAP4</tt> is the base class:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4105' xml:id='l2h-4105' class="class">IMAP4</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>host</var><big>[</big><var>, port</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This class implements the actual IMAP4 protocol.  The connection is
+created and protocol version (IMAP4 or IMAP4rev1) is determined when
+the instance is initialized.
+If <var>host</var> is not specified, <code>''</code> (the local host) is used.
+If <var>port</var> is omitted, the standard IMAP4 port (143) is used.
+</dl>
+
+<p>
+Three exceptions are defined as attributes of the <tt class="class">IMAP4</tt> class:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4106' xml:id='l2h-4106' class="exception">IMAP4.error</tt></b></dt>
+<dd>
+Exception raised on any errors.  The reason for the exception is
+passed to the constructor as a string.
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4107' xml:id='l2h-4107' class="exception">IMAP4.abort</tt></b></dt>
+<dd>
+IMAP4 server errors cause this exception to be raised.  This is a
+sub-class of <tt class="exception">IMAP4.error</tt>.  Note that closing the instance
+and instantiating a new one will usually allow recovery from this
+exception.
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4108' xml:id='l2h-4108' class="exception">IMAP4.readonly</tt></b></dt>
+<dd>
+This exception is raised when a writable mailbox has its status
+changed by the server.  This is a sub-class of
+<tt class="exception">IMAP4.error</tt>.  Some other client now has write permission,
+and the mailbox will need to be re-opened to re-obtain write
+permission.
+</dd></dl>
+
+<p>
+There's also a subclass for secure connections:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4109' xml:id='l2h-4109' class="class">IMAP4_SSL</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>host</var><big>[</big><var>, port</var><big>[</big><var>,
+                             keyfile</var><big>[</big><var>, certfile</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a subclass derived from <tt class="class">IMAP4</tt> that connects over an
+SSL encrypted socket (to use this class you need a socket module that
+was compiled with SSL support).  If <var>host</var> is not specified,
+<code>''</code> (the local host) is used.  If <var>port</var> is omitted, the
+standard IMAP4-over-SSL port (993) is used.  <var>keyfile</var> and
+<var>certfile</var> are also optional - they can contain a PEM formatted
+private key and certificate chain file for the SSL connection.
+</dl>
+
+<p>
+The second subclass allows for connections created by a child process:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4110' xml:id='l2h-4110' class="class">IMAP4_stream</tt></b>(</nobr></td>
+  <td><var>command</var>)</td></tr></table></dt>
+<dd>
+This is a subclass derived from <tt class="class">IMAP4</tt> that connects
+to the <code>stdin/stdout</code> file descriptors created by passing
+<var>command</var> to <code>os.popen2()</code>.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+The following utility functions are defined:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4111' xml:id='l2h-4111' class="function">Internaldate2tuple</tt></b>(</nobr></td>
+  <td><var>datestr</var>)</td></tr></table></dt>
+<dd>
+  Converts an IMAP4 INTERNALDATE string to Coordinated Universal
+  Time. Returns a <tt class="module"><a href="module-time.html">time</a></tt> module tuple.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4112' xml:id='l2h-4112' class="function">Int2AP</tt></b>(</nobr></td>
+  <td><var>num</var>)</td></tr></table></dt>
+<dd>
+  Converts an integer into a string representation using characters
+  from the set [<code>A</code> .. <code>P</code>].
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4113' xml:id='l2h-4113' class="function">ParseFlags</tt></b>(</nobr></td>
+  <td><var>flagstr</var>)</td></tr></table></dt>
+<dd>
+  Converts an IMAP4 "<tt class="samp">FLAGS</tt>" response to a tuple of individual
+  flags.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4114' xml:id='l2h-4114' class="function">Time2Internaldate</tt></b>(</nobr></td>
+  <td><var>date_time</var>)</td></tr></table></dt>
+<dd>
+  Converts a <tt class="module"><a href="module-time.html">time</a></tt> module tuple to an IMAP4
+  "<tt class="samp">INTERNALDATE</tt>" representation.  Returns a string in the form:
+  <code>"DD-Mmm-YYYY HH:MM:SS +HHMM"</code> (including double-quotes).
+</dl>
+
+<p>
+Note that IMAP4 message numbers change as the mailbox changes; in
+particular, after an "<tt class="samp">EXPUNGE</tt>" command performs deletions the
+remaining messages are renumbered. So it is highly advisable to use
+UIDs instead, with the UID command.
+
+<p>
+At the end of the module, there is a test section that contains a more
+extensive example of usage.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <div class="seetext"><p>Documents describing the protocol, and sources and binaries 
+           for servers implementing it, can all be found at the
+           University of Washington's <em>IMAP Information Center</em>
+           (<a class="url" href="http://www.cac.washington.edu/imap/">http://www.cac.washington.edu/imap/</a>).</p></div>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="imap4-objects.html">18.11.1 IMAP4 Objects</a>
+<li><a href="imap4-example.html">18.11.2 IMAP4 Example</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.10.2 pop3 Example"
+  href="pop3-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.11.1 imap4 Objects"
+  href="imap4-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pop3-example.html">18.10.2 POP3 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="imap4-objects.html">18.11.1 IMAP4 Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-thread.html" />
+<link rel="prev" href="someos.html" />
+<link rel="parent" href="someos.html" />
+<link rel="next" href="poll-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>15.1 select -- Waiting for I/O completion</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15. optional Operating System"
+  href="someos.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15. optional Operating System"
+  href="someos.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.1.1 polling Objects"
+  href="poll-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="someos.html">15. Optional Operating System</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="someos.html">15. Optional Operating System</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="poll-objects.html">15.1.1 Polling Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0017100000000000000000">
+15.1 <tt class="module">select</tt> --
+         Waiting for I/O completion</a>
+</h1>
+
+<p>
+<a name="module-select"></a>
+
+<p>
+This module provides access to the <tt class="cfunction">select()</tt>
+and <tt class="cfunction">poll()</tt> functions
+available in most operating systems.  Note that on Windows, it only
+works for sockets; on other operating systems, it also works for other
+file types (in particular, on <span class="Unix">Unix</span>, it works on pipes).  It cannot
+be used on regular files to determine whether a file has grown since
+it was last read.
+
+<p>
+The module defines the following:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-3392' xml:id='l2h-3392' class="exception">error</tt></b></dt>
+<dd>
+The exception raised when an error occurs.  The accompanying value is
+a pair containing the numeric error code from <tt class="cdata">errno</tt> and the
+corresponding string, as would be printed by the C function
+<tt class="cfunction">perror()</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3393' xml:id='l2h-3393' class="function">poll</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+(Not supported by all operating systems.)  Returns a polling object,
+which supports registering and unregistering file descriptors, and
+then polling them for I/O events;
+see section&nbsp;<a href="poll-objects.html#poll-objects">15.1.1</a> below for the methods supported by
+polling objects.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3394' xml:id='l2h-3394' class="function">select</tt></b>(</nobr></td>
+  <td><var>iwtd, owtd, ewtd</var><big>[</big><var>, timeout</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a straightforward interface to the <span class="Unix">Unix</span> <tt class="cfunction">select()</tt>
+system call.  The first three arguments are sequences of `waitable
+objects': either integers representing file descriptors or
+objects with a parameterless method named <tt class="method">fileno()</tt> returning
+such an integer.  The three sequences of waitable objects are for input,
+output and `exceptional conditions', respectively.  Empty sequences are
+allowed, but acceptance of three empty sequences is platform-dependent.
+(It is known to work on <span class="Unix">Unix</span> but not on Windows.)  The optional
+<var>timeout</var> argument specifies a time-out as a floating point number
+in seconds.  When the <var>timeout</var> argument is omitted the function
+blocks until at least one file descriptor is ready.  A time-out value
+of zero specifies a poll and never blocks.
+
+<p>
+The return value is a triple of lists of objects that are ready:
+subsets of the first three arguments.  When the time-out is reached
+without a file descriptor becoming ready, three empty lists are
+returned.
+
+<p>
+Among the acceptable object types in the sequences are Python file
+objects (e.g. <code>sys.stdin</code>, or objects returned by
+<tt class="function">open()</tt> or <tt class="function">os.popen()</tt>), socket objects
+returned by <tt class="function">socket.socket()</tt>.<a id='l2h-3396' xml:id='l2h-3396'></a><a id='l2h-3398' xml:id='l2h-3398'></a>You may also define a <i class="dfn">wrapper</i> class yourself, as long as it has
+an appropriate <tt class="method">fileno()</tt> method (that really returns a file
+descriptor, not just a random integer).
+<span class="note"><b class="label">Note:</b>
+File objects on Windows are not acceptable, but sockets
+are.<a id='l2h-3399' xml:id='l2h-3399'></a>  On Windows, the underlying <tt class="cfunction">select()</tt>
+function is provided by the WinSock library, and does not handle file
+descriptors that don't originate from WinSock.</span>
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="poll-objects.html">15.1.1 Polling Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15. optional Operating System"
+  href="someos.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15. optional Operating System"
+  href="someos.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.1.1 polling Objects"
+  href="poll-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="someos.html">15. Optional Operating System</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="someos.html">15. Optional Operating System</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="poll-objects.html">15.1.1 Polling Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

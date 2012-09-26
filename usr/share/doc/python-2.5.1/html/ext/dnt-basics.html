@@ -1,0 +1,470 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="dnt-type-methods.html" />
+<link rel="prev" href="defining-new-types.html" />
+<link rel="parent" href="defining-new-types.html" />
+<link rel="next" href="node22.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.1 The Basics
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2. defining New Types"
+  href="defining-new-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. defining New Types"
+  href="defining-new-types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1.1 adding data and"
+  href="node22.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="defining-new-types.html">2. Defining New Types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="defining-new-types.html">2. Defining New Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node22.html">2.1.1 Adding data and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION004100000000000000000"></a><a name="dnt-basics"></a>
+<br>
+2.1 The Basics
+    
+</h1>
+
+<p>
+The Python runtime sees all Python objects as variables of type
+<tt class="ctype">PyObject*</tt>.  A <tt class="ctype">PyObject</tt> is not a very magnificent
+object - it just contains the refcount and a pointer to the object's
+``type object''.  This is where the action is; the type object
+determines which (C) functions get called when, for instance, an
+attribute gets looked up on an object or it is multiplied by another
+object.  These C functions are called ``type methods'' to distinguish
+them from things like <code>[].append</code> (which we call ``object
+methods'').
+
+<p>
+So, if you want to define a new object type, you need to create a new
+type object.
+
+<p>
+This sort of thing can only be explained by example, so here's a
+minimal, but complete, module that defines a new type:
+
+<p>
+<div class="verbatim">
+<pre>#include &lt;Python.h&gt;
+
+typedef struct {
+    PyObject_HEAD
+    /* Type-specific fields go here. */
+} noddy_NoddyObject;
+
+static PyTypeObject noddy_NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    0,                         /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+    "Noddy objects",           /* tp_doc */
+};
+
+static PyMethodDef noddy_methods[] = {
+    {NULL}  /* Sentinel */
+};
+
+#ifndef PyMODINIT_FUNC	/* declarations for DLL import/export */
+#define PyMODINIT_FUNC void
+#endif
+PyMODINIT_FUNC
+initnoddy(void) 
+{
+    PyObject* m;
+
+    noddy_NoddyType.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&amp;noddy_NoddyType) &lt; 0)
+        return;
+
+    m = Py_InitModule3("noddy", noddy_methods,
+                       "Example module that creates an extension type.");
+
+    Py_INCREF(&amp;noddy_NoddyType);
+    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;noddy_NoddyType);
+}
+</pre>
+<div class="footer">
+<a href="noddy.txt" type="text/plain">Download as text (original file name: <span class="file">noddy.c</span>).</a>
+</div></div>
+
+<p>
+Now that's quite a bit to take in at once, but hopefully bits will
+seem familiar from the last chapter.
+
+<p>
+The first bit that will be new is:
+
+<p>
+<div class="verbatim"><pre>
+typedef struct {
+    PyObject_HEAD
+} noddy_NoddyObject;
+</pre></div>
+
+<p>
+This is what a Noddy object will contain--in this case, nothing more
+than every Python object contains, namely a refcount and a pointer to a type
+object.  These are the fields the <code>PyObject_HEAD</code> macro brings
+in.  The reason for the macro is to standardize the layout and to
+enable special debugging fields in debug builds.  Note that there is
+no semicolon after the <code>PyObject_HEAD</code> macro; one is included in
+the macro definition.  Be wary of adding one by accident; it's easy to
+do from habit, and your compiler might not complain, but someone
+else's probably will!  (On Windows, MSVC is known to call this an
+error and refuse to compile the code.)
+
+<p>
+For contrast, let's take a look at the corresponding definition for
+standard Python integers:
+
+<p>
+<div class="verbatim"><pre>
+typedef struct {
+    PyObject_HEAD
+    long ob_ival;
+} PyIntObject;
+</pre></div>
+
+<p>
+Moving on, we come to the crunch -- the type object.
+
+<p>
+<div class="verbatim"><pre>
+static PyTypeObject noddy_NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    0,                         /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+    "Noddy objects",           /* tp_doc */
+};
+</pre></div>
+
+<p>
+Now if you go and look up the definition of <tt class="ctype">PyTypeObject</tt> in
+<span class="file">object.h</span> you'll see that it has many more fields that the
+definition above.  The remaining fields will be filled with zeros by
+the C compiler, and it's common practice to not specify them
+explicitly unless you need them.
+
+<p>
+This is so important that we're going to pick the top of it apart still
+further:
+
+<p>
+<div class="verbatim"><pre>
+    PyObject_HEAD_INIT(NULL)
+</pre></div>
+
+<p>
+This line is a bit of a wart; what we'd like to write is:
+
+<p>
+<div class="verbatim"><pre>
+    PyObject_HEAD_INIT(&amp;PyType_Type)
+</pre></div>
+
+<p>
+as the type of a type object is ``type'', but this isn't strictly
+conforming C and some compilers complain.  Fortunately, this member
+will be filled in for us by <tt class="cfunction">PyType_Ready()</tt>.
+
+<p>
+<div class="verbatim"><pre>
+    0,                          /* ob_size */
+</pre></div>
+
+<p>
+The <tt class="member">ob_size</tt> field of the header is not used; its presence in
+the type structure is a historical artifact that is maintained for
+binary compatibility with extension modules compiled for older
+versions of Python.  Always set this field to zero.
+
+<p>
+<div class="verbatim"><pre>
+    "noddy.Noddy",              /* tp_name */
+</pre></div>
+
+<p>
+The name of our type.  This will appear in the default textual
+representation of our objects and in some error messages, for example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; "" + noddy.new_noddy()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+TypeError: cannot add type "noddy.Noddy" to string
+</pre></div>
+
+<p>
+Note that the name is a dotted name that includes both the module name
+and the name of the type within the module. The module in this case is
+<tt class="module">noddy</tt> and the type is <tt class="class">Noddy</tt>, so we set the type name
+to <tt class="class">noddy.Noddy</tt>.
+
+<p>
+<div class="verbatim"><pre>
+    sizeof(noddy_NoddyObject),  /* tp_basicsize */
+</pre></div>
+
+<p>
+This is so that Python knows how much memory to allocate when you call
+<tt class="cfunction">PyObject_New()</tt>.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+If you want your type to be subclassable from Python, and your
+type has the same <tt class="member">tp_basicsize</tt> as its base type, you may
+have problems with multiple inheritance.  A Python subclass of your
+type will have to list your type first in its <tt class="member">__bases__</tt>, or
+else it will not be able to call your type's <tt class="method">__new__</tt> method
+without getting an error.  You can avoid this problem by ensuring
+that your type has a larger value for <tt class="member">tp_basicsize</tt> than
+its base type does.  Most of the time, this will be true anyway,
+because either your base type will be <tt class="class">object</tt>, or else you will
+be adding data members to your base type, and therefore increasing its
+size.</span>
+
+<p>
+<div class="verbatim"><pre>
+    0,                          /* tp_itemsize */
+</pre></div>
+
+<p>
+This has to do with variable length objects like lists and strings.
+Ignore this for now.
+
+<p>
+Skipping a number of type methods that we don't provide, we set the
+class flags to <tt class="constant">Py_TPFLAGS_DEFAULT</tt>.
+
+<p>
+<div class="verbatim"><pre>
+    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+</pre></div>
+
+<p>
+All types should include this constant in their flags.  It enables all
+of the members defined by the current version of Python.
+
+<p>
+We provide a doc string for the type in <tt class="member">tp_doc</tt>.
+
+<p>
+<div class="verbatim"><pre>
+    "Noddy objects",           /* tp_doc */
+</pre></div>
+
+<p>
+Now we get into the type methods, the things that make your objects
+different from the others.  We aren't going to implement any of these
+in this version of the module.  We'll expand this example later to
+have more interesting behavior.
+
+<p>
+For now, all we want to be able to do is to create new <tt class="class">Noddy</tt>
+objects. To enable object creation, we have to provide a
+<tt class="member">tp_new</tt> implementation. In this case, we can just use the
+default implementation provided by the API function
+<tt class="cfunction">PyType_GenericNew()</tt>.  We'd like to just assign this to the
+<tt class="member">tp_new</tt> slot, but we can't, for portability sake, On some
+platforms or compilers, we can't statically initialize a structure
+member with a function defined in another C module, so, instead, we'll
+assign the <tt class="member">tp_new</tt> slot in the module initialization function
+just before calling <tt class="cfunction">PyType_Ready()</tt>:
+
+<p>
+<div class="verbatim"><pre>
+    noddy_NoddyType.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&amp;noddy_NoddyType) &lt; 0)
+        return;
+</pre></div>
+
+<p>
+All the other type methods are <tt class="constant">NULL</tt>, so we'll go over them later
+-- that's for a later section!
+
+<p>
+Everything else in the file should be familiar, except for some code
+in <tt class="cfunction">initnoddy()</tt>:
+
+<p>
+<div class="verbatim"><pre>
+    if (PyType_Ready(&amp;noddy_NoddyType) &lt; 0)
+        return;
+</pre></div>
+
+<p>
+This initializes the <tt class="class">Noddy</tt> type, filing in a number of
+members, including <tt class="member">ob_type</tt> that we initially set to <tt class="constant">NULL</tt>.
+
+<p>
+<div class="verbatim"><pre>
+    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;noddy_NoddyType);
+</pre></div>
+
+<p>
+This adds the type to the module dictionary.  This allows us to create
+<tt class="class">Noddy</tt> instances by calling the <tt class="class">Noddy</tt> class:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import noddy
+&gt;&gt;&gt; mynoddy = noddy.Noddy()
+</pre></div>
+
+<p>
+That's it!  All that remains is to build it; put the above code in a
+file called <span class="file">noddy.c</span> and
+
+<p>
+<div class="verbatim"><pre>
+from distutils.core import setup, Extension
+setup(name="noddy", version="1.0",
+      ext_modules=[Extension("noddy", ["noddy.c"])])
+</pre></div>
+
+<p>
+in a file called <span class="file">setup.py</span>; then typing
+
+<p>
+<div class="verbatim"><pre>
+$ python setup.py build
+</pre></div> 
+<p>
+at a shell should produce a file <span class="file">noddy.so</span> in a subdirectory;
+move to that directory and fire up Python -- you should be able to
+<code>import noddy</code> and play around with Noddy objects.
+
+<p>
+That wasn't so hard, was it?
+
+<p>
+Of course, the current Noddy type is pretty uninteresting. It has no
+data and doesn't do anything. It can't even be subclassed.
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node22.html">2.1.1 Adding data and methods to the Basic example</a>
+<li><a href="node23.html">2.1.2 Providing finer control over data attributes</a>
+<li><a href="node24.html">2.1.3 Supporting cyclic garbage collection</a>
+<li><a href="node25.html">2.1.4 Subclassing other types</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2. defining New Types"
+  href="defining-new-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. defining New Types"
+  href="defining-new-types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1.1 adding data and"
+  href="node22.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="defining-new-types.html">2. Defining New Types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="defining-new-types.html">2. Defining New Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node22.html">2.1.1 Adding data and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

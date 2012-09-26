@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="objects.html" />
+<link rel="prev" href="intro.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.1 Include Files </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1. Introduction"
+  href="intro.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. Introduction"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.2 Objects, types and"
+  href="objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="intro.html">1. Introduction</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Introduction</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="objects.html">1.2 Objects, Types and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION003100000000000000000"></a><a name="includes"></a>
+<br>
+1.1 Include Files 
+</h1>
+
+<p>
+All function, type and macro definitions needed to use the Python/C
+API are included in your code by the following line:
+
+<p>
+<div class="verbatim"><pre>
+#include "Python.h"
+</pre></div>
+
+<p>
+This implies inclusion of the following standard headers:
+<code>&lt;stdio.h&gt;</code>, <code>&lt;string.h&gt;</code>, <code>&lt;errno.h&gt;</code>,
+<code>&lt;limits.h&gt;</code>, and <code>&lt;stdlib.h&gt;</code> (if available).
+
+<p>
+<div class="warning"><b class="label">Warning:</b>
+
+  Since Python may define some pre-processor definitions which affect
+  the standard headers on some systems, you <em>must</em> include
+  <span class="file">Python.h</span> before any standard headers are included.
+</div>
+
+<p>
+All user visible names defined by Python.h (except those defined by
+the included standard headers) have one of the prefixes "<tt class="samp">Py</tt>" or
+"<tt class="samp">_Py</tt>".  Names beginning with "<tt class="samp">_Py</tt>" are for internal use by
+the Python implementation and should not be used by extension writers.
+Structure member names do not have a reserved prefix.
+
+<p>
+<strong>Important:</strong> user code should never define names that begin
+with "<tt class="samp">Py</tt>" or "<tt class="samp">_Py</tt>".  This confuses the reader, and
+jeopardizes the portability of the user code to future Python
+versions, which may define additional names beginning with one of
+these prefixes.
+
+<p>
+The header files are typically installed with Python.  On <span class="Unix">Unix</span>, these 
+are located in the directories
+<span class="file"><a class="envvar" id='l2h-1' xml:id='l2h-1'>prefix</a>/include/python<var>version</var>/</span> and
+<span class="file"><a class="envvar" id='l2h-2' xml:id='l2h-2'>exec_prefix</a>/include/python<var>version</var>/</span>, where
+<a class="envvar" id='l2h-4' xml:id='l2h-4'>prefix</a> and <a class="envvar" id='l2h-5' xml:id='l2h-5'>exec_prefix</a> are defined by the
+corresponding parameters to Python's <b class="program">configure</b> script and
+<var>version</var> is <code>sys.version[:3]</code>.  On Windows, the headers are
+installed in <span class="file"><a class="envvar" id='l2h-3' xml:id='l2h-3'>prefix</a>/include</span>, where <a class="envvar" id='l2h-6' xml:id='l2h-6'>prefix</a> is
+the installation directory specified to the installer.
+
+<p>
+To include the headers, place both directories (if different) on your
+compiler's search path for includes.  Do <em>not</em> place the parent
+directories on the search path and then use
+"<tt class="samp">#include &lt;python2.5/Python.h&gt;</tt>"; this will break on
+multi-platform builds since the platform independent headers under
+<a class="envvar" id='l2h-7' xml:id='l2h-7'>prefix</a> include the platform specific headers from
+<a class="envvar" id='l2h-8' xml:id='l2h-8'>exec_prefix</a>.
+
+<p>
+C++ users should note that though the API is defined entirely using
+C, the header files do properly declare the entry points to be
+<code>extern "C"</code>, so there is no need to do anything special to use
+the API from C++.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1. Introduction"
+  href="intro.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. Introduction"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.2 Objects, types and"
+  href="objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="intro.html">1. Introduction</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Introduction</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="objects.html">1.2 Objects, Types and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

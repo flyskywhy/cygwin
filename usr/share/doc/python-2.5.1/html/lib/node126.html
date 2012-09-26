@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="decimal-decimal.html" />
+<link rel="prev" href="decimal-tutorial.html" />
+<link rel="parent" href="module-decimal.html" />
+<link rel="next" href="decimal-decimal.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.2 Decimal objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.1 quick-start Tutorial"
+  href="decimal-tutorial.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.3 context objects"
+  href="decimal-decimal.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-tutorial.html">6.3.1 Quick-start Tutorial</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-decimal.html">6.3.3 Context objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION008320000000000000000"></a><a name="decimal-decimal"></a>
+<br>
+6.3.2 Decimal objects 
+</h2>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-979' xml:id='l2h-979' class="class">Decimal</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>value </var><big>[</big><var>, context</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Constructs a new <tt class="class">Decimal</tt> object based from <var>value</var>.
+
+<p>
+<var>value</var> can be an integer, string, tuple, or another <tt class="class">Decimal</tt>
+  object. If no <var>value</var> is given, returns <code>Decimal("0")</code>.  If
+  <var>value</var> is a string, it should conform to the decimal numeric string
+  syntax:
+
+<p>
+<div class="verbatim"><pre>
+    sign           ::=  '+' | '-'
+    digit          ::=  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+    indicator      ::=  'e' | 'E'
+    digits         ::=  digit [digit]...
+    decimal-part   ::=  digits '.' [digits] | ['.'] digits
+    exponent-part  ::=  indicator [sign] digits
+    infinity       ::=  'Infinity' | 'Inf'
+    nan            ::=  'NaN' [digits] | 'sNaN' [digits]
+    numeric-value  ::=  decimal-part [exponent-part] | infinity
+    numeric-string ::=  [sign] numeric-value | [sign] nan
+</pre></div>
+
+<p>
+If <var>value</var> is a <tt class="class">tuple</tt>, it should have three components,
+  a sign (<tt class="constant">0</tt> for positive or <tt class="constant">1</tt> for negative),
+  a <tt class="class">tuple</tt> of digits, and an integer exponent. For example,
+  "<tt class="samp">Decimal((0, (1, 4, 1, 4), -3))</tt>" returns <code>Decimal("1.414")</code>.
+
+<p>
+The <var>context</var> precision does not affect how many digits are stored.
+  That is determined exclusively by the number of digits in <var>value</var>. For
+  example, "<tt class="samp">Decimal("3.00000")</tt>" records all five zeroes even if the
+  context precision is only three.
+
+<p>
+The purpose of the <var>context</var> argument is determining what to do if
+  <var>value</var> is a malformed string.  If the context traps
+  <tt class="constant">InvalidOperation</tt>, an exception is raised; otherwise, the
+  constructor returns a new Decimal with the value of <tt class="constant">NaN</tt>.
+
+<p>
+Once constructed, <tt class="class">Decimal</tt> objects are immutable.
+</dl>
+
+<p>
+Decimal floating point objects share many properties with the other builtin
+numeric types such as <tt class="class">float</tt> and <tt class="class">int</tt>.  All of the usual
+math operations and special methods apply.  Likewise, decimal objects can
+be copied, pickled, printed, used as dictionary keys, used as set elements,
+compared, sorted, and coerced to another type (such as <tt class="class">float</tt>
+or <tt class="class">long</tt>).
+
+<p>
+In addition to the standard numeric properties, decimal floating point objects
+also have a number of specialized methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-980' xml:id='l2h-980' class="method">adjusted</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the adjusted exponent after shifting out the coefficient's rightmost
+  digits until only the lead digit remains: <code>Decimal("321e+5").adjusted()</code>
+  returns seven.  Used for determining the position of the most significant
+  digit with respect to the decimal point.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-981' xml:id='l2h-981' class="method">as_tuple</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Returns a tuple representation of the number:
+  "<tt class="samp">(sign, digittuple, exponent)</tt>".
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-982' xml:id='l2h-982' class="method">compare</tt></b>(</nobr></td>
+  <td><var>other</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Compares like <tt class="method">__cmp__()</tt> but returns a decimal instance:
+  <div class="verbatim"><pre>
+        a or b is a NaN ==&gt; Decimal("NaN")
+        a &lt; b           ==&gt; Decimal("-1")
+        a == b          ==&gt; Decimal("0")
+        a &gt; b           ==&gt; Decimal("1")
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-983' xml:id='l2h-983' class="method">max</tt></b>(</nobr></td>
+  <td><var>other</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Like "<tt class="samp">max(self, other)</tt>" except that the context rounding rule
+  is applied before returning and that <tt class="constant">NaN</tt> values are
+  either signalled or ignored (depending on the context and whether
+  they are signaling or quiet).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-984' xml:id='l2h-984' class="method">min</tt></b>(</nobr></td>
+  <td><var>other</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Like "<tt class="samp">min(self, other)</tt>" except that the context rounding rule
+  is applied before returning and that <tt class="constant">NaN</tt> values are
+  either signalled or ignored (depending on the context and whether
+  they are signaling or quiet).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-985' xml:id='l2h-985' class="method">normalize</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Normalize the number by stripping the rightmost trailing zeroes and
+  converting any result equal to <tt class="constant">Decimal("0")</tt> to
+  <tt class="constant">Decimal("0e0")</tt>. Used for producing canonical values for members
+  of an equivalence class. For example, <code>Decimal("32.100")</code> and
+  <code>Decimal("0.321000e+2")</code> both normalize to the equivalent value
+  <code>Decimal("32.1")</code>.
+</dl>                                              
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-986' xml:id='l2h-986' class="method">quantize</tt></b>(</nobr></td>
+  <td><var>exp </var><big>[</big><var>, rounding</var><big>[</big><var>, context</var><big>[</big><var>, watchexp</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Quantize makes the exponent the same as <var>exp</var>.  Searches for a
+  rounding method in <var>rounding</var>, then in <var>context</var>, and then
+  in the current context.
+
+<p>
+If <var>watchexp</var> is set (default), then an error is returned whenever
+  the resulting exponent is greater than <tt class="member">Emax</tt> or less than
+  <tt class="member">Etiny</tt>.
+</dl> 
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-987' xml:id='l2h-987' class="method">remainder_near</tt></b>(</nobr></td>
+  <td><var>other</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Computes the modulo as either a positive or negative value depending
+  on which is closest to zero.  For instance,
+  "<tt class="samp">Decimal(10).remainder_near(6)</tt>" returns <code>Decimal("-2")</code>
+  which is closer to zero than <code>Decimal("4")</code>.
+
+<p>
+If both are equally close, the one chosen will have the same sign
+  as <var>self</var>.
+</dl>  
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-988' xml:id='l2h-988' class="method">same_quantum</tt></b>(</nobr></td>
+  <td><var>other</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Test whether self and other have the same exponent or whether both
+  are <tt class="constant">NaN</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-989' xml:id='l2h-989' class="method">sqrt</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return the square root to full precision.
+</dl>                    
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-990' xml:id='l2h-990' class="method">to_eng_string</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Convert to an engineering-type string.
+
+<p>
+Engineering notation has an exponent which is a multiple of 3, so there
+  are up to 3 digits left of the decimal place.  For example, converts
+  <code>Decimal('123E+1')</code> to <code>Decimal("1.23E+3")</code>
+</dl>  
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-991' xml:id='l2h-991' class="method">to_integral</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>rounding</var><big>[</big><var>, context</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>                   
+  Rounds to the nearest integer without signaling <tt class="constant">Inexact</tt>
+  or <tt class="constant">Rounded</tt>.  If given, applies <var>rounding</var>; otherwise,
+  uses the rounding method in either the supplied <var>context</var> or the
+  current context.
+</dl> 
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.1 quick-start Tutorial"
+  href="decimal-tutorial.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.3 context objects"
+  href="decimal-decimal.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-tutorial.html">6.3.1 Quick-start Tutorial</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-decimal.html">6.3.3 Context objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<html xmlns:cf="http://docbook.sourceforge.net/xmlns/chunkfast/1.0">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>GtkTreeSortable</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.69.0">
+<link rel="start" href="index.html" title="GTK+ Reference Manual">
+<link rel="up" href="TreeWidgetObjects.html" title="Tree, List and Icon Grid Widgets">
+<link rel="prev" href="GtkIconView.html" title="GtkIconView">
+<link rel="next" href="GtkTreeModelSort.html" title="GtkTreeModelSort">
+<meta name="generator" content="GTK-Doc V1.3 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="part" href="gtk.html" title="Part&#160;1.&#160;GTK+ Overview">
+<link rel="part" href="gtkbase.html" title="Part&#160;2.&#160;GTK+ Core Reference">
+<link rel="part" href="gtkobjects.html" title="Part&#160;3.&#160;GTK+ Widgets and Objects">
+<link rel="chapter" href="ch01.html" title="Object Hierarchy">
+<link rel="chapter" href="ch02.html" title="Widget Gallery">
+<link rel="chapter" href="WindowWidgets.html" title="Windows">
+<link rel="chapter" href="DisplayWidgets.html" title="Display Widgets">
+<link rel="chapter" href="ButtonWidgets.html" title="Buttons and Toggles">
+<link rel="chapter" href="NumericEntry.html" title="Numeric/Text Data Entry">
+<link rel="chapter" href="TextWidgetObjects.html" title="Multiline Text Editor">
+<link rel="chapter" href="TreeWidgetObjects.html" title="Tree, List and Icon Grid Widgets">
+<link rel="chapter" href="MenusAndCombos.html" title="Menus, Combo Box, Toolbar">
+<link rel="chapter" href="Actions.html" title="Action-based menus and toolbars">
+<link rel="chapter" href="SelectorWidgets.html" title="Selectors (File/Font/Color/Input Devices)">
+<link rel="chapter" href="LayoutContainers.html" title="Layout Containers">
+<link rel="chapter" href="Ornaments.html" title="Ornaments">
+<link rel="chapter" href="ScrollingWidgets.html" title="Scrolling">
+<link rel="chapter" href="MiscObjects.html" title="Miscellaneous">
+<link rel="chapter" href="AbstractObjects.html" title="Abstract Base Classes">
+<link rel="chapter" href="PlugSocket.html" title="Cross-process Embedding">
+<link rel="chapter" href="SpecialObjects.html" title="Special-purpose features">
+<link rel="chapter" href="DeprecatedObjects.html" title="Deprecated">
+<link rel="part" href="migrating.html" title="Part&#160;4.&#160;Migrating from Previous Versions of GTK+">
+<link rel="chapter" href="gtk-migrating-checklist.html" title="Migration Checklist">
+<link rel="chapter" href="gtk-migrating-GtkFileChooser.html" title="Migrating from GtkFileSelection to GtkFileChooser">
+<link rel="chapter" href="gtk-migrating-GtkAction.html" title="Migrating from old menu and toolbar systems to GtkAction">
+<link rel="chapter" href="gtk-migrating-GtkComboBox.html" title="Migrating from GtkOptionMenu and GtkCombo to GtkComboBox and GtkComboBoxEntry">
+<link rel="chapter" href="gtk-migrating-GtkIconView.html" title="Migrating from GnomeIconList to GtkIconView">
+<link rel="chapter" href="gtk-migrating-GtkAboutDialog.html" title="Migrating from GnomeAbout to GtkAboutDialog">
+<link rel="chapter" href="gtk-migrating-GtkColorButton.html" title="Migrating from GnomeColorPicker to GtkColorButton">
+<link rel="part" href="pt05.html" title="Part&#160;5.&#160;GTK+ Tools">
+<link rel="glossary" href="glossary.html" title="Glossary">
+<link rel="index" href="ix01.html" title="Index">
+<link rel="index" href="ix02.html" title="Index of deprecated symbols">
+<link rel="index" href="ix03.html" title="Index of new symbols in 2.2">
+<link rel="index" href="ix04.html" title="Index of new symbols in 2.4">
+<link rel="index" href="ix05.html" title="Index of new symbols in 2.6">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2"><tr valign="middle">
+<td><a accesskey="p" href="GtkIconView.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="u" href="TreeWidgetObjects.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
+<th width="100%" align="center">GTK+ Reference Manual</th>
+<td><a accesskey="n" href="GtkTreeModelSort.html"><img src="right.png" width="24" height="24" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry" lang="en">
+<a name="GtkTreeSortable"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle">GtkTreeSortable</span></h2>
+<p>GtkTreeSortable &#8212; The interface for sortable models used by GtkTreeView</p>
+</td>
+<td valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsynopsisdiv">
+<h2>Synopsis</h2>
+<pre class="synopsis">
+
+#include &lt;gtk/gtk.h&gt;
+
+
+            <a href="GtkTreeSortable.html#GtkTreeSortable-struct">GtkTreeSortable</a>;
+            <a href="GtkTreeSortable.html#GtkTreeSortableIface">GtkTreeSortableIface</a>;
+gint        (<a href="GtkTreeSortable.html#GtkTreeIterCompareFunc">*GtkTreeIterCompareFunc</a>)       (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *a,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *b,
+                                             gpointer user_data);
+void        <a href="GtkTreeSortable.html#gtk-tree-sortable-sort-column-changed">gtk_tree_sortable_sort_column_changed</a>
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable);
+gboolean    <a href="GtkTreeSortable.html#gtk-tree-sortable-get-sort-column-id">gtk_tree_sortable_get_sort_column_id</a>
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             gint *sort_column_id,
+                                             <a href="gtk-Standard-Enumerations.html#GtkSortType">GtkSortType</a> *order);
+void        <a href="GtkTreeSortable.html#gtk-tree-sortable-set-sort-column-id">gtk_tree_sortable_set_sort_column_id</a>
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             gint sort_column_id,
+                                             <a href="gtk-Standard-Enumerations.html#GtkSortType">GtkSortType</a> order);
+void        <a href="GtkTreeSortable.html#gtk-tree-sortable-set-sort-func">gtk_tree_sortable_set_sort_func</a> (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             gint sort_column_id,
+                                             <a href="GtkTreeSortable.html#GtkTreeIterCompareFunc">GtkTreeIterCompareFunc</a> sort_func,
+                                             gpointer user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);
+void        <a href="GtkTreeSortable.html#gtk-tree-sortable-set-default-sort-func">gtk_tree_sortable_set_default_sort_func</a>
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             <a href="GtkTreeSortable.html#GtkTreeIterCompareFunc">GtkTreeIterCompareFunc</a> sort_func,
+                                             gpointer user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);
+gboolean    <a href="GtkTreeSortable.html#gtk-tree-sortable-has-default-sort-func">gtk_tree_sortable_has_default_sort_func</a>
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable);
+
+
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3532073"></a><h2>Object Hierarchy</h2>
+<pre class="synopsis">
+
+  GInterface
+   +----GtkTreeSortable
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3532093"></a><h2>Prerequisites</h2>
+<p>
+GtkTreeSortable requires
+ <a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> and  GObject.</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3532117"></a><h2>Known Implementations</h2>
+<p>
+GtkTreeSortable is implemented by
+ <a href="GtkTreeModelSort.html" title="GtkTreeModelSort">GtkTreeModelSort</a>,  <a href="GtkTreeStore.html" title="GtkTreeStore">GtkTreeStore</a> and  <a href="GtkListStore.html" title="GtkListStore">GtkListStore</a>.</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3532150"></a><h2>Signal Prototypes</h2>
+<pre class="synopsis">
+
+"<a href="GtkTreeSortable.html#GtkTreeSortable-sort-column-changed">sort-column-changed</a>"
+            void        user_function      (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *treesortable,
+                                            gpointer user_data);
+</pre>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3532194"></a><h2>Description</h2>
+<p>
+<a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a> is an interface to be implemented by tree models which
+support sorting. The <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a> uses the methods provided by this interface
+to sort the model.
+</p>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3532223"></a><h2>Details</h2>
+<div class="refsect2" lang="en">
+<a name="id3532228"></a><h3>
+<a name="GtkTreeSortable-struct"></a>GtkTreeSortable</h3>
+<a class="indexterm" name="id3532239"></a><pre class="programlisting">typedef struct _GtkTreeSortable GtkTreeSortable;</pre>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3532255"></a><h3>
+<a name="GtkTreeSortableIface"></a>GtkTreeSortableIface</h3>
+<a class="indexterm" name="id3532265"></a><pre class="programlisting">typedef struct {
+  GTypeInterface g_iface;
+
+  /* signals */
+  void     (* sort_column_changed)   (GtkTreeSortable        *sortable);
+
+  /* virtual table */
+  gboolean (* get_sort_column_id)    (GtkTreeSortable        *sortable,
+				      gint                   *sort_column_id,
+				      GtkSortType            *order);
+  void     (* set_sort_column_id)    (GtkTreeSortable        *sortable,
+				      gint                    sort_column_id,
+				      GtkSortType             order);
+  void     (* set_sort_func)         (GtkTreeSortable        *sortable,
+				      gint                    sort_column_id,
+				      GtkTreeIterCompareFunc  func,
+				      gpointer                data,
+				      GtkDestroyNotify        destroy);
+  void     (* set_default_sort_func) (GtkTreeSortable        *sortable,
+				      GtkTreeIterCompareFunc  func,
+				      gpointer                data,
+				      GtkDestroyNotify        destroy);
+  gboolean (* has_default_sort_func) (GtkTreeSortable        *sortable);
+} GtkTreeSortableIface;
+</pre>
+<p>
+
+</p>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3532297"></a><h3>
+<a name="GtkTreeIterCompareFunc"></a>GtkTreeIterCompareFunc ()</h3>
+<a class="indexterm" name="id3532308"></a><pre class="programlisting">gint        (*GtkTreeIterCompareFunc)       (<a href="GtkTreeModel.html" title="GtkTreeModel">GtkTreeModel</a> *model,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *a,
+                                             <a href="GtkTreeModel.html#GtkTreeIter">GtkTreeIter</a> *b,
+                                             gpointer user_data);</pre>
+<p>
+A GtkTreeIterCompareFunc should return a negative integer, zero, or a positive
+integer if <em class="parameter"><code>a</code></em> sorts before <em class="parameter"><code>b</code></em>, <em class="parameter"><code>a</code></em> sorts with <em class="parameter"><code>b</code></em>, or <em class="parameter"><code>a</code></em> sorts after <em class="parameter"><code>b</code></em>
+respectively. If two iters compare as equal, their order in the sorted model 
+is undefined. In order to ensure that the <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a> behaves as 
+expected, the GtkTreeIterCompareFunc must define a partial order on 
+the model, i.e. it must be reflexive, antisymmetric and transitive.
+</p>
+<p>
+For example, if <em class="parameter"><code>model</code></em> is a product catalogue, then a compare function
+for the "price" column could be one which returns 
+<code class="literal">price_of(<em class="parameter"><code>a</code></em>) - price_of(<em class="parameter"><code>b</code></em>)</code>.
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>model</code></em>&#160;:</span></td>
+<td>The <a href="GtkTreeModel.html" title="GtkTreeModel"><span class="type">GtkTreeModel</span></a> the comparison is within
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>a</code></em>&#160;:</span></td>
+<td>A <a href="GtkTreeModel.html#GtkTreeIter"><span class="type">GtkTreeIter</span></a> in <em class="parameter"><code>model</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>b</code></em>&#160;:</span></td>
+<td>Another <a href="GtkTreeModel.html#GtkTreeIter"><span class="type">GtkTreeIter</span></a> in <em class="parameter"><code>model</code></em>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>Data passed when the compare func is assigned e.g. by
+<a href="GtkTreeSortable.html#gtk-tree-sortable-set-sort-func"><code class="function">gtk_tree_sortable_set_sort_func()</code></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td>
+
+
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3532554"></a><h3>
+<a name="gtk-tree-sortable-sort-column-changed"></a>gtk_tree_sortable_sort_column_changed ()</h3>
+<a class="indexterm" name="id3532565"></a><pre class="programlisting">void        gtk_tree_sortable_sort_column_changed
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable);</pre>
+<p>
+Emits a GtkTreeSortable::sort_column_changed signal on</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td>
+<span class="term"><em class="parameter"><code>sortable</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a>
+</td>
+</tr></tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3532625"></a><h3>
+<a name="gtk-tree-sortable-get-sort-column-id"></a>gtk_tree_sortable_get_sort_column_id ()</h3>
+<a class="indexterm" name="id3532637"></a><pre class="programlisting">gboolean    gtk_tree_sortable_get_sort_column_id
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             gint *sort_column_id,
+                                             <a href="gtk-Standard-Enumerations.html#GtkSortType">GtkSortType</a> *order);</pre>
+<p>
+Fills in <em class="parameter"><code>sort_column_id</code></em> and <em class="parameter"><code>order</code></em> with the current sort column and the
+order.  It returns <code class="literal">TRUE</code> unless the <em class="parameter"><code>sort_column_id</code></em> is 
+<code class="literal">GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID</code> or 
+<code class="literal">GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID</code>.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sortable</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sort_column_id</code></em>&#160;:</span></td>
+<td> The sort column id to be filled in
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>order</code></em>&#160;:</span></td>
+<td> The <a href="gtk-Standard-Enumerations.html#GtkSortType"><span class="type">GtkSortType</span></a> to be filled in
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code> if the sort column is not one of the special sort
+  column ids.
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3532803"></a><h3>
+<a name="gtk-tree-sortable-set-sort-column-id"></a>gtk_tree_sortable_set_sort_column_id ()</h3>
+<a class="indexterm" name="id3532814"></a><pre class="programlisting">void        gtk_tree_sortable_set_sort_column_id
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             gint sort_column_id,
+                                             <a href="gtk-Standard-Enumerations.html#GtkSortType">GtkSortType</a> order);</pre>
+<p>
+Sets the current sort column to be <em class="parameter"><code>sort_column_id</code></em>.  The <em class="parameter"><code>sortable</code></em> will
+resort itself to reflect this change, after emitting a
+GtkTreeSortable::sort_column_changed signal.  If <em class="parameter"><code>sort_column_id</code></em> is
+<code class="literal">GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID</code>, then the default sort function
+will be used, if it is set.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sortable</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sort_column_id</code></em>&#160;:</span></td>
+<td> the sort column id to set
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>order</code></em>&#160;:</span></td>
+<td> The sort order of the column
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3532945"></a><h3>
+<a name="gtk-tree-sortable-set-sort-func"></a>gtk_tree_sortable_set_sort_func ()</h3>
+<a class="indexterm" name="id3532957"></a><pre class="programlisting">void        gtk_tree_sortable_set_sort_func (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             gint sort_column_id,
+                                             <a href="GtkTreeSortable.html#GtkTreeIterCompareFunc">GtkTreeIterCompareFunc</a> sort_func,
+                                             gpointer user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);</pre>
+<p>
+Sets the comparison function used when sorting to be <em class="parameter"><code>sort_func</code></em>.  If the
+current sort column id of <em class="parameter"><code>sortable</code></em> is the same as <em class="parameter"><code>sort_column_id</code></em>, then the
+model will sort using this function.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sortable</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sort_column_id</code></em>&#160;:</span></td>
+<td> the sort column id to set the function for
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sort_func</code></em>&#160;:</span></td>
+<td> The sorting function
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> User data to pass to the sort func, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>destroy</code></em>&#160;:</span></td>
+<td> Destroy notifier of <em class="parameter"><code>user_data</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3533142"></a><h3>
+<a name="gtk-tree-sortable-set-default-sort-func"></a>gtk_tree_sortable_set_default_sort_func ()</h3>
+<a class="indexterm" name="id3533153"></a><pre class="programlisting">void        gtk_tree_sortable_set_default_sort_func
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable,
+                                             <a href="GtkTreeSortable.html#GtkTreeIterCompareFunc">GtkTreeIterCompareFunc</a> sort_func,
+                                             gpointer user_data,
+                                             <a href="gtk-Types.html#GtkDestroyNotify">GtkDestroyNotify</a> destroy);</pre>
+<p>
+Sets the default comparison function used when sorting to be <em class="parameter"><code>sort_func</code></em>.  If
+the current sort column id of <em class="parameter"><code>sortable</code></em> is
+<code class="literal">GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID</code>, then the model will sort using this function.
+</p>
+<p>
+If <em class="parameter"><code>sort_func</code></em> is <code class="literal">NULL</code>, then there will be no default comparison function.
+This means that once the model  has been sorted, it can't go back to the
+default state. In this case, when the current sort column id of <em class="parameter"><code>sortable</code></em> is
+GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID, the model will be unsorted.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sortable</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sort_func</code></em>&#160;:</span></td>
+<td> The sorting function
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td> User data to pass to the sort func, or <code class="literal">NULL</code>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>destroy</code></em>&#160;:</span></td>
+<td> Destroy notifier of <em class="parameter"><code>user_data</code></em>, or <code class="literal">NULL</code>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2" lang="en">
+<a name="id3533343"></a><h3>
+<a name="gtk-tree-sortable-has-default-sort-func"></a>gtk_tree_sortable_has_default_sort_func ()</h3>
+<a class="indexterm" name="id3533354"></a><pre class="programlisting">gboolean    gtk_tree_sortable_has_default_sort_func
+                                            (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *sortable);</pre>
+<p>
+Returns <code class="literal">TRUE</code> if the model has a default sort function.  This is used
+primarily by GtkTreeViewColumns in order to determine if a model can go back
+to the default state, or not.</p>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>sortable</code></em>&#160;:</span></td>
+<td> A <a href="GtkTreeSortable.html" title="GtkTreeSortable"><span class="type">GtkTreeSortable</span></a>
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><span class="emphasis"><em>Returns</em></span>&#160;:</span></td>
+<td> <code class="literal">TRUE</code>, if the model has a default sort function
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3533440"></a><h2>Signals</h2>
+<div class="refsect2" lang="en">
+<a name="id3533446"></a><h3>
+<a name="GtkTreeSortable-sort-column-changed"></a>The "sort-column-changed" signal</h3>
+<pre class="programlisting">void        user_function                  (<a href="GtkTreeSortable.html" title="GtkTreeSortable">GtkTreeSortable</a> *treesortable,
+                                            gpointer user_data);</pre>
+<p>
+
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>treesortable</code></em>&#160;:</span></td>
+<td>the object which received the signal.
+
+</td>
+</tr>
+<tr>
+<td>
+<span class="term"><em class="parameter"><code>user_data</code></em>&#160;:</span></td>
+<td>user data set when the signal handler was connected.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<div class="refsect1" lang="en">
+<a name="id3533522"></a><h2>See Also</h2>
+<p>
+<a href="GtkTreeModel.html" title="GtkTreeModel"><span class="type">GtkTreeModel</span></a>, <a href="GtkTreeView.html" title="GtkTreeView"><span class="type">GtkTreeView</span></a>
+</p>
+</div>
+</div>
+<table class="navigation" width="100%" summary="Navigation footer" cellpadding="2" cellspacing="0"><tr valign="middle">
+<td align="left"><a accesskey="p" href="GtkIconView.html"><b>&lt;&lt;&#160;GtkIconView</b></a></td>
+<td align="right"><a accesskey="n" href="GtkTreeModelSort.html"><b>GtkTreeModelSort&#160;&gt;&gt;</b></a></td>
+</tr></table>
+</body>
+</html>

@@ -1,0 +1,51 @@
+#!/usr/bin/make -f
+#
+# Sample dpatch rules file. Only example. Nothing else. :)
+
+export DH_COMPAT = 4
+
+# Include dpatch stuff.
+include /usr/share/dpatch/dpatch.make
+
+CFLAGS = -Wall -g
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+CFLAGS += -O0
+else
+CFLAGS += -O2
+endif
+
+build: build-stamp
+build-stamp: patch-stamp
+	@echo "--- Compiling"
+	dh_testdir
+# Do something to build your package here
+	touch build-stamp
+
+clean: clean1 unpatch
+clean1:
+	@echo "--- Cleaning"
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+# Clean your build tree
+
+install: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+# Install it here
+
+# Build architecture-independent files here.
+binary-indep: build install
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+# And all the other dh_* stuff you need for your package.
+
+binary: binary-indep binary-arch
+.PHONY: binary clean binary-indep binary-arch build install patch unpatch \
+	clean1

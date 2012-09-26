@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="thinIce.html" />
+<link rel="parent" href="refcounts.html" />
+<link rel="next" href="cplusplus.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.10.4 NULL Pointers
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.10.3 thin Ice"
+  href="thinIce.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1.10 reference Counts"
+  href="refcounts.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.11 writing Extensions in"
+  href="cplusplus.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="thinIce.html">1.10.3 Thin Ice</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="refcounts.html">1.10 Reference Counts</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="cplusplus.html">1.11 Writing Extensions in</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0031040000000000000000"></a><a name="nullPointers"></a>
+<br>
+1.10.4 NULL Pointers
+            
+</h2>
+
+<p>
+In general, functions that take object references as arguments do not
+expect you to pass them <tt class="constant">NULL</tt> pointers, and will dump core (or
+cause later core dumps) if you do so.  Functions that return object
+references generally return <tt class="constant">NULL</tt> only to indicate that an
+exception occurred.  The reason for not testing for <tt class="constant">NULL</tt>
+arguments is that functions often pass the objects they receive on to
+other function -- if each function were to test for <tt class="constant">NULL</tt>,
+there would be a lot of redundant tests and the code would run more
+slowly.
+
+<p>
+It is better to test for <tt class="constant">NULL</tt> only at the ``source:'' when a
+pointer that may be <tt class="constant">NULL</tt> is received, for example, from
+<tt class="cfunction">malloc()</tt> or from a function that may raise an exception.
+
+<p>
+The macros <tt class="cfunction">Py_INCREF()</tt> and <tt class="cfunction">Py_DECREF()</tt>
+do not check for <tt class="constant">NULL</tt> pointers -- however, their variants
+<tt class="cfunction">Py_XINCREF()</tt> and <tt class="cfunction">Py_XDECREF()</tt> do.
+
+<p>
+The macros for checking for a particular object type
+(<code>Py<var>type</var>_Check()</code>) don't check for <tt class="constant">NULL</tt> pointers --
+again, there is much code that calls several of these in a row to test
+an object against various different expected types, and this would
+generate redundant tests.  There are no variants with <tt class="constant">NULL</tt>
+checking.
+
+<p>
+The C function calling mechanism guarantees that the argument list
+passed to C functions (<code>args</code> in the examples) is never
+<tt class="constant">NULL</tt> -- in fact it guarantees that it is always a tuple.<a name="tex2html4"
+  href="#foot465"><sup>1.4</sup></a>
+<p>
+It is a severe error to ever let a <tt class="constant">NULL</tt> pointer ``escape'' to
+the Python user.
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot465">... tuple.</a><A
+ href="nullPointers.html#tex2html4"><sup>1.4</sup></a></dt>
+<dd>
+These guarantees don't hold when you use the ``old'' style
+calling convention -- this is still found in much existing code.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.10.3 thin Ice"
+  href="thinIce.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1.10 reference Counts"
+  href="refcounts.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.11 writing Extensions in"
+  href="cplusplus.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="thinIce.html">1.10.3 Thin Ice</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="refcounts.html">1.10 Reference Counts</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="cplusplus.html">1.11 Writing Extensions in</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

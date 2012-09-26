@@ -1,0 +1,91 @@
+cg-mkpatch(1)
+=============
+
+NAME
+----
+cg-mkpatch - create a patch from a commit or a series of commits
+
+SYNOPSIS
+--------
+cg-mkpatch [-m] [-s] [-r FROM_ID[..TO_ID] [-d DIRNAME]]
+
+DESCRIPTION
+-----------
+Generate a patch with diff statistics and meta info about each commit.
+
+Note that if you want to use this as the output interface for your
+GIT tree containing changes against upstream GIT tree, please consider
+using the StGIT tool ("quilt for GIT"), which will enable you to
+update your patches seamlessly, rebase them against the latest upstream
+version, directly send them over mail, etc.
+
+OPTIONS
+-------
+
+--
+-d DIRNAME::
+	Split the patches to separate files with their names in the
+	format "%02d.patch", created in directory DIRNAME (will be
+	created if non-existent). Note that this makes sense only
+	when generating patch series, that is when you use the -r
+	argument.
+
+-f FORMAT::
+	Format string used for generating the patch filename when
+	outputting the split-out patches (that is, passed the -d
+	option). This is by default "%s/%02d-%s.patch". The first %s
+	represents the directory name and %d represents the patch
+	sequence number. The last %s is mangled first line of the
+	commit message - kind of patch title.
+
+-m::
+	Base the patches at the merge base of the -r arguments
+	(defaulting to HEAD and origin).
+
+-r FROM_ID[..TO_ID]::
+	Specify a set of commits to make patches from using either
+	'-r FROM_ID[..TO_ID]' or '-r FROM_ID -r TO_ID'. In both cases the
+	option expects IDs which resolve to commits and will include the
+	specified IDs. If 'TO_ID' is omitted patches for all commits
+	from 'FROM_ID' to the initial commit will be generated. If the
+	`-r` option is not given the commit ID defaults to 'HEAD'.
+
+-s::
+	Specify whether to print a short version of the patch without
+	a patch header with meta info such as author and committer.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-mkpatch[1].
+--
+
+
+EXAMPLE USAGE
+-------------
+To make patches for all commits between two releases tagged as
+'releasetag-0.9' and 'releasetag-0.10' do:
+
+	$ cg-mkpatch -r releasetag-0.9..releasetag-0.10
+
+The output will be a continuous dump of patches each separated by
+the line:
+
+	!-------------------------------------------------------------flip-
+
+NOTES
+-----
+The ':' is equivalent to '..' in revisions range specification (to make
+things more comfortable to SVN users). See cogito(7) for more details
+about revision specification.
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-mkpatch is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

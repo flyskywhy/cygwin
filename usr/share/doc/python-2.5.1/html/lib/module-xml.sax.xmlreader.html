@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-xml.etree.ElementTree.html" />
+<link rel="prev" href="module-xml.sax.saxutils.html" />
+<link rel="parent" href="markup.html" />
+<link rel="next" href="xmlreader-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>8.12 xml.sax.xmlreader -- Interface for XML parsers</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.11 xml.sax.saxutils  "
+  href="module-xml.sax.saxutils.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8. structured Markup Processing"
+  href="markup.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.12.1 xmlreader Objects"
+  href="xmlreader-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-xml.sax.saxutils.html">8.11 xml.sax.saxutils  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="markup.html">8. Structured Markup Processing</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="xmlreader-objects.html">8.12.1 XMLReader Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00101200000000000000000">
+8.12 <tt class="module">xml.sax.xmlreader</tt> --
+         Interface for XML parsers</a>
+</h1>
+
+<p>
+<a name="module-xml.sax.xmlreader"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.0.</span>
+
+<p>
+SAX parsers implement the <tt class="class">XMLReader</tt> interface. They are
+implemented in a Python module, which must provide a function
+<tt class="function">create_parser()</tt>. This function is invoked by 
+<tt class="function">xml.sax.make_parser()</tt> with no arguments to create a new 
+parser object.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1928' xml:id='l2h-1928' class="class">XMLReader</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Base class which can be inherited by SAX parsers.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1929' xml:id='l2h-1929' class="class">IncrementalParser</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  In some cases, it is desirable not to parse an input source at once,
+  but to feed chunks of the document as they get available. Note that
+  the reader will normally not read the entire file, but read it in
+  chunks as well; still <tt class="method">parse()</tt> won't return until the entire
+  document is processed. So these interfaces should be used if the
+  blocking behaviour of <tt class="method">parse()</tt> is not desirable.
+
+<p>
+When the parser is instantiated it is ready to begin accepting data
+  from the feed method immediately. After parsing has been finished
+  with a call to close the reset method must be called to make the
+  parser ready to accept new data, either from feed or using the parse
+  method.
+
+<p>
+Note that these methods must <em>not</em> be called during parsing,
+  that is, after parse has been called and before it returns.
+
+<p>
+By default, the class also implements the parse method of the
+  XMLReader interface using the feed, close and reset methods of the
+  IncrementalParser interface as a convenience to SAX 2.0 driver
+  writers.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1930' xml:id='l2h-1930' class="class">Locator</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Interface for associating a SAX event with a document location. A
+  locator object will return valid results only during calls to
+  DocumentHandler methods; at any other time, the results are
+  unpredictable. If information is not available, methods may return
+  <code>None</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1931' xml:id='l2h-1931' class="class">InputSource</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>systemId</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Encapsulation of the information needed by the <tt class="class">XMLReader</tt> to
+  read entities.
+
+<p>
+This class may include information about the public identifier,
+  system identifier, byte stream (possibly with character encoding
+  information) and/or the character stream of an entity.
+
+<p>
+Applications will create objects of this class for use in the
+  <tt class="method">XMLReader.parse()</tt> method and for returning from
+  EntityResolver.resolveEntity.
+
+<p>
+An <tt class="class">InputSource</tt> belongs to the application, the
+  <tt class="class">XMLReader</tt> is not allowed to modify <tt class="class">InputSource</tt> objects
+  passed to it from the application, although it may make copies and
+  modify those.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1932' xml:id='l2h-1932' class="class">AttributesImpl</tt></b>(</nobr></td>
+  <td><var>attrs</var>)</td></tr></table></dt>
+<dd>
+  This is an implementation of the <a class="ulink" href="attributes-objects.html"
+  ><tt class="class">Attributes</tt>
+  interface</a> (see
+  section&nbsp;<a href="attributes-objects.html#attributes-objects">8.12.5</a>).  This is a dictionary-like
+  object which represents the element attributes in a
+  <tt class="method">startElement()</tt> call. In addition to the most useful
+  dictionary operations, it supports a number of other methods as
+  described by the interface. Objects of this class should be
+  instantiated by readers; <var>attrs</var> must be a dictionary-like
+  object containing a mapping from attribute names to attribute
+  values.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1933' xml:id='l2h-1933' class="class">AttributesNSImpl</tt></b>(</nobr></td>
+  <td><var>attrs, qnames</var>)</td></tr></table></dt>
+<dd>
+  Namespace-aware variant of <tt class="class">AttributesImpl</tt>, which will be
+  passed to <tt class="method">startElementNS()</tt>. It is derived from
+  <tt class="class">AttributesImpl</tt>, but understands attribute names as
+  two-tuples of <var>namespaceURI</var> and <var>localname</var>. In addition,
+  it provides a number of methods expecting qualified names as they
+  appear in the original document.  This class implements the
+  <a class="ulink" href="attributes-ns-objects.html"
+  ><tt class="class">AttributesNS</tt> interface</a>
+  (see section&nbsp;<a href="attributes-ns-objects.html#attributes-ns-objects">8.12.6</a>).
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="xmlreader-objects.html">8.12.1 XMLReader Objects</a>
+<li><a href="incremental-parser-objects.html">8.12.2 IncrementalParser Objects</a>
+<li><a href="locator-objects.html">8.12.3 Locator Objects</a>
+<li><a href="input-source-objects.html">8.12.4 InputSource Objects</a>
+<li><a href="attributes-objects.html">8.12.5 The <tt class="class">Attributes</tt> Interface</a>
+<li><a href="attributes-ns-objects.html">8.12.6 The <tt class="class">AttributesNS</tt> Interface</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.11 xml.sax.saxutils  "
+  href="module-xml.sax.saxutils.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8. structured Markup Processing"
+  href="markup.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.12.1 xmlreader Objects"
+  href="xmlreader-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-xml.sax.saxutils.html">8.11 xml.sax.saxutils  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="markup.html">8. Structured Markup Processing</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="xmlreader-objects.html">8.12.1 XMLReader Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-309.html" />
+<link rel="prev" href="contents.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-309.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1 PEP 308: Conditional Expressions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="Contents"
+  href="contents.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2 pep 309: Partial"
+  href="pep-309.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="contents.html">Contents</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-309.html">2 PEP 309: Partial</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION000200000000000000000"></a><a name="pep-308"></a>
+<br>
+1 PEP 308: Conditional Expressions
+</h1>
+
+<p>
+For a long time, people have been requesting a way to write
+conditional expressions, which are expressions that return value A or
+value B depending on whether a Boolean value is true or false.  A
+conditional expression lets you write a single assignment statement
+that has the same effect as the following:
+
+<p>
+<div class="verbatim"><pre>
+if condition:
+    x = true_value
+else:
+    x = false_value
+</pre></div>
+
+<p>
+There have been endless tedious discussions of syntax on both
+python-dev and comp.lang.python.  A vote was even held that found the
+majority of voters wanted conditional expressions in some form,
+but there was no syntax that was preferred by a clear majority.
+Candidates included C's <code>cond ? true_v : false_v</code>,
+<code>if cond then true_v else false_v</code>, and 16 other variations.
+
+<p>
+Guido van&nbsp;Rossum eventually chose a surprising syntax:
+
+<p>
+<div class="verbatim"><pre>
+x = true_value if condition else false_value
+</pre></div>
+
+<p>
+Evaluation is still lazy as in existing Boolean expressions, so the
+order of evaluation jumps around a bit.  The <var>condition</var>
+expression in the middle is evaluated first, and the <var>true_value</var>
+expression is evaluated only if the condition was true.  Similarly,
+the <var>false_value</var> expression is only evaluated when the condition
+is false.
+
+<p>
+This syntax may seem strange and backwards; why does the condition go
+in the <em>middle</em> of the expression, and not in the front as in C's
+<code>c ? x : y</code>?  The decision was checked by applying the new syntax
+to the modules in the standard library and seeing how the resulting
+code read.  In many cases where a conditional expression is used, one
+value seems to be the 'common case' and one value is an 'exceptional
+case', used only on rarer occasions when the condition isn't met.  The
+conditional syntax makes this pattern a bit more obvious:
+
+<p>
+<div class="verbatim"><pre>
+contents = ((doc + '\n') if doc else '')
+</pre></div>
+
+<p>
+I read the above statement as meaning ``here <var>contents</var> is 
+usually assigned a value of <code>doc+'\n'</code>; sometimes 
+<var>doc</var> is empty, in which special case an empty string is returned.''  
+I doubt I will use conditional expressions very often where there 
+isn't a clear common and uncommon case.
+
+<p>
+There was some discussion of whether the language should require
+surrounding conditional expressions with parentheses.  The decision
+was made to <em>not</em> require parentheses in the Python language's
+grammar, but as a matter of style I think you should always use them.
+Consider these two statements:
+
+<p>
+<div class="verbatim"><pre>
+# First version -- no parens
+level = 1 if logging else 0
+
+# Second version -- with parens
+level = (1 if logging else 0)
+</pre></div>
+
+<p>
+In the first version, I think a reader's eye might group the statement
+into 'level = 1', 'if logging', 'else 0', and think that the condition
+decides whether the assignment to <var>level</var> is performed.  The
+second version reads better, in my opinion, because it makes it clear
+that the assignment is always performed and the choice is being made
+between two values.
+
+<p>
+Another reason for including the brackets: a few odd combinations of
+list comprehensions and lambdas could look like incorrect conditional
+expressions. See <a class="rfc" id='rfcref-2358' xml:id='rfcref-2358'
+href="http://www.python.org/peps/pep-0308.html">PEP 308</a> for some examples.  If you put parentheses
+around your conditional expressions, you won't run into this case.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0308.html"
+        title="Conditional Expressions"
+        >PEP 308, <em>Conditional Expressions</em></a>
+    <dd>PEP written by
+Guido van&nbsp;Rossum and Raymond D. Hettinger; implemented by Thomas
+Wouters.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="Contents"
+  href="contents.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2 pep 309: Partial"
+  href="pep-309.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="contents.html">Contents</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-309.html">2 PEP 309: Partial</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

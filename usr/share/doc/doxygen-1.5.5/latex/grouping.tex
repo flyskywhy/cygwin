@@ -1,0 +1,253 @@
+Doxygen has three mechanisms to group things together. One mechanism works at a global level, creating a new page for each group. These groups are called \hyperlink{grouping_modules}{'modules'} in the documentation. The second mechanism works within a member list of some compound entity, and is refered to as a \hyperlink{grouping_memgroup}{'member groups'}. For \hyperlink{commands_cmdpage}{pages} there is a third grouping mechanism referred to as \hyperlink{grouping_subpaging}{subpaging}.\hypertarget{grouping_modules}{}\section{Modules}\label{grouping_modules}
+Modules are a way to group things together on a separate page. You can document a group as a whole, as well as all individual members. Members of a group can be files, namespaces, classes, functions, variables, enums, typedefs, and defines, but also other groups.
+
+To define a group, you should put the \hyperlink{commands_cmddefgroup}{$\backslash$defgroup} command in a special comment block. The first argument of the command is a label that should uniquely identify the group. The second argument is the name or title of the group as it should appear in the documentation.
+
+You can make an entity a member of a specific group by putting a \hyperlink{commands_cmdingroup}{$\backslash$ingroup} command inside its documentation block.
+
+To avoid putting \hyperlink{commands_cmdingroup}{$\backslash$ingroup} commands in the documentation for each member you can also group members together by the open marker {\tt @\{} before the group and the closing marker {\tt @\}} after the group. The markers can be put in the documentation of the group definition or in a separate documentation block.
+
+Groups themselves can also be nested using these grouping markers.
+
+You will get an error message when you use the same group label more than once. If you don't want doxygen to enforce unique labels, then you can use \hyperlink{commands_cmdaddtogroup}{$\backslash$addtogroup} instead of \hyperlink{commands_cmddefgroup}{$\backslash$defgroup}. It can be used exactly like \hyperlink{commands_cmddefgroup}{$\backslash$defgroup}, but when the group has been defined already, then it silently merges the existing documentation with the new one. The title of the group is optional for this command, so you can use 
+
+\footnotesize\begin{verbatim}
+/** \addtogroup <label> */
+/*\@{*/
+/*\@}*/
+\end{verbatim}
+\normalsize
+ to add additional members to a group that is defined in more detail elsewhere.
+
+Note that compound entities (like classes, files and namespaces) can be put into multiple groups, but members (like variable, functions, typedefs and enums) can only be a member of one group (this restriction is in place to avoid ambiguous linking targets in case a member is not documented in the context of its class, namespace or file, but only visible as part of a group).
+
+Doxygen will put members into the group whose definition has the highest \char`\"{}priority\char`\"{}: e.g. An explicit \hyperlink{commands_cmdingroup}{$\backslash$ingroup} overrides an implicit grouping definition via {\tt @\{} {\tt @\}}. Conflicting grouping definitions with the same priority trigger a warning, unless one definition was for a member without any explicit documentation.
+
+The following example puts VarInA into group A and silently resolves the conflict for IntegerVariable by putting it into group IntVariables, because the second instance of IntegerVariable is undocumented:
+
+
+
+\footnotesize\begin{verbatim}
+
+/**
+ * \ingroup A
+ */
+extern int VarInA;
+
+/**
+ * \defgroup IntVariables Global integer variables
+ */
+/*@{*/
+
+/** an integer variable */
+extern int IntegerVariable;
+
+/*@}*/
+
+....
+
+/**
+ * \defgroup Variables Global variables
+ */
+/*@{*/
+
+/** a variable in group A */
+int VarInA;
+
+int IntegerVariable;
+
+/*@}*/
+\end{verbatim}
+\normalsize
+
+
+The \hyperlink{commands_cmdref}{$\backslash$ref} command can be used to refer to a group. The first argument of the $\backslash$ref command should be group's label. To use a custom link name, you can put the name of the links in double quotes after the label, as shown by the following example 
+
+\footnotesize\begin{verbatim}
+This is the \ref group_label "link" to this group.
+\end{verbatim}
+\normalsize
+
+
+The priorities of grouping definitions are (from highest to lowest): \hyperlink{commands_cmdingroup}{$\backslash$ingroup}, \hyperlink{commands_cmddefgroup}{$\backslash$defgroup}, \hyperlink{commands_cmdaddtogroup}{$\backslash$addtogroup}, \hyperlink{commands_cmdweakgroup}{$\backslash$weakgroup}. The last command is exactly like \hyperlink{commands_cmdaddtogroup}{$\backslash$addtogroup} with a lower priority. It was added to allow \char`\"{}lazy\char`\"{} grouping definitions: you can use commands with a higher priority in your .h files to define the hierarchy and \hyperlink{commands_cmdweakgroup}{$\backslash$weakgroup} in .c files without having to duplicate the hierarchy exactly.
+
+\begin{Desc}
+\item[Example:]
+
+\begin{VerbInclude}\begin{verbatim}/** @defgroup group1 The First Group
+ *  This is the first group
+ *  @{
+ */
+
+/** @brief class C1 in group 1 */
+class C1 {};
+
+/** @brief class C2 in group 1 */
+class C2 {};
+
+/** function in group 1 */
+void func() {}
+
+/** @} */ // end of group1
+
+/**
+ *  @defgroup group2 The Second Group
+ *  This is the second group
+ */
+
+/** @defgroup group3 The Third Group
+ *  This is the third group
+ */
+
+/** @defgroup group4 The Fourth Group
+ *  @ingroup group3
+ *  Group 4 is a subgroup of group 3
+ */
+
+/**
+ *  @ingroup group2
+ *  @brief class C3 in group 2
+ */
+class C3 {};
+
+/** @ingroup group2
+ *  @brief class C4 in group 2
+ */
+class C4 {};
+
+/** @ingroup group3
+ *  @brief class C5 in @link group3 the third group@endlink.
+ */
+class C5 {};
+
+/** @ingroup group1 group2 group3 group4
+ *  namespace N1 is in four groups
+ *  @sa @link group1 The first group@endlink, group2, group3, group4 
+ *
+ *  Also see @ref mypage2
+ */
+namespace N1 {};
+
+/** @file
+ *  @ingroup group3
+ *  @brief this file in group 3
+ */
+
+/** @defgroup group5 The Fifth Group
+ *  This is the fifth group
+ *  @{
+ */
+
+/** @page mypage1 This is a section in group 5
+ *  Text of the first section
+ */
+
+/** @page mypage2 This is another section in group 5
+ *  Text of the second section
+ */
+
+/** @} */ // end of group5
+
+/** @addtogroup group1
+ *  
+ *  More documentation for the first group.
+ *  @{
+ */
+
+/** another function in group 1 */
+void func2() {}
+
+/** yet another function in group 1 */
+void func3() {}
+
+/** @} */ // end of group1
+
+\end{verbatim}
+\end{VerbInclude}
+\end{Desc}
+\hypertarget{grouping_memgroup}{}\section{Member Groups}\label{grouping_memgroup}
+If a compound (e.g. a class or file) has many members, it is often desired to group them together. Doxygen already automatically groups things together on type and protection level, but maybe you feel that this is not enough or that that default grouping is wrong. For instance, because you feel that members of different (syntactic) types belong to the same (semantic) group.
+
+A member group is defined by a 
+
+\footnotesize\begin{verbatim}
+//@{ 
+  ...
+//@}
+\end{verbatim}
+\normalsize
+ block or a 
+
+\footnotesize\begin{verbatim}
+/*@{*/ 
+  ... 
+/*@}*/ 
+\end{verbatim}
+\normalsize
+ block if you prefer C style comments. Note that the members of the group should be physcially inside the member group's body.
+
+Before the opening marker of a block a separate comment block may be placed. This block should contain the \hyperlink{commands_cmdname}{@name} (or \hyperlink{commands_cmdname}{$\backslash$name}) command and is used to specify the header of the group. Optionally, the comment block may also contain more detailed information about the group.
+
+Nesting of member groups is not allowed.
+
+If all members of a member group inside a class have the same type and protection level (for instance all are static public members), then the whole member group is displayed as a subgroup of the type/protection level group (the group is displayed as a subsection of the \char`\"{}Static Public Members\char`\"{} section for instance). If two or more members have different types, then the group is put at the same level as the automatically generated groups. If you want to force all member-groups of a class to be at the top level, you should put a \hyperlink{commands_cmdnosubgrouping}{$\backslash$nosubgrouping} command inside the documentation of the class.
+
+\begin{Desc}
+\item[Example:]
+
+\begin{VerbInclude}\begin{verbatim}/** A class. Details */
+class Test
+{
+  public:
+    //@{
+    /** Same documentation for both members. Details */
+    void func1InGroup1();
+    void func2InGroup1();
+    //@}
+
+    /** Function without group. Details. */
+    void ungroupedFunction();
+    void func1InGroup2();
+  protected:
+    void func2InGroup2();
+};
+
+void Test::func1InGroup1() {}
+void Test::func2InGroup1() {}
+
+/** @name Group2
+ *  Description of group 2. 
+ */
+//@{
+/** Function 2 in group 2. Details. */
+void Test::func2InGroup2() {}
+/** Function 1 in group 2. Details. */
+void Test::func1InGroup2() {}
+//@}
+
+/*! \file 
+ *  docs for this file
+ */
+
+//@{
+//! one description for all members of this group 
+//! (because DISTRIBUTE_GROUP_DOC is YES in the config file)
+#define A 1
+#define B 2
+void glob_func();
+//@}
+\end{verbatim}
+\end{VerbInclude}
+\end{Desc}
+
+
+Here Group1 is displayed as a subsection of the \char`\"{}Public Members\char`\"{}. And Group2 is a separate section because it contains members with different protection levels (i.e. public and protected).
+
+\hypertarget{grouping_subpaging}{}\section{Subpaging}\label{grouping_subpaging}
+Information can be grouped into pages using the \hyperlink{commands_cmdpage}{$\backslash$page} and \hyperlink{commands_cmdsubpage}{$\backslash$mainpage} commands. Normally, this results in a flat list of pages, where the \char`\"{}main\char`\"{} page is the first in the list.
+
+Instead of adding structure using the approach decribed in section \hyperlink{grouping_modules}{modules} it is often more natural and convienent to add additional structure to the pages using the \hyperlink{commands_cmdsubpage}{$\backslash$subpage} command.
+
+For a page A the $\backslash$subpage command adds a link to another page B and at the same time makes page B a subpage of A. This has the effect of making two groups GA and GB, where GB is part of GA, page A is put in group GA, and page B is put in group GB.
+
+ 

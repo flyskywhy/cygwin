@@ -1,0 +1,116 @@
+cg-patch(1)
+===========
+
+NAME
+----
+cg-patch - apply a patch from a file, standard input, or a commit
+
+SYNOPSIS
+--------
+cg-patch [-c] [-C COMMIT] [-pN] [-R] [-m | -d DIR] [OTHER_OPTIONS] < PATCH
+
+DESCRIPTION
+-----------
+Apply a patch in a manner similar to the 'patch' tool, but while also
+handling the Git extensions to the diff format: file mode changes, file
+renames, distinguishing removal of files and empty files, etc. Newly
+created files are automatically gitlink:cg-add[1]ed and removed files are
+gitlink:cg-rm[1]oved.
+
+gitlink:cg-patch[1] can also automatically commit the applied patches and extract
+patches from existing commits, therefore effectively enabling you to
+'cherrypick' certain changes from a different branch.
+
+In comparison with the 'git apply' tool, gitlink:cg-patch[1] will also apply
+fuzzy patches.
+
+OPTIONS
+-------
+
+--
+-c::
+	Automatically extract the commit message and authorship information
+	(if provided) from the patch and commit it after applying it
+	successfully.
+
+-C COMMIT::
+	Instead of applying a patch from stdin, apply and commit the patch
+	introduced by the given commit. This is basically an extension of
+	`cg-commit -c`, it also applies the commit diff.
+
+In combination with '-R', this does the opposite - it will revert
+the given commit and then try to commit a revert commit - it will
+prefill the headline and open the commit editor for you to write
+further details.
+
+Note that even though this is functionally equivalent to the
+cherry-picking concept present in other version control systems,
+this does not play very well together with regular merges and if
+you both cherry-pick and merge between two branches, the picking
+may increase the number of conflicts you will get when merging.
+
+-d DIRNAME::
+	Instead of applying a patch from stdin, apply and separately commit
+	all patches in the specified directory. This can be used to import
+	a range of patches made by `cg-mkpatch -d`. Implies '-c'.
+
+-e::
+	Edit the commit message before performing a commit. Makes sense
+	only with '-c' or other options implying '-c' (e.g. '-m').
+
+-m::
+	Applies series of patches in a mailbox fed to the command's
+	standard input. Implies '-c'.
+
+-pN::
+	Strip path of filenames in the diff to the level N. This works
+	exactly the same as in the `patch` tool except that the default
+	strip level is not infinite but 1 (or more if you are in a
+	subdirectory; in short, `cg-diff | cg-patch -R` and such always
+	works).
+
+-R::
+	Apply the patch in reverse (therefore effectively unapply it).
+	Implies '-e' except when the input is not a tty.
+
+--resolved::
+	In case the patch series application failed in the middle and
+	you resolved the situation, running cg-patch with with the '-d' or '-m'
+	argument as well as '--resolved' will cause it to pick up where it
+	dropped off and go on applying. (This includes committing the failed
+	patch; do not commit it on your own!) (For '-m', you don't need to
+	feed the mailbox on stdin anymore.)
+
+-s, --signoff[=STRING]::
+	Add Signed-off-by line at the end of the commit message when
+	autocommitting (-c, -C, -d or -m). Optionally, specify the exact name
+	and email to sign off with by passing:
+	`--signoff="Author Name <user@example.com>"`.
+
+-u::
+	Make gitlink:cg-patch[1] assume the patch on the input is a classic unified
+	diff instead of a diff produced by GIT or Cogito. This means only
+	that file adds and removals will be recorded even if the patch file
+	does not explicitly describe them. Use this if the patch was not
+	produced by gitlink:cg-diff[1] or similar but by a traditional `diff` tool.
+
+Takes the diff on stdin (unless specified otherwise).
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-patch[1].
+--
+
+
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-patch is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

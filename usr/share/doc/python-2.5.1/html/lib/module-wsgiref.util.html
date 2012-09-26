@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-wsgiref.headers.html" />
+<link rel="prev" href="module-wsgiref.html" />
+<link rel="parent" href="module-wsgiref.html" />
+<link rel="next" href="module-wsgiref.headers.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.4.1 wsgiref.util - WSGI environment utilities</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.2 wsgiref.headers - WSGI"
+  href="module-wsgiref.headers.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.headers.html">18.4.2 wsgiref.headers - WSGI</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020410000000000000000">
+18.4.1 <tt class="module">wsgiref.util</tt> - WSGI environment utilities</a>
+</h2>
+<a name="module-wsgiref.util"></a>
+<p>
+This module provides a variety of utility functions for working with
+WSGI environments.  A WSGI environment is a dictionary containing
+HTTP request variables as described in <a class="rfc" id='rfcref-102667' xml:id='rfcref-102667'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.  All of the functions
+taking an <var>environ</var> parameter expect a WSGI-compliant dictionary to
+be supplied; please see <a class="rfc" id='rfcref-102669' xml:id='rfcref-102669'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a> for a detailed specification.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3840' xml:id='l2h-3840' class="function">guess_scheme</tt></b>(</nobr></td>
+  <td><var>environ</var>)</td></tr></table></dt>
+<dd>
+Return a guess for whether <code>wsgi.url_scheme</code> should be ``http'' or
+``https'', by checking for a <code>HTTPS</code> environment variable in the
+<var>environ</var> dictionary.  The return value is a string.
+
+<p>
+This function is useful when creating a gateway that wraps CGI or a
+CGI-like protocol such as FastCGI.  Typically, servers providing such
+protocols will include a <code>HTTPS</code> variable with a value of ``1''
+``yes'', or ``on'' when a request is received via SSL.  So, this
+function returns ``https'' if such a value is found, and ``http''
+otherwise.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3841' xml:id='l2h-3841' class="function">request_uri</tt></b>(</nobr></td>
+  <td><var>environ </var><big>[</big><var>, include_query=1</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return the full request URI, optionally including the query string,
+using the algorithm found in the ``URL Reconstruction'' section of
+<a class="rfc" id='rfcref-102671' xml:id='rfcref-102671'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.  If <var>include_query</var> is false, the query string is
+not included in the resulting URI.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3842' xml:id='l2h-3842' class="function">application_uri</tt></b>(</nobr></td>
+  <td><var>environ</var>)</td></tr></table></dt>
+<dd>
+Similar to <tt class="function">request_uri</tt>, except that the <code>PATH_INFO</code> and
+<code>QUERY_STRING</code> variables are ignored.  The result is the base URI
+of the application object addressed by the request.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3843' xml:id='l2h-3843' class="function">shift_path_info</tt></b>(</nobr></td>
+  <td><var>environ</var>)</td></tr></table></dt>
+<dd>
+Shift a single name from <code>PATH_INFO</code> to <code>SCRIPT_NAME</code> and
+return the name.  The <var>environ</var> dictionary is <em>modified</em>
+in-place; use a copy if you need to keep the original <code>PATH_INFO</code>
+or <code>SCRIPT_NAME</code> intact.
+
+<p>
+If there are no remaining path segments in <code>PATH_INFO</code>, <code>None</code>
+is returned.
+
+<p>
+Typically, this routine is used to process each portion of a request
+URI path, for example to treat the path as a series of dictionary keys.
+This routine modifies the passed-in environment to make it suitable for
+invoking another WSGI application that is located at the target URI.
+For example, if there is a WSGI application at <code>/foo</code>, and the
+request URI path is <code>/foo/bar/baz</code>, and the WSGI application at
+<code>/foo</code> calls <tt class="function">shift_path_info</tt>, it will receive the string
+``bar'', and the environment will be updated to be suitable for passing
+to a WSGI application at <code>/foo/bar</code>.  That is, <code>SCRIPT_NAME</code>
+will change from <code>/foo</code> to <code>/foo/bar</code>, and <code>PATH_INFO</code>
+will change from <code>/bar/baz</code> to <code>/baz</code>.
+
+<p>
+When <code>PATH_INFO</code> is just a ``/'', this routine returns an empty
+string and appends a trailing slash to <code>SCRIPT_NAME</code>, even though
+empty path segments are normally ignored, and <code>SCRIPT_NAME</code> doesn't
+normally end in a slash.  This is intentional behavior, to ensure that
+an application can tell the difference between URIs ending in <code>/x</code>
+from ones ending in <code>/x/</code> when using this routine to do object
+traversal.
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3844' xml:id='l2h-3844' class="function">setup_testing_defaults</tt></b>(</nobr></td>
+  <td><var>environ</var>)</td></tr></table></dt>
+<dd>
+Update <var>environ</var> with trivial defaults for testing purposes.
+
+<p>
+This routine adds various parameters required for WSGI, including
+<code>HTTP_HOST</code>, <code>SERVER_NAME</code>, <code>SERVER_PORT</code>,
+<code>REQUEST_METHOD</code>, <code>SCRIPT_NAME</code>, <code>PATH_INFO</code>, and all of
+the <a class="rfc" id='rfcref-102673' xml:id='rfcref-102673'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>-defined <code>wsgi.*</code> variables.  It only supplies default
+values, and does not replace any existing settings for these variables.
+
+<p>
+This routine is intended to make it easier for unit tests of WSGI
+servers and applications to set up dummy environments.  It should NOT
+be used by actual WSGI servers or applications, since the data is fake!
+</dl>
+
+<p>
+In addition to the environment functions above, the
+<tt class="module">wsgiref.util</tt> module also provides these miscellaneous
+utilities:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3845' xml:id='l2h-3845' class="function">is_hop_by_hop</tt></b>(</nobr></td>
+  <td><var>header_name</var>)</td></tr></table></dt>
+<dd>
+Return true if 'header_name' is an HTTP/1.1 ``Hop-by-Hop'' header, as
+defined by <a class="rfc" id='rfcref-102675' xml:id='rfcref-102675'
+href="http://www.faqs.org/rfcs/rfc2616.html">RFC 2616</a>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3846' xml:id='l2h-3846' class="class">FileWrapper</tt></b>(</nobr></td>
+  <td><var>filelike </var><big>[</big><var>, blksize=8192</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+A wrapper to convert a file-like object to an iterator.  The resulting
+objects support both <tt class="method">__getitem__</tt> and <tt class="method">__iter__</tt>
+iteration styles, for compatibility with Python 2.1 and Jython.
+As the object is iterated over, the optional <var>blksize</var> parameter
+will be repeatedly passed to the <var>filelike</var> object's <tt class="method">read()</tt>
+method to obtain strings to yield.  When <tt class="method">read()</tt> returns an
+empty string, iteration is ended and is not resumable.
+
+<p>
+If <var>filelike</var> has a <tt class="method">close()</tt> method, the returned object
+will also have a <tt class="method">close()</tt> method, and it will invoke the
+<var>filelike</var> object's <tt class="method">close()</tt> method when called.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.4.2 wsgiref.headers - WSGI"
+  href="module-wsgiref.headers.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-wsgiref.headers.html">18.4.2 wsgiref.headers - WSGI</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

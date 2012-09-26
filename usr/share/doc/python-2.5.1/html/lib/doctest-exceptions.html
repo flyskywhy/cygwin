@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="doctest-options.html" />
+<link rel="prev" href="doctest-execution-context.html" />
+<link rel="parent" href="doctest-how-it-works.html" />
+<link rel="next" href="doctest-options.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.2.3.4 What About Exceptions?</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.3 What's the Execution"
+  href="doctest-execution-context.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2.3 how It Works"
+  href="doctest-how-it-works.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.3.5 option Flags and"
+  href="doctest-options.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-execution-context.html">23.2.3.3 What's the Execution</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doctest-how-it-works.html">23.2.3 How It Works</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-options.html">23.2.3.5 Option Flags and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0025234000000000000000"></a><a name="doctest-exceptions"></a>
+<br>
+23.2.3.4 What About Exceptions?
+</h3>
+
+<p>
+No problem, provided that the traceback is the only output produced by
+the example:  just paste in the traceback.<a name="tex2html187"
+  href="#foot72133"><sup>23.1</sup></a>Since tracebacks contain details that are likely to change rapidly (for
+example, exact file paths and line numbers), this is one case where doctest
+works hard to be flexible in what it accepts.
+
+<p>
+Simple example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; [1, 2, 3].remove(42)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+ValueError: list.remove(x): x not in list
+</pre></div>
+
+<p>
+That doctest succeeds if <tt class="exception">ValueError</tt> is raised, with the
+"<tt class="samp">list.remove(x): x not in list</tt>" detail as shown.
+
+<p>
+The expected output for an exception must start with a traceback
+header, which may be either of the following two lines, indented the
+same as the first line of the example:
+
+<p>
+<div class="verbatim"><pre>
+Traceback (most recent call last):
+Traceback (innermost last):
+</pre></div>
+
+<p>
+The traceback header is followed by an optional traceback stack, whose
+contents are ignored by doctest.  The traceback stack is typically
+omitted, or copied verbatim from an interactive session.
+
+<p>
+The traceback stack is followed by the most interesting part:  the
+line(s) containing the exception type and detail.  This is usually the
+last line of a traceback, but can extend across multiple lines if the
+exception has a multi-line detail:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; raise ValueError('multi\n    line\ndetail')
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+ValueError: multi
+    line
+detail
+</pre></div>
+
+<p>
+The last three lines (starting with <tt class="exception">ValueError</tt>) are
+compared against the exception's type and detail, and the rest are
+ignored.
+
+<p>
+Best practice is to omit the traceback stack, unless it adds
+significant documentation value to the example.  So the last example
+is probably better as:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; raise ValueError('multi\n    line\ndetail')
+Traceback (most recent call last):
+    ...
+ValueError: multi
+    line
+detail
+</pre></div>
+
+<p>
+Note that tracebacks are treated very specially.  In particular, in the
+rewritten example, the use of "<tt class="samp">...</tt>" is independent of doctest's
+<tt class="constant">ELLIPSIS</tt> option.  The ellipsis in that example could be left
+out, or could just as well be three (or three hundred) commas or digits,
+or an indented transcript of a Monty Python skit.
+
+<p>
+Some details you should read once, but won't need to remember:
+
+<p>
+
+<ul>
+<li>Doctest can't guess whether your expected output came from an
+  exception traceback or from ordinary printing.  So, e.g., an example
+  that expects "<tt class="samp">ValueError: 42 is prime</tt>" will pass whether
+  <tt class="exception">ValueError</tt> is actually raised or if the example merely
+  prints that traceback text.  In practice, ordinary output rarely begins
+  with a traceback header line, so this doesn't create real problems.
+
+<p>
+</li>
+<li>Each line of the traceback stack (if present) must be indented
+  further than the first line of the example, <em>or</em> start with a
+  non-alphanumeric character.  The first line following the traceback
+  header indented the same and starting with an alphanumeric is taken
+  to be the start of the exception detail.  Of course this does the
+  right thing for genuine tracebacks.
+
+<p>
+</li>
+<li>When the <tt class="constant">IGNORE_EXCEPTION_DETAIL</tt> doctest option is
+  is specified, everything following the leftmost colon is ignored.
+
+<p>
+</li>
+<li>The interactive shell omits the traceback header line for some
+  <tt class="exception">SyntaxError</tt>s.  But doctest uses the traceback header
+  line to distinguish exceptions from non-exceptions.  So in the rare
+  case where you need to test a <tt class="exception">SyntaxError</tt> that omits the
+  traceback header, you will need to manually add the traceback header
+  line to your test example.
+
+<p>
+</li>
+<li>For some <tt class="exception">SyntaxError</tt>s, Python displays the character
+  position of the syntax error, using a <code>^</code> marker:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 1 1
+  File "&lt;stdin&gt;", line 1
+    1 1
+      ^
+SyntaxError: invalid syntax
+</pre></div>
+
+<p>
+Since the lines showing the position of the error come before the
+  exception type and detail, they are not checked by doctest.  For
+  example, the following test would pass, even though it puts the
+  <code>^</code> marker in the wrong location:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 1 1
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1
+    1 1
+    ^
+SyntaxError: invalid syntax
+</pre></div>
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+The ability to handle a multi-line exception detail,
+                and the <tt class="constant">IGNORE_EXCEPTION_DETAIL</tt> doctest option,
+                were added.</span>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot72133">... traceback.</a><A
+ href="doctest-exceptions.html#tex2html187"><sup>23.1</sup></a></dt>
+<dd>Examples containing
+    both expected output and an exception are not supported.  Trying
+    to guess where one ends and the other begins is too error-prone,
+    and that also makes for a confusing test.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.3 What's the Execution"
+  href="doctest-execution-context.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2.3 how It Works"
+  href="doctest-how-it-works.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.3.5 option Flags and"
+  href="doctest-options.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-execution-context.html">23.2.3.3 What's the Execution</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doctest-how-it-works.html">23.2.3 How It Works</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-options.html">23.2.3.5 Option Flags and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

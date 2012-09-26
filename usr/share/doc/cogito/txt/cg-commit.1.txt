@@ -1,0 +1,209 @@
+cg-commit(1)
+============
+
+NAME
+----
+cg-commit - commit changes in the working tree to the repository
+
+SYNOPSIS
+--------
+cg-commit [-m MESSAGE]... [-e] [-c COMMIT_ID] [OTHER_OPTIONS] [FILE]... [< MESSAGE]
+
+DESCRIPTION
+-----------
+Commits your changes to the GIT repository. Accepts the commit message
+from `stdin`. If the commit message is not modified the commit will be
+aborted.
+
+Note that you can undo a commit by the gitlink:cg-admin-uncommit[1] command,
+but that is possible only under special circumstances. See the CAVEATS
+section of its documentation.
+
+Commit author
+~~~~~~~~~~~~~
+Each commit has two user identification fields - commit author and committer.
+By default, it is recorded that you authored the commit, but it is considered
+a good practice to change this to the actual author of the change if you are
+merely applying someone else's patch. It is always recorded that you were the
+patch committer.
+
+The commit author is determined by examining various sources in this order:
+
+* '--author' (see OPTIONS)
+
+* 'GIT_AUTHOR_*' (see ENVIRONMENT)
+
+* Configuration file: you can insert this to '.git/config' or '~/.gitconfig':
+
+	[user]
+		name = "Your Name"
+		email = "your@email.address.xz"
+
+* System information: The author name defaults to the GECOS field of your
+'/etc/passwd' entry, which is taken almost verbatim. The author email
+defaults to your 'username@hostname.domainname' (but you should change this
+to the real email address you use if it is any different).
+
+OPTIONS
+-------
+
+--
+--amend::
+	Amend the last commit with some additional stuff; this will use your
+	current working copy as the new commit "contents" and otherwise
+	have similar effects as -c HEAD; the new commit will _replace_ the
+	current HEAD - which means that you should read gitlink:cg-admin-uncommit[1]
+	caveats section. If you want to adjust the log message or authorship
+	information, use it with combination with the '-e' option.
+
+--author AUTHOR_STRING::
+	Set the commit author information according to the argument instead
+	of your environment, .git/author, or user information.
+
+The 'AUTHOR_STRING' format is `Author Name <author@email> Date`. The
+author name and date is optional, only the email is required to be
+always present (e.g. '--author "<pasky@ucw.cz>"' will use the current
+date and the real name set for your system account (usually in
+the GECOS field), but a different email address).
+
+-c COMMIT_ID::
+	Copy the commit metainformation from a given commit ID (that is, only
+	the author information and the commit message - NOT committer
+	information and NOT the commit diff). This option is typically used
+	when replaying commits from one lineage or repository to another - see
+	also `cg-patch -C` (if you want to apply the diffs as well).
+
+-C::
+	Make gitlink:cg-commit[1] ignore the cache and just commit the thing as-is.
+	Note, this is used internally by 'Cogito' when merging, and it is
+	also useful when you are performing the initial commit manually. This
+	option does not make sense when files are given on the command line.
+
+-m MESSAGE::
+	Specify the commit message, which is used instead of starting
+	up an editor (if the input is not `stdin`, the input is appended
+	after all the '-m' messages). Multiple '-m' parameters are appended
+	to a single commit message, each as separate paragraph.
+
+-M FILE::
+	Include commit message from a file (this has the same effect as if
+	you would cat it to stdin).
+
+-e::
+	Force the editor to be brought up even when '-m' parameters were
+	passed to gitlink:cg-commit[1].
+
+-E::
+	Force the editor to be brought up and do the commit even if
+	the default commit message is not changed.
+
+-f::
+	Force the commit even when there's "nothing to commit", that is
+	the tree is the same as the last time you committed, no changes
+	happened. This also forces the commit even if committing is blocked
+	for some reason.
+
+-N::
+	Don't add the files to the object database, just update the caches
+	and the commit information. This is for special purposes when you
+	might not actually _have_ any object database. This option is
+	normally not interesting.
+
+--no-hooks::
+	Do not call any commit hooks during the commit.
+
+-p, --review::
+	Show changes being committed as a patch appended to the commit message
+	buffer. Changes made to the patch will be reapplied before completing
+	the commit. This implies '-e'.
+
+-q::
+	Be quiet in case there's "nothing to commit", and silently exit
+	returning success. In a sense, this is the opposite to '-f'.
+
+-s, --signoff[=STRING]::
+	Add Signed-off-by line at the end of the commit message.
+	Optionally, specify the exact name and email to sign off with by
+	passing: `--signoff="Author Name <user@example.com>"`.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-commit[1].
+--
+
+
+FILES
+-----
+$GIT_DIR/commit-template::
+	If the file exists it will be used as a template when creating
+	the commit message. The template file makes it possible to
+	automatically add `Signed-off-by` line to the log message.
+
+$GIT_DIR/hooks/commit-post::
+	If the file exists and is executable it will be executed upon
+	completion of the commit. The script is passed two arguments.
+	The first argument is the commit ID and the second is the
+	branchname. A sample `commit-post` script might look like:
+
+	#!/bin/sh
+	id=$1
+	branch=$2
+	echo "Committed $id in $branch" | mail user@host
+
+ENVIRONMENT VARIABLES
+---------------------
+See the 'Commit author' section above for details about the name/email/date
+environment variables meaning and default values.
+
+GIT_AUTHOR_NAME::
+	Author's name.
+
+GIT_AUTHOR_EMAIL::
+	Author's e-mail address.
+
+GIT_AUTHOR_DATE::
+	Date, useful when applying patches submitted over e-mail.
+
+GIT_COMMITTER_NAME::
+	Committer's name.
+
+GIT_COMMITTER_EMAIL::
+	Committer's e-mail address. The recommended policy is not to change
+	this, though - it may not be necessarily a valid e-mail address, but
+	its purpose is more to identify the actual user and machine
+	where the commit was done. However, it is obviously ultimately
+	a policy decision of a particular project to determine whether
+	this should be a real e-mail or not.
+
+GIT_COMMITTER_DATE::
+	This is the date of the commit itself. It should be never
+	overridden, unless you know you absolutely need to override it
+	(to ensure the commit gets the same ID as another or when
+	migrating history around).
+
+EDITOR::
+	The editor used for entering revision log information.
+
+CONFIGURATION VARIABLES
+-----------------------
+The following GIT configuration file variables are recognized:
+
+user.author, user.email::
+	User credentials. See the "Commit author" section for details.
+
+cogito.hooks.commit.post.allmerged::
+	If set to "true" and you are committing a merge, the post-hook will
+	be called for all the merged commits in sequence (the earliest first).
+	Otherwise, the hook will be called only for the merge commit.
+
+COPYRIGHT
+---------
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-commit is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

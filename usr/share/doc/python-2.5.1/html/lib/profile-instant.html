@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node796.html" />
+<link rel="prev" href="node794.html" />
+<link rel="parent" href="profile.html" />
+<link rel="next" href="node796.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>25.2 Instant User's Manual </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.1 introduction to the"
+  href="node794.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.3 what Is Deterministic"
+  href="node796.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node794.html">25.1 Introduction to the</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node796.html">25.3 What Is Deterministic</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0027200000000000000000"></a><a name="profile-instant"></a>
+<br>
+25.2 Instant User's Manual 
+</h1>
+
+<p>
+This section is provided for users that ``don't want to read the
+manual.'' It provides a very brief overview, and allows a user to
+rapidly perform profiling on an existing application.
+
+<p>
+To profile an application with a main entry point of <tt class="function">foo()</tt>,
+you would add the following to your module:
+
+<p>
+<div class="verbatim"><pre>
+import cProfile
+cProfile.run('foo()')
+</pre></div>
+
+<p>
+(Use <tt class="module">profile</tt> instead of <tt class="module">cProfile</tt> if the latter is not
+available on your system.)
+
+<p>
+The above action would cause <tt class="function">foo()</tt> to be run, and a series of
+informative lines (the profile) to be printed.  The above approach is
+most useful when working with the interpreter.  If you would like to
+save the results of a profile into a file for later examination, you
+can supply a file name as the second argument to the <tt class="function">run()</tt>
+function:
+
+<p>
+<div class="verbatim"><pre>
+import cProfile
+cProfile.run('foo()', 'fooprof')
+</pre></div>
+
+<p>
+The file <span class="file">cProfile.py</span> can also be invoked as
+a script to profile another script.  For example:
+
+<p>
+<div class="verbatim"><pre>
+python -m cProfile myscript.py
+</pre></div>
+
+<p>
+<span class="file">cProfile.py</span> accepts two optional arguments on the command line:
+
+<p>
+<div class="verbatim"><pre>
+cProfile.py [-o output_file] [-s sort_order]
+</pre></div>
+
+<p>
+<b class="programopt">-s</b> only applies to standard output (<b class="programopt">-o</b> is
+not supplied).  Look in the <tt class="class">Stats</tt> documentation for valid sort
+values.
+
+<p>
+When you wish to review the profile, you should use the methods in the
+<tt class="module">pstats</tt> module.  Typically you would load the statistics data as
+follows:
+
+<p>
+<div class="verbatim"><pre>
+import pstats
+p = pstats.Stats('fooprof')
+</pre></div>
+
+<p>
+The class <tt class="class">Stats</tt> (the above code just created an instance of
+this class) has a variety of methods for manipulating and printing the
+data that was just read into <code>p</code>.  When you ran
+<tt class="function">cProfile.run()</tt> above, what was printed was the result of three
+method calls:
+
+<p>
+<div class="verbatim"><pre>
+p.strip_dirs().sort_stats(-1).print_stats()
+</pre></div>
+
+<p>
+The first method removed the extraneous path from all the module
+names. The second method sorted all the entries according to the
+standard module/line/name string that is printed.
+The third method printed out
+all the statistics.  You might try the following sort calls:
+
+<p>
+<div class="verbatim"><pre>
+p.sort_stats('name')
+p.print_stats()
+</pre></div>
+
+<p>
+The first call will actually sort the list by function name, and the
+second call will print out the statistics.  The following are some
+interesting calls to experiment with:
+
+<p>
+<div class="verbatim"><pre>
+p.sort_stats('cumulative').print_stats(10)
+</pre></div>
+
+<p>
+This sorts the profile by cumulative time in a function, and then only
+prints the ten most significant lines.  If you want to understand what
+algorithms are taking time, the above line is what you would use.
+
+<p>
+If you were looking to see what functions were looping a lot, and
+taking a lot of time, you would do:
+
+<p>
+<div class="verbatim"><pre>
+p.sort_stats('time').print_stats(10)
+</pre></div>
+
+<p>
+to sort according to time spent within each function, and then print
+the statistics for the top ten functions.
+
+<p>
+You might also try:
+
+<p>
+<div class="verbatim"><pre>
+p.sort_stats('file').print_stats('__init__')
+</pre></div>
+
+<p>
+This will sort all the statistics by file name, and then print out
+statistics for only the class init methods (since they are spelled
+with <code>__init__</code> in them).  As one final example, you could try:
+
+<p>
+<div class="verbatim"><pre>
+p.sort_stats('time', 'cum').print_stats(.5, 'init')
+</pre></div>
+
+<p>
+This line sorts statistics with a primary key of time, and a secondary
+key of cumulative time, and then prints out some of the statistics.
+To be specific, the list is first culled down to 50% (re: "<tt class="samp">.5</tt>")
+of its original size, then only lines containing <code>init</code> are
+maintained, and that sub-sub-list is printed.
+
+<p>
+If you wondered what functions called the above functions, you could
+now (<code>p</code> is still sorted according to the last criteria) do:
+
+<p>
+<div class="verbatim"><pre>
+p.print_callers(.5, 'init')
+</pre></div>
+
+<p>
+and you would get a list of callers for each of the listed functions.
+
+<p>
+If you want more functionality, you're going to have to read the
+manual, or guess what the following functions do:
+
+<p>
+<div class="verbatim"><pre>
+p.print_callees()
+p.add('fooprof')
+</pre></div>
+
+<p>
+Invoked as a script, the <tt class="module">pstats</tt> module is a statistics
+browser for reading and examining profile dumps.  It has a simple
+line-oriented interface (implemented using <tt class="module"><a href="module-cmd.html">cmd</a></tt>) and
+interactive help.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.1 introduction to the"
+  href="node794.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.3 what Is Deterministic"
+  href="node796.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node794.html">25.1 Introduction to the</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node796.html">25.3 What Is Deterministic</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

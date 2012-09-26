@@ -1,0 +1,17 @@
+#!/bin/bash
+
+for fn in autoconf.info.gz	autoconf.info \
+	autoconf-2.13.info.gz	autoconf-2.13.info \
+	autoconf2.13.info.gz	autoconf2.13.info \
+	autoconf-2.5x.info.gz	autoconf-2.5x.info \
+	standards-2.5x.info.gz	standards-2.5x.info \
+	standards-2.13.info.gz	standards-2.13.info
+do
+	if [ -f /usr/share/info/${fn} ]
+	then
+		/usr/bin/install-info --delete --quiet \
+		    --dir-file=/usr/share/info/dir \
+		    --info-file=/usr/share/info/${fn} 2>/dev/null || /bin/true
+	fi
+done
+

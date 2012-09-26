@@ -1,0 +1,79 @@
+
+        OpenCDK - Open Crypto Development Kit v0.5
+        ------------------------------------------
+
+This library provides basic parts of the OpenPGP message format.
+For reference, please read the rfc2440.txt in the doc/ directory.
+Due to some possible security problems, the library also implements
+parts of draft-ietf-openpgp-rfc2440bis-08.txt. If you want to exchange
+messages with earlier PGP version < 7, you should use the compat mode.
+
+The aim of the library is *not* to replace any available OpenPGP version.
+There will be no real support for key management (sign, revoke,
+alter preferences, ...) and some other parts are only rudimentary
+available. The main purpose is to handle and understand OpenPGP
+packets and to use basic operations. For example to encrypt/decrypt
+or to sign/verify and packet routines.
+
+Hint: Due to the fact that Libgcrypt is an excellent library but too
+      bloated for our use, we do not need CBC, counter mode, OID, etc., 
+      OpenCDK now includes optimized libs for symmetrical cryptography
+      and message digest routines. These code is copied from Libgcrypt
+      and thus it should be stable and secure.
+
+
+In the doc/ directory, you can find a HTML-API overview. In the tests/
+directory, you can find some regression tests and the MinPG example.
+MinPG is a detailed example how to use the lib and the various functions.
+
+
+Libraries you'll also need for using all parts:
+libzlib   - ftp.uu.net/pub/archiving/zip/zlib/
+libgcrypt - ftp.gnupg.org/gcrypt/alpha/libgcrypt
+
+Precompiled packages:
+You can find a bundled version of OpenCDK in the unstable section of Debian.
+
+Overview of the code structure:
+
+mdlib/          internal message digest library
+md5.c           - message digest 5 algorithm
+rmd160.c        - RIPE-MD 160 algorithm
+sha1.c          - Secure Hash Algorithm v1
+
+cipherlib/      internal cipher library
+blowfish.c      - Blowfish
+cast5.c         - CAST5 (CAST-128)
+des.c           - Data Encryption Standard (3DES)
+rijndael.c      - Rijndael AES
+twofish.c       - Twofish
+
+src/
+
+cipher.c        - cipher filter (Tag 9, Tag 18)
+compress.c      - compress filter (Tag 8)
+armor.c         - armor filter for OpenPGP armor
+plaintext.c     - literal filter (Tag 10)
+
+keydb.c         - key database routines
+pubkey.c        - general public key interface
+keylist.c       - linked lists for encryption, signing (Tag 1, Tag 2)
+keyserver.c     - high-level keyserver handling
+keygen.c        - key generation routines
+
+encrypt.c       - encryption and decryption routines
+seskey.c        - session key handling and pkcs#1 support
+sign.c          - signature routines
+verify.c        - verify routines
+sig-check.c     - low-level signature handling
+
+new-packet.c    - allocate and free packets
+read-packet.c   - read OpenPGP packets
+write-packet.c  - write OpenPGP packets
+
+main.c          - memory handling and global stuff
+misc.c          - various code parts which do not fit in any section
+trustdb.c       - high-level trust database handling
+stream.c        - provides an abstraction of a data type, called stream
+
+

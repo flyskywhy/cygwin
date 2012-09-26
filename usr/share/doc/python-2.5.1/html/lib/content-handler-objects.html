@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="dtd-handler-objects.html" />
+<link rel="prev" href="module-xml.sax.handler.html" />
+<link rel="parent" href="module-xml.sax.handler.html" />
+<link rel="next" href="dtd-handler-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>8.10.1 ContentHandler Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.10 xml.sax.handler  "
+  href="module-xml.sax.handler.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8.10 xml.sax.handler  "
+  href="module-xml.sax.handler.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.10.2 dtdhandler Objects"
+  href="dtd-handler-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-xml.sax.handler.html">8.10 xml.sax.handler  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-xml.sax.handler.html">8.10 xml.sax.handler  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="dtd-handler-objects.html">8.10.2 DTDHandler Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00101010000000000000000"></a><a name="content-handler-objects"></a>
+<br>
+8.10.1 ContentHandler Objects 
+</h2>
+
+<p>
+Users are expected to subclass <tt class="class">ContentHandler</tt> to support their
+application.  The following methods are called by the parser on the
+appropriate events in the input document:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1901' xml:id='l2h-1901' class="method">setDocumentLocator</tt></b>(</nobr></td>
+  <td><var>locator</var>)</td></tr></table></dt>
+<dd>
+  Called by the parser to give the application a locator for locating
+  the origin of document events.
+
+<p>
+SAX parsers are strongly encouraged (though not absolutely required)
+  to supply a locator: if it does so, it must supply the locator to
+  the application by invoking this method before invoking any of the
+  other methods in the DocumentHandler interface.
+
+<p>
+The locator allows the application to determine the end position of
+  any document-related event, even if the parser is not reporting an
+  error. Typically, the application will use this information for
+  reporting its own errors (such as character content that does not
+  match an application's business rules). The information returned by
+  the locator is probably not sufficient for use with a search engine.
+
+<p>
+Note that the locator will return correct information only during
+  the invocation of the events in this interface. The application
+  should not attempt to use it at any other time.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1902' xml:id='l2h-1902' class="method">startDocument</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Receive notification of the beginning of a document.
+
+<p>
+The SAX parser will invoke this method only once, before any other
+  methods in this interface or in DTDHandler (except for
+  <tt class="method">setDocumentLocator()</tt>).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1903' xml:id='l2h-1903' class="method">endDocument</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Receive notification of the end of a document.
+
+<p>
+The SAX parser will invoke this method only once, and it will be the
+  last method invoked during the parse. The parser shall not invoke
+  this method until it has either abandoned parsing (because of an
+  unrecoverable error) or reached the end of input.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1904' xml:id='l2h-1904' class="method">startPrefixMapping</tt></b>(</nobr></td>
+  <td><var>prefix, uri</var>)</td></tr></table></dt>
+<dd>
+  Begin the scope of a prefix-URI Namespace mapping.
+
+<p>
+The information from this event is not necessary for normal
+  Namespace processing: the SAX XML reader will automatically replace
+  prefixes for element and attribute names when the
+  <code>feature_namespaces</code> feature is enabled (the default).
+
+<p>
+There are cases, however, when applications need to use prefixes in
+  character data or in attribute values, where they cannot safely be
+  expanded automatically; the <tt class="method">startPrefixMapping()</tt> and
+  <tt class="method">endPrefixMapping()</tt> events supply the information to the
+  application to expand prefixes in those contexts itself, if
+  necessary.
+
+<p>
+Note that <tt class="method">startPrefixMapping()</tt> and
+  <tt class="method">endPrefixMapping()</tt> events are not guaranteed to be properly
+  nested relative to each-other: all <tt class="method">startPrefixMapping()</tt>
+  events will occur before the corresponding <tt class="method">startElement()</tt>
+  event, and all <tt class="method">endPrefixMapping()</tt> events will occur after
+  the corresponding <tt class="method">endElement()</tt> event, but their order is
+  not guaranteed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1905' xml:id='l2h-1905' class="method">endPrefixMapping</tt></b>(</nobr></td>
+  <td><var>prefix</var>)</td></tr></table></dt>
+<dd>
+  End the scope of a prefix-URI mapping.
+
+<p>
+See <tt class="method">startPrefixMapping()</tt> for details. This event will
+  always occur after the corresponding <tt class="method">endElement()</tt> event,
+  but the order of <tt class="method">endPrefixMapping()</tt> events is not otherwise
+  guaranteed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1906' xml:id='l2h-1906' class="method">startElement</tt></b>(</nobr></td>
+  <td><var>name, attrs</var>)</td></tr></table></dt>
+<dd>
+  Signals the start of an element in non-namespace mode.
+
+<p>
+The <var>name</var> parameter contains the raw XML 1.0 name of the
+  element type as a string and the <var>attrs</var> parameter holds an
+  object of the <a class="ulink" href="attributes-objects.html"
+  ><tt class="class">Attributes</tt>
+  interface</a> containing the attributes of the
+  element.  The object passed as <var>attrs</var> may be re-used by the
+  parser; holding on to a reference to it is not a reliable way to
+  keep a copy of the attributes.  To keep a copy of the attributes,
+  use the <tt class="method">copy()</tt> method of the <var>attrs</var> object.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1907' xml:id='l2h-1907' class="method">endElement</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+  Signals the end of an element in non-namespace mode.
+
+<p>
+The <var>name</var> parameter contains the name of the element type, just
+  as with the <tt class="method">startElement()</tt> event.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1908' xml:id='l2h-1908' class="method">startElementNS</tt></b>(</nobr></td>
+  <td><var>name, qname, attrs</var>)</td></tr></table></dt>
+<dd>
+  Signals the start of an element in namespace mode.
+
+<p>
+The <var>name</var> parameter contains the name of the element type as a
+  <code>(<var>uri</var>, <var>localname</var>)</code> tuple, the <var>qname</var> parameter
+  contains the raw XML 1.0 name used in the source document, and the
+  <var>attrs</var> parameter holds an instance of the
+  <a class="ulink" href="attributes-ns-objects.html"
+  ><tt class="class">AttributesNS</tt> interface</a>
+  containing the attributes of the element.  If no namespace is
+  associated with the element, the <var>uri</var> component of <var>name</var>
+  will be <code>None</code>.  The object passed as <var>attrs</var> may be
+  re-used by the parser; holding on to a reference to it is not a
+  reliable way to keep a copy of the attributes.  To keep a copy of
+  the attributes, use the <tt class="method">copy()</tt> method of the <var>attrs</var>
+  object.
+
+<p>
+Parsers may set the <var>qname</var> parameter to <code>None</code>, unless the
+  <code>feature_namespace_prefixes</code> feature is activated.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1909' xml:id='l2h-1909' class="method">endElementNS</tt></b>(</nobr></td>
+  <td><var>name, qname</var>)</td></tr></table></dt>
+<dd>
+  Signals the end of an element in namespace mode.
+
+<p>
+The <var>name</var> parameter contains the name of the element type, just
+  as with the <tt class="method">startElementNS()</tt> method, likewise the
+  <var>qname</var> parameter.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1910' xml:id='l2h-1910' class="method">characters</tt></b>(</nobr></td>
+  <td><var>content</var>)</td></tr></table></dt>
+<dd>
+  Receive notification of character data.
+
+<p>
+The Parser will call this method to report each chunk of character
+  data. SAX parsers may return all contiguous character data in a
+  single chunk, or they may split it into several chunks; however, all
+  of the characters in any single event must come from the same
+  external entity so that the Locator provides useful information.
+
+<p>
+<var>content</var> may be a Unicode string or a byte string; the
+  <code>expat</code> reader module produces always Unicode strings.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+The earlier SAX 1 interface provided by the Python
+  XML Special Interest Group used a more Java-like interface for this
+  method.  Since most parsers used from Python did not take advantage
+  of the older interface, the simpler signature was chosen to replace
+  it.  To convert old code to the new interface, use <var>content</var>
+  instead of slicing content with the old <var>offset</var> and
+  <var>length</var> parameters.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1911' xml:id='l2h-1911' class="method">ignorableWhitespace</tt></b>(</nobr></td>
+  <td><var>whitespace</var>)</td></tr></table></dt>
+<dd>
+  Receive notification of ignorable whitespace in element content.
+
+<p>
+Validating Parsers must use this method to report each chunk
+  of ignorable whitespace (see the W3C XML 1.0 recommendation,
+  section 2.10): non-validating parsers may also use this method
+  if they are capable of parsing and using content models.
+
+<p>
+SAX parsers may return all contiguous whitespace in a single
+  chunk, or they may split it into several chunks; however, all
+  of the characters in any single event must come from the same
+  external entity, so that the Locator provides useful
+  information.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1912' xml:id='l2h-1912' class="method">processingInstruction</tt></b>(</nobr></td>
+  <td><var>target, data</var>)</td></tr></table></dt>
+<dd>
+  Receive notification of a processing instruction.
+
+<p>
+The Parser will invoke this method once for each processing
+  instruction found: note that processing instructions may occur
+  before or after the main document element.
+
+<p>
+A SAX parser should never report an XML declaration (XML 1.0,
+  section 2.8) or a text declaration (XML 1.0, section 4.3.1) using
+  this method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1913' xml:id='l2h-1913' class="method">skippedEntity</tt></b>(</nobr></td>
+  <td><var>name</var>)</td></tr></table></dt>
+<dd>
+  Receive notification of a skipped entity.
+
+<p>
+The Parser will invoke this method once for each entity
+  skipped. Non-validating processors may skip entities if they have
+  not seen the declarations (because, for example, the entity was
+  declared in an external DTD subset). All processors may skip
+  external entities, depending on the values of the
+  <code>feature_external_ges</code> and the
+  <code>feature_external_pes</code> properties.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8.10 xml.sax.handler  "
+  href="module-xml.sax.handler.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="8.10 xml.sax.handler  "
+  href="module-xml.sax.handler.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8.10.2 dtdhandler Objects"
+  href="dtd-handler-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-xml.sax.handler.html">8.10 xml.sax.handler  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-xml.sax.handler.html">8.10 xml.sax.handler  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="dtd-handler-objects.html">8.10.2 DTDHandler Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

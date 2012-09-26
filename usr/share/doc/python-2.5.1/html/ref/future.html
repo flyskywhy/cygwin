@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="import.html" />
+<link rel="parent" href="import.html" />
+<link rel="next" href="global.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.12.1 Future statements </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.12 the import statement"
+  href="import.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.12 the import statement"
+  href="import.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.13 the global statement"
+  href="global.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="import.html">6.12 The import statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="import.html">6.12 The import statement</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="global.html">6.13 The global statement</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0081210000000000000000"></a><a name="future"></a>
+<br>
+6.12.1 Future statements 
+</h2>
+
+<p>
+A <i class="dfn">future statement</i><a id='l2h-577' xml:id='l2h-577'></a> is a directive to
+the compiler that a particular module should be compiled using syntax
+or semantics that will be available in a specified future release of
+Python.  The future statement is intended to ease migration to future
+versions of Python that introduce incompatible changes to the
+language.  It allows use of the new features on a per-module basis
+before the release in which the feature becomes standard.
+
+<p>
+<dl><dd class="grammar">
+<div class="productions">
+<table>
+
+  <tr>
+    <td>future_statement</td>
+    <td>::=</td>
+    <td>"from" "__future__" "import" feature ["as" name]</td></tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td><code>&nbsp;&nbsp;("," feature ["as" name])*</code></td></tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td><code>| "from" "__future__" "import" "(" feature ["as" name]</code></td></tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td><code>&nbsp;&nbsp;("," feature ["as" name])* [","] ")"</code></td></tr>
+  <tr>
+    <td>feature</td>
+    <td>::=</td>
+    <td>identifier</td></tr>
+  <tr>
+    <td>name</td>
+    <td>::=</td>
+    <td>identifier</td></tr>
+</table>
+</div>
+</dd></dl>
+
+<p>
+A future statement must appear near the top of the module.  The only
+lines that can appear before a future statement are:
+
+<p>
+
+<ul>
+<li>the module docstring (if any),
+</li>
+<li>comments,
+</li>
+<li>blank lines, and
+</li>
+<li>other future statements.
+
+<p>
+</li>
+</ul>
+
+<p>
+The features recognized by Python 2.5 are "<tt class="samp">absolute_import</tt>",
+"<tt class="samp">division</tt>", "<tt class="samp">generators</tt>", "<tt class="samp">nested_scopes</tt>" and
+"<tt class="samp">with_statement</tt>".  "<tt class="samp">generators</tt>" and "<tt class="samp">nested_scopes</tt>" 
+are redundant in Python version 2.3 and above because they are always
+enabled. 
+
+<p>
+A future statement is recognized and treated specially at compile
+time: Changes to the semantics of core constructs are often
+implemented by generating different code.  It may even be the case
+that a new feature introduces new incompatible syntax (such as a new
+reserved word), in which case the compiler may need to parse the
+module differently.  Such decisions cannot be pushed off until
+runtime.
+
+<p>
+For any given release, the compiler knows which feature names have been
+defined, and raises a compile-time error if a future statement contains
+a feature not known to it.
+
+<p>
+The direct runtime semantics are the same as for any import statement:
+there is a standard module <tt class="module">__future__</tt>, described later, and
+it will be imported in the usual way at the time the future statement
+is executed.
+
+<p>
+The interesting runtime semantics depend on the specific feature
+enabled by the future statement.
+
+<p>
+Note that there is nothing special about the statement:
+
+<p>
+<div class="verbatim"><pre>
+import __future__ [as name]
+</pre></div>
+
+<p>
+That is not a future statement; it's an ordinary import statement with
+no special semantics or syntax restrictions.
+
+<p>
+Code compiled by an <tt class="keyword">exec</tt> statement or calls to the builtin functions
+<tt class="function">compile()</tt> and <tt class="function">execfile()</tt> that occur in a module
+<tt class="module">M</tt> containing a future statement will, by default, use the new 
+syntax or semantics associated with the future statement.  This can,
+starting with Python 2.2 be controlled by optional arguments to
+<tt class="function">compile()</tt> -- see the documentation of that function in the
+<em class="citetitle"><a
+ href="../lib/built-in-funcs.html"
+ title="Python Library Reference"
+ >Python Library Reference</a></em> for
+details.
+
+<p>
+A future statement typed at an interactive interpreter prompt will
+take effect for the rest of the interpreter session.  If an
+interpreter is started with the <b class="programopt">-i</b> option, is passed a
+script name to execute, and the script includes a future statement, it
+will be in effect in the interactive session started after the script
+is executed.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.12 the import statement"
+  href="import.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.12 the import statement"
+  href="import.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.13 the global statement"
+  href="global.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="import.html">6.12 The import statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="import.html">6.12 The import statement</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="global.html">6.13 The global statement</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

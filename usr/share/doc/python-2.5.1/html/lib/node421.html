@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node422.html" />
+<link rel="prev" href="node409.html" />
+<link rel="parent" href="module-logging.html" />
+<link rel="next" href="node422.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.5.6 Formatter Objects</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.5.11 HTTPHandler"
+  href="node420.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.7 filter Objects"
+  href="node422.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node420.html">14.5.5.11 HTTPHandler</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node422.html">14.5.7 Filter Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0016560000000000000000">
+14.5.6 Formatter Objects</a>
+</h2>
+
+<p>
+<tt class="class">Formatter</tt>s have the following attributes and methods. They are
+responsible for converting a <tt class="class">LogRecord</tt> to (usually) a string
+which can be interpreted by either a human or an external system. The
+base
+<tt class="class">Formatter</tt> allows a formatting string to be specified. If none is
+supplied, the default value of <code>'%(message)s'</code> is used.
+
+<p>
+A Formatter can be initialized with a format string which makes use of
+knowledge of the <tt class="class">LogRecord</tt> attributes - such as the default value
+mentioned above making use of the fact that the user's message and
+arguments are pre-formatted into a <tt class="class">LogRecord</tt>'s <var>message</var>
+attribute.  This format string contains standard python %-style
+mapping keys. See section <a href="typesseq-strings.html#typesseq-strings">3.6.2</a>, ``String Formatting
+Operations,'' for more information on string formatting.
+
+<p>
+Currently, the useful mapping keys in a <tt class="class">LogRecord</tt> are:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Format</th>
+      <th class="left"  >Description</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><code>%(name)s</code></td>
+        <td class="left"  >Name of the logger (logging channel).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(levelno)s</code></td>
+        <td class="left"  >Numeric logging level for the message
+                        (<tt class="constant">DEBUG</tt>, <tt class="constant">INFO</tt>,
+                        <tt class="constant">WARNING</tt>, <tt class="constant">ERROR</tt>,
+                        <tt class="constant">CRITICAL</tt>).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(levelname)s</code></td>
+        <td class="left"  >Text logging level for the message
+                        (<code>'DEBUG'</code>, <code>'INFO'</code>,
+                        <code>'WARNING'</code>, <code>'ERROR'</code>,
+                        <code>'CRITICAL'</code>).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(pathname)s</code></td>
+        <td class="left"  >Full pathname of the source file where the logging
+                        call was issued (if available).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(filename)s</code></td>
+        <td class="left"  >Filename portion of pathname.</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(module)s</code></td>
+        <td class="left"  >Module (name portion of filename).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(funcName)s</code></td>
+        <td class="left"  >Name of function containing the logging call.</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(lineno)d</code></td>
+        <td class="left"  >Source line number where the logging call was issued
+                        (if available).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(created)f</code></td>
+        <td class="left"  >Time when the <tt class="class">LogRecord</tt> was created (as
+                        returned by <tt class="function">time.time()</tt>).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(relativeCreated)d</code></td>
+        <td class="left"  >Time in milliseconds when the LogRecord was
+                        created, relative to the time the logging module was
+                        loaded.</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(asctime)s</code></td>
+        <td class="left"  >Human-readable time when the <tt class="class">LogRecord</tt>
+                        was created.  By default this is of the form
+                        ``2003-07-08 16:49:45,896'' (the numbers after the
+                        comma are millisecond portion of the time).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(msecs)d</code></td>
+        <td class="left"  >Millisecond portion of the time when the
+                        <tt class="class">LogRecord</tt> was created.</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(thread)d</code></td>
+        <td class="left"  >Thread ID (if available).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(threadName)s</code></td>
+        <td class="left"  >Thread name (if available).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(process)d</code></td>
+        <td class="left"  >Process ID (if available).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(message)s</code></td>
+        <td class="left"  >The logged message, computed as <code>msg % args</code>.</td></tr></tbody>
+</table></div>
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+<var>funcName</var> was added.</span>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-2955' xml:id='l2h-2955' class="class">Formatter</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>fmt</var><big>[</big><var>, datefmt</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns a new instance of the <tt class="class">Formatter</tt> class. The
+instance is initialized with a format string for the message as a whole,
+as well as a format string for the date/time portion of a message. If
+no <var>fmt</var> is specified, <code>'%(message)s'</code> is used. If no <var>datefmt</var>
+is specified, the ISO8601 date format is used.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2956' xml:id='l2h-2956' class="method">format</tt></b>(</nobr></td>
+  <td><var>record</var>)</td></tr></table></dt>
+<dd>
+The record's attribute dictionary is used as the operand to a
+string formatting operation. Returns the resulting string.
+Before formatting the dictionary, a couple of preparatory steps
+are carried out. The <var>message</var> attribute of the record is computed
+using <var>msg</var> % <var>args</var>. If the formatting string contains
+<code>'(asctime)'</code>, <tt class="method">formatTime()</tt> is called to format the
+event time. If there is exception information, it is formatted using
+<tt class="method">formatException()</tt> and appended to the message.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2957' xml:id='l2h-2957' class="method">formatTime</tt></b>(</nobr></td>
+  <td><var>record</var><big>[</big><var>, datefmt</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This method should be called from <tt class="method">format()</tt> by a formatter which
+wants to make use of a formatted time. This method can be overridden
+in formatters to provide for any specific requirement, but the
+basic behavior is as follows: if <var>datefmt</var> (a string) is specified,
+it is used with <tt class="function">time.strftime()</tt> to format the creation time of the
+record. Otherwise, the ISO8601 format is used. The resulting
+string is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2958' xml:id='l2h-2958' class="method">formatException</tt></b>(</nobr></td>
+  <td><var>exc_info</var>)</td></tr></table></dt>
+<dd>
+Formats the specified exception information (a standard exception tuple
+as returned by <tt class="function">sys.exc_info()</tt>) as a string. This default
+implementation just uses <tt class="function">traceback.print_exception()</tt>.
+The resulting string is returned.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.5.11 HTTPHandler"
+  href="node420.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.7 filter Objects"
+  href="node422.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node420.html">14.5.5.11 HTTPHandler</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node422.html">14.5.7 Filter Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

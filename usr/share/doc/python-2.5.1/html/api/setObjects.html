@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="datetime-objects.html" />
+<link rel="parent" href="otherObjects.html" />
+<link rel="next" href="initialization.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.5.14 Set Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.13 datetime Objects"
+  href="datetime-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8. Initialization, Finalization, and"
+  href="initialization.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="datetime-objects.html">7.5.13 DateTime Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="initialization.html">8. Initialization, Finalization, and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0095140000000000000000"></a><a name="setObjects"></a>
+<br>
+7.5.14 Set Objects 
+</h2>
+
+<p>
+<a id='l2h-800' xml:id='l2h-800'></a><a id='l2h-801' xml:id='l2h-801'></a>
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+This section details the public API for <tt class="class">set</tt> and <tt class="class">frozenset</tt>
+objects.  Any functionality not listed below is best accessed using the
+either the abstract object protocol (including
+<tt class="cfunction">PyObject_CallMethod()</tt>, <tt class="cfunction">PyObject_RichCompareBool()</tt>,
+<tt class="cfunction">PyObject_Hash()</tt>, <tt class="cfunction">PyObject_Repr()</tt>,
+<tt class="cfunction">PyObject_IsTrue()</tt>, <tt class="cfunction">PyObject_Print()</tt>, and
+<tt class="cfunction">PyObject_GetIter()</tt>)
+or the abstract number protocol (including
+<tt class="cfunction">PyNumber_Add()</tt>, <tt class="cfunction">PyNumber_Subtract()</tt>,
+<tt class="cfunction">PyNumber_Or()</tt>, <tt class="cfunction">PyNumber_Xor()</tt>,
+<tt class="cfunction">PyNumber_InPlaceAdd()</tt>, <tt class="cfunction">PyNumber_InPlaceSubtract()</tt>,
+<tt class="cfunction">PyNumber_InPlaceOr()</tt>, and <tt class="cfunction">PyNumber_InPlaceXor()</tt>).
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-802' xml:id='l2h-802'>PySetObject</a></tt></b></dt>
+<dd>
+  This subtype of <tt class="ctype">PyObject</tt> is used to hold the internal data for
+  both <tt class="class">set</tt> and <tt class="class">frozenset</tt> objects.  It is like a
+  <tt class="ctype">PyDictObject</tt> in that it is a fixed size for small sets
+  (much like tuple storage) and will point to a separate, variable sized
+  block of memory for medium and large sized sets (much like list storage).
+  None of the fields of this structure should be considered public and
+  are subject to change.  All access should be done through the
+  documented API rather than by manipulating the values in the structure.
+
+<p>
+</dl>
+
+<p>
+<dl><dt>PyTypeObject <b><tt id='l2h-803' xml:id='l2h-803' class="cdata">PySet_Type</tt></b></dt>
+<dd>
+  This is an instance of <tt class="ctype">PyTypeObject</tt> representing the Python
+  <tt class="class">set</tt> type.
+</dd></dl>
+
+<p>
+<dl><dt>PyTypeObject <b><tt id='l2h-804' xml:id='l2h-804' class="cdata">PyFrozenSet_Type</tt></b></dt>
+<dd>
+  This is an instance of <tt class="ctype">PyTypeObject</tt> representing the Python
+  <tt class="class">frozenset</tt> type.
+</dd></dl>
+
+<p>
+The following type check macros work on pointers to any Python object.
+Likewise, the constructor functions work with any iterable Python object.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-805' xml:id='l2h-805' class="cfunction">PyAnySet_Check</tt></b>(</nobr></td><td>PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+  Return true if <var>p</var> is a <tt class="class">set</tt> object, a <tt class="class">frozenset</tt>
+  object, or an instance of a subtype.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-806' xml:id='l2h-806' class="cfunction">PyAnySet_CheckExact</tt></b>(</nobr></td><td>PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+  Return true if <var>p</var> is a <tt class="class">set</tt> object or a <tt class="class">frozenset</tt>
+  object but not an instance of a subtype.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-807' xml:id='l2h-807' class="cfunction">PyFrozenSet_CheckExact</tt></b>(</nobr></td><td>PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+  Return true if <var>p</var> is a <tt class="class">frozenset</tt> object
+  but not an instance of a subtype.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-808' xml:id='l2h-808' class="cfunction">PySet_New</tt></b>(</nobr></td><td>PyObject *<var>iterable</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a new <tt class="class">set</tt> containing objects returned by the
+  <var>iterable</var>.  The <var>iterable</var> may be <tt class="constant">NULL</tt> to create a
+  new empty set.  Return the new set on success or <tt class="constant">NULL</tt> on
+  failure.  Raise <tt class="exception">TypeError</tt> if <var>iterable</var> is
+  not actually iterable.  The constructor is also useful for
+  copying a set (<code>c=set(s)</code>).
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-809' xml:id='l2h-809' class="cfunction">PyFrozenSet_New</tt></b>(</nobr></td><td>PyObject *<var>iterable</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a new <tt class="class">frozenset</tt> containing objects returned by the
+  <var>iterable</var>.  The <var>iterable</var> may be <tt class="constant">NULL</tt> to create a
+  new empty frozenset.  Return the new set on success or <tt class="constant">NULL</tt> on
+  failure.  Raise <tt class="exception">TypeError</tt> if <var>iterable</var> is
+  not actually iterable.
+</dd></dl>
+
+<p>
+The following functions and macros are available for instances of
+<tt class="class">set</tt> or <tt class="class">frozenset</tt> or instances of their subtypes.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-810' xml:id='l2h-810' class="cfunction">PySet_Size</tt></b>(</nobr></td><td>PyObject *<var>anyset</var>)</td></tr></table></dt>
+<dd>
+  Return the length of a <tt class="class">set</tt> or <tt class="class">frozenset</tt> object.
+  Equivalent to "<tt class="samp">len(<var>anyset</var>)</tt>".  Raises a
+  <tt class="exception">PyExc_SystemError</tt> if <var>anyset</var> is not a <tt class="class">set</tt>,
+  <tt class="class">frozenset</tt>, or an instance of a subtype.
+  <a id='l2h-811' xml:id='l2h-811'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-812' xml:id='l2h-812' class="cfunction">PySet_GET_SIZE</tt></b>(</nobr></td><td>PyObject *<var>anyset</var>)</td></tr></table></dt>
+<dd>
+  Macro form of <tt class="cfunction">PySet_Size()</tt> without error checking.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-813' xml:id='l2h-813' class="cfunction">PySet_Contains</tt></b>(</nobr></td><td>PyObject *<var>anyset</var>, PyObject *<var>key</var>)</td></tr></table></dt>
+<dd>
+  Return 1 if found, 0 if not found, and -1 if an error is
+  encountered.  Unlike the Python <tt class="method">__contains__()</tt> method, this
+  function does not automatically convert unhashable sets into temporary
+  frozensets.  Raise a <tt class="exception">TypeError</tt> if the <var>key</var> is unhashable.
+  Raise <tt class="exception">PyExc_SystemError</tt> if <var>anyset</var> is not a <tt class="class">set</tt>,
+  <tt class="class">frozenset</tt>, or an instance of a subtype.
+</dd></dl>
+
+<p>
+The following functions are available for instances of <tt class="class">set</tt> or
+its subtypes but not for instances of <tt class="class">frozenset</tt> or its subtypes.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-814' xml:id='l2h-814' class="cfunction">PySet_Add</tt></b>(</nobr></td><td>PyObject *<var>set</var>, PyObject *<var>key</var>)</td></tr></table></dt>
+<dd>
+  Add <var>key</var> to a <tt class="class">set</tt> instance.  Does not apply to
+  <tt class="class">frozenset</tt> instances.  Return 0 on success or -1 on failure.
+  Raise a <tt class="exception">TypeError</tt> if the <var>key</var> is unhashable.
+  Raise a <tt class="exception">MemoryError</tt> if there is no room to grow.
+  Raise a <tt class="exception">SystemError</tt> if <var>set</var> is an not an instance
+  of <tt class="class">set</tt> or its subtype.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-815' xml:id='l2h-815' class="cfunction">PySet_Discard</tt></b>(</nobr></td><td>PyObject *<var>set</var>, PyObject *<var>key</var>)</td></tr></table></dt>
+<dd>
+  Return 1 if found and removed, 0 if not found (no action taken),
+  and -1 if an error is encountered.  Does not raise <tt class="exception">KeyError</tt>
+  for missing keys.  Raise a <tt class="exception">TypeError</tt> if the <var>key</var> is
+  unhashable.  Unlike the Python <tt class="method">discard()</tt> method, this function
+  does not automatically convert unhashable sets into temporary frozensets.
+  Raise <tt class="exception">PyExc_SystemError</tt> if <var>set</var> is an not an instance
+  of <tt class="class">set</tt> or its subtype.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-816' xml:id='l2h-816' class="cfunction">PySet_Pop</tt></b>(</nobr></td><td>PyObject *<var>set</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a new reference to an arbitrary object in the <var>set</var>,
+  and removes the object from the <var>set</var>.  Return <tt class="constant">NULL</tt> on
+  failure.  Raise <tt class="exception">KeyError</tt> if the set is empty.
+  Raise a <tt class="exception">SystemError</tt> if <var>set</var> is an not an instance
+  of <tt class="class">set</tt> or its subtype.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-817' xml:id='l2h-817' class="cfunction">PySet_Clear</tt></b>(</nobr></td><td>PyObject *<var>set</var>)</td></tr></table></dt>
+<dd>
+  Empty an existing set of all elements.
+</dd></dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.13 datetime Objects"
+  href="datetime-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8. Initialization, Finalization, and"
+  href="initialization.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="datetime-objects.html">7.5.13 DateTime Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="initialization.html">8. Initialization, Finalization, and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="exceptions.html" />
+<link rel="prev" href="execmodel.html" />
+<link rel="parent" href="execmodel.html" />
+<link rel="next" href="dynamic-features.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.1 Naming and binding </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4. execution model"
+  href="execmodel.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. execution model"
+  href="execmodel.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.1.1 interaction with dynamic"
+  href="dynamic-features.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="execmodel.html">4. Execution model</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="execmodel.html">4. Execution model</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="dynamic-features.html">4.1.1 Interaction with dynamic</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006100000000000000000"></a><a name="naming"></a>
+<br>
+4.1 Naming and binding 
+</h1>
+<a id='l2h-316' xml:id='l2h-316'></a><a id='l2h-324' xml:id='l2h-324'></a>
+
+<p>
+<i class="dfn">Names</i><a id='l2h-325' xml:id='l2h-325'></a> refer to objects.  Names are introduced by
+name binding operations.  Each occurrence of a name in the program
+text refers to the <i class="dfn">binding</i><a id='l2h-317' xml:id='l2h-317'></a> of that name
+established in the innermost function block containing the use.
+
+<p>
+A <i class="dfn">block</i><a id='l2h-326' xml:id='l2h-326'></a> is a piece of Python program text that is
+executed as a unit.  The following are blocks: a module, a function
+body, and a class definition.  Each command typed interactively is a
+block.  A script file (a file given as standard input to the
+interpreter or specified on the interpreter command line the first
+argument) is a code block.  A script command (a command specified on
+the interpreter command line with the `<strong>-c</strong>' option) is a code
+block.  The file read by the built-in function <tt class="function">execfile()</tt>
+is a code block.  The string argument passed to the built-in function
+<tt class="function">eval()</tt> and to the <tt class="keyword">exec</tt> statement is a code block.
+The expression read and evaluated by the built-in function
+<tt class="function">input()</tt> is a code block.
+
+<p>
+A code block is executed in an <i class="dfn">execution
+frame</i><a id='l2h-318' xml:id='l2h-318'></a>.  A frame contains some
+administrative information (used for debugging) and determines where
+and how execution continues after the code block's execution has
+completed.
+
+<p>
+A <i class="dfn">scope</i><a id='l2h-327' xml:id='l2h-327'></a> defines the visibility of a name within a
+block.  If a local variable is defined in a block, its scope includes
+that block.  If the definition occurs in a function block, the scope
+extends to any blocks contained within the defining one, unless a
+contained block introduces a different binding for the name.  The
+scope of names defined in a class block is limited to the class block;
+it does not extend to the code blocks of methods.
+
+<p>
+When a name is used in a code block, it is resolved using the nearest
+enclosing scope.  The set of all such scopes visible to a code block
+is called the block's <i class="dfn">environment</i><a id='l2h-328' xml:id='l2h-328'></a>.  
+
+<p>
+If a name is bound in a block, it is a local variable of that block.
+If a name is bound at the module level, it is a global variable.  (The
+variables of the module code block are local and global.)  If a
+variable is used in a code block but not defined there, it is a
+<i class="dfn">free variable</i><a id='l2h-319' xml:id='l2h-319'></a>.
+
+<p>
+When a name is not found at all, a
+<tt class="exception">NameError</tt><a id='l2h-321' xml:id='l2h-321'></a> exception is raised.  If the name
+refers to a local variable that has not been bound, a
+<tt class="exception">UnboundLocalError</tt><a id='l2h-329' xml:id='l2h-329'></a> exception is
+raised.  <tt class="exception">UnboundLocalError</tt> is a subclass of
+<tt class="exception">NameError</tt>.
+
+<p>
+The following constructs bind names: formal parameters to functions,
+<tt class="keyword">import</tt> statements, class and function definitions (these
+bind the class or function name in the defining block), and targets
+that are identifiers if occurring in an assignment, <tt class="keyword">for</tt> loop
+header, or in the second position of an <tt class="keyword">except</tt> clause
+header.  The <tt class="keyword">import</tt> statement of the form ``"<tt class="samp">from
+...import *</tt>"''<a id='l2h-322' xml:id='l2h-322'></a> binds all names defined in the
+imported module, except those beginning with an underscore.  This form
+may only be used at the module level.
+
+<p>
+A target occurring in a <tt class="keyword">del</tt> statement is also considered bound
+for this purpose (though the actual semantics are to unbind the
+name).  It is illegal to unbind a name that is referenced by an
+enclosing scope; the compiler will report a <tt class="exception">SyntaxError</tt>.
+
+<p>
+Each assignment or import statement occurs within a block defined by a
+class or function definition or at the module level (the top-level
+code block).
+
+<p>
+If a name binding operation occurs anywhere within a code block, all
+uses of the name within the block are treated as references to the
+current block.  This can lead to errors when a name is used within a
+block before it is bound.
+This rule is subtle.  Python lacks declarations and allows
+name binding operations to occur anywhere within a code block.  The
+local variables of a code block can be determined by scanning the
+entire text of the block for name binding operations.
+
+<p>
+If the global statement occurs within a block, all uses of the name
+specified in the statement refer to the binding of that name in the
+top-level namespace.  Names are resolved in the top-level namespace by
+searching the global namespace, i.e. the namespace of the module
+containing the code block, and the builtin namespace, the namespace of
+the module <tt class="module">__builtin__</tt>.  The global namespace is searched
+first.  If the name is not found there, the builtin namespace is
+searched.  The global statement must precede all uses of the name.
+
+<p>
+The built-in namespace associated with the execution of a code block
+is actually found by looking up the name <code>__builtins__</code> in its
+global namespace; this should be a dictionary or a module (in the
+latter case the module's dictionary is used).  By default, when in the
+<tt class="module">__main__</tt> module, <code>__builtins__</code> is the built-in module
+<tt class="module">__builtin__</tt> (note: no `s'); when in any other module,
+<code>__builtins__</code> is an alias for the dictionary of the
+<tt class="module">__builtin__</tt> module itself.  <code>__builtins__</code> can be set
+to a user-created dictionary to create a weak form of restricted
+execution<a id='l2h-323' xml:id='l2h-323'></a>.
+
+<p>
+<div class="note"><b class="label">Note:</b>
+Users should not touch <code>__builtins__</code>; it is strictly an
+  implementation detail.  Users wanting to override values in the
+  built-in namespace should <tt class="keyword">import</tt> the <tt class="module">__builtin__</tt>
+  (no `s') module and modify its attributes appropriately.
+</div>
+
+<p>
+The namespace for a module is automatically created the first time a
+module is imported.  The main module for a script is always called
+<tt class="module">__main__</tt><a id='l2h-330' xml:id='l2h-330'></a>.
+
+<p>
+The global statement has the same scope as a name binding operation
+in the same block.  If the nearest enclosing scope for a free variable
+contains a global statement, the free variable is treated as a global.
+
+<p>
+A class definition is an executable statement that may use and define
+names.  These references follow the normal rules for name resolution.
+The namespace of the class definition becomes the attribute dictionary
+of the class.  Names defined at the class scope are not visible in
+methods. 
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="dynamic-features.html">4.1.1 Interaction with dynamic features</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4. execution model"
+  href="execmodel.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. execution model"
+  href="execmodel.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="4.1.1 interaction with dynamic"
+  href="dynamic-features.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="execmodel.html">4. Execution model</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="execmodel.html">4. Execution model</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="dynamic-features.html">4.1.1 Interaction with dynamic</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

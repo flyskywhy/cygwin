@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# List configured remote branches
+# Copyright (c) Steven Cole 2005
+#
+# Print a listing of all known branches.
+#
+# The output has the following format:
+#
+#	BRANCH LOCATION
+# 
+# For example
+#
+#	origin  http://www.kernel.org/pub/scm/cogito/cogito.git
+#
+# Terminology note: This command concerns remote branches, not the local
+# ones (those managed by `cg-switch` and listed by `cg-status -g`).
+
+# Testsuite: TODO
+
+USAGE="cg-branch-ls"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+msg_no_branches="list of branches is empty (see cg-branch-add(1))"
+
+[ -d "$_git/branches" ] || die "$msg_no_branches"
+
+[ "$(find "$_git/branches" -follow -type f)" ] \
+	|| die "$msg_no_branches"
+
+maxlen="$(find "$_git/branches" -name '*' -a ! -type d |
+	  column_width "$_git/branches/")"
+
+find "$_git/branches" -name '*' -a ! -type d | sort | while read branch; do
+	name="${branch#$_git/branches/}"
+	url="$(cat "$branch")"
+	columns_print "$name" t$maxlen "$url" -
+done

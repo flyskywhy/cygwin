@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-distutils.util.html" />
+<link rel="prev" href="module-distutils.dirutil.html" />
+<link rel="parent" href="api-reference.html" />
+<link rel="next" href="module-distutils.util.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.12 distutils.file_util -- Single file operations</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.11 distutils.dir_util  "
+  href="module-distutils.dirutil.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.13 distutils.util  "
+  href="module-distutils.util.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.dirutil.html">11.11 distutils.dir_util  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.util.html">11.13 distutils.util  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00111200000000000000000">
+11.12 <tt class="module">distutils.file_util</tt> -- Single file operations</a>
+</h1>
+<a name="module-distutils.fileutil"></a>
+
+<p>
+This module contains some utility functions for operating on individual files.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-76' xml:id='l2h-76' class="function">copy_file</tt></b>(</nobr></td>
+  <td><var>src, dst</var><big>[</big><var>preserve_mode=<code>1</code>, preserve_times=<code>1</code>, update=<code>0</code>, link=<code>None</code>, verbose=<code>0</code>, dry_run=<code>0</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Copy file <var>src</var> to <var>dst</var>. If <var>dst</var> is a directory, then
+<var>src</var> is copied there with the same name; otherwise, it must be a
+filename. (If the file exists, it will be ruthlessly clobbered.) If
+<var>preserve_mode</var> is true (the default), the file's mode (type and
+permission bits, or whatever is analogous on the current platform) is
+copied. If <var>preserve_times</var> is true (the default), the last-modified
+and last-access times are copied as well. If <var>update</var> is true,
+<var>src</var> will only be copied if <var>dst</var> does not exist, or if
+<var>dst</var> does exist but is older than <var>src</var>.
+
+<p>
+<var>link</var> allows you to make hard links (using <tt class="function">os.link</tt>) or
+symbolic links (using <tt class="function">os.symlink</tt>) instead of copying: set it
+to <code>'hard'</code> or <code>'sym'</code>; if it is <code>None</code> (the default),
+files are copied. Don't set <var>link</var> on systems that don't support
+it: <tt class="function">copy_file()</tt> doesn't check if hard or symbolic linking is
+available.  It uses <tt class="function">_copy_file_contents()</tt> to copy file contents.
+
+<p>
+Return a tuple "<tt class="samp">(dest_name, copied)</tt>": <var>dest_name</var> is the actual 
+name of the output file, and <var>copied</var> is true if the file was copied 
+(or would have been copied, if <var>dry_run</var> true).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-77' xml:id='l2h-77' class="function">move_file</tt></b>(</nobr></td>
+  <td><var>src, dst</var><big>[</big><var>verbose, dry_run</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Move file <var>src</var> to <var>dst</var>. If <var>dst</var> is a directory, the file will
+be moved into it with the same name; otherwise, <var>src</var> is just renamed
+to <var>dst</var>.  Returns the new full name of the file.
+<span class="warning"><b class="label">Warning:</b>
+Handles cross-device moves on <span class="Unix">Unix</span> using <tt class="function">copy_file()</tt>.  
+What about other systems???</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-78' xml:id='l2h-78' class="function">write_file</tt></b>(</nobr></td>
+  <td><var>filename, contents</var>)</td></tr></table></dt>
+<dd>
+Create a file called <var>filename</var> and write <var>contents</var> (a
+sequence of strings without line terminators) to it.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.11 distutils.dir_util  "
+  href="module-distutils.dirutil.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. api Reference"
+  href="api-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.13 distutils.util  "
+  href="module-distutils.util.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-distutils.dirutil.html">11.11 distutils.dir_util  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="api-reference.html">11. API Reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-distutils.util.html">11.13 distutils.util  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

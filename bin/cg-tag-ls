@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+#
+# List existing tags
+# Copyright (c) Steve Hoelzer 2005
+# Copyright (c) Petr Baudis 2006
+#
+# This command takes no arguments, and lists all tags in a given repository
+# in alphabetical order, along with their corresponding SHA1 hash IDs.
+#
+# OUTPUT FORMAT
+# -------------
+# The first column contains flag letters. The 'S' flag means that the tag is
+# GPG-signed, the '%' flag means that this is a "direct tag" (does not point
+# to a tag object; this is now considered deprecated and you might have trouble
+# distributing the tag to others). The '!' flag means that the tag is broken
+# and points to a non-existing object.
+#
+# The second column shows the tag name, the third column its (abbreviated)
+# object id and the fourth column the first line of tag description,
+# if applicable.
+
+# Testsuite: TODO
+
+USAGE="cg-tag-ls"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+msg_no_tags="list of tags is empty, please see cg-tag(1)"
+
+[ -d "$_git/refs/tags" ] || die "$msg_no_tags"
+
+[ "$(find "$_git/refs/tags" -follow -type f)" ] \
+       || die "$msg_no_tags"
+
+maxlen="$(find "$_git/refs/tags" -name '*' -a ! -type d |
+	  column_width "$_git/refs/tags/")"
+
+find "$_git/refs/tags" -name '*' -a ! -type d | sort | while read tag; do 
+	flag=" "
+	name="${tag#$_git/refs/tags/}"
+	sha1="$(cat "$tag")"
+	title=
+
+	type="$(git cat-file -t "$sha1" 2>/dev/null)" || flag="!"
+	if [ "$type" = "tag" ]; then
+		title="$(git cat-file tag "$sha1" | sed -ne '/^$/{n;s/^-----BEGIN PGP SIGNATURE-----//;p;q;}')"
+		git cat-file tag "$sha1" | grep -q '^-----BEGIN PGP SIGNATURE-----' && flag="S"
+	elif [ "$type" ]; then
+		flag="%"
+	fi
+
+	columns_print "$flag " - "$name" $maxlen "  ${sha1:0:12} " - " $title" -
+done

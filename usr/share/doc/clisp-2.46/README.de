@@ -1,0 +1,202 @@
+Dies ist GNU CLISP, eine Implementierung von COMMON LISP.
+
+
+Was ist LISP?
+-------------
+
+LISP ist eine Programmiersprache, die 1959 von J. McCarthy erfunden wurde.
+Früher gab's viele verschiedene Dialekte, heute ist LISP durch den Industrie-
+Standard COMMON LISP standardisiert und weit verbreitet worden. Anwendungen
+reichen von der symbolischen Wissensverarbeitung (KI) über die Numerik
+(MACLISP lieferte einen ebensoguten Numerik-Code wie FORTRAN) bis hin zu
+verbreiteten Programmen wie Editoren (EMACS) oder CAD-Systemen (AUTOCAD).
+Eine Einführung in die Sprache ist:
+
+  Sheila Hughes: Lisp. Pitman Publishing Limited, London 1986.
+  107 Seiten. ca. DM 15,80.
+  Paul Graham: "ANSI Common Lisp", Prentice Hall, 1995, ISBN 0133708756.
+  <http://paulgraham.com/acl.html>
+  und "On Lisp", Prentice Hall, 1993. ISBN 0130305529.
+  <http://paulgraham.com/onlisp.html>
+
+Nach einiger Zeit unentbehrlich ist das Standardwerk mit der Sprachdefinition
+
+  Guy L. Steele Jr.: Common Lisp - The Language. Digital Press.
+  1. Auflage 1984, 465 Seiten, ca. DM 73,60.
+  2. Auflage 1990, 1032 Seiten. ca. DM 94,90.
+
+Dieses Buch ist in HTML-Format per FTP erhältlich von
+  ftp://ftp.cs.cmu.edu/user/ai/lang/lisp/doc/cltl/cltl_ht.tgz
+und per WWW einsehbar unter
+  http://www-2.cs.cmu.edu/Groups/AI/html/cltl/cltl2.html oder
+  http://www-2.cs.cmu.edu/afs/cs/project/ai-repository/ai/html/cltl/cltl2.html .
+
+Für Experten: Dieses Standardwerk hat sich zu einem ANSI-Standard
+weiterentwickelt, der ausnahmsweise kostenlos erhältlich ist von
+  http://www.lisp.org/HyperSpec/FrontMatter/
+
+LISP liegt in einer interaktiven Umgebung vor, d.h. man gibt Formen ein, die
+dann sofort ausgewertet werden. So kann man Variablen inspizieren, Funktionen
+mit wechselnden Argumenten aufrufen oder auch eigene Funktionen definieren.
+
+
+Inhalt:
+-------
+
+Zu CLISP gehören folgende Dateien:
+
+   base/lisp.a          Hauptprogramm, muß erst noch gelinkt werden
+   base/lispinit.mem    beim Start benötigtes Speicherabbild
+   doc/clisp.1          Benutzungshinweise im man-Format von Unix
+   doc/clisp.man        Benutzungshinweise
+   doc/clisp.html       Benutzungshinweise im HTML-Format
+   doc/impnotes.html    Dokumentation von Implementierungsdetails
+   doc/LISP-tutorial.txt  Kurzkurs LISP für Anfänger
+   doc/CLOS-guide.txt     Kurzkurs CLOS
+   README               dies hier
+   SUMMARY              Kurzbeschreibung von CLISP
+   ANNOUNCE             Ankündingung
+   NEWS                 Liste der Veränderungen seit der letzten Version
+   COPYRIGHT            Klarstellung des Urheberrechts
+   GNU-GPL              Gebrauchslizenz für Offene Software
+   doc/editors.txt      Überblick über Editoren mit Lisp-Unterstützung
+   emacs/*.el           Anpassung von Emacs, siehe doc/editors.txt
+   src/clisp.c          Quellen des Wegweisers
+   src/config.lisp      örtliche Konfiguration
+
+und - als Zugabe, für den Fall, daß Sie Quellen lesen möchten -
+
+   src/*.lisp           die Quellen zu lispinit.mem
+   src/*.fas            dieselben Dateien in compilierter Form
+
+Um das ausführbare Programm zu erstellen, brauchen Sie ferner:
+
+   base/libreadline.a    die GNU Readline-Bibliothek
+
+oder
+
+   base/libnoreadline.a  wertloser Ersatz für die GNU Readline-Bibliothek
+
+
+Installation:
+-------------
+
+Um das ausführbare Programm zu erstellen, geben Sie ein:
+
+         make
+
+Passen Sie die Strings innerhalb von src/config.lisp mit einem Texteditor an.
+Starten Sie dann
+
+         base/lisp.run -M base/lispinit.mem
+
+Auf den LISP-Prompt
+
+      > _
+
+hin eingeben:
+
+      (without-package-lock ()
+        (compile-file "src/config.lisp")
+        (load "src/config.fas"))
+
+und dann
+
+        (cd "base/")
+        (saveinitmem)
+
+Damit überschreiben Sie die Datei lispinit.mem mit Ihrer Konfiguration. Sodann
+
+        (exit)
+
+Alles weitere erledigt ein
+
+        make install
+
+Sie können dies stattdessen auch selber, schrittweise tun:
+
+Legen Sie ein Verzeichnis an und legen Sie das ausführbare Programm und das
+Speicherabbild dort ab.
+Ich schlage hierfür /usr/local/lib/lisp vor:
+
+   mkdir /usr/local/lib/lisp
+   mv base/lisp.run /usr/local/lib/lisp
+   mv base/lispinit.mem /usr/local/lib/lisp
+
+Und erstellen Sie den Wegweiser, der Lisp startet:
+
+   ./hardcode -DLISPLIBDIR='/usr/local/lib/lisp' \
+              -DLOCALEDIR='/usr/local/share/locale' \
+              clisp /usr/local/bin/clisp
+
+Installieren Sie nun die Benutzungshinweise
+
+   mv doc/clisp.1 /usr/local/man/man1/clisp.1
+   mv doc/clreadline.3 /usr/local/man/man3/clreadline.3
+
+and probieren Sie
+
+   man clisp
+
+Wenn's Probleme gibt:
+---------------------
+
+Bei Errors befindet man sich im Debugger:
+
+     1. Break> _
+
+Hier kann man wie üblich Formen auswerten.
+Außerdem:
+
+     Help
+               ruft Hilfestellung an.
+     Abort     oder
+     Unwind
+               steigt hoch in die nächsthöhere Hauptschleife.
+     Backtrace
+               zeigt den Stackinhalt an. Das hilft bei der Fehlersuche.
+
+Außerdem kann man sich die Werte der Variablen der Funktion anzeigen lassen,
+in der der Fehler passierte.
+
+Bei größeren Problemen, z.B. harten Abstürzen, bitte Fehlerbeschreibung
+und reproduzierbare Vorgehensweise zur Erzeugung dieses Fehlers an die
+Autoren senden. Bitte nennen Sie dabei auch die Version von CLISP; sie
+erhalten sie durch Aufrufen von (lisp-implementation-version).
+Quellen:
+--------
+
+Die Quellen von CLISP gibt es von
+     ftp://clisp.cons.org/pub/lisp/clisp/source/clispsrc*
+
+
+Mailing-Liste:
+--------------
+
+Für die Benutzer von CLISP gibt es drei Mailing-Listen. Sie finden
+Abonnier-Informationen und Archive auf der Homepage http://clisp.cons.org/.
+
+
+Dank:
+-----
+
+Wir schulden Dank
+  * Guy L. Steele und vielen anderen für die Spezifikation von Common Lisp.
+  * dem GNU-Projekt von Richard Stallman für GCC, Autoconf und die
+    Readline-Bibliothek.
+
+
+Autoren:
+--------
+
+        Bruno Haible
+        Michael Stoll
+
+Email: clisp-list@lists.sourceforge.net
+
+Wartung und Pflege:
+-------------------
+
+        Sam Steingold
+
+Email: clisp-list@lists.sourceforge.net

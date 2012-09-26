@@ -1,0 +1,233 @@
+What comes on my mind but it isn't able to hold it all. Unsorted.
+
+
+Cogito-only stuff:
+
+
+Pre-1.0 stuff:
+
+* Tutorial
+	(See homepage. It should be included in the source as well, though.)
+
+* Cogito homepage
+	Reference documentation + Jonas' asciidoc'd README + tutorial
+		= http://git.or.cz/cogito/
+
+* Show only first 12 (or so) nibbles of the hashes everywhere
+	Even this might be too much, but more than this is really useless
+	for anyone remotely human. And it's less scary, too.
+
+* "Volatile" branches
+	* Make one-time merges easier by enabling cg-update to take
+	  URIs directly, not only head names.
+
+* Support for mass-cloning all remote refs at once
+	* Requires first multi-origin support (if origin is a dir, fall
+	  back to origin/master).
+	* Interface: cg-clone -a
+	* Implement this using refs/remote/ so that the branches won't
+	  get mixed together and we can trace new/disappearing branches
+	  in the parent repository sanely
+
+* Support for remotes/
+	More powerful 'n stuff than branches/, ya know.
+	LIKELY NOT - parsing those would be just annoying, we will probably
+	just dump directly to supporting [remote] in .git/config. There will
+	need to be a conversion script though.
+
+* Push new tags automagically
+	(With the same logic as when fetching - push tags which reference
+	objects that are already pushed.)
+
+* Better merging
+	* Handle all possible conflicts
+	* Make sure the user resolved the conflicts
+	  (if possible without requiring him to manually indicate that)
+	-- post 1.0 --
+	* Support for various GIT's "merge strategies"
+	* Somehow show the list of commits getting merged
+	* Vim-merging
+	* cg-resolve: resolving swiss-army knife, see msgid:
+		<20060924171246.GY13132@pasky.or.cz>
+
+* Always do three-way merge
+	Always perform three-way merge instead of applying patches - when
+	fast-forwarding trees, uncommitting, etc.
+
+* cg-mkpatch overhaul
+	cg-mkpatch was overlooked for too long, while it could do a huge
+	number of cool things (after some cleanups, and probably factoring
+	out the common parts of cg-mkpatch, cg-log and cg-diff):
+	Frontending git-request-fetch, interfacing with email directly...
+
+* cg-patch improvements
+	* Just frontend git-apply
+
+* cg-commit enhancements
+	* Possibly verify the patch being committed against
+	  whitespace errors and stuff; hooks are good for this too,
+	  but I think it's good to have internal support for the
+	  basic stuff. (Get inspired in git-commit.)
+	* call git-fmt-merge-msg when committing a merge
+
+* cg-shelf - shelve changes temporarily
+	This saves your current uncommitted changes, removes them from the
+	tree, opens editor with the diff of those changes and lets you edit
+	it; then it applies only the diff on the tree and lets you commit
+	it or whatever. After committing, cg-unshelf or cg-shelf -u or
+	whatever will restore the state of the tree before cg-shelf was
+	called.
+
+* Unify hooks usage with Git - Cogito's are older but Git's are more
+  widespread nowadays
+
+
+Post 1.0:
+
+* Subprojects
+	Support a GIT project inside a GIT project:
+
+		x/.git
+		x/foo/bar/.git
+		x/foo/bar/baz/.git
+		x/quux/zot/.git
+
+	That means cg-update working recursively and cg-add'n'stuff
+	checking if there isn't another .git along the path of its
+	argument.
+
+	Needs more thought, especially wrt. fetching and merging
+	recursive semantics.
+
+* Comfortable cg-log
+	Probably make it a real terminal application, not just less
+	backend.
+
+	* Somehow switch between summary and full output
+	* Possibility to quickly show patches for commits
+
+* Graphical commit/merge tool
+
+* cg-annotate, cg-bisect
+
+* Cogito's friendly patch stack handling (frontending stgit?)
+	Not sure yet if the UI improvement would be substantial
+
+* More comfortable history rewriting
+	* Make it possible to do rebase-merge easily, rebasing local
+	  changes against new remote head; OTOH, perhaps we just need
+	  to advertise StGIT more...
+	* Easier recommitting - if I need to uncommit or change some
+	  commit not at the top, let me more easily uncommit, change it
+	  and recommit the rest on the top.
+
+	  This is encouraging history rewriting which is bad as soon
+	  as you publish your changes, but not before; I believe it's
+	  good to offer people ways to keep their history tidy if you
+	  also educate them not to do it after they publish it.
+
+* Revisions numbering
+	An alternative way to identify revisions - by their sequential
+	number from the root, after merge-sorted.
+
+	Needs more thought.
+
+
+* Rewrite in some other language
+	csh? Postscript? Befunge?
+
+* Make Cogito agnostic to the underlying layer
+	Actually, I start to miss Cogito's convenient interface a lot when
+	working with other systems, and my fingers are already trained for
+	the cg-commands. But this is a very long-term goal and will take
+	a good deal of thought and work.
+
+* World domination
+	Make sure that as many projects as possible use GIT, and in
+	particular that everyone uses Cogito! ;-)
+
+
+
+Stuff partially or fully involving Core GIT:
+
+
+Short term:
+
+* Unnamed remote branches
+	Pull from an URI without cg-branch-add'ing it first.
+	See Pasky's mail.
+
+* Private tags support
+
+* Empty directories handling
+	Directories should be first-class index objects, not implicit.
+	Perhaps.
+
+* Common templates
+	The discussion about templates sharing among the toolkits somewhat
+	died out.
+
+
+Long term:
+
+* Proper renaming recording
+	We need to do something about it. For now, at least properly follow
+	renames everywhere and have tree renames detection.
+
+	In the long term, either some Linus-envisioned smart moves detection
+	needs to be done (I'm still skeptical) or persistent file ids. One
+	trouble is keeping merge from traversing all the history.
+
+* Better than three-way merging
+	Perhaps pcdv merge, let's see how will that turn out.
+
+	Three-way merge silently gets some cases wrong, and an army of
+	experimental VCSes developers is devising better merge algorithms
+	for us. ;-)
+
+	(pcdv merge is actually probably very similar to how the BK merge
+	works.)
+
+* Cherrypicking support
+	At least "partial" cherrypicking support, with changing head IDs.
+	Merge up to the first dropped revision, rebase and merge on...
+
+	Needs more thought.
+
+* Revision journal
+	I envision each head having a revision journal - list of all preceding
+	revisions in their merge order.
+
+	There are two motivations. The first is possibility of fast and
+	setupless dumb server transport. But more importantly, git-rev-list
+	does not scale if you want to sort it by anything but date, and you
+	definitively want - I think the date order is confusing and e.g.
+	for cg-mkpatch simply wrong and you really need merge order instead.
+	But that requires to load all the history, then order it, and that
+	means that it takes to crunch through the whole history even when
+	showing the tip of cg-log. And that is not going to scale to
+	thousands of revisions - it already takes 2s (20s for cold cache!)
+	for the current Cogito/git repositories, which is too long for
+	a quick cg-log peek.
+
+	So instead, every time you commit, the new revision is appended
+	to the revision journal of the given head, and when you fetch the
+	head, you bring the remote revision journal along. When you merge,
+	all the new revisions are appended between the previous head and
+	the merge head - that gives you the merge order.
+
+	Well, if you want to append to it, you want new revisions at the end.
+	If you want to fetch it, you want the new revisions at the start.
+	So I think the journal should look like
+
+		.git/revlist/master/0001
+		.git/revlist/master/0002
+		...
+
+	where each file contains some 1024 revisions or so, with the new
+	ones at the end.
+
+	Needs more thought. See also
+
+		Jun 16 Jon Seymour [PATCH 1/1] [PROPOSAL] Add a module (repo-log.c) to log repository events.
+

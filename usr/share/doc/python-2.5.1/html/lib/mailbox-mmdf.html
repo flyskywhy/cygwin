@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="mailbox-babyl.html" />
+<link rel="parent" href="mailbox-objects.html" />
+<link rel="next" href="mailbox-message-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3.1.5 MMDF</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.1.4 Babyl"
+  href="mailbox-babyl.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.2 message objects"
+  href="mailbox-message-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-babyl.html">7.3.1.4 Babyl</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-message-objects.html">7.3.2 Message objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION009315000000000000000"></a>
+<a name="mailbox-mmdf"></a>
+<br>
+7.3.1.5 <tt class="class">MMDF</tt>
+</h3>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1404' xml:id='l2h-1404' class="class">MMDF</tt></b>(</nobr></td>
+  <td><var>path</var><big>[</big><var>, factory=None</var><big>[</big><var>, create=True</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+A subclass of <tt class="class">Mailbox</tt> for mailboxes in MMDF format. Parameter
+<var>factory</var> is a callable object that accepts a file-like message
+representation (which behaves as if opened in binary mode) and returns a custom
+representation. If <var>factory</var> is <code>None</code>, <tt class="class">MMDFMessage</tt> is used as
+the default message representation. If <var>create</var> is <code>True</code>, the mailbox
+is created if it does not exist.
+</dl>
+
+<p>
+MMDF is a single-file mailbox format invented for the Multichannel Memorandum
+Distribution Facility, a mail transfer agent. Each message is in the same form
+as an mbox message but is bracketed before and after by lines containing four
+Control-A ("<tt class="character">\001</tt>") characters. As with the mbox format,
+the beginning of each message is indicated by a line whose first five
+characters are "From&nbsp;", but additional occurrences of "From&nbsp;" are not
+transformed to "&gt;From&nbsp;" when storing messages because the extra message
+separator lines prevent mistaking such occurrences for the starts of subsequent
+messages.
+
+<p>
+Some <tt class="class">Mailbox</tt> methods implemented by <tt class="class">MMDF</tt> deserve special
+remarks:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1405' xml:id='l2h-1405' class="method">get_file</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+Using the file after calling <tt class="method">flush()</tt> or <tt class="method">close()</tt> on the
+<tt class="class">MMDF</tt> instance may yield unpredictable results or raise an exception.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1406' xml:id='l2h-1406' class="method">lock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1407' xml:id='l2h-1407' class="method">unlock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>Three locking mechanisms are used--dot locking and, if available, the
+<tt class="cfunction">flock()</tt> and <tt class="cfunction">lockf()</tt> system calls.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<dl compact="compact" class="seeurl">
+    <dt><a href='http://www.tin.org/bin/man.cgi?section=5&amp;topic=mmdf'
+        >mmdf man page
+from tin</a></dt>
+    <dd>A specification of MMDF format from the documentation of tin, a
+newsreader.</dd>
+  </dl>
+<dl compact="compact" class="seeurl">
+    <dt><a href='http://en.wikipedia.org/wiki/MMDF'
+        >MMDF</a></dt>
+    <dd>A Wikipedia article
+describing the Multichannel Memorandum Distribution Facility.</dd>
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.1.4 Babyl"
+  href="mailbox-babyl.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.2 message objects"
+  href="mailbox-message-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-babyl.html">7.3.1.4 Babyl</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-message-objects.html">7.3.2 Message objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

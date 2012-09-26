@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="profile-calibration.html" />
+<link rel="prev" href="module-profile.html" />
+<link rel="parent" href="profile.html" />
+<link rel="next" href="profile-calibration.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>25.5 Limitations </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.4.1 the Stats Class"
+  href="profile-stats.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.6 Calibration"
+  href="profile-calibration.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="profile-stats.html">25.4.1 The Stats Class</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="profile-calibration.html">25.6 Calibration</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0027500000000000000000"></a><a name="profile-limits"></a>
+<br>
+25.5 Limitations 
+</h1>
+
+<p>
+One limitation has to do with accuracy of timing information.
+There is a fundamental problem with deterministic profilers involving
+accuracy.  The most obvious restriction is that the underlying ``clock''
+is only ticking at a rate (typically) of about .001 seconds.  Hence no
+measurements will be more accurate than the underlying clock.  If
+enough measurements are taken, then the ``error'' will tend to average
+out. Unfortunately, removing this first error induces a second source
+of error.
+
+<p>
+The second problem is that it ``takes a while'' from when an event is
+dispatched until the profiler's call to get the time actually
+<em>gets</em> the state of the clock.  Similarly, there is a certain lag
+when exiting the profiler event handler from the time that the clock's
+value was obtained (and then squirreled away), until the user's code
+is once again executing.  As a result, functions that are called many
+times, or call many functions, will typically accumulate this error.
+The error that accumulates in this fashion is typically less than the
+accuracy of the clock (less than one clock tick), but it
+<em>can</em> accumulate and become very significant.
+
+<p>
+The problem is more important with <tt class="module">profile</tt> than with the
+lower-overhead <tt class="module">cProfile</tt>.  For this reason, <tt class="module">profile</tt>
+provides a means of calibrating itself for a given platform so that
+this error can be probabilistically (on the average) removed.
+After the profiler is calibrated, it will be more accurate (in a least
+square sense), but it will sometimes produce negative numbers (when
+call counts are exceptionally low, and the gods of probability work
+against you :-). )  Do <em>not</em> be alarmed by negative numbers in
+the profile.  They should <em>only</em> appear if you have calibrated
+your profiler, and the results are actually better than without
+calibration.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="25.4.1 the Stats Class"
+  href="profile-stats.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25.6 Calibration"
+  href="profile-calibration.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="profile-stats.html">25.4.1 The Stats Class</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="profile.html">25. The Python Profilers</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="profile-calibration.html">25.6 Calibration</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

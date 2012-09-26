@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="doctest-debugging.html" />
+<link rel="prev" href="doctest-unittest-api.html" />
+<link rel="parent" href="module-doctest.html" />
+<link rel="next" href="doctest-DocTest.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.2.6 Advanced API</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.5 unittest API"
+  href="doctest-unittest-api.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2 doctest  "
+  href="module-doctest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.6.1 doctest Objects"
+  href="doctest-DocTest.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-unittest-api.html">23.2.5 Unittest API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-doctest.html">23.2 doctest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-DocTest.html">23.2.6.1 DocTest Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0025260000000000000000"></a><a name="doctest-advanced-api"></a>
+<br>
+23.2.6 Advanced API
+</h2>
+
+<p>
+The basic API is a simple wrapper that's intended to make doctest easy
+to use.  It is fairly flexible, and should meet most users' needs;
+however, if you require more fine-grained control over testing, or
+wish to extend doctest's capabilities, then you should use the
+advanced API.
+
+<p>
+The advanced API revolves around two container classes, which are used
+to store the interactive examples extracted from doctest cases:
+
+<p>
+
+<ul>
+<li><tt class="class">Example</tt>: A single python statement, paired with its
+      expected output.
+</li>
+<li><tt class="class">DocTest</tt>: A collection of <tt class="class">Example</tt>s, typically
+      extracted from a single docstring or text file.
+</li>
+</ul>
+
+<p>
+Additional processing classes are defined to find, parse, and run, and
+check doctest examples:
+
+<p>
+
+<ul>
+<li><tt class="class">DocTestFinder</tt>: Finds all docstrings in a given module,
+      and uses a <tt class="class">DocTestParser</tt> to create a <tt class="class">DocTest</tt>
+      from every docstring that contains interactive examples.
+</li>
+<li><tt class="class">DocTestParser</tt>: Creates a <tt class="class">DocTest</tt> object from
+      a string (such as an object's docstring).
+</li>
+<li><tt class="class">DocTestRunner</tt>: Executes the examples in a
+      <tt class="class">DocTest</tt>, and uses an <tt class="class">OutputChecker</tt> to verify
+      their output.
+</li>
+<li><tt class="class">OutputChecker</tt>: Compares the actual output from a
+      doctest example with the expected output, and decides whether
+      they match.
+</li>
+</ul>
+
+<p>
+The relationships among these processing classes are summarized in the
+following diagram:
+
+<p>
+<div class="verbatim"><pre>
+                            list of:
++------+                   +---------+
+|module| --DocTestFinder-&gt; | DocTest | --DocTestRunner-&gt; results
++------+    |        ^     +---------+     |       ^    (printed)
+            |        |     | Example |     |       |
+            v        |     |   ...   |     v       |
+           DocTestParser   | Example |   OutputChecker
+                           +---------+
+</pre></div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="doctest-DocTest.html">23.2.6.1 DocTest Objects</a>
+<li><a href="doctest-Example.html">23.2.6.2 Example Objects</a>
+<li><a href="doctest-DocTestFinder.html">23.2.6.3 DocTestFinder objects</a>
+<li><a href="doctest-DocTestParser.html">23.2.6.4 DocTestParser objects</a>
+<li><a href="doctest-DocTestRunner.html">23.2.6.5 DocTestRunner objects</a>
+<li><a href="doctest-OutputChecker.html">23.2.6.6 OutputChecker objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.5 unittest API"
+  href="doctest-unittest-api.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2 doctest  "
+  href="module-doctest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.6.1 doctest Objects"
+  href="doctest-DocTest.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-unittest-api.html">23.2.5 Unittest API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-doctest.html">23.2 doctest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-DocTest.html">23.2.6.1 DocTest Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="doctest-execution-context.html" />
+<link rel="prev" href="doctest-which-docstrings.html" />
+<link rel="parent" href="doctest-how-it-works.html" />
+<link rel="next" href="doctest-execution-context.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.2.3.2 How are Docstring Examples Recognized?</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.1 which Docstrings Are"
+  href="doctest-which-docstrings.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2.3 how It Works"
+  href="doctest-how-it-works.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.3.3 What's the Execution"
+  href="doctest-execution-context.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-which-docstrings.html">23.2.3.1 Which Docstrings Are</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doctest-how-it-works.html">23.2.3 How It Works</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-execution-context.html">23.2.3.3 What's the Execution</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0025232000000000000000"></a><a name="doctest-finding-examples"></a>
+<br>
+23.2.3.2 How are Docstring Examples
+               Recognized?
+</h3>
+
+<p>
+In most cases a copy-and-paste of an interactive console session works
+fine, but doctest isn't trying to do an exact emulation of any specific
+Python shell.  All hard tab characters are expanded to spaces, using
+8-column tab stops.  If you don't believe tabs should mean that, too
+bad:  don't use hard tabs, or write your own <tt class="class">DocTestParser</tt>
+class.
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+Expanding tabs to spaces is new; previous versions
+                tried to preserve hard tabs, with confusing results.</span>
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; # comments are ignored
+&gt;&gt;&gt; x = 12
+&gt;&gt;&gt; x
+12
+&gt;&gt;&gt; if x == 13:
+...     print "yes"
+... else:
+...     print "no"
+...     print "NO"
+...     print "NO!!!"
+...
+no
+NO
+NO!!!
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Any expected output must immediately follow the final
+<code>'&gt;&gt;&gt;&nbsp;'</code> or <code>'...&nbsp;'</code> line containing the code, and
+the expected output (if any) extends to the next <code>'&gt;&gt;&gt;&nbsp;'</code>
+or all-whitespace line.
+
+<p>
+The fine print:
+
+<p>
+
+<ul>
+<li>Expected output cannot contain an all-whitespace line, since such a
+  line is taken to signal the end of expected output.  If expected
+  output does contain a blank line, put <code>&lt;BLANKLINE&gt;</code> in your
+  doctest example each place a blank line is expected.
+  
+<span class="versionnote">Changed in version 2.4:
+<code>&lt;BLANKLINE&gt;</code> was added; there was no way to
+                  use expected output containing empty lines in
+                  previous versions.</span>
+
+<p>
+</li>
+<li>Output to stdout is captured, but not output to stderr (exception
+  tracebacks are captured via a different means).
+
+<p>
+</li>
+<li>If you continue a line via backslashing in an interactive session,
+  or for any other reason use a backslash, you should use a raw
+  docstring, which will preserve your backslashes exactly as you type
+  them:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def f(x):
+...     r'''Backslashes in a raw docstring: m\n'''
+&gt;&gt;&gt; print f.__doc__
+Backslashes in a raw docstring: m\n
+</pre></div>
+
+<p>
+Otherwise, the backslash will be interpreted as part of the string.
+  For example, the "\" above would be interpreted as a
+  newline character.  Alternatively, you can double each backslash in the
+  doctest version (and not use a raw string):
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def f(x):
+...     '''Backslashes in a raw docstring: m\\n'''
+&gt;&gt;&gt; print f.__doc__
+Backslashes in a raw docstring: m\n
+</pre></div>
+
+<p>
+</li>
+<li>The starting column doesn't matter:
+
+<p>
+<div class="verbatim"><pre>
+  &gt;&gt;&gt; assert "Easy!"
+        &gt;&gt;&gt; import math
+            &gt;&gt;&gt; math.floor(1.9)
+            1.0
+</pre></div>
+
+<p>
+and as many leading whitespace characters are stripped from the
+expected output as appeared in the initial <code>'&gt;&gt;&gt;&nbsp;'</code> line
+that started the example.
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.3.1 which Docstrings Are"
+  href="doctest-which-docstrings.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2.3 how It Works"
+  href="doctest-how-it-works.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.3.3 What's the Execution"
+  href="doctest-execution-context.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-which-docstrings.html">23.2.3.1 Which Docstrings Are</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="doctest-how-it-works.html">23.2.3 How It Works</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-execution-context.html">23.2.3.3 What's the Execution</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

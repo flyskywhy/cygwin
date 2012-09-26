@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-bisect.html" />
+<link rel="prev" href="module-collections.html" />
+<link rel="parent" href="datatypes.html" />
+<link rel="next" href="node92.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.4 heapq -- Heap queue algorithm</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.3.2.1 defaultdict Examples"
+  href="defaultdict-examples.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.4.1 Theory"
+  href="node92.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="defaultdict-examples.html">5.3.2.1 defaultdict Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node92.html">5.4.1 Theory</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION007400000000000000000">
+5.4 <tt class="module">heapq</tt> --
+         Heap queue algorithm</a>
+</h1>
+
+<p>
+<a name="module-heapq"></a>
+
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+This module provides an implementation of the heap queue algorithm,
+also known as the priority queue algorithm.
+
+<p>
+Heaps are arrays for which
+<code><var>heap</var>[<var>k</var>] &lt;= <var>heap</var>[2*<var>k</var>+1]</code> and
+<code><var>heap</var>[<var>k</var>] &lt;= <var>heap</var>[2*<var>k</var>+2]</code>
+for all <var>k</var>, counting elements from zero.  For the sake of
+comparison, non-existing elements are considered to be infinite.  The
+interesting property of a heap is that <code><var>heap</var>[0]</code> is always
+its smallest element.
+
+<p>
+The API below differs from textbook heap algorithms in two aspects:
+(a) We use zero-based indexing.  This makes the relationship between the
+index for a node and the indexes for its children slightly less
+obvious, but is more suitable since Python uses zero-based indexing.
+(b) Our pop method returns the smallest item, not the largest (called a
+"min heap" in textbooks; a "max heap" is more common in texts because
+of its suitability for in-place sorting).
+
+<p>
+These two make it possible to view the heap as a regular Python list
+without surprises: <code><var>heap</var>[0]</code> is the smallest item, and
+<code><var>heap</var>.sort()</code> maintains the heap invariant!
+
+<p>
+To create a heap, use a list initialized to <code>[]</code>, or you can
+transform a populated list into a heap via function <tt class="function">heapify()</tt>.
+
+<p>
+The following functions are provided:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-747' xml:id='l2h-747' class="function">heappush</tt></b>(</nobr></td>
+  <td><var>heap, item</var>)</td></tr></table></dt>
+<dd>
+Push the value <var>item</var> onto the <var>heap</var>, maintaining the
+heap invariant.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-748' xml:id='l2h-748' class="function">heappop</tt></b>(</nobr></td>
+  <td><var>heap</var>)</td></tr></table></dt>
+<dd>
+Pop and return the smallest item from the <var>heap</var>, maintaining the
+heap invariant.  If the heap is empty, <tt class="exception">IndexError</tt> is raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-749' xml:id='l2h-749' class="function">heapify</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>
+Transform list <var>x</var> into a heap, in-place, in linear time.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-750' xml:id='l2h-750' class="function">heapreplace</tt></b>(</nobr></td>
+  <td><var>heap, item</var>)</td></tr></table></dt>
+<dd>
+Pop and return the smallest item from the <var>heap</var>, and also push
+the new <var>item</var>.  The heap size doesn't change.
+If the heap is empty, <tt class="exception">IndexError</tt> is raised.
+This is more efficient than <tt class="function">heappop()</tt> followed
+by  <tt class="function">heappush()</tt>, and can be more appropriate when using
+a fixed-size heap.  Note that the value returned may be larger
+than <var>item</var>!  That constrains reasonable uses of this routine
+unless written as part of a conditional replacement:
+<div class="verbatim"><pre>
+        if item &gt; heap[0]:
+            item = heapreplace(heap, item)
+</pre></div>
+</dl>
+
+<p>
+Example of use:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from heapq import heappush, heappop
+&gt;&gt;&gt; heap = []
+&gt;&gt;&gt; data = [1, 3, 5, 7, 9, 2, 4, 6, 8, 0]
+&gt;&gt;&gt; for item in data:
+...     heappush(heap, item)
+...
+&gt;&gt;&gt; ordered = []
+&gt;&gt;&gt; while heap:
+...     ordered.append(heappop(heap))
+...
+&gt;&gt;&gt; print ordered
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+&gt;&gt;&gt; data.sort()
+&gt;&gt;&gt; print data == ordered
+True
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+The module also offers two general purpose functions based on heaps.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-751' xml:id='l2h-751' class="function">nlargest</tt></b>(</nobr></td>
+  <td><var>n, iterable</var><big>[</big><var>, key</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a list with the <var>n</var> largest elements from the dataset defined
+by <var>iterable</var>.  <var>key</var>, if provided, specifies a function of one
+argument that is used to extract a comparison key from each element
+in the iterable:  "<tt class="samp"><var>key</var>=<tt class="function">str.lower</tt></tt>"Equivalent to:  "<tt class="samp">sorted(iterable, key=key, reverse=True)[:n]</tt>"
+<span class="versionnote">New in version 2.4.</span>
+
+<span class="versionnote">Changed in version 2.5:
+Added the optional <var>key</var> argument.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-752' xml:id='l2h-752' class="function">nsmallest</tt></b>(</nobr></td>
+  <td><var>n, iterable</var><big>[</big><var>, key</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a list with the <var>n</var> smallest elements from the dataset defined
+by <var>iterable</var>.  <var>key</var>, if provided, specifies a function of one
+argument that is used to extract a comparison key from each element
+in the iterable:  "<tt class="samp"><var>key</var>=<tt class="function">str.lower</tt></tt>"Equivalent to:  "<tt class="samp">sorted(iterable, key=key)[:n]</tt>"
+<span class="versionnote">New in version 2.4.</span>
+
+<span class="versionnote">Changed in version 2.5:
+Added the optional <var>key</var> argument.</span>
+
+</dl>
+
+<p>
+Both functions perform best for smaller values of <var>n</var>.  For larger
+values, it is more efficient to use the <tt class="function">sorted()</tt> function.  Also,
+when <code>n==1</code>, it is more efficient to use the builtin <tt class="function">min()</tt>
+and <tt class="function">max()</tt> functions.
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node92.html">5.4.1 Theory</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.3.2.1 defaultdict Examples"
+  href="defaultdict-examples.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.4.1 Theory"
+  href="node92.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="defaultdict-examples.html">5.3.2.1 defaultdict Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node92.html">5.4.1 Theory</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

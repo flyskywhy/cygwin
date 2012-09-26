@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node643.html" />
+<link rel="prev" href="cookie-policy-objects.html" />
+<link rel="parent" href="module-cookielib.html" />
+<link rel="next" href="node643.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.22.4 DefaultCookiePolicy Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.22.3 cookiepolicy Objects"
+  href="cookie-policy-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.5 cookie Objects"
+  href="node643.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cookie-policy-objects.html">18.22.3 CookiePolicy Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node643.html">18.22.5 Cookie Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00202240000000000000000"></a><a name="default-cookie-policy-objects"></a>
+<br>
+18.22.4 DefaultCookiePolicy Objects 
+</h2>
+
+<p>
+Implements the standard rules for accepting and returning cookies.
+
+<p>
+Both RFC 2965 and Netscape cookies are covered.  RFC 2965 handling is
+switched off by default.
+
+<p>
+The easiest way to provide your own policy is to override this class
+and call its methods in your overridden implementations before adding
+your own additional checks:
+
+<p>
+<div class="verbatim"><pre>
+import cookielib
+class MyCookiePolicy(cookielib.DefaultCookiePolicy):
+    def set_ok(self, cookie, request):
+        if not cookielib.DefaultCookiePolicy.set_ok(self, cookie, request):
+            return False
+        if i_dont_want_to_store_this_cookie(cookie):
+            return False
+        return True
+</pre></div>
+
+<p>
+In addition to the features required to implement the
+<tt class="class">CookiePolicy</tt> interface, this class allows you to block and
+allow domains from setting and receiving cookies.  There are also some
+strictness switches that allow you to tighten up the rather loose
+Netscape protocol rules a little bit (at the cost of blocking some
+benign cookies).
+
+<p>
+A domain blacklist and whitelist is provided (both off by default).
+Only domains not in the blacklist and present in the whitelist (if the
+whitelist is active) participate in cookie setting and returning.  Use
+the <var>blocked_domains</var> constructor argument, and
+<tt class="method">blocked_domains()</tt> and <tt class="method">set_blocked_domains()</tt> methods
+(and the corresponding argument and methods for
+<var>allowed_domains</var>).  If you set a whitelist, you can turn it off
+again by setting it to <tt class="constant">None</tt>.
+
+<p>
+Domains in block or allow lists that do not start with a dot must
+equal the cookie domain to be matched.  For example,
+<code>"example.com"</code> matches a blacklist entry of
+<code>"example.com"</code>, but <code>"www.example.com"</code> does not.  Domains
+that do start with a dot are matched by more specific domains too.
+For example, both <code>"www.example.com"</code> and
+<code>"www.coyote.example.com"</code> match <code>".example.com"</code> (but
+<code>"example.com"</code> itself does not).  IP addresses are an exception,
+and must match exactly.  For example, if blocked_domains contains
+<code>"192.168.1.2"</code> and <code>".168.1.2"</code>, 192.168.1.2 is blocked,
+but 193.168.1.2 is not.
+
+<p>
+<tt class="class">DefaultCookiePolicy</tt> implements the following additional
+methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4387' xml:id='l2h-4387' class="method">blocked_domains</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the sequence of blocked domains (as a tuple).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4388' xml:id='l2h-4388' class="method">set_blocked_domains</tt></b>(</nobr></td>
+  <td><var>blocked_domains</var>)</td></tr></table></dt>
+<dd>
+Set the sequence of blocked domains.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4389' xml:id='l2h-4389' class="method">is_blocked</tt></b>(</nobr></td>
+  <td><var>domain</var>)</td></tr></table></dt>
+<dd>
+Return whether <var>domain</var> is on the blacklist for setting or
+receiving cookies.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4390' xml:id='l2h-4390' class="method">allowed_domains</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return <tt class="constant">None</tt>, or the sequence of allowed domains (as a tuple).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4391' xml:id='l2h-4391' class="method">set_allowed_domains</tt></b>(</nobr></td>
+  <td><var>allowed_domains</var>)</td></tr></table></dt>
+<dd>
+Set the sequence of allowed domains, or <tt class="constant">None</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4392' xml:id='l2h-4392' class="method">is_not_allowed</tt></b>(</nobr></td>
+  <td><var>domain</var>)</td></tr></table></dt>
+<dd>
+Return whether <var>domain</var> is not on the whitelist for setting or
+receiving cookies.
+</dl>
+
+<p>
+<tt class="class">DefaultCookiePolicy</tt> instances have the following attributes,
+which are all initialised from the constructor arguments of the same
+name, and which may all be assigned to.
+
+<p>
+<dl><dt><b><tt id='l2h-4393' xml:id='l2h-4393' class="member">rfc2109_as_netscape</tt></b></dt>
+<dd>
+If true, request that the <tt class="class">CookieJar</tt> instance downgrade RFC
+2109 cookies (ie. cookies received in a <span class="mailheader">Set-Cookie:</span> header
+with a version cookie-attribute of 1) to Netscape cookies by setting
+the version attribute of the <tt class="class">Cookie</tt> instance to 0.  The
+default value is <tt class="constant">None</tt>, in which case RFC 2109 cookies are
+downgraded if and only if RFC 2965 handling is turned off.  Therefore,
+RFC 2109 cookies are downgraded by default.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+General strictness switches:
+
+<p>
+<dl><dt><b><tt id='l2h-4394' xml:id='l2h-4394' class="member">strict_domain</tt></b></dt>
+<dd>
+Don't allow sites to set two-component domains with country-code
+top-level domains like <code>.co.uk</code>, <code>.gov.uk</code>,
+<code>.co.nz</code>.etc.  This is far from perfect and isn't guaranteed to
+work!
+</dl>
+
+<p>
+RFC 2965 protocol strictness switches:
+
+<p>
+<dl><dt><b><tt id='l2h-4395' xml:id='l2h-4395' class="member">strict_rfc2965_unverifiable</tt></b></dt>
+<dd>
+Follow RFC 2965 rules on unverifiable transactions (usually, an
+unverifiable transaction is one resulting from a redirect or a request
+for an image hosted on another site).  If this is false, cookies are
+<em>never</em> blocked on the basis of verifiability
+</dl>
+
+<p>
+Netscape protocol strictness switches:
+
+<p>
+<dl><dt><b><tt id='l2h-4396' xml:id='l2h-4396' class="member">strict_ns_unverifiable</tt></b></dt>
+<dd>
+apply RFC 2965 rules on unverifiable transactions even to Netscape
+cookies
+</dl>
+<dl><dt><b><tt id='l2h-4397' xml:id='l2h-4397' class="member">strict_ns_domain</tt></b></dt>
+<dd>
+Flags indicating how strict to be with domain-matching rules for
+Netscape cookies.  See below for acceptable values.
+</dl>
+<dl><dt><b><tt id='l2h-4398' xml:id='l2h-4398' class="member">strict_ns_set_initial_dollar</tt></b></dt>
+<dd>
+Ignore cookies in Set-Cookie: headers that have names starting with
+<code>'$'</code>.
+</dl>
+<dl><dt><b><tt id='l2h-4399' xml:id='l2h-4399' class="member">strict_ns_set_path</tt></b></dt>
+<dd>
+Don't allow setting cookies whose path doesn't path-match request URI.
+</dl>
+
+<p>
+<tt class="member">strict_ns_domain</tt> is a collection of flags.  Its value is
+constructed by or-ing together (for example,
+<code>DomainStrictNoDots|DomainStrictNonDomain</code> means both flags are
+set).
+
+<p>
+<dl><dt><b><tt id='l2h-4400' xml:id='l2h-4400' class="member">DomainStrictNoDots</tt></b></dt>
+<dd>
+When setting cookies, the 'host prefix' must not contain a dot
+(eg. <code>www.foo.bar.com</code> can't set a cookie for <code>.bar.com</code>,
+because <code>www.foo</code> contains a dot).
+</dl>
+<dl><dt><b><tt id='l2h-4401' xml:id='l2h-4401' class="member">DomainStrictNonDomain</tt></b></dt>
+<dd>
+Cookies that did not explicitly specify a <code>domain</code>
+cookie-attribute can only be returned to a domain equal to the domain
+that set the cookie (eg. <code>spam.example.com</code> won't be returned
+cookies from <code>example.com</code> that had no <code>domain</code>
+cookie-attribute).
+</dl>
+<dl><dt><b><tt id='l2h-4402' xml:id='l2h-4402' class="member">DomainRFC2965Match</tt></b></dt>
+<dd>
+When setting cookies, require a full RFC 2965 domain-match.
+</dl>
+
+<p>
+The following attributes are provided for convenience, and are the
+most useful combinations of the above flags:
+
+<p>
+<dl><dt><b><tt id='l2h-4403' xml:id='l2h-4403' class="member">DomainLiberal</tt></b></dt>
+<dd>
+Equivalent to 0 (ie. all of the above Netscape domain strictness flags
+switched off).
+</dl>
+<dl><dt><b><tt id='l2h-4404' xml:id='l2h-4404' class="member">DomainStrict</tt></b></dt>
+<dd>
+Equivalent to <code>DomainStrictNoDots|DomainStrictNonDomain</code>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.22.3 cookiepolicy Objects"
+  href="cookie-policy-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.5 cookie Objects"
+  href="node643.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="cookie-policy-objects.html">18.22.3 CookiePolicy Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node643.html">18.22.5 Cookie Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

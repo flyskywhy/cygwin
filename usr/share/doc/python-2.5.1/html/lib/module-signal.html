@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-popen2.html" />
+<link rel="prev" href="module-socket.html" />
+<link rel="parent" href="ipc.html" />
+<link rel="next" href="node545.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>17.3 signal -- Set handlers for asynchronous events</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.2.3 Example"
+  href="socket-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17. interprocess Communication and"
+  href="ipc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.3.1 Example"
+  href="node545.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="socket-example.html">17.2.3 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ipc.html">17. Interprocess Communication and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node545.html">17.3.1 Example</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0019300000000000000000">
+17.3 <tt class="module">signal</tt> --
+         Set handlers for asynchronous events</a>
+</h1>
+
+<p>
+<a name="module-signal"></a>
+
+<p>
+This module provides mechanisms to use signal handlers in Python.
+Some general rules for working with signals and their handlers:
+
+<p>
+
+<ul>
+<li>A handler for a particular signal, once set, remains installed until
+it is explicitly reset (Python emulates the BSD style interface
+regardless of the underlying implementation), with the exception of
+the handler for <tt class="constant">SIGCHLD</tt>, which follows the underlying
+implementation.
+
+<p>
+</li>
+<li>There is no way to ``block'' signals temporarily from critical
+sections (since this is not supported by all <span class="Unix">Unix</span> flavors).
+
+<p>
+</li>
+<li>Although Python signal handlers are called asynchronously as far as
+the Python user is concerned, they can only occur between the
+``atomic'' instructions of the Python interpreter.  This means that
+signals arriving during long calculations implemented purely in C
+(such as regular expression matches on large bodies of text) may be
+delayed for an arbitrary amount of time.
+
+<p>
+</li>
+<li>When a signal arrives during an I/O operation, it is possible that the
+I/O operation raises an exception after the signal handler returns.
+This is dependent on the underlying <span class="Unix">Unix</span> system's semantics regarding
+interrupted system calls.
+
+<p>
+</li>
+<li>Because the C signal handler always returns, it makes little sense to
+catch synchronous errors like <tt class="constant">SIGFPE</tt> or <tt class="constant">SIGSEGV</tt>.
+
+<p>
+</li>
+<li>Python installs a small number of signal handlers by default:
+<tt class="constant">SIGPIPE</tt> is ignored (so write errors on pipes and sockets can be
+reported as ordinary Python exceptions) and <tt class="constant">SIGINT</tt> is translated
+into a <tt class="exception">KeyboardInterrupt</tt> exception.  All of these can be
+overridden.
+
+<p>
+</li>
+<li>Some care must be taken if both signals and threads are used in the
+same program.  The fundamental thing to remember in using signals and
+threads simultaneously is: always perform <tt class="function">signal()</tt> operations
+in the main thread of execution.  Any thread can perform an
+<tt class="function">alarm()</tt>, <tt class="function">getsignal()</tt>, or <tt class="function">pause()</tt>;
+only the main thread can set a new signal handler, and the main thread
+will be the only one to receive signals (this is enforced by the
+Python <tt class="module">signal</tt> module, even if the underlying thread
+implementation supports sending signals to individual threads).  This
+means that signals can't be used as a means of inter-thread
+communication.  Use locks instead.
+
+<p>
+</li>
+</ul>
+
+<p>
+The variables defined in the <tt class="module">signal</tt> module are:
+
+<p>
+<dl><dt><b><tt id='l2h-3726' xml:id='l2h-3726'>SIG_DFL</tt></b></dt>
+<dd>
+  This is one of two standard signal handling options; it will simply
+  perform the default function for the signal.  For example, on most
+  systems the default action for <tt class="constant">SIGQUIT</tt> is to dump core
+  and exit, while the default action for <tt class="constant">SIGCLD</tt> is to
+  simply ignore it.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3727' xml:id='l2h-3727'>SIG_IGN</tt></b></dt>
+<dd>
+  This is another standard signal handler, which will simply ignore
+  the given signal.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3728' xml:id='l2h-3728'>SIG*</tt></b></dt>
+<dd>
+  All the signal numbers are defined symbolically.  For example, the
+  hangup signal is defined as <tt class="constant">signal.SIGHUP</tt>; the variable names
+  are identical to the names used in C programs, as found in
+  <code>&lt;signal.h&gt;</code>.
+  The <span class="Unix">Unix</span> man page for `<tt class="cfunction">signal()</tt>' lists the existing
+  signals (on some systems this is <span class="manpage"><i>signal</i>(2)</span>, on others the
+  list is in <span class="manpage"><i>signal</i>(7)</span>).
+  Note that not all systems define the same set of signal names; only
+  those names defined by the system are defined by this module.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3729' xml:id='l2h-3729'>NSIG</tt></b></dt>
+<dd>
+  One more than the number of the highest signal number.
+</dd></dl>
+
+<p>
+The <tt class="module">signal</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3730' xml:id='l2h-3730' class="function">alarm</tt></b>(</nobr></td>
+  <td><var>time</var>)</td></tr></table></dt>
+<dd>
+  If <var>time</var> is non-zero, this function requests that a
+  <tt class="constant">SIGALRM</tt> signal be sent to the process in <var>time</var> seconds.
+  Any previously scheduled alarm is canceled (only one alarm can
+  be scheduled at any time).  The returned value is then the number of
+  seconds before any previously set alarm was to have been delivered.
+  If <var>time</var> is zero, no alarm is scheduled, and any scheduled
+  alarm is canceled.  The return value is the number of seconds
+  remaining before a previously scheduled alarm.  If the return value
+  is zero, no alarm is currently scheduled.  (See the <span class="Unix">Unix</span> man page
+  <span class="manpage"><i>alarm</i>(2)</span>.)
+  Availability: <span class="Unix">Unix</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3731' xml:id='l2h-3731' class="function">getsignal</tt></b>(</nobr></td>
+  <td><var>signalnum</var>)</td></tr></table></dt>
+<dd>
+  Return the current signal handler for the signal <var>signalnum</var>.
+  The returned value may be a callable Python object, or one of the
+  special values <tt class="constant">signal.SIG_IGN</tt>, <tt class="constant">signal.SIG_DFL</tt> or
+  <tt class="constant">None</tt>.  Here, <tt class="constant">signal.SIG_IGN</tt> means that the
+  signal was previously ignored, <tt class="constant">signal.SIG_DFL</tt> means that the
+  default way of handling the signal was previously in use, and
+  <code>None</code> means that the previous signal handler was not installed
+  from Python.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3732' xml:id='l2h-3732' class="function">pause</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Cause the process to sleep until a signal is received; the
+  appropriate handler will then be called.  Returns nothing.  Not on
+  Windows. (See the <span class="Unix">Unix</span> man page <span class="manpage"><i>signal</i>(2)</span>.)
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3733' xml:id='l2h-3733' class="function">signal</tt></b>(</nobr></td>
+  <td><var>signalnum, handler</var>)</td></tr></table></dt>
+<dd>
+  Set the handler for signal <var>signalnum</var> to the function
+  <var>handler</var>.  <var>handler</var> can be a callable Python object
+  taking two arguments (see below), or
+  one of the special values <tt class="constant">signal.SIG_IGN</tt> or
+  <tt class="constant">signal.SIG_DFL</tt>.  The previous signal handler will be returned
+  (see the description of <tt class="function">getsignal()</tt> above).  (See the
+  <span class="Unix">Unix</span> man page <span class="manpage"><i>signal</i>(2)</span>.)
+
+<p>
+When threads are enabled, this function can only be called from the
+  main thread; attempting to call it from other threads will cause a
+  <tt class="exception">ValueError</tt> exception to be raised.
+
+<p>
+The <var>handler</var> is called with two arguments: the signal number
+  and the current stack frame (<code>None</code> or a frame object;
+  for a description of frame objects, see the reference manual section
+  on the standard type hierarchy or see the attribute descriptions in
+  the <tt class="module"><a href="module-inspect.html">inspect</a></tt> module).
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node545.html">17.3.1 Example</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.2.3 Example"
+  href="socket-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17. interprocess Communication and"
+  href="ipc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.3.1 Example"
+  href="node545.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="socket-example.html">17.2.3 Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ipc.html">17. Interprocess Communication and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node545.html">17.3.1 Example</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

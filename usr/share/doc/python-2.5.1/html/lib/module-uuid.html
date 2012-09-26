@@ -1,0 +1,398 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-urlparse.html" />
+<link rel="prev" href="module-telnetlib.html" />
+<link rel="parent" href="internet.html" />
+<link rel="next" href="uuid-example.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.16 uuid -- UUID objects according to RFC 4122</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.15.2 telnet Example"
+  href="telnet-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.16.1 Example"
+  href="uuid-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="telnet-example.html">18.15.2 Telnet Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="uuid-example.html">18.16.1 Example</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00201600000000000000000">
+18.16 <tt class="module">uuid</tt> --
+         UUID objects according to RFC 4122</a>
+</h1>
+<a name="module-uuid"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+This module provides immutable <tt class="class">UUID</tt> objects (the <tt class="class">UUID</tt> class)
+and the functions <tt class="function">uuid1()</tt>, <tt class="function">uuid3()</tt>,
+<tt class="function">uuid4()</tt>, <tt class="function">uuid5()</tt> for generating version 1, 3, 4,
+and 5 UUIDs as specified in <a class="rfc" id='rfcref-103251' xml:id='rfcref-103251'
+href="http://www.faqs.org/rfcs/rfc4122.html">RFC 4122</a>.
+
+<p>
+If all you want is a unique ID, you should probably call
+<tt class="function">uuid1()</tt> or <tt class="function">uuid4()</tt>.  Note that <tt class="function">uuid1()</tt>
+may compromise privacy since it creates a UUID containing the computer's
+network address.  <tt class="function">uuid4()</tt> creates a random UUID.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4250' xml:id='l2h-4250' class="class">UUID</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>hex</var><big>[</big><var>, bytes</var><big>[</big><var>,
+bytes_le</var><big>[</big><var>, fields</var><big>[</big><var>, int</var><big>[</big><var>, version</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Create a UUID from either a string of 32 hexadecimal digits,
+a string of 16 bytes as the <var>bytes</var> argument, a string of 16 bytes
+in little-endian order as the <var>bytes_le</var> argument, a tuple of six
+integers (32-bit <var>time_low</var>, 16-bit <var>time_mid</var>,
+16-bit <var>time_hi_version</var>,
+8-bit <var>clock_seq_hi_variant</var>, 8-bit <var>clock_seq_low</var>, 48-bit <var>node</var>)
+as the <var>fields</var> argument, or a single 128-bit integer as the <var>int</var>
+argument.  When a string of hex digits is given, curly braces,
+hyphens, and a URN prefix are all optional.  For example, these
+expressions all yield the same UUID:
+
+<p>
+<div class="verbatim"><pre>
+UUID('{12345678-1234-5678-1234-567812345678}')
+UUID('12345678123456781234567812345678')
+UUID('urn:uuid:12345678-1234-5678-1234-567812345678')
+UUID(bytes='\x12\x34\x56\x78'*4)
+UUID(bytes_le='\x78\x56\x34\x12\x34\x12\x78\x56' +
+              '\x12\x34\x56\x78\x12\x34\x56\x78')
+UUID(fields=(0x12345678, 0x1234, 0x5678, 0x12, 0x34, 0x567812345678))
+UUID(int=0x12345678123456781234567812345678)
+</pre></div>
+
+<p>
+Exactly one of <var>hex</var>, <var>bytes</var>, <var>bytes_le</var>, <var>fields</var>,
+or <var>int</var> must
+be given.  The <var>version</var> argument is optional; if given, the
+resulting UUID will have its variant and version number set according to
+RFC 4122, overriding bits in the given <var>hex</var>, <var>bytes</var>,
+<var>bytes_le</var>, <var>fields</var>, or <var>int</var>.
+
+<p>
+</dl>
+
+<p>
+<tt class="class">UUID</tt> instances have these read-only attributes:
+
+<p>
+<dl><dt><b><tt id='l2h-4251' xml:id='l2h-4251' class="member">bytes</tt></b></dt>
+<dd>
+The UUID as a 16-byte string (containing the six
+integer fields in big-endian byte order).
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4252' xml:id='l2h-4252' class="member">bytes_le</tt></b></dt>
+<dd>
+The UUID as a 16-byte string (with <var>time_low</var>, <var>time_mid</var>,
+and <var>time_hi_version</var> in little-endian byte order).
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4253' xml:id='l2h-4253' class="member">fields</tt></b></dt>
+<dd>
+A tuple of the six integer fields of the UUID, which are also available
+as six individual attributes and two derived attributes:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Field</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><tt class="member">time_low</tt></td>
+        <td class="left"  >the first 32 bits of the UUID</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">time_mid</tt></td>
+        <td class="left"  >the next 16 bits of the UUID</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">time_hi_version</tt></td>
+        <td class="left"  >the next 16 bits of the UUID</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">clock_seq_hi_variant</tt></td>
+        <td class="left"  >the next 8 bits of the UUID</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">clock_seq_low</tt></td>
+        <td class="left"  >the next 8 bits of the UUID</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">node</tt></td>
+        <td class="left"  >the last 48 bits of the UUID</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">time</tt></td>
+        <td class="left"  >the 60-bit timestamp</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="member">clock_seq</tt></td>
+        <td class="left"  >the 14-bit sequence number</td></tr></tbody>
+</table></div>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4254' xml:id='l2h-4254' class="member">hex</tt></b></dt>
+<dd>
+The UUID as a 32-character hexadecimal string.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4255' xml:id='l2h-4255' class="member">int</tt></b></dt>
+<dd>
+The UUID as a 128-bit integer.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4256' xml:id='l2h-4256' class="member">urn</tt></b></dt>
+<dd>
+The UUID as a URN as specified in RFC 4122.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4257' xml:id='l2h-4257' class="member">variant</tt></b></dt>
+<dd>
+The UUID variant, which determines the internal layout of the UUID.
+This will be one of the integer constants
+<tt class="constant">RESERVED_NCS</tt>,
+<tt class="constant">RFC_4122</tt>, <tt class="constant">RESERVED_MICROSOFT</tt>, or
+<tt class="constant">RESERVED_FUTURE</tt>.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4258' xml:id='l2h-4258' class="member">version</tt></b></dt>
+<dd>
+The UUID version number (1 through 5, meaningful only
+when the variant is <tt class="constant">RFC_4122</tt>).
+</dl>
+
+<p>
+The <tt class="module">uuid</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4259' xml:id='l2h-4259' class="function">getnode</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Get the hardware address as a 48-bit positive integer.  The first time this
+runs, it may launch a separate program, which could be quite slow.  If all
+attempts to obtain the hardware address fail, we choose a random 48-bit
+number with its eighth bit set to 1 as recommended in RFC 4122.  "Hardware
+address" means the MAC address of a network interface, and on a machine
+with multiple network interfaces the MAC address of any one of them may
+be returned.
+</dl>
+<a id='l2h-4272' xml:id='l2h-4272'></a>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4260' xml:id='l2h-4260' class="function">uuid1</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>node</var><big>[</big><var>, clock_seq</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Generate a UUID from a host ID, sequence number, and the current time.
+If <var>node</var> is not given, <tt class="function">getnode()</tt> is used to obtain the
+hardware address.
+If <var>clock_seq</var> is given, it is used as the sequence number;
+otherwise a random 14-bit sequence number is chosen.
+</dl>
+<a id='l2h-4273' xml:id='l2h-4273'></a>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4261' xml:id='l2h-4261' class="function">uuid3</tt></b>(</nobr></td>
+  <td><var>namespace, name</var>)</td></tr></table></dt>
+<dd>
+Generate a UUID based on the MD5 hash
+of a namespace identifier (which is a UUID) and a name (which is a string).
+</dl>
+<a id='l2h-4274' xml:id='l2h-4274'></a>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4262' xml:id='l2h-4262' class="function">uuid4</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Generate a random UUID.
+</dl>
+<a id='l2h-4275' xml:id='l2h-4275'></a>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4263' xml:id='l2h-4263' class="function">uuid5</tt></b>(</nobr></td>
+  <td><var>namespace, name</var>)</td></tr></table></dt>
+<dd>
+Generate a UUID based on the SHA-1 hash
+of a namespace identifier (which is a UUID) and a name (which is a string).
+</dl>
+<a id='l2h-4276' xml:id='l2h-4276'></a>
+
+<p>
+The <tt class="module">uuid</tt> module defines the following namespace identifiers
+for use with <tt class="function">uuid3()</tt> or <tt class="function">uuid5()</tt>.
+
+<p>
+<dl><dt><b><tt id='l2h-4264' xml:id='l2h-4264'>NAMESPACE_DNS</tt></b></dt>
+<dd>
+When this namespace is specified,
+the <var>name</var> string is a fully-qualified domain name.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4265' xml:id='l2h-4265'>NAMESPACE_URL</tt></b></dt>
+<dd>
+When this namespace is specified,
+the <var>name</var> string is a URL.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4266' xml:id='l2h-4266'>NAMESPACE_OID</tt></b></dt>
+<dd>
+When this namespace is specified,
+the <var>name</var> string is an ISO OID.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4267' xml:id='l2h-4267'>NAMESPACE_X500</tt></b></dt>
+<dd>
+When this namespace is specified,
+the <var>name</var> string is an X.500 DN in DER or a text output format.
+</dd></dl>
+
+<p>
+The <tt class="module">uuid</tt> module defines the following constants
+for the possible values of the <tt class="member">variant</tt> attribute:
+
+<p>
+<dl><dt><b><tt id='l2h-4268' xml:id='l2h-4268'>RESERVED_NCS</tt></b></dt>
+<dd>
+Reserved for NCS compatibility.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4269' xml:id='l2h-4269'>RFC_4122</tt></b></dt>
+<dd>
+Specifies the UUID layout given in <a class="rfc" id='rfcref-103258' xml:id='rfcref-103258'
+href="http://www.faqs.org/rfcs/rfc4122.html">RFC 4122</a>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4270' xml:id='l2h-4270'>RESERVED_MICROSOFT</tt></b></dt>
+<dd>
+Reserved for Microsoft compatibility.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4271' xml:id='l2h-4271'>RESERVED_FUTURE</tt></b></dt>
+<dd>
+Reserved for future definition.
+</dd></dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seerfc">
+    <dt><a href="http://www.faqs.org/rfcs/rfc4122.html"
+        title="A universally Unique identifier (UUID) urn Namespace"
+        >RFC 4122, <em>A Universally Unique IDentifier (UUID) URN Namespace</em></a>
+    <dd>
+This specification defines a Uniform Resource Name namespace for UUIDs,
+the internal format of UUIDs, and methods of generating UUIDs.
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="uuid-example.html">18.16.1 Example</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.15.2 telnet Example"
+  href="telnet-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.16.1 Example"
+  href="uuid-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="telnet-example.html">18.15.2 Telnet Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="uuid-example.html">18.16.1 Example</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

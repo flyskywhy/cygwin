@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node567.html" />
+<link rel="prev" href="node565.html" />
+<link rel="parent" href="module-cgi.html" />
+<link rel="next" href="node567.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.2.9 Debugging CGI scripts</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.8 testing your CGI"
+  href="node565.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.10 common problems and"
+  href="node567.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node565.html">18.2.8 Testing your CGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node567.html">18.2.10 Common problems and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020290000000000000000">
+18.2.9 Debugging CGI scripts</a>
+</h2> <a id='l2h-3830' xml:id='l2h-3830'></a>
+<p>
+First of all, check for trivial installation errors -- reading the
+section above on installing your CGI script carefully can save you a
+lot of time.  If you wonder whether you have understood the
+installation procedure correctly, try installing a copy of this module
+file (<span class="file">cgi.py</span>) as a CGI script.  When invoked as a script, the file
+will dump its environment and the contents of the form in HTML form.
+Give it the right mode etc, and send it a request.  If it's installed
+in the standard <span class="file">cgi-bin</span> directory, it should be possible to send it a
+request by entering a URL into your browser of the form:
+
+<p>
+<div class="verbatim"><pre>
+http://yourhostname/cgi-bin/cgi.py?name=Joe+Blow&amp;addr=At+Home
+</pre></div>
+
+<p>
+If this gives an error of type 404, the server cannot find the script
+- perhaps you need to install it in a different directory.  If it
+gives another error, there's an installation problem that
+you should fix before trying to go any further.  If you get a nicely
+formatted listing of the environment and form content (in this
+example, the fields should be listed as ``addr'' with value ``At Home''
+and ``name'' with value ``Joe Blow''), the <span class="file">cgi.py</span> script has been
+installed correctly.  If you follow the same procedure for your own
+script, you should now be able to debug it.
+
+<p>
+The next step could be to call the <tt class="module">cgi</tt> module's
+<tt class="function">test()</tt> function from your script: replace its main code
+with the single statement
+
+<p>
+<div class="verbatim"><pre>
+cgi.test()
+</pre></div>
+
+<p>
+This should produce the same results as those gotten from installing
+the <span class="file">cgi.py</span> file itself.
+
+<p>
+When an ordinary Python script raises an unhandled exception (for
+whatever reason: of a typo in a module name, a file that can't be
+opened, etc.), the Python interpreter prints a nice traceback and
+exits.  While the Python interpreter will still do this when your CGI
+script raises an exception, most likely the traceback will end up in
+one of the HTTP server's log files, or be discarded altogether.
+
+<p>
+Fortunately, once you have managed to get your script to execute
+<em>some</em> code, you can easily send tracebacks to the Web browser
+using the <tt class="module"><a href="module-cgitb.html">cgitb</a></tt> module.  If you haven't done so already,
+just add the line:
+
+<p>
+<div class="verbatim"><pre>
+import cgitb; cgitb.enable()
+</pre></div>
+
+<p>
+to the top of your script.  Then try running it again; when a
+problem occurs, you should see a detailed report that will
+likely make apparent the cause of the crash.
+
+<p>
+If you suspect that there may be a problem in importing the
+<tt class="module"><a href="module-cgitb.html">cgitb</a></tt> module, you can use an even more robust approach
+(which only uses built-in modules):
+
+<p>
+<div class="verbatim"><pre>
+import sys
+sys.stderr = sys.stdout
+print "Content-Type: text/plain"
+print
+...your code here...
+</pre></div>
+
+<p>
+This relies on the Python interpreter to print the traceback.  The
+content type of the output is set to plain text, which disables all
+HTML processing.  If your script works, the raw HTML will be displayed
+by your client.  If it raises an exception, most likely after the
+first two lines have been printed, a traceback will be displayed.
+Because no HTML interpretation is going on, the traceback will be
+readable.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.2.8 testing your CGI"
+  href="node565.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.2 cgi  "
+  href="module-cgi.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.2.10 common problems and"
+  href="node567.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node565.html">18.2.8 Testing your CGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cgi.html">18.2 cgi  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node567.html">18.2.10 Common problems and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

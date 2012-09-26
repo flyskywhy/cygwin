@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="ssl-objects.html" />
+<link rel="parent" href="module-socket.html" />
+<link rel="next" href="module-signal.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>17.2.3 Example </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.2.2 ssl Objects"
+  href="ssl-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.2 socket  "
+  href="module-socket.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.3 signal  "
+  href="module-signal.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ssl-objects.html">17.2.2 SSL Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-socket.html">17.2 socket  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-signal.html">17.3 signal  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0019230000000000000000"></a><a name="socket-example"></a>
+<br>
+17.2.3 Example 
+</h2>
+
+<p>
+Here are four minimal example programs using the TCP/IP protocol: a
+server that echoes all data that it receives back (servicing only one
+client), and a client using it.  Note that a server must perform the
+sequence <tt class="function">socket()</tt>, <tt class="method">bind()</tt>, <tt class="method">listen()</tt>,
+<tt class="method">accept()</tt> (possibly repeating the <tt class="method">accept()</tt> to service
+more than one client), while a client only needs the sequence
+<tt class="function">socket()</tt>, <tt class="method">connect()</tt>.  Also note that the server
+does not <tt class="method">send()</tt>/<tt class="method">recv()</tt> on the 
+socket it is listening on but on the new socket returned by
+<tt class="method">accept()</tt>.
+
+<p>
+The first two examples support IPv4 only.
+
+<p>
+<div class="verbatim"><pre>
+# Echo server program
+import socket
+
+HOST = ''                 # Symbolic name meaning the local host
+PORT = 50007              # Arbitrary non-privileged port
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((HOST, PORT))
+s.listen(1)
+conn, addr = s.accept()
+print 'Connected by', addr
+while 1:
+    data = conn.recv(1024)
+    if not data: break
+    conn.send(data)
+conn.close()
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+# Echo client program
+import socket
+
+HOST = 'daring.cwi.nl'    # The remote host
+PORT = 50007              # The same port as used by the server
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
+s.send('Hello, world')
+data = s.recv(1024)
+s.close()
+print 'Received', repr(data)
+</pre></div>
+
+<p>
+The next two examples are identical to the above two, but support both
+IPv4 and IPv6.
+The server side will listen to the first address family available
+(it should listen to both instead).
+On most of IPv6-ready systems, IPv6 will take precedence
+and the server may not accept IPv4 traffic.
+The client side will try to connect to the all addresses returned as a result
+of the name resolution, and sends traffic to the first one connected
+successfully.
+
+<p>
+<div class="verbatim"><pre>
+# Echo server program
+import socket
+import sys
+
+HOST = ''                 # Symbolic name meaning the local host
+PORT = 50007              # Arbitrary non-privileged port
+s = None
+for res in socket.getaddrinfo(HOST, PORT, socket.AF_UNSPEC, socket.SOCK_STREAM, 0, socket.AI_PASSIVE):
+    af, socktype, proto, canonname, sa = res
+    try:
+	s = socket.socket(af, socktype, proto)
+    except socket.error, msg:
+	s = None
+	continue
+    try:
+	s.bind(sa)
+	s.listen(1)
+    except socket.error, msg:
+	s.close()
+	s = None
+	continue
+    break
+if s is None:
+    print 'could not open socket'
+    sys.exit(1)
+conn, addr = s.accept()
+print 'Connected by', addr
+while 1:
+    data = conn.recv(1024)
+    if not data: break
+    conn.send(data)
+conn.close()
+</pre></div>
+
+<p>
+<div class="verbatim"><pre>
+# Echo client program
+import socket
+import sys
+
+HOST = 'daring.cwi.nl'    # The remote host
+PORT = 50007              # The same port as used by the server
+s = None
+for res in socket.getaddrinfo(HOST, PORT, socket.AF_UNSPEC, socket.SOCK_STREAM):
+    af, socktype, proto, canonname, sa = res
+    try:
+	s = socket.socket(af, socktype, proto)
+    except socket.error, msg:
+	s = None
+	continue
+    try:
+	s.connect(sa)
+    except socket.error, msg:
+	s.close()
+	s = None
+	continue
+    break
+if s is None:
+    print 'could not open socket'
+    sys.exit(1)
+s.send('Hello, world')
+data = s.recv(1024)
+s.close()
+print 'Received', repr(data)
+</pre></div>
+
+<p>
+This example connects to an SSL server, prints the 
+server and issuer's distinguished names, sends some bytes,
+and reads part of the response:
+
+<p>
+<div class="verbatim"><pre>
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(('www.verisign.com', 443))
+
+ssl_sock = socket.ssl(s)
+
+print repr(ssl_sock.server())
+print repr(ssl_sock.issuer())
+
+# Set a simple HTTP request -- use httplib in actual code.
+ssl_sock.write("""GET / HTTP/1.0\r
+Host: www.verisign.com\r\n\r\n""")
+
+# Read a chunk of data.  Will not necessarily
+# read all the data returned by the server.
+data = ssl_sock.read()
+
+# Note that you need to close the underlying socket, not the SSL object.
+del ssl_sock
+s.close()
+</pre></div>
+
+<p>
+At this writing, this SSL example prints the following output (line
+breaks inserted for readability):
+
+<p>
+<div class="verbatim"><pre>
+'/C=US/ST=California/L=Mountain View/
+ O=VeriSign, Inc./OU=Production Services/
+ OU=Terms of use at www.verisign.com/rpa (c)00/
+ CN=www.verisign.com'
+'/O=VeriSign Trust Network/OU=VeriSign, Inc./
+ OU=VeriSign International Server CA - Class 3/
+ OU=www.verisign.com/CPS Incorp.by Ref. LIABILITY LTD.(c)97 VeriSign'
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.2.2 ssl Objects"
+  href="ssl-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.2 socket  "
+  href="module-socket.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.3 signal  "
+  href="module-signal.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ssl-objects.html">17.2.2 SSL Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-socket.html">17.2 socket  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-signal.html">17.3 signal  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

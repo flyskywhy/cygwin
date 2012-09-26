@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+#
+# Add new remote branch
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes the desired branch name and source location as parameters.
+#
+# This command lets you add to the list of 'remote branches'. Those are
+# branches in your local repository which correspond to some branches
+# in other repositories.
+#
+# After you add a remote branch, you can `cg-fetch` from it to get the
+# latest changes on the branch, as they appeared in the remote repository.
+#
+# Terminology note: This command concerns remote branches, not the local
+# ones (those managed by `cg-switch`).
+#
+# The possible source location specifiers are:
+#
+# 1. Local path - note that fetching will hardlink the objects if possible.
+#
+# 2. rsync - `rsync://host/path`
+#    THE rsync REPOSITORY ACCESS METHOD IS DEPRECATED AND WILL BE REMOVED
+#    IN THE FUTURE! The problem is that it will download _all_ data from
+#    the remote repository, including objects which do not belong to the
+#    one particular branch you want to fetch.
+#
+# 3. HTTP - `http://host/path`
+#
+# 4. HTTPS - `https://host/path`
+#
+# 5. FTP - 'ftp://host/path'
+#
+# 6. SSH - `git+ssh://host/path` or `host:path` (the latter can change);
+#    note that the path must be absolute in the first case.
+#
+# 7. git daemon - `git://host/path`
+#
+#
+# The URL can have a fragment part, which identifies a branch inside of
+# the remote repository (in the form "repoURL#branchname"). Otherwise,
+# Cogito defaults to whatever branch the repository's HEAD points to
+# at the time of each fetch.
+#
+# FILES
+# -----
+# $GIT_DIR/branches/BRANCH_NAME::
+#	Contains the source location of the remote branch.
+#
+# $GIT_DIR/refs/heads/BRANCH_NAME::
+# 	Contains pointer to the latest commit in a branch. It can be more
+#	conveniently retrieved using `cg-object-id BRANCH_NAME`.
+#
+# EXAMPLE USAGE
+# -------------
+# Let's say you have a repository at `git+ssh://host/path/repo.git` and you
+# want to fetch its 'testing' branch to your local repository. In that case
+# you can do
+#
+#	$ cg-branch-add repo-testing 'git+ssh://host/path/repo.git#testing'
+#
+# and refer to it as 'repo-testing' anytime later:
+#
+#	$ cg-fetch repo-testing
+#
+# For example you can check the changes in the `repo-testing` branch compared
+# to your current branch:
+#
+#	$ cg-diff -r repo-testing
+
+# Testsuite: Partial (used in many tests but a dedicated testsuite is missing)
+
+USAGE="cg-branch-add BRANCH_NAME LOCATION"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+name="${ARGS[0]}"
+location="${ARGS[1]}"
+
+([ -n "$name" ] && [ -n "$location" ] && ! [ -n "${ARGS[2]}" ]) || usage
+git check-ref-format "refs/heads/$name" || \
+	die "name contains invalid characters"
+if [ "$name" = "this" ] || [ "$name" = "HEAD" ]; then
+	die "given branch name is reserved"
+fi
+
+mkdir -p "$_git/branches/$(dirname "$name")"
+[ -s "$_git/branches/$name" ] && die "branch already exists"
+[ -s "$_git/refs/heads/$name" ] && warn "branch head already exists"
+
+if ! echo "$location" | grep -q ":" ; then
+	location=$(echo "$location" | sed -e "s#^[^/]#$(pwd)\/&#" | normpath)
+fi
+
+echo "$location" >"$_git/branches/$name"

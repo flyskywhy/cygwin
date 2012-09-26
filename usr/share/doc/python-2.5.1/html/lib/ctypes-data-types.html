@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-fundamental-data-types.html" />
+<link rel="prev" href="ctypes-utility-functions.html" />
+<link rel="parent" href="ctypes-ctypes-reference.html" />
+<link rel="next" href="ctypes-fundamental-data-types.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.2.6 Data types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.5 utility functions"
+  href="ctypes-utility-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.7 fundamental data types"
+  href="ctypes-fundamental-data-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-utility-functions.html">14.14.2.5 Utility functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-fundamental-data-types.html">14.14.2.7 Fundamental data types</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00161426000000000000000"></a><a name="ctypes-data-types"></a>
+<br>
+14.14.2.6 Data types
+</h3>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3347' xml:id='l2h-3347' class="class">_CData</tt></b>
+<dd>
+This non-public class is the common base class of all ctypes data
+types.  Among other things, all ctypes type instances contain a
+memory block that hold C compatible data; the address of the
+memory block is returned by the <code>addressof()</code> helper function.
+Another instance variable is exposed as <tt class="member">_objects</tt>; this
+contains other Python objects that need to be kept alive in case
+the memory block contains pointers.
+</dl>
+
+<p>
+Common methods of ctypes data types, these are all class methods (to
+be exact, they are methods of the metaclass):
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3348' xml:id='l2h-3348' class="method">from_address</tt></b>(</nobr></td>
+  <td><var>address</var>)</td></tr></table></dt>
+<dd>
+This method returns a ctypes type instance using the memory
+specified by address which must be an integer.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3349' xml:id='l2h-3349' class="method">from_param</tt></b>(</nobr></td>
+  <td><var>obj</var>)</td></tr></table></dt>
+<dd>
+This method adapts obj to a ctypes type.  It is called with the
+actual object used in a foreign function call, when the type is
+present in the foreign functions <tt class="member">argtypes</tt> tuple; it must
+return an object that can be used as function call parameter.
+
+<p>
+All ctypes data types have a default implementation of this
+classmethod, normally it returns <code>obj</code> if that is an instance of
+the type.  Some types accept other objects as well.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3350' xml:id='l2h-3350' class="method">in_dll</tt></b>(</nobr></td>
+  <td><var>library, name</var>)</td></tr></table></dt>
+<dd>
+This method returns a ctypes type instance exported by a shared
+library. <var>name</var> is the name of the symbol that exports the data,
+<var>library</var> is the loaded shared library.
+</dl>
+
+<p>
+Common instance variables of ctypes data types:
+
+<p>
+<dl><dt><b><tt id='l2h-3351' xml:id='l2h-3351' class="member">_b_base_</tt></b></dt>
+<dd>
+Sometimes ctypes data instances do not own the memory block they
+contain, instead they share part of the memory block of a base
+object.  The <tt class="member">_b_base_</tt> readonly member is the root ctypes
+object that owns the memory block.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3352' xml:id='l2h-3352' class="member">_b_needsfree_</tt></b></dt>
+<dd>
+This readonly variable is true when the ctypes data instance has
+allocated the memory block itself, false otherwise.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3353' xml:id='l2h-3353' class="member">_objects</tt></b></dt>
+<dd>
+This member is either <code>None</code> or a dictionary containing Python
+objects that need to be kept alive so that the memory block
+contents is kept valid.  This object is only exposed for
+debugging; never modify the contents of this dictionary.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.5 utility functions"
+  href="ctypes-utility-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.7 fundamental data types"
+  href="ctypes-fundamental-data-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-utility-functions.html">14.14.2.5 Utility functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-fundamental-data-types.html">14.14.2.7 Fundamental data types</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

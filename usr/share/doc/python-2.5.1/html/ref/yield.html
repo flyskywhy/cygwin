@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="raise.html" />
+<link rel="prev" href="return.html" />
+<link rel="parent" href="simple.html" />
+<link rel="next" href="raise.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.8 The yield statement </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.7 the return statement"
+  href="return.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. simple statements"
+  href="simple.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.9 the raise statement"
+  href="raise.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="return.html">6.7 The return statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="simple.html">6. Simple statements</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="raise.html">6.9 The raise statement</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008800000000000000000"></a><a name="yield"></a>
+<br>
+6.8 The <tt class="keyword">yield</tt> statement 
+</h1>
+<a id='l2h-531' xml:id='l2h-531'></a>
+<p>
+<dl><dd class="grammar">
+<div class="productions">
+<table>
+<tr>
+    <td><a id='tok-yield_stmt' xml:id='tok-yield_stmt'>yield_stmt</a></td>
+    <td>::=</td>
+    <td><a class='grammartoken' href="yieldexpr.html#tok-yield_expression">yield_expression</a></td></tr>
+</table>
+</div>
+<a class="grammar-footer"
+  href="grammar.txt" type="text/plain"
+  >Download entire grammar as text.</a>
+</dd></dl>
+
+<p>
+<a id='l2h-533' xml:id='l2h-533'></a>
+<a id='l2h-532' xml:id='l2h-532'></a>
+<p>
+The <tt class="keyword">yield</tt> statement is only used when defining a generator
+function, and is only used in the body of the generator function.
+Using a <tt class="keyword">yield</tt> statement in a function definition is
+sufficient to cause that definition to create a generator function
+instead of a normal function.
+
+<p>
+When a generator function is called, it returns an iterator known as a
+generator iterator, or more commonly, a generator.  The body of the
+generator function is executed by calling the generator's
+<tt class="method">next()</tt> method repeatedly until it raises an exception.
+
+<p>
+When a <tt class="keyword">yield</tt> statement is executed, the state of the
+generator is frozen and the value of <a class='grammartoken' href="exprlists.html#tok-expression_list">expression_list</a> is
+returned to <tt class="method">next()</tt>'s caller.  By ``frozen'' we mean that all
+local state is retained, including the current bindings of local
+variables, the instruction pointer, and the internal evaluation stack:
+enough information is saved so that the next time <tt class="method">next()</tt> is
+invoked, the function can proceed exactly as if the <tt class="keyword">yield</tt>
+statement were just another external call.
+
+<p>
+As of Python version 2.5, the <tt class="keyword">yield</tt> statement is now
+allowed in the <tt class="keyword">try</tt> clause of a <tt class="keyword">try</tt> ... 
+<tt class="keyword">finally</tt> construct.  If the generator is not resumed before
+it is finalized (by reaching a zero reference count or by being garbage
+collected), the generator-iterator's <tt class="method">close()</tt> method will be
+called, allowing any pending <tt class="keyword">finally</tt> clauses to execute.
+
+<p>
+<div class="note"><b class="label">Note:</b>
+In Python 2.2, the <tt class="keyword">yield</tt> statement is only allowed
+when the <code>generators</code> feature has been enabled.  It will always
+be enabled in Python 2.3.  This <code>__future__</code> import statement can
+be used to enable the feature:
+
+<p>
+<div class="verbatim"><pre>
+from __future__ import generators
+</pre></div>
+</div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0255.html"
+        title="Simple Generators"
+        >PEP 0255, <em>Simple Generators</em></a>
+    <dd>The proposal for adding generators and the <tt class="keyword">yield</tt>
+          statement to Python.
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0342.html"
+        title="Coroutines via Enhanced Generators"
+        >PEP 0342, <em>Coroutines via Enhanced Generators</em></a>
+    <dd>The proposal that, among other generator enhancements,
+          proposed allowing <tt class="keyword">yield</tt> to appear inside a
+          <tt class="keyword">try</tt> ... <tt class="keyword">finally</tt> block.
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.7 the return statement"
+  href="return.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. simple statements"
+  href="simple.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.9 the raise statement"
+  href="raise.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="return.html">6.7 The return statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="simple.html">6. Simple statements</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="raise.html">6.9 The raise statement</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

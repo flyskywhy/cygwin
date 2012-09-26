@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-asynchat.html" />
+<link rel="prev" href="module-popen2.html" />
+<link rel="parent" href="ipc.html" />
+<link rel="next" href="asyncore-example.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>17.5 asyncore -- Asynchronous socket handler</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.4.2 flow Control Issues"
+  href="popen2-flow-control.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17. interprocess Communication and"
+  href="ipc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.5.1 asyncore Example basic"
+  href="asyncore-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="popen2-flow-control.html">17.4.2 Flow Control Issues</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ipc.html">17. Interprocess Communication and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="asyncore-example.html">17.5.1 asyncore Example basic</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0019500000000000000000">
+17.5 <tt class="module">asyncore</tt> --
+         Asynchronous socket handler</a>
+</h1>
+
+<p>
+<a name="module-asyncore"></a>
+
+<p>
+This module provides the basic infrastructure for writing asynchronous 
+socket service clients and servers.
+
+<p>
+There are only two ways to have a program on a single processor do 
+``more than one thing at a time.'' Multi-threaded programming is the 
+simplest and most popular way to do it, but there is another very 
+different technique, that lets you have nearly all the advantages of 
+multi-threading, without actually using multiple threads.  It's really 
+only practical if your program is largely I/O bound.  If your program 
+is processor bound, then pre-emptive scheduled threads are probably what 
+you really need. Network servers are rarely processor bound, however.
+
+<p>
+If your operating system supports the <tt class="cfunction">select()</tt> system call 
+in its I/O library (and nearly all do), then you can use it to juggle 
+multiple communication channels at once; doing other work while your 
+I/O is taking place in the ``background.''  Although this strategy can 
+seem strange and complex, especially at first, it is in many ways 
+easier to understand and control than multi-threaded programming.  
+The <tt class="module">asyncore</tt> module solves many of the difficult problems for 
+you, making the task of building sophisticated high-performance 
+network servers and clients a snap. For ``conversational'' applications
+and protocols the companion  <tt class="module"><a href="module-asynchat.html">asynchat</a></tt> module is invaluable.
+
+<p>
+The basic idea behind both modules is to create one or more network
+<em>channels</em>, instances of class <tt class="class">asyncore.dispatcher</tt> and
+<tt class="class">asynchat.async_chat</tt>. Creating the channels adds them to a global
+map, used by the <tt class="function">loop()</tt> function if you do not provide it
+with your own <var>map</var>.
+
+<p>
+Once the initial channel(s) is(are) created, calling the <tt class="function">loop()</tt>
+function activates channel service, which continues until the last
+channel (including any that have been added to the map during asynchronous
+service) is closed.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3747' xml:id='l2h-3747' class="function">loop</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>timeout</var><big>[</big><var>, use_poll</var><big>[</big><var>,
+                       map</var><big>[</big><var>,count</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Enter a polling loop that terminates after count passes or all open
+  channels have been closed.  All arguments are optional.  The <var>(</var>count)
+  parameter defaults to None, resulting in the loop terminating only
+  when all channels have been closed.  The <var>timeout</var> argument sets the
+  timeout parameter for the appropriate <tt class="function">select()</tt> or
+  <tt class="function">poll()</tt> call, measured in seconds; the default is 30 seconds.
+  The <var>use_poll</var> parameter, if true, indicates that <tt class="function">poll()</tt>
+  should be used in preference to <tt class="function">select()</tt> (the default is
+  <code>False</code>).  
+
+<p>
+The <var>map</var> parameter is a dictionary whose items are
+  the channels to watch.  As channels are closed they are deleted from their
+  map.  If <var>map</var> is omitted, a global map is used.
+  Channels (instances of <tt class="class">asyncore.dispatcher</tt>, <tt class="class">asynchat.async_chat</tt>
+  and subclasses thereof) can freely be mixed in the map.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3748' xml:id='l2h-3748' class="class">dispatcher</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  The <tt class="class">dispatcher</tt> class is a thin wrapper around a low-level socket object.
+  To make it more useful, it has a few methods for event-handling  which are called
+  from the asynchronous loop.  
+  Otherwise, it can be treated as a normal non-blocking socket object.
+
+<p>
+Two class attributes can be modified, to improve performance,
+  or possibly even to conserve memory.
+
+<p>
+<dl><dt><b><tt id='l2h-3749' xml:id='l2h-3749'>ac_in_buffer_size</tt></b></dt>
+<dd>
+  The asynchronous input buffer size (default <code>4096</code>).
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3750' xml:id='l2h-3750'>ac_out_buffer_size</tt></b></dt>
+<dd>
+  The asynchronous output buffer size (default <code>4096</code>).
+  </dd></dl>
+
+<p>
+The firing of low-level events at certain times or in certain connection
+  states tells the asynchronous loop that certain higher-level events have
+  taken place. For example, if we have asked for a socket to connect to
+  another host, we know that the connection has been made when the socket
+  becomes writable for the first time (at this point you know that you may
+  write to it with the expectation of success). The implied higher-level
+  events are:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Event</th>
+      <th class="left"  >Description</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><code>handle_connect()</code></td>
+        <td class="left"  >Implied by the first write event</td></tr>
+    <tr><td class="left"   valign="baseline"><code>handle_close()</code></td>
+        <td class="left"  >Implied by a read event with no data available</td></tr>
+    <tr><td class="left"   valign="baseline"><code>handle_accept()</code></td>
+        <td class="left"  >Implied by a read event on a listening socket</td></tr></tbody>
+</table></div>
+
+<p>
+During asynchronous processing, each mapped channel's <tt class="method">readable()</tt>
+  and <tt class="method">writable()</tt> methods are used to determine whether the channel's
+  socket should be added to the list of channels <tt class="cfunction">select()</tt>ed or
+  <tt class="cfunction">poll()</tt>ed for read and write events.
+
+<p>
+</dl>
+
+<p>
+Thus, the set of channel events is larger than the basic socket events.
+The full set of methods that can be overridden in your subclass follows:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3751' xml:id='l2h-3751' class="method">handle_read</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called when the asynchronous loop detects that a <tt class="method">read()</tt>
+  call on the channel's socket will succeed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3752' xml:id='l2h-3752' class="method">handle_write</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called when the asynchronous loop detects that a writable socket
+  can be written.  
+  Often this method will implement the necessary buffering for 
+  performance.  For example:
+
+<p>
+<div class="verbatim"><pre>
+def handle_write(self):
+    sent = self.send(self.buffer)
+    self.buffer = self.buffer[sent:]
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3753' xml:id='l2h-3753' class="method">handle_expt</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called when there is out of band (OOB) data for a socket 
+  connection.  This will almost never happen, as OOB is 
+  tenuously supported and rarely used.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3754' xml:id='l2h-3754' class="method">handle_connect</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called when the active opener's socket actually makes a connection.
+  Might send a ``welcome'' banner, or initiate a protocol
+  negotiation with the remote endpoint, for example.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3755' xml:id='l2h-3755' class="method">handle_close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called when the socket is closed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3756' xml:id='l2h-3756' class="method">handle_error</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called when an exception is raised and not otherwise handled.  The default
+  version prints a condensed traceback.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3757' xml:id='l2h-3757' class="method">handle_accept</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called on listening channels (passive openers) when a  
+  connection can be established with a new remote endpoint that
+  has issued a <tt class="method">connect()</tt> call for the local endpoint.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3758' xml:id='l2h-3758' class="method">readable</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called each time around the asynchronous loop to determine whether a
+  channel's socket should be added to the list on which read events can
+  occur.  The default method simply returns <code>True</code>, 
+  indicating that by default, all channels will be interested in
+  read events.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3759' xml:id='l2h-3759' class="method">writable</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Called each time around the asynchronous loop to determine whether a
+  channel's socket should be added to the list on which write events can
+  occur.  The default method simply returns <code>True</code>, 
+  indicating that by default, all channels will be interested in
+  write events.
+</dl>
+
+<p>
+In addition, each channel delegates or extends many of the socket methods.
+Most of these are nearly identical to their socket partners.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3760' xml:id='l2h-3760' class="method">create_socket</tt></b>(</nobr></td>
+  <td><var>family, type</var>)</td></tr></table></dt>
+<dd>
+  This is identical to the creation of a normal socket, and 
+  will use the same options for creation.  Refer to the
+  <tt class="module"><a href="module-socket.html">socket</a></tt> documentation for information on creating
+  sockets.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3761' xml:id='l2h-3761' class="method">connect</tt></b>(</nobr></td>
+  <td><var>address</var>)</td></tr></table></dt>
+<dd>
+  As with the normal socket object, <var>address</var> is a 
+  tuple with the first element the host to connect to, and the 
+  second the port number.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3762' xml:id='l2h-3762' class="method">send</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+  Send <var>data</var> to the remote end-point of the socket.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3763' xml:id='l2h-3763' class="method">recv</tt></b>(</nobr></td>
+  <td><var>buffer_size</var>)</td></tr></table></dt>
+<dd>
+  Read at most <var>buffer_size</var> bytes from the socket's remote end-point.
+  An empty string implies that the channel has been closed from the other
+  end.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3764' xml:id='l2h-3764' class="method">listen</tt></b>(</nobr></td>
+  <td><var>backlog</var>)</td></tr></table></dt>
+<dd>
+  Listen for connections made to the socket.  The <var>backlog</var>
+  argument specifies the maximum number of queued connections
+  and should be at least 1; the maximum value is
+  system-dependent (usually 5).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3765' xml:id='l2h-3765' class="method">bind</tt></b>(</nobr></td>
+  <td><var>address</var>)</td></tr></table></dt>
+<dd>
+  Bind the socket to <var>address</var>.  The socket must not already be
+  bound.  (The format of <var>address</var> depends on the address family
+  -- see above.)  To mark the socket as re-usable (setting the
+  <tt class="constant">SO_REUSEADDR</tt> option), call the <tt class="class">dispatcher</tt>
+  object's <tt class="method">set_reuse_addr()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3766' xml:id='l2h-3766' class="method">accept</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Accept a connection.  The socket must be bound to an address
+  and listening for connections.  The return value is a pair
+  <code>(<var>conn</var>, <var>address</var>)</code> where <var>conn</var> is a
+  <em>new</em> socket object usable to send and receive data on
+  the connection, and <var>address</var> is the address bound to the
+  socket on the other end of the connection.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3767' xml:id='l2h-3767' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Close the socket.  All future operations on the socket object
+  will fail.  The remote end-point will receive no more data (after
+  queued data is flushed).  Sockets are automatically closed
+  when they are garbage-collected.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="asyncore-example.html">17.5.1 asyncore Example basic HTTP client</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.4.2 flow Control Issues"
+  href="popen2-flow-control.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17. interprocess Communication and"
+  href="ipc.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.5.1 asyncore Example basic"
+  href="asyncore-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="popen2-flow-control.html">17.4.2 Flow Control Issues</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ipc.html">17. Interprocess Communication and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="asyncore-example.html">17.5.1 asyncore Example basic</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

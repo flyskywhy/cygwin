@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="inspect-classes-functions.html" />
+<link rel="parent" href="module-inspect.html" />
+<link rel="next" href="module-site.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>26.10.4 The interpreter stack </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.10.3 classes and functions"
+  href="inspect-classes-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26.10 inspect  "
+  href="module-inspect.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.11 site  "
+  href="module-site.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="inspect-classes-functions.html">26.10.3 Classes and functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-inspect.html">26.10 inspect  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-site.html">26.11 site  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00281040000000000000000"></a><a name="inspect-stack"></a>
+<br>
+26.10.4 The interpreter stack
+            
+</h2>
+
+<p>
+When the following functions return ``frame records,'' each record
+is a tuple of six items: the frame object, the filename,
+the line number of the current line, the function name, a list of
+lines of context from the source code, and the index of the current
+line within that list.
+
+<p>
+<div class="warning"><b class="label">Warning:</b>
+
+Keeping references to frame objects, as found in
+the first element of the frame records these functions return, can
+cause your program to create reference cycles.  Once a reference cycle
+has been created, the lifespan of all objects which can be accessed
+from the objects which form the cycle can become much longer even if
+Python's optional cycle detector is enabled.  If such cycles must be
+created, it is important to ensure they are explicitly broken to avoid
+the delayed destruction of objects and increased memory consumption
+which occurs.
+
+<p>
+Though the cycle detector will catch these, destruction of the frames
+(and local variables) can be made deterministic by removing the cycle
+in a <tt class="keyword">finally</tt> clause.  This is also important if the cycle
+detector was disabled when Python was compiled or using
+<tt class="function"><tt class="module"><a href="module-gc.html">gc</a></tt>.disable()</tt>.  For example:
+
+<p>
+<div class="verbatim"><pre>
+def handle_stackframe_without_leak():
+    frame = inspect.currentframe()
+    try:
+        # do something with the frame
+    finally:
+        del frame
+</pre></div>
+</div>
+
+<p>
+The optional <var>context</var> argument supported by most of these
+functions specifies the number of lines of context to return, which
+are centered around the current line.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5287' xml:id='l2h-5287' class="function">getframeinfo</tt></b>(</nobr></td>
+  <td><var>frame</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Get information about a frame or traceback object.  A 5-tuple
+  is returned, the last five elements of the frame's frame record.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5288' xml:id='l2h-5288' class="function">getouterframes</tt></b>(</nobr></td>
+  <td><var>frame</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Get a list of frame records for a frame and all outer frames.  These
+  frames represent the calls that lead to the creation of <var>frame</var>.
+  The first entry in the returned list represents <var>frame</var>; the
+  last entry represents the outermost call on <var>frame</var>'s stack.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5289' xml:id='l2h-5289' class="function">getinnerframes</tt></b>(</nobr></td>
+  <td><var>traceback</var><big>[</big><var>, context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Get a list of frame records for a traceback's frame and all inner
+  frames.  These frames represent calls made as a consequence of
+  <var>frame</var>.  The first entry in the list represents
+  <var>traceback</var>; the last entry represents where the exception was
+  raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5290' xml:id='l2h-5290' class="function">currentframe</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the frame object for the caller's stack frame.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5291' xml:id='l2h-5291' class="function">stack</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return a list of frame records for the caller's stack.  The first
+  entry in the returned list represents the caller; the last entry
+  represents the outermost call on the stack.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5292' xml:id='l2h-5292' class="function">trace</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>context</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return a list of frame records for the stack between the current
+  frame and the frame in which an exception currently being handled
+  was raised in.  The first entry in the list represents the caller;
+  the last entry represents where the exception was raised.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.10.3 classes and functions"
+  href="inspect-classes-functions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26.10 inspect  "
+  href="module-inspect.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.11 site  "
+  href="module-site.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="inspect-classes-functions.html">26.10.3 Classes and functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-inspect.html">26.10 inspect  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-site.html">26.11 site  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

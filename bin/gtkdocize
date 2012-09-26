@@ -1,0 +1,85 @@
+#!/bin/sh
+
+progname=`echo "$0" | sed 's%^.*/%%'`
+
+PROGRAM=gtkdocize
+PACKAGE=gtk-doc
+VERSION=1.5
+
+prefix=/usr
+datarootdir=@datarootdir@
+datadir=/usr/share
+
+# options
+docdir=.
+copy=no
+
+while test $# -gt 0; do
+  case "$1" in
+  --help)
+    echo "usage: $progname [ --copy ] [ --docdir DIR ]" 1>&2
+    exit 1 ;;
+  --version)
+    echo "$PROGRAM ($PACKAGE) $VERSION"
+    exit 0 ;;
+  --copy)
+    copy=yes
+    shift ;;
+  --docdir)
+    shift
+    docdir="$1"
+    shift ;;
+  -*)
+    echo "$progname: unrecognised option '$1'" 1>&2
+    echo "usage: $progname [ --copy ] [ --docdir DIR ]" 1>&2
+    exit 1 ;;
+  *)
+    echo "$progname: too many arguments" 1>&2
+    echo "usage: $progname [ --copy ] [ --docdir DIR ]" 1>&2
+    exit 1 ;;
+  esac
+done
+
+if test -f configure.ac; then
+  configure=configure.ac
+elif test -f configure.in; then
+  configure=configure.in
+else
+  echo "$progname: neither configure.ac nor configure.in exist" 1>&2
+  exit 1
+fi
+
+if grep '^GTK_DOC_CHECK' $configure >/dev/null 2>&1; then
+  :
+else
+  echo "$progname: GTK_DOC_CHECK not called in $configure" 1>&2
+  exit 1
+fi
+
+# If the AC_CONFIG_MACRO_DIR() macro is used, copy gtk-doc.m4 from our
+# prefix to that directory.  This makes sure that the M4 macro used
+# matches the the automake fragment.
+# If AC_CONFIG_MACRO_DIR is not used, the macro won't be copied, and
+# the correct flags must be passed to aclocal for it to find the macro.
+m4dir=`cat "$configure" | grep '^AC_CONFIG_MACRO_DIR' | sed -n -e 's/AC_CONFIG_MACRO_DIR(\([^()]*\))/\1/p' | sed -e 's/^\[\(.*\)\]$/\1/' | sed -e 1q`
+if test -n "$m4dir"; then
+  rm -f $m4dir/gtk-doc.m4
+  if test "$copy" = yes; then
+    cp -f $datadir/aclocal/gtk-doc.m4 $m4dir/ ||
+      exit 1
+  else
+    ln -sf $datadir/aclocal/gtk-doc.m4 $m4dir/ || 
+      cp -f $datadir/aclocal/gtk-doc.m4 $m4dir/ ||
+      exit 1
+  fi
+fi
+
+rm -f $docdir/gtk-doc.make
+if test "$copy" = yes; then
+  cp -f $datadir/gtk-doc/data/gtk-doc.make $docdir/ ||
+    exit 1
+else
+  ln -sf $datadir/gtk-doc/data/gtk-doc.make $docdir/ ||
+    cp -f $datadir/gtk-doc/data/gtk-doc.make $docdir/ ||
+    exit 1
+fi

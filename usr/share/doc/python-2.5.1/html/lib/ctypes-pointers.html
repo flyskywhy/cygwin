@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-type-conversions.html" />
+<link rel="prev" href="ctypes-arrays.html" />
+<link rel="parent" href="ctypes-ctypes-tutorial.html" />
+<link rel="next" href="ctypes-type-conversions.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.1.14 Pointers</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.13 Arrays"
+  href="ctypes-arrays.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.15 type conversions"
+  href="ctypes-type-conversions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-arrays.html">14.14.1.13 Arrays</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-type-conversions.html">14.14.1.15 Type conversions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION001614114000000000000000"></a><a name="ctypes-pointers"></a>
+<br>
+14.14.1.14 Pointers
+</h3>
+
+<p>
+Pointer instances are created by calling the <code>pointer</code> function on a
+<code>ctypes</code> type:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; i = c_int(42)
+&gt;&gt;&gt; pi = pointer(i)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Pointer instances have a <code>contents</code> attribute which returns the
+object to which the pointer points, the <code>i</code> object above:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; pi.contents
+c_long(42)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Note that <code>ctypes</code> does not have OOR (original object return), it
+constructs a new, equivalent object each time you retrieve an
+attribute:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; pi.contents is i
+False
+&gt;&gt;&gt; pi.contents is pi.contents
+False
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Assigning another <tt class="class">c_int</tt> instance to the pointer's contents
+attribute would cause the pointer to point to the memory location
+where this is stored:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; i = c_int(99)
+&gt;&gt;&gt; pi.contents = i
+&gt;&gt;&gt; pi.contents
+c_long(99)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Pointer instances can also be indexed with integers:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; pi[0]
+99
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Assigning to an integer index changes the pointed to value:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print i
+c_long(99)
+&gt;&gt;&gt; pi[0] = 22
+&gt;&gt;&gt; print i
+c_long(22)
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+It is also possible to use indexes different from 0, but you must know
+what you're doing, just as in C: You can access or change arbitrary
+memory locations. Generally you only use this feature if you receive a
+pointer from a C function, and you <em>know</em> that the pointer actually
+points to an array instead of a single item.
+
+<p>
+Behind the scenes, the <code>pointer</code> function does more than simply
+create pointer instances, it has to create pointer <em>types</em> first.
+This is done with the <code>POINTER</code> function, which accepts any
+<code>ctypes</code> type, and returns a new type:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; PI = POINTER(c_int)
+&gt;&gt;&gt; PI
+&lt;class 'ctypes.LP_c_long'&gt;
+&gt;&gt;&gt; PI(42)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+TypeError: expected c_long instead of int
+&gt;&gt;&gt; PI(c_int(42))
+&lt;ctypes.LP_c_long object at 0x...&gt;
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+Calling the pointer type without an argument creates a <code>NULL</code>
+pointer.  <code>NULL</code> pointers have a <code>False</code> boolean value:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; null_ptr = POINTER(c_int)()
+&gt;&gt;&gt; print bool(null_ptr)
+False
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+<code>ctypes</code> checks for <code>NULL</code> when dereferencing pointers (but
+dereferencing non-<code>NULL</code> pointers would crash Python):
+<div class="verbatim"><pre>
+&gt;&gt;&gt; null_ptr[0]
+Traceback (most recent call last):
+    ....
+ValueError: NULL pointer access
+&gt;&gt;&gt;
+
+&gt;&gt;&gt; null_ptr[0] = 1234
+Traceback (most recent call last):
+    ....
+ValueError: NULL pointer access
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.1.13 Arrays"
+  href="ctypes-arrays.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.1 ctypes tutorial"
+  href="ctypes-ctypes-tutorial.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.1.15 type conversions"
+  href="ctypes-type-conversions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-arrays.html">14.14.1.13 Arrays</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-tutorial.html">14.14.1 ctypes tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-type-conversions.html">14.14.1.15 Type conversions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

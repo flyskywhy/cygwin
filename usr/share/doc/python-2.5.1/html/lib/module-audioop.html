@@ -1,0 +1,490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-imageop.html" />
+<link rel="prev" href="mmedia.html" />
+<link rel="parent" href="mmedia.html" />
+<link rel="next" href="module-imageop.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>19.1 audioop -- Manipulate raw audio data</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.2 imageop  "
+  href="module-imageop.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-imageop.html">19.2 imageop  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0021100000000000000000">
+19.1 <tt class="module">audioop</tt> --
+         Manipulate raw audio data</a>
+</h1>
+
+<p>
+<a name="module-audioop"></a>
+
+<p>
+The <tt class="module">audioop</tt> module contains some useful operations on sound
+fragments.  It operates on sound fragments consisting of signed
+integer samples 8, 16 or 32 bits wide, stored in Python strings.  This
+is the same format as used by the <tt class="module"><a href="module-al.html">al</a></tt> and <tt class="module"><a href="module-sunaudiodev.html">sunaudiodev</a></tt>
+modules.  All scalar items are integers, unless specified otherwise.
+
+<p>
+This module provides support for a-LAW, u-LAW and Intel/DVI ADPCM encodings.
+<a id='l2h-4515' xml:id='l2h-4515'></a>
+
+<p>
+A few of the more complicated operations only take 16-bit samples,
+otherwise the sample size (in bytes) is always a parameter of the
+operation.
+
+<p>
+The module defines the following variables and functions:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4489' xml:id='l2h-4489' class="exception">error</tt></b></dt>
+<dd>
+This exception is raised on all errors, such as unknown number of bytes
+per sample, etc.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4490' xml:id='l2h-4490' class="function">add</tt></b>(</nobr></td>
+  <td><var>fragment1, fragment2, width</var>)</td></tr></table></dt>
+<dd>
+Return a fragment which is the addition of the two samples passed as
+parameters.  <var>width</var> is the sample width in bytes, either
+<code>1</code>, <code>2</code> or <code>4</code>.  Both fragments should have the same
+length.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4491' xml:id='l2h-4491' class="function">adpcm2lin</tt></b>(</nobr></td>
+  <td><var>adpcmfragment, width, state</var>)</td></tr></table></dt>
+<dd>
+Decode an Intel/DVI ADPCM coded fragment to a linear fragment.  See
+the description of <tt class="function">lin2adpcm()</tt> for details on ADPCM coding.
+Return a tuple <code>(<var>sample</var>, <var>newstate</var>)</code> where the sample
+has the width specified in <var>width</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4492' xml:id='l2h-4492' class="function">alaw2lin</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Convert sound fragments in a-LAW encoding to linearly encoded sound
+fragments.  a-LAW encoding always uses 8 bits samples, so <var>width</var>
+refers only to the sample width of the output fragment here.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4493' xml:id='l2h-4493' class="function">avg</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Return the average over all samples in the fragment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4494' xml:id='l2h-4494' class="function">avgpp</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Return the average peak-peak value over all samples in the fragment.
+No filtering is done, so the usefulness of this routine is
+questionable.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4495' xml:id='l2h-4495' class="function">bias</tt></b>(</nobr></td>
+  <td><var>fragment, width, bias</var>)</td></tr></table></dt>
+<dd>
+Return a fragment that is the original fragment with a bias added to
+each sample.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4496' xml:id='l2h-4496' class="function">cross</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Return the number of zero crossings in the fragment passed as an
+argument.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4497' xml:id='l2h-4497' class="function">findfactor</tt></b>(</nobr></td>
+  <td><var>fragment, reference</var>)</td></tr></table></dt>
+<dd>
+Return a factor <var>F</var> such that
+<code>rms(add(<var>fragment</var>, mul(<var>reference</var>, -<var>F</var>)))</code> is
+minimal, i.e., return the factor with which you should multiply
+<var>reference</var> to make it match as well as possible to
+<var>fragment</var>.  The fragments should both contain 2-byte samples.
+
+<p>
+The time taken by this routine is proportional to
+<code>len(<var>fragment</var>)</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4498' xml:id='l2h-4498' class="function">findfit</tt></b>(</nobr></td>
+  <td><var>fragment, reference</var>)</td></tr></table></dt>
+<dd>
+Try to match <var>reference</var> as well as possible to a portion of
+<var>fragment</var> (which should be the longer fragment).  This is
+(conceptually) done by taking slices out of <var>fragment</var>, using
+<tt class="function">findfactor()</tt> to compute the best match, and minimizing the
+result.  The fragments should both contain 2-byte samples.  Return a
+tuple <code>(<var>offset</var>, <var>factor</var>)</code> where <var>offset</var> is the
+(integer) offset into <var>fragment</var> where the optimal match started
+and <var>factor</var> is the (floating-point) factor as per
+<tt class="function">findfactor()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4499' xml:id='l2h-4499' class="function">findmax</tt></b>(</nobr></td>
+  <td><var>fragment, length</var>)</td></tr></table></dt>
+<dd>
+Search <var>fragment</var> for a slice of length <var>length</var> samples (not
+bytes!) with maximum energy, i.e., return <var>i</var> for which
+<code>rms(fragment[i*2:(i+length)*2])</code> is maximal.  The fragments
+should both contain 2-byte samples.
+
+<p>
+The routine takes time proportional to <code>len(<var>fragment</var>)</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4500' xml:id='l2h-4500' class="function">getsample</tt></b>(</nobr></td>
+  <td><var>fragment, width, index</var>)</td></tr></table></dt>
+<dd>
+Return the value of sample <var>index</var> from the fragment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4501' xml:id='l2h-4501' class="function">lin2adpcm</tt></b>(</nobr></td>
+  <td><var>fragment, width, state</var>)</td></tr></table></dt>
+<dd>
+Convert samples to 4 bit Intel/DVI ADPCM encoding.  ADPCM coding is an
+adaptive coding scheme, whereby each 4 bit number is the difference
+between one sample and the next, divided by a (varying) step.  The
+Intel/DVI ADPCM algorithm has been selected for use by the IMA, so it
+may well become a standard.
+
+<p>
+<var>state</var> is a tuple containing the state of the coder.  The coder
+returns a tuple <code>(<var>adpcmfrag</var>, <var>newstate</var>)</code>, and the
+<var>newstate</var> should be passed to the next call of
+<tt class="function">lin2adpcm()</tt>.  In the initial call, <code>None</code> can be
+passed as the state.  <var>adpcmfrag</var> is the ADPCM coded fragment
+packed 2 4-bit values per byte.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4502' xml:id='l2h-4502' class="function">lin2alaw</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Convert samples in the audio fragment to a-LAW encoding and return
+this as a Python string.  a-LAW is an audio encoding format whereby
+you get a dynamic range of about 13 bits using only 8 bit samples.  It
+is used by the Sun audio hardware, among others.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4503' xml:id='l2h-4503' class="function">lin2lin</tt></b>(</nobr></td>
+  <td><var>fragment, width, newwidth</var>)</td></tr></table></dt>
+<dd>
+Convert samples between 1-, 2- and 4-byte formats.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4504' xml:id='l2h-4504' class="function">lin2ulaw</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Convert samples in the audio fragment to u-LAW encoding and return
+this as a Python string.  u-LAW is an audio encoding format whereby
+you get a dynamic range of about 14 bits using only 8 bit samples.  It
+is used by the Sun audio hardware, among others.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4505' xml:id='l2h-4505' class="function">minmax</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Return a tuple consisting of the minimum and maximum values of all
+samples in the sound fragment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4506' xml:id='l2h-4506' class="function">max</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Return the maximum of the <em>absolute value</em> of all samples in a
+fragment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4507' xml:id='l2h-4507' class="function">maxpp</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Return the maximum peak-peak value in the sound fragment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4508' xml:id='l2h-4508' class="function">mul</tt></b>(</nobr></td>
+  <td><var>fragment, width, factor</var>)</td></tr></table></dt>
+<dd>
+Return a fragment that has all samples in the original fragment
+multiplied by the floating-point value <var>factor</var>.  Overflow is
+silently ignored.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4509' xml:id='l2h-4509' class="function">ratecv</tt></b>(</nobr></td>
+  <td><var>fragment, width, nchannels, inrate, outrate,
+                         state</var><big>[</big><var>, weightA</var><big>[</big><var>, weightB</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Convert the frame rate of the input fragment.
+
+<p>
+<var>state</var> is a tuple containing the state of the converter.  The
+converter returns a tuple <code>(<var>newfragment</var>, <var>newstate</var>)</code>,
+and <var>newstate</var> should be passed to the next call of
+<tt class="function">ratecv()</tt>.  The initial call should pass <code>None</code>
+as the state.
+
+<p>
+The <var>weightA</var> and <var>weightB</var> arguments are parameters for a
+simple digital filter and default to <code>1</code> and <code>0</code> respectively.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4510' xml:id='l2h-4510' class="function">reverse</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Reverse the samples in a fragment and returns the modified fragment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4511' xml:id='l2h-4511' class="function">rms</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Return the root-mean-square of the fragment, i.e.
+<br><p></p>
+<div align="CENTER" class="mathdisplay">
+<!-- MATH
+ \begin{displaymath}
+\catcode`_=8
+\sqrt{\frac{\sum{{S_{i}}^{2}}}{n}}
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="61" HEIGHT="55" BORDER="0"
+ SRC="img3.png"
+ ALT="\begin{displaymath}
+\catcode\lq _=8
+\sqrt{\frac{\sum{{S_{i}}^{2}}}{n}}
+\end{displaymath}">
+</div>
+<br clear="ALL">
+<p></p>
+This is a measure of the power in an audio signal.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4512' xml:id='l2h-4512' class="function">tomono</tt></b>(</nobr></td>
+  <td><var>fragment, width, lfactor, rfactor</var>)</td></tr></table></dt>
+<dd> 
+Convert a stereo fragment to a mono fragment.  The left channel is
+multiplied by <var>lfactor</var> and the right channel by <var>rfactor</var>
+before adding the two channels to give a mono signal.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4513' xml:id='l2h-4513' class="function">tostereo</tt></b>(</nobr></td>
+  <td><var>fragment, width, lfactor, rfactor</var>)</td></tr></table></dt>
+<dd>
+Generate a stereo fragment from a mono fragment.  Each pair of samples
+in the stereo fragment are computed from the mono sample, whereby left
+channel samples are multiplied by <var>lfactor</var> and right channel
+samples by <var>rfactor</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4514' xml:id='l2h-4514' class="function">ulaw2lin</tt></b>(</nobr></td>
+  <td><var>fragment, width</var>)</td></tr></table></dt>
+<dd>
+Convert sound fragments in u-LAW encoding to linearly encoded sound
+fragments.  u-LAW encoding always uses 8 bits samples, so <var>width</var>
+refers only to the sample width of the output fragment here.
+</dl>
+
+<p>
+Note that operations such as <tt class="function">mul()</tt> or <tt class="function">max()</tt> make
+no distinction between mono and stereo fragments, i.e. all samples
+are treated equal.  If this is a problem the stereo fragment should be
+split into two mono fragments first and recombined later.  Here is an
+example of how to do that:
+
+<p>
+<div class="verbatim"><pre>
+def mul_stereo(sample, width, lfactor, rfactor):
+    lsample = audioop.tomono(sample, width, 1, 0)
+    rsample = audioop.tomono(sample, width, 0, 1)
+    lsample = audioop.mul(sample, width, lfactor)
+    rsample = audioop.mul(sample, width, rfactor)
+    lsample = audioop.tostereo(lsample, width, 1, 0)
+    rsample = audioop.tostereo(rsample, width, 0, 1)
+    return audioop.add(lsample, rsample, width)
+</pre></div>
+
+<p>
+If you use the ADPCM coder to build network packets and you want your
+protocol to be stateless (i.e. to be able to tolerate packet loss)
+you should not only transmit the data but also the state.  Note that
+you should send the <var>initial</var> state (the one you passed to
+<tt class="function">lin2adpcm()</tt>) along to the decoder, not the final state (as
+returned by the coder).  If you want to use <tt class="function">struct.struct()</tt>
+to store the state in binary you can code the first element (the
+predicted value) in 16 bits and the second (the delta index) in 8.
+
+<p>
+The ADPCM coders have never been tried against other ADPCM coders,
+only against themselves.  It could well be that I misinterpreted the
+standards in which case they will not be interoperable with the
+respective standards.
+
+<p>
+The <tt class="function">find*()</tt> routines might look a bit funny at first sight.
+They are primarily meant to do echo cancellation.  A reasonably
+fast way to do this is to pick the most energetic piece of the output
+sample, locate that in the input sample and subtract the whole output
+sample from the input sample:
+
+<p>
+<div class="verbatim"><pre>
+def echocancel(outputdata, inputdata):
+    pos = audioop.findmax(outputdata, 800)    # one tenth second
+    out_test = outputdata[pos*2:]
+    in_test = inputdata[pos*2:]
+    ipos, factor = audioop.findfit(in_test, out_test)
+    # Optional (for better cancellation):
+    # factor = audioop.findfactor(in_test[ipos*2:ipos*2+len(out_test)], 
+    #              out_test)
+    prefill = '\0'*(pos+ipos)*2
+    postfill = '\0'*(len(inputdata)-len(prefill)-len(outputdata))
+    outputdata = prefill + audioop.mul(outputdata,2,-factor) + postfill
+    return audioop.add(inputdata, outputdata, 2)
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="19. multimedia Services"
+  href="mmedia.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="19.2 imageop  "
+  href="module-imageop.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mmedia.html">19. Multimedia Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-imageop.html">19.2 imageop  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

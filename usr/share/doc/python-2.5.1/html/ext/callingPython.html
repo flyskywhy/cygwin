@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="parseTuple.html" />
+<link rel="prev" href="compilation.html" />
+<link rel="parent" href="intro.html" />
+<link rel="next" href="parseTuple.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.6 Calling Python Functions from C
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.5 compilation and Linkage"
+  href="compilation.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.7 extracting Parameters in"
+  href="parseTuple.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="compilation.html">1.5 Compilation and Linkage</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="parseTuple.html">1.7 Extracting Parameters in</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION003600000000000000000"></a><a name="callingPython"></a>
+<br>
+1.6 Calling Python Functions from C
+         
+</h1>
+
+<p>
+So far we have concentrated on making C functions callable from
+Python.  The reverse is also useful: calling Python functions from C.
+This is especially the case for libraries that support so-called
+``callback'' functions.  If a C interface makes use of callbacks, the
+equivalent Python often needs to provide a callback mechanism to the
+Python programmer; the implementation will require calling the Python
+callback functions from a C callback.  Other uses are also imaginable.
+
+<p>
+Fortunately, the Python interpreter is easily called recursively, and
+there is a standard interface to call a Python function.  (I won't
+dwell on how to call the Python parser with a particular string as
+input -- if you're interested, have a look at the implementation of
+the <b class="programopt">-c</b> command line option in <span class="file">Python/pythonmain.c</span>
+from the Python source code.)
+
+<p>
+Calling a Python function is easy.  First, the Python program must
+somehow pass you the Python function object.  You should provide a
+function (or some other interface) to do this.  When this function is
+called, save a pointer to the Python function object (be careful to
+<tt class="cfunction">Py_INCREF()</tt> it!) in a global variable -- or wherever you
+see fit. For example, the following function might be part of a module
+definition:
+
+<p>
+<div class="verbatim"><pre>
+static PyObject *my_callback = NULL;
+
+static PyObject *
+my_set_callback(PyObject *dummy, PyObject *args)
+{
+    PyObject *result = NULL;
+    PyObject *temp;
+
+    if (PyArg_ParseTuple(args, "O:set_callback", &amp;temp)) {
+        if (!PyCallable_Check(temp)) {
+            PyErr_SetString(PyExc_TypeError, "parameter must be callable");
+            return NULL;
+        }
+        Py_XINCREF(temp);         /* Add a reference to new callback */
+        Py_XDECREF(my_callback);  /* Dispose of previous callback */
+        my_callback = temp;       /* Remember new callback */
+        /* Boilerplate to return "None" */
+        Py_INCREF(Py_None);
+        result = Py_None;
+    }
+    return result;
+}
+</pre></div>
+
+<p>
+This function must be registered with the interpreter using the
+<tt class="constant">METH_VARARGS</tt> flag; this is described in section
+<a href="methodTable.html#methodTable">1.4</a>, ``The Module's Method Table and Initialization
+Function.''  The <tt class="cfunction">PyArg_ParseTuple()</tt> function and its
+arguments are documented in section&nbsp;<a href="parseTuple.html#parseTuple">1.7</a>, ``Extracting
+Parameters in Extension Functions.''
+
+<p>
+The macros <tt class="cfunction">Py_XINCREF()</tt> and <tt class="cfunction">Py_XDECREF()</tt>
+increment/decrement the reference count of an object and are safe in
+the presence of <tt class="constant">NULL</tt> pointers (but note that <var>temp</var> will not be 
+<tt class="constant">NULL</tt> in this context).  More info on them in
+section&nbsp;<a href="refcounts.html#refcounts">1.10</a>, ``Reference Counts.''
+
+<p>
+Later, when it is time to call the function, you call the C function
+<tt class="cfunction">PyEval_CallObject()</tt>.<a id='l2h-1' xml:id='l2h-1'></a>  This
+function has two arguments, both pointers to arbitrary Python objects:
+the Python function, and the argument list.  The argument list must
+always be a tuple object, whose length is the number of arguments.  To
+call the Python function with no arguments, pass an empty tuple; to
+call it with one argument, pass a singleton tuple.
+<tt class="cfunction">Py_BuildValue()</tt> returns a tuple when its format string
+consists of zero or more format codes between parentheses.  For
+example:
+
+<p>
+<div class="verbatim"><pre>
+    int arg;
+    PyObject *arglist;
+    PyObject *result;
+    ...
+    arg = 123;
+    ...
+    /* Time to call the callback */
+    arglist = Py_BuildValue("(i)", arg);
+    result = PyEval_CallObject(my_callback, arglist);
+    Py_DECREF(arglist);
+</pre></div>
+
+<p>
+<tt class="cfunction">PyEval_CallObject()</tt> returns a Python object pointer: this is
+the return value of the Python function.  <tt class="cfunction">PyEval_CallObject()</tt> is
+``reference-count-neutral'' with respect to its arguments.  In the
+example a new tuple was created to serve as the argument list, which
+is <tt class="cfunction">Py_DECREF()</tt>-ed immediately after the call.
+
+<p>
+The return value of <tt class="cfunction">PyEval_CallObject()</tt> is ``new'': either it
+is a brand new object, or it is an existing object whose reference
+count has been incremented.  So, unless you want to save it in a
+global variable, you should somehow <tt class="cfunction">Py_DECREF()</tt> the result,
+even (especially!) if you are not interested in its value.
+
+<p>
+Before you do this, however, it is important to check that the return
+value isn't <tt class="constant">NULL</tt>.  If it is, the Python function terminated by
+raising an exception.  If the C code that called
+<tt class="cfunction">PyEval_CallObject()</tt> is called from Python, it should now
+return an error indication to its Python caller, so the interpreter
+can print a stack trace, or the calling Python code can handle the
+exception.  If this is not possible or desirable, the exception should
+be cleared by calling <tt class="cfunction">PyErr_Clear()</tt>.  For example:
+
+<p>
+<div class="verbatim"><pre>
+    if (result == NULL)
+        return NULL; /* Pass error back */
+    ...use result...
+    Py_DECREF(result);
+</pre></div>
+
+<p>
+Depending on the desired interface to the Python callback function,
+you may also have to provide an argument list to
+<tt class="cfunction">PyEval_CallObject()</tt>.  In some cases the argument list is
+also provided by the Python program, through the same interface that
+specified the callback function.  It can then be saved and used in the
+same manner as the function object.  In other cases, you may have to
+construct a new tuple to pass as the argument list.  The simplest way
+to do this is to call <tt class="cfunction">Py_BuildValue()</tt>.  For example, if
+you want to pass an integral event code, you might use the following
+code:
+
+<p>
+<div class="verbatim"><pre>
+    PyObject *arglist;
+    ...
+    arglist = Py_BuildValue("(l)", eventcode);
+    result = PyEval_CallObject(my_callback, arglist);
+    Py_DECREF(arglist);
+    if (result == NULL)
+        return NULL; /* Pass error back */
+    /* Here maybe use the result */
+    Py_DECREF(result);
+</pre></div>
+
+<p>
+Note the placement of "<tt class="samp">Py_DECREF(arglist)</tt>" immediately after the
+call, before the error check!  Also note that strictly spoken this
+code is not complete: <tt class="cfunction">Py_BuildValue()</tt> may run out of
+memory, and this should be checked.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.5 compilation and Linkage"
+  href="compilation.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1. extending Python with"
+  href="intro.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.7 extracting Parameters in"
+  href="parseTuple.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="compilation.html">1.5 Compilation and Linkage</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="intro.html">1. Extending Python with</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="parseTuple.html">1.7 Extracting Parameters in</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

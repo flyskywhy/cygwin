@@ -1,0 +1,345 @@
+\index{installation@{installation}} First go to the \href{http://www.doxygen.org/download.html}{\tt download} page  ({\tt http://www.doxygen.org/download.html}) to get the latest distribution, if you did not have it already.
+
+This section is divided into the following sections: \begin{itemize}
+\item \hyperlink{install_install_src_unix}{Compiling from source on Unix} \item \hyperlink{install_install_bin_unix}{Installing the binaries on Unix} \item \hyperlink{install_unix_problems}{Known compilation problems for Unix} \item \hyperlink{install_install_src_windows}{Compiling from source on Windows} \item \hyperlink{install_install_bin_windows}{Installing the binaries on Windows} \item \hyperlink{install_build_tools}{Tools used to develop doxygen} \end{itemize}
+\hypertarget{install_install_src_unix}{}\section{Compiling from source on Unix}\label{install_install_src_unix}
+If you downloaded the source distribution, you need at least the following to build the executable: \begin{itemize}
+\item The \href{ftp://prep.ai.mit.edu/pub/gnu/}{\tt GNU} tools flex, bison and GNU make, and strip \index{flex@{flex}} \index{bison@{bison}} \index{make@{make}} \index{strip@{strip}} \item In order to generate a Makefile for your platform, you need \href{http://www.perl.com/}{\tt perl}  (see {\tt http://www.perl.com/}). \index{perl@{perl}} \item The configure script assume the availibility of standard Unix tools such as sed, date, find, uname, mv, cp, cat, echo, tr, cd, and rm. \end{itemize}
+
+
+To take full advantage of doxygen's features the following additional tools should be installed.
+
+\begin{itemize}
+\item Troll Tech's GUI toolkit \href{http://www.trolltech.com/products/qt.html}{\tt Qt}  (see {\tt http://www.trolltech.com/products/qt.html}) \index{Qt@{Qt}} version 3.3 or higher. This is needed to build the GUI front-end doxywizard. \item A $\mbox{\LaTeX}$ distribution: for instance \href{http://www.tug.org/interest.html#free}{\tt teTeX 1.0}  \\par (see {\tt http://www.tug.org/interest.html\#free}). This is needed for generating LaTeX, Postscript, and PDF output. \item \href{http://www.graphviz.org/}{\tt the Graph visualization toolkit version 1.8.10 or higher}  \\par (see {\tt http://www.graphviz.org/}). Needed for the include dependency graphs, the graphical inheritance graphs, and the collaboration graphs. If you compile graphviz yourself, make sure you do include freetype support (which requires the freetype library and header files), otherwise the graphs will not render proper text labels. \item For formulas or if you do not wish to use pdflatex, the ghostscript interpreter is needed. You can find it at \href{http://www.ghostscript.com/}{\tt www.ghostscript.com}. \item In order to generate doxygen's own documentation, Python is needed, you can find it at \href{http://www.python.org}{\tt www.python.org}. \end{itemize}
+
+
+Compilation is now done by performing the following steps:
+
+\begin{enumerate}
+\item Unpack the archive, unless you already have done that:
+
+
+
+\footnotesize\begin{verbatim}
+    gunzip doxygen-$VERSION.src.tar.gz    # uncompress the archive
+    tar xf doxygen-$VERSION.src.tar       # unpack it
+\end{verbatim}
+\normalsize
+
+
+\item Run the configure script:
+
+
+
+\footnotesize\begin{verbatim}
+    sh ./configure
+\end{verbatim}
+\normalsize
+
+
+The script tries to determine the platform you use, the make tool (which {\em must\/} be GNU make) and the perl interpreter. It will report what it finds.
+
+To override the auto detected platform and compiler you can run configure as follows:
+
+
+
+\footnotesize\begin{verbatim}
+    configure --platform platform-type
+\end{verbatim}
+\normalsize
+
+
+See the {\tt PLATFORMS} file for a list of possible platform options.
+
+If you have Qt-3.3.x installed and want to build the GUI front-end, you should run the configure script with the {\tt --with-doxywizard} option:
+
+
+
+\footnotesize\begin{verbatim}
+    configure --with-doxywizard
+\end{verbatim}
+\normalsize
+
+
+For an overview of other configuration options use
+
+
+
+\footnotesize\begin{verbatim}
+    configure --help
+\end{verbatim}
+\normalsize
+
+
+\item Compile the program by running make:
+
+
+
+\footnotesize\begin{verbatim}
+    make
+\end{verbatim}
+\normalsize
+
+
+The program should compile without problems and three binaries ({\tt doxygen} and {\tt doxytag}) should be available in the bin directory of the distribution.
+
+\item Optional: Generate the user manual.
+
+
+
+\footnotesize\begin{verbatim}
+    make docs
+\end{verbatim}
+\normalsize
+
+
+To let doxygen generate the HTML documentation.
+
+The HTML directory of the distribution will now contain the html documentation (just point a HTML browser to the file {\tt index.html} in the html directory). You will need the {\tt python} interpreter for this.
+
+\item Optional: Generate a PDF version of the manual (you will need {\tt pdflatex}, {\tt makeindex}, and {\tt egrep} for this).
+
+
+
+\footnotesize\begin{verbatim}
+    make pdf
+\end{verbatim}
+\normalsize
+
+
+The PDF manual {\tt doxygen\_\-manual.pdf} will be located in the latex directory of the distribution. Just view and print it via the acrobat reader.
+
+\end{enumerate}
+\hypertarget{install_install_bin_unix}{}\section{Installing the binaries on Unix}\label{install_install_bin_unix}
+After the compilation of the source code do a {\tt make install} to install doxygen. If you downloaded the binary distribution for Unix, type:
+
+
+
+\footnotesize\begin{verbatim}
+    ./configure
+    make install
+\end{verbatim}
+\normalsize
+
+
+Binaries are installed into the directory {\tt $<$prefix$>$/bin}. Use {\tt make install\_\-docs} to install the documentation and examples into {\tt $<$docdir$>$/doxygen}.
+
+{\tt $<$prefix$>$} defaults to {\tt /usr/local} but can be changed with the {\tt --prefix} option of the configure script. The default {\tt $<$docdir$>$} directory is {\tt $<$prefix$>$/share/doc/packages} and can be changed with the {\tt --docdir} option of the configure script.
+
+Alternatively, you can also copy the binaries from the {\tt bin} directory manually to some {\tt bin} directory in your search path. This is sufficient to use doxygen.
+
+\begin{Desc}
+\item[Note:]You need the GNU install tool for this to work (it is part of the coreutils package). Other install tools may put the binaries in the wrong directory!\end{Desc}
+If you have a RPM or DEP package, then please follow the standard installation procedure that is required for these packages.\hypertarget{install_unix_problems}{}\section{Known compilation problems for Unix}\label{install_unix_problems}
+{\bf Qt problems}
+
+The Qt include files and libraries are not a subdirectory of the directory pointed to by QTDIR on some systems (for instance on Red Hat 6.0 includes are in /usr/include/qt and libs are in /usr/lib).
+
+The solution: go to the root of the doxygen distribution and do: 
+
+\footnotesize\begin{verbatim}
+   mkdir qt
+   cd qt
+   ln -s your-qt-include-dir-here include
+   ln -s your-qt-lib-dir-here lib
+   export QTDIR=$PWD
+\end{verbatim}
+\normalsize
+
+
+If you have a csh-like shell you should use {\tt setenv QTDIR \$PWD} instead of the {\tt export} command above.
+
+Now install doxygen as described above.
+
+{\bf Bison problems}
+
+Versions 1.31 to 1.34 of bison contain a \char`\"{}bug\char`\"{} that results in a compiler errors like this:
+
+ce\_\-parse.cpp:348: member `class CPPValue yyalloc::yyvs' with constructor not allowed in union
+
+This problem has been solved in version 1.35 (versions before 1.31 will also work).
+
+{\bf Latex problems}
+
+The file {\tt a4wide.sty} is not available for all distributions. If your distribution does not have it please select another paper type in the config file (see the \hyperlink{config_cfg_paper_type}{PAPER\_\-TYPE} tag in the config file).
+
+{\bf HP-UX \& Digital Unix problems}
+
+If you are compiling for HP-UX with aCC and you get this error: 
+
+\footnotesize\begin{verbatim}
+    /opt/aCC/lbin/ld: Unsatisfied symbols:
+    alloca (code)
+\end{verbatim}
+\normalsize
+ then you should (according to Anke Selig) edit {\tt ce\_\-parse.cpp} and replace 
+
+\footnotesize\begin{verbatim}
+    extern "C" {
+      void *alloca (unsigned int);
+    };
+\end{verbatim}
+\normalsize
+ with 
+
+\footnotesize\begin{verbatim}
+    #include <alloca.h>  
+\end{verbatim}
+\normalsize
+
+
+If that does not help, try removing {\tt ce\_\-parse.cpp} and let bison rebuild it (this worked for me).
+
+If you are compiling for Digital Unix, the same problem can be solved (according to Barnard Schmallhof) by replacing the following in ce\_\-parse.cpp:
+
+
+
+\footnotesize\begin{verbatim}
+    #else /* not GNU C.  */
+    #if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) \
+        || defined (__sparc) || defined (__sgi)
+    #include <alloca.h>
+\end{verbatim}
+\normalsize
+
+
+with
+
+
+
+\footnotesize\begin{verbatim}
+    #else /* not GNU C.  */
+    #if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) \
+        || defined (__sparc) || defined (__sgi) || defined (__osf__)
+    #include <alloca.h>
+\end{verbatim}
+\normalsize
+
+
+Alternatively, one could fix the problem at the bison side. Here is patch for bison.simple (provided by Andre Johansen):
+
+
+
+\footnotesize\begin{verbatim}
+--- bison.simple~       Tue Nov 18 11:45:53 1997
++++ bison.simple        Mon Jan 26 15:10:26 1998
+@@ -27,7 +27,7 @@
+ #ifdef __GNUC__
+ #define alloca __builtin_alloca
+ #else /* not GNU C.  */
+-#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) \
+     || defined (__sparc) || defined (__sgi)
++#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) \
+     || defined (__sparc) || defined (__sgi) || defined (__alpha)
+ #include <alloca.h>
+ #else /* not sparc */
+ #if defined (MSDOS) && !defined (__TURBOC__)
+\end{verbatim}
+\normalsize
+
+
+The generated scanner.cpp that comes with doxygen is build with this patch applied.
+
+{\bf Sun compiler problems}
+
+It appears that doxygen doesn't work properly if it is compiled with Sun's C++ WorkShop Compiler. I cannot verify this myself as I do not have access to a Solaris machine with this compiler. With GNU compiler it does work.
+
+when configuring with {\tt --static} I got:
+
+
+
+\footnotesize\begin{verbatim}
+Undefined                       first referenced
+ symbol                             in file
+dlclose                             /usr/lib/libc.a(nss_deffinder.o)
+dlsym                               /usr/lib/libc.a(nss_deffinder.o)
+dlopen                              /usr/lib/libc.a(nss_deffinder.o)
+\end{verbatim}
+\normalsize
+
+
+Manually adding {\tt -Bdynamic} after the target rule in {\tt Makefile.doxygen} and {\tt Makefile.doxytag} will fix this:
+
+
+
+\footnotesize\begin{verbatim}
+$(TARGET): $(OBJECTS) $(OBJMOC) 
+        $(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJMOC) $(LIBS) -Bdynamic
+\end{verbatim}
+\normalsize
+
+
+{\bf GCC compiler problems}
+
+Older versions of the GNU compiler have problems with constant strings containing characters with character codes larger than 127. Therefore the compiler will fail to compile some of the translator\_\-xx.h files. A workaround, if you are planning to use the English translation only, is to configure doxygen with the {\tt --english-only} option.
+
+On some platforms (such as OpenBSD) using some versions of gcc with -O2 can lead to eating all memory during the compilation of files such as config.cpp. As a workaround use --debug as a configure option or omit the -O2 for the particular files in the Makefile.
+
+Gcc versions before 2.95 may produce broken binaries due to bugs in these compilers.
+
+{\bf Dot problems}
+
+Due to a change in the way image maps are generated, older versions of doxygen ($<$=1.2.17) will not work correctly with newer versions of graphviz ($>$=1.8.8). The effect of this incompatibility is that generated graphs in HTML are not properly clickable. For doxygen 1.3 it is recommended to use at least graphviz 1.8.10 or higher. For doxygen 1.4.7 or higher it is recommended to use GraphViz 2.8 or higher to avoid font issues.
+
+{\bf Red Hat 9.0 problems}
+
+If you get the following error after running make 
+
+\footnotesize\begin{verbatim}
+tmake error: qtools.pro:70: Syntax error
+\end{verbatim}
+\normalsize
+ then first type 
+
+\footnotesize\begin{verbatim}
+export LANG=
+\end{verbatim}
+\normalsize
+ before running make.\hypertarget{install_install_src_windows}{}\section{Compiling from source on Windows}\label{install_install_src_windows}
+From version 1.5.0 onwards, build files are provided for Visual Studio 2005. Also the free (as in beer) \char`\"{}Express\char`\"{} version of Developer Studio can be used to compile doxygen. Alternatively, you can compile doxygen \hyperlink{install_install_src_unix}{the Unix way} using \href{http://en.wikipedia.org/wiki/Cygwin}{\tt Cygwin} or \href{http://www.mingw.org/}{\tt MinGW}.
+
+Before you can compile doxygen you need to download and install the C++ compiler of Visual Studio. Since Microsoft apparently wants to lure everyone into using their .NET stuff, they made things somewhat difficult when you use the Express version. You need to \href{http://msdn2.microsoft.com/en-gb/express/aa700755.aspx}{\tt do some manual steps} in order to setup a proper working environment for building native win32 applications such as Doxygen.
+
+The next step is to install unxutils (see \href{http://sourceforge.net/projects/unxutils}{\tt http://sourceforge.net/projects/unxutils}). This packages contains the tools {\tt flex} and {\tt bison} which are needed during the compilation process if you use a CVS snapshot of doxygen (the official source releases come with pre-generated sources). Download the zip extract it to e.g. {\tt c:$\backslash$tools$\backslash$unxutils}.
+
+Now you need to add/adjust the following environment variables (via Control Panel/System/Advanced/Environment Variables):\begin{itemize}
+\item add {\tt c:$\backslash$tools$\backslash$unxutils$\backslash$usr$\backslash$local$\backslash$wbin;} to the start of {\tt PATH}\item set {\tt BISON\_\-SIMPLE} to {\tt c:$\backslash$tools$\backslash$unxutils$\backslash$usr$\backslash$share$\backslash$bison.simple}\end{itemize}
+
+
+Download doxygen's source tarball and put it somewhere (e.g use {\tt c:$\backslash$tools})
+
+Now start a new command shell and type 
+
+\footnotesize\begin{verbatim}
+cd c:\tools
+gunzip doxygen-x.y.z.src.tar.gz
+tar xvf doxygen-x.y.z.src.tar
+\end{verbatim}
+\normalsize
+ to unpack the sources.
+
+Now your environment is setup to build {\tt doxygen} and {\tt doxytag}.
+
+Inside the {\tt doxygen-x.y.z} directory you will find a {\tt winbuild} directory containing a {\tt Doxygen.sln} file. Open this file in Visual Studio. You can now build the Release or Debug flavor of Doxygen and Doxytag by right-clicking the project in the solutions explorer, and selecting Build.
+
+Note that compiling Doxywizard currently requires Qt version 3 (see \href{http://www.trolltech.com/products/qt/qt3}{\tt http://www.trolltech.com/products/qt/qt3}). If you do not have a commercial license, you can build Doxywizard with the open source version (see \href{http://qtwin.sourceforge.net/qt3-win32/compile-msvc-2005.php}{\tt http://qtwin.sourceforge.net/qt3-win32/compile-msvc-2005.php}), but I have not tried this myself.
+
+Also read the next section for additional tools you may need to install to run doxygen with certain features enabled.\hypertarget{install_install_bin_windows}{}\section{Installing the binaries on Windows}\label{install_install_bin_windows}
+Doxygen comes as a self-installing archive, so installation is extremely simple. Just follow the dialogs.
+
+After installation it is recommended to also download and install GraphViz (version 2.8 or better is highly recommended). Doxygen can use the {\tt dot} tool of the GraphViz package to render nicer diagrams, see the \hyperlink{config_cfg_have_dot}{HAVE\_\-DOT} option in the configuration file.
+
+If you want to produce compressed HTML files (see \hyperlink{config_cfg_generate_htmlhelp}{GENERATE\_\-HTMLHELP}) in the config file, then you need the Microsoft HTML help workshop. You can download it from \href{http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/vsconHH1Start.asp}{\tt Microsoft}.
+
+In order to generate PDF output or use scientific formulas you will also need to install \href{http://en.wikipedia.org/wiki/LaTeX}{\tt LaTeX} and \href{http://en.wikipedia.org/wiki/Ghostscript}{\tt Ghostscript}.
+
+For LaTeX a number of distributions exists. Popular onces that should work with doxygen are \href{http://www.miktex.org}{\tt MikTex} and \href{http://www.xemtex.org}{\tt XemTex}.
+
+Ghostscript can be \href{http://sourceforge.net/projects/ghostscript/}{\tt downloaded} from Sourceforge.
+
+After installing LaTeX and Ghostscript you'll need to make sure the tools latex.exe, pdflatex.exe, and gswin32c.exe are present in the search path of a command box. Follow \href{http://www.computerhope.com/issues/ch000549.htm}{\tt these} instructions if you are unsure and run the commands from a command box to verify it works.\hypertarget{install_build_tools}{}\section{Tools used to develop doxygen}\label{install_build_tools}
+Doxygen was developed and tested under Linux \& MacOSX using the following open-source tools: \begin{itemize}
+\item GCC version 3.3.6 (Linux) and 4.0.1 (MacOSX) \item GNU flex version 2.5.33 (Linux) and 2.5.4 (MacOSX) \item GNU bison version 1.75 \item GNU make version 3.80 \item Perl version 5.8.1 \item VIM version 6.2 \item Firefox 1.5 \item Troll Tech's tmake version 1.3 (included in the distribution) \item teTeX version 2.0.2 \item CVS 1.12.12 \end{itemize}
+
+
+ 

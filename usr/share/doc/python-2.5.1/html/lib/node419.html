@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node420.html" />
+<link rel="prev" href="node418.html" />
+<link rel="parent" href="node409.html" />
+<link rel="next" href="node420.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.5.5.10 MemoryHandler</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.5.9 SMTPHandler"
+  href="node418.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5.5 handler Objects"
+  href="node409.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.5.11 HTTPHandler"
+  href="node420.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node418.html">14.5.5.9 SMTPHandler</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node409.html">14.5.5 Handler Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node420.html">14.5.5.11 HTTPHandler</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00165510000000000000000">
+14.5.5.10 MemoryHandler</a>
+</h3>
+
+<p>
+The <tt class="class">MemoryHandler</tt> class, located in the
+<tt class="module">logging.handlers</tt> module, supports buffering of logging
+records in memory, periodically flushing them to a <i class="dfn">target</i>
+handler. Flushing occurs whenever the buffer is full, or when an event
+of a certain severity or greater is seen.
+
+<p>
+<tt class="class">MemoryHandler</tt> is a subclass of the more general
+<tt class="class">BufferingHandler</tt>, which is an abstract class. This buffers logging
+records in memory. Whenever each record is added to the buffer, a
+check is made by calling <tt class="method">shouldFlush()</tt> to see if the buffer
+should be flushed.  If it should, then <tt class="method">flush()</tt> is expected to
+do the needful.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-2944' xml:id='l2h-2944' class="class">BufferingHandler</tt></b>(</nobr></td>
+  <td><var>capacity</var>)</td></tr></table></dt>
+<dd>
+Initializes the handler with a buffer of the specified capacity.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2945' xml:id='l2h-2945' class="method">emit</tt></b>(</nobr></td>
+  <td><var>record</var>)</td></tr></table></dt>
+<dd>
+Appends the record to the buffer. If <tt class="method">shouldFlush()</tt> returns true,
+calls <tt class="method">flush()</tt> to process the buffer.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2946' xml:id='l2h-2946' class="method">flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+You can override this to implement custom flushing behavior. This version
+just zaps the buffer to empty.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2947' xml:id='l2h-2947' class="method">shouldFlush</tt></b>(</nobr></td>
+  <td><var>record</var>)</td></tr></table></dt>
+<dd>
+Returns true if the buffer is up to capacity. This method can be
+overridden to implement custom flushing strategies.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-2948' xml:id='l2h-2948' class="class">MemoryHandler</tt></b>(</nobr></td>
+  <td><var>capacity</var><big>[</big><var>, flushLevel
+</var><big>[</big><var>, target</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns a new instance of the <tt class="class">MemoryHandler</tt> class. The
+instance is initialized with a buffer size of <var>capacity</var>. If
+<var>flushLevel</var> is not specified, <tt class="constant">ERROR</tt> is used. If no
+<var>target</var> is specified, the target will need to be set using
+<tt class="method">setTarget()</tt> before this handler does anything useful.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2949' xml:id='l2h-2949' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Calls <tt class="method">flush()</tt>, sets the target to <tt class="constant">None</tt> and
+clears the buffer.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2950' xml:id='l2h-2950' class="method">flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+For a <tt class="class">MemoryHandler</tt>, flushing means just sending the buffered
+records to the target, if there is one. Override if you want
+different behavior.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2951' xml:id='l2h-2951' class="method">setTarget</tt></b>(</nobr></td>
+  <td><var>target</var>)</td></tr></table></dt>
+<dd>
+Sets the target handler for this handler.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2952' xml:id='l2h-2952' class="method">shouldFlush</tt></b>(</nobr></td>
+  <td><var>record</var>)</td></tr></table></dt>
+<dd>
+Checks for buffer full or a record at the <var>flushLevel</var> or higher.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.5.9 SMTPHandler"
+  href="node418.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5.5 handler Objects"
+  href="node409.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.5.11 HTTPHandler"
+  href="node420.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node418.html">14.5.5.9 SMTPHandler</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node409.html">14.5.5 Handler Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node420.html">14.5.5.11 HTTPHandler</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

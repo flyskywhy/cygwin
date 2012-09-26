@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+#
+# Show information about given tag(s)
+# Copyright (c) Petr Baudis 2006
+#
+# This command shows detailed information about specified tag(s).
+
+# Testsuite: TODO
+
+USAGE="cg-tag-show TAGNAME..."
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+
+verify_tag()
+{
+	local tag="$1" sha1="$2"
+	local tagfile="$(mktemp -t gittag.XXXXXX)"
+
+	git cat-file tag "$1" >"$tagfile" || return 1
+	cat "$tagfile" | sed '/^-----BEGIN PGP SIGNATURE-----/Q' |
+		gpg --verify "$tagfile" - || return 1
+	rm -f "$tagfile"
+	return 0
+}
+
+header_end()
+{
+	local tag="$1" sha1="$2" verify="$3"
+
+	if [ "$verify" ]; then
+		if verify_tag "$tag" "$sha1"; then
+			echo "Signature: Ok"
+		else
+			echo "Signature: NOT VERIFIED"
+		fi
+	else
+		echo "Signature: None"
+	fi
+}
+
+cat_tag()
+{
+	local tag="$1" sha1="$2" verify="$3" object= state=1 date=
+	while read -r line; do
+		if [ ! "$line" -a "$state" = 1 ]; then
+			header_end "$tag" "$sha1" "$verify"
+			echo
+			state=2
+			continue
+		fi
+
+		if [ "$state" = 1 ]; then
+			data="${line#* }"
+			case "${line%% *}" in
+			object) object="$data";;
+			type)
+				echo "Object: $object ($data)";;
+			tag)
+				if [ "$data" != "$tag" ]; then
+					echo "Real tag name: $data"
+				fi;;
+			tagger)
+				# We want wordsplitting in the $date here, to get
+				# TZ as separate argument.
+				date=(${data#*> })
+				showdate ${date[*]}; date="$_showdate"
+				echo "Tagger: ${data%%> *}> $date";;
+			*)
+				echo " $line";; # print unknown headers as-they-are
+			esac
+		elif [ "$state" = 2 ]; then
+			if [ x"$line" = x"-----BEGIN PGP SIGNATURE-----" ]; then
+				# FIXME: Extra newline was printed just before
+				break
+			fi
+			echo "    $line"
+		fi
+	done
+	if [ "$state" = 1 ]; then
+		header_end "$tag" "$sha1" "$verify"
+	fi
+}
+
+show_tag()
+{
+	local tag="$1"
+	local sha1="$(cat "$_git/refs/tags/$tag" 2>/dev/null)"
+	if [ ! "$sha1" ]; then
+		echo "No such tag: $tag" >&2
+		echo >&2
+		return 1
+	fi
+	local type="$(git cat-file -t "$sha1" 2>/dev/null)"
+	if [ ! "$type" ]; then
+		echo "Broken tag: $tag" >&2
+		echo >&2
+		return 1
+	fi
+
+	echo -n "Tag: $tag"
+	if [ "$type" != "tag" ]; then
+		echo " (direct)"
+		echo "Object: $sha1 ($type)"
+		return 0
+	fi
+	echo
+
+	local verify=
+	if git cat-file tag "$sha1" | grep -q '^-----BEGIN PGP SIGNATURE-----'; then
+		verify=1
+	fi
+	git cat-file tag "$sha1" | cat_tag "$tag" "$sha1" "$verify"
+	if [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ]; then
+		return 1
+	fi
+	return 0
+}
+
+
+[ "${ARGS[0]}" ] || usage
+
+first=1
+ret=0
+for tag in "${ARGS[@]}"; do
+	if [ "$first" ]; then
+		first=
+	else
+		echo
+	fi
+	if ! show_tag "$tag"; then
+		ret=1
+		first=1
+	fi
+done
+exit $ret

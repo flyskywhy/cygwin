@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+
+usage="\
+Usage: gtkdoc-mkhtml MODULE DRIVER_FILE"
+
+if test "x$1" = "x--version"; then
+      echo "1.5"
+      exit 0
+fi
+
+if test $# -ne 2; then
+      echo "${usage}" 1>&2
+      exit 1
+fi
+
+module=$1
+document=$2
+
+prefix=/usr
+datarootdir=@datarootdir@
+gtkdocdir=/usr/share/gtk-doc/data
+
+declaration=$gtkdocdir/gtk-doc.dcl
+
+if head -n 1 $document | grep "<?xml" > /dev/null; then
+  is_xml=true
+else
+  is_xml=false
+fi
+
+# Delete the old index.sgml file, if it exists.
+if test -f index.sgml; then
+      rm -f index.sgml
+fi
+
+if $is_xml; then
+  /usr/bin/xsltproc --nonet --xinclude \
+      --stringparam gtkdoc.bookname $module \
+      --stringparam gtkdoc.version "1.5" \
+      $gtkdocdir/gtk-doc.xsl $document || exit $?
+else
+  /usr/bin/openjade -t sgml-raw -w no-idref -d $gtkdocdir/gtk-doc.dsl \
+      -V "gtkdoc-bookname=$module" -V "gtkdoc-version=1.5" \
+      $gtkdocdir/gtk-doc.dcl $document || exit $?
+fi
+
+# copy navigation images to html directory ...
+cp -f $gtkdocdir/*.png .
+cp -f $gtkdocdir/*.css .
+
+
+echo "timestamp" > ../html.stamp
+

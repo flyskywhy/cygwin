@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-email.generator.html" />
+<link rel="prev" href="module-email.message.html" />
+<link rel="parent" href="module-email.html" />
+<link rel="next" href="node148.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.1.2 Parsing email messages</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.1 representing an email"
+  href="module-email.message.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.2.1 feedparser API"
+  href="node148.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.message.html">7.1.1 Representing an email</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node148.html">7.1.2.1 FeedParser API</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009120000000000000000">
+7.1.2 Parsing email messages</a>
+</h2>
+<a name="module-email.parser"></a>
+
+<p>
+Message object structures can be created in one of two ways: they can be
+created from whole cloth by instantiating <tt class="class">Message</tt> objects and
+stringing them together via <tt class="method">attach()</tt> and
+<tt class="method">set_payload()</tt> calls, or they can be created by parsing a flat text
+representation of the email message.
+
+<p>
+The <tt class="module">email</tt> package provides a standard parser that understands
+most email document structures, including MIME documents.  You can
+pass the parser a string or a file object, and the parser will return
+to you the root <tt class="class">Message</tt> instance of the object structure.  For
+simple, non-MIME messages the payload of this root object will likely
+be a string containing the text of the message.  For MIME
+messages, the root object will return <code>True</code> from its
+<tt class="method">is_multipart()</tt> method, and the subparts can be accessed via
+the <tt class="method">get_payload()</tt> and <tt class="method">walk()</tt> methods.
+
+<p>
+There are actually two parser interfaces available for use, the classic
+<tt class="class">Parser</tt> API and the incremental <tt class="class">FeedParser</tt> API.  The classic
+<tt class="class">Parser</tt> API is fine if you have the entire text of the message in
+memory as a string, or if the entire message lives in a file on the file
+system.  <tt class="class">FeedParser</tt> is more appropriate for when you're reading the
+message from a stream which might block waiting for more input (e.g. reading
+an email message from a socket).  The <tt class="class">FeedParser</tt> can consume and parse
+the message incrementally, and only returns the root object when you close the
+parser<a name="tex2html38"
+  href="#foot20420"><sup>7.1</sup></a>.
+
+<p>
+Note that the parser can be extended in limited ways, and of course
+you can implement your own parser completely from scratch.  There is
+no magical connection between the <tt class="module">email</tt> package's bundled
+parser and the <tt class="class">Message</tt> class, so your custom parser can create
+message object trees any way it finds necessary.
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot20420">...
+parser</a><A
+ href="module-email.parser.html#tex2html38"><sup>7.1</sup></a></dt>
+<dd>As of email package version 3.0, introduced in
+Python 2.4, the classic <tt class="class">Parser</tt> was re-implemented in terms of the
+<tt class="class">FeedParser</tt>, so the semantics and results are identical between the two
+parsers.
+
+</dd>
+</dl>
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node148.html">7.1.2.1 FeedParser API</a>
+<li><a href="node149.html">7.1.2.2 Parser class API</a>
+<li><a href="node150.html">7.1.2.3 Additional notes</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.1 representing an email"
+  href="module-email.message.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.1 email  "
+  href="module-email.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.1.2.1 feedparser API"
+  href="node148.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-email.message.html">7.1.1 Representing an email</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-email.html">7.1 email  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node148.html">7.1.2.1 FeedParser API</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="porting.html" />
+<link rel="prev" href="modules.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="porting.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14 Build and C API Changes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13 New, Improved, and"
+  href="modules.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15 porting to Python"
+  href="porting.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="modules.html">13 New, Improved, and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="porting.html">15 Porting to Python</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="ports.html#SECTION0001510000000000000000">14.1 Port-Specific Changes</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION0001500000000000000000"></a><a name="build-api"></a>
+<br>
+14 Build and C API Changes
+</h1>
+
+<p>
+Changes to Python's build process and to the C API include:
+
+<p>
+
+<ul>
+<li>The Python source tree was converted from CVS to Subversion, 
+in a complex migration procedure that was supervised and flawlessly
+carried out by Martin von&nbsp;Löwis.  The procedure was developed as
+<a class="rfc" id='rfcref-2400' xml:id='rfcref-2400'
+href="http://www.python.org/peps/pep-0347.html">PEP 347</a>.
+
+<p>
+</li>
+<li>Coverity, a company that markets a source code analysis tool
+called Prevent, provided the results of their examination of the Python
+source code.  The analysis found about 60 bugs that 
+were quickly fixed.  Many of the bugs were refcounting problems, often
+occurring in error-handling code.  See
+<a class="url" href="http://scan.coverity.com">http://scan.coverity.com</a> for the statistics.
+
+<p>
+</li>
+<li>The largest change to the C API came from <a class="rfc" id='rfcref-2402' xml:id='rfcref-2402'
+href="http://www.python.org/peps/pep-0353.html">PEP 353</a>,
+which modifies the interpreter to use a <tt class="ctype">Py_ssize_t</tt> type
+definition instead of <tt class="ctype">int</tt>.  See the earlier
+section&nbsp;<a href="pep-353.html#pep-353">10</a> for a discussion of this change.
+
+<p>
+</li>
+<li>The design of the bytecode compiler has changed a great deal, 
+no longer generating bytecode by traversing the parse tree.  Instead
+the parse tree is converted to an abstract syntax tree (or AST), and it is 
+the abstract syntax tree that's traversed to produce the bytecode.
+
+<p>
+It's possible for Python code to obtain AST objects by using the 
+<tt class="function">compile()</tt> built-in and specifying <code>_ast.PyCF_ONLY_AST</code>
+as the value of the 
+<var>flags</var> parameter:
+
+<p>
+<div class="verbatim"><pre>
+from _ast import PyCF_ONLY_AST
+ast = compile("""a=0
+for i in range(10):
+    a += i
+""", "&lt;string&gt;", 'exec', PyCF_ONLY_AST)
+
+assignment = ast.body[0]
+for_loop = ast.body[1]
+</pre></div>
+
+<p>
+No official documentation has been written for the AST code yet, but
+<a class="rfc" id='rfcref-2404' xml:id='rfcref-2404'
+href="http://www.python.org/peps/pep-0339.html">PEP 339</a> discusses the design.  To start learning about the code, read the
+definition of the various AST nodes in <span class="file">Parser/Python.asdl</span>.  A
+Python script reads this file and generates a set of C structure
+definitions in <span class="file">Include/Python-ast.h</span>.  The
+<tt class="cfunction">PyParser_ASTFromString()</tt> and
+<tt class="cfunction">PyParser_ASTFromFile()</tt>, defined in
+<span class="file">Include/pythonrun.h</span>, take Python source as input and return the
+root of an AST representing the contents.  This AST can then be turned
+into a code object by <tt class="cfunction">PyAST_Compile()</tt>.  For more
+information, read the source code, and then ask questions on
+python-dev.
+
+<p>
+The AST code was developed under Jeremy Hylton's management, and
+implemented by (in alphabetical order) Brett Cannon, Nick Coghlan,
+Grant Edwards, John Ehresman, Kurt Kaiser, Neal Norwitz, Tim Peters,
+Armin Rigo, and Neil Schemenauer, plus the participants in a number of
+AST sprints at conferences such as PyCon.
+
+<p>
+</li>
+<li>Evan Jones's patch to obmalloc, first described in a talk
+at PyCon DC 2005, was applied.  Python 2.4 allocated small objects in
+256K-sized arenas, but never freed arenas.  With this patch, Python
+will free arenas when they're empty.  The net effect is that on some
+platforms, when you allocate many objects, Python's memory usage may
+actually drop when you delete them and the memory may be returned to
+the operating system.  (Implemented by Evan Jones, and reworked by Tim
+Peters.)
+
+<p>
+Note that this change means extension modules must be more careful
+when allocating memory.  Python's API has many different
+functions for allocating memory that are grouped into families.  For
+example, <tt class="cfunction">PyMem_Malloc()</tt>, <tt class="cfunction">PyMem_Realloc()</tt>, and
+<tt class="cfunction">PyMem_Free()</tt> are one family that allocates raw memory,
+while <tt class="cfunction">PyObject_Malloc()</tt>, <tt class="cfunction">PyObject_Realloc()</tt>,
+and <tt class="cfunction">PyObject_Free()</tt> are another family that's supposed to
+be used for creating Python objects.  
+
+<p>
+Previously these different families all reduced to the platform's
+<tt class="cfunction">malloc()</tt> and <tt class="cfunction">free()</tt> functions.  This meant 
+it didn't matter if you got things wrong and allocated memory with the
+<tt class="cfunction">PyMem</tt> function but freed it with the <tt class="cfunction">PyObject</tt>
+function.  With 2.5's changes to obmalloc, these families now do different
+things and mismatches will probably result in a segfault.  You should
+carefully test your C extension modules with Python 2.5.
+
+<p>
+</li>
+<li>The built-in set types now have an official C API.  Call
+<tt class="cfunction">PySet_New()</tt> and <tt class="cfunction">PyFrozenSet_New()</tt> to create a
+new set, <tt class="cfunction">PySet_Add()</tt> and <tt class="cfunction">PySet_Discard()</tt> to
+add and remove elements, and <tt class="cfunction">PySet_Contains</tt> and
+<tt class="cfunction">PySet_Size</tt> to examine the set's state.
+(Contributed by Raymond Hettinger.)
+
+<p>
+</li>
+<li>C code can now obtain information about the exact revision
+of the Python interpreter by calling the 
+<tt class="cfunction">Py_GetBuildInfo()</tt> function that returns a 
+string of build information like this:
+<code>"trunk:45355:45356M, Apr 13 2006, 07:42:19"</code>.  
+(Contributed by Barry Warsaw.)
+
+<p>
+</li>
+<li>Two new macros can be used to indicate C functions that are
+local to the current file so that a faster calling convention can be
+used.  <tt class="cfunction">Py_LOCAL(<var>type</var>)</tt> declares the function as
+returning a value of the specified <var>type</var> and uses a fast-calling
+qualifier. <tt class="cfunction">Py_LOCAL_INLINE(<var>type</var>)</tt> does the same thing
+and also requests the function be inlined.  If
+<tt class="cfunction">PY_LOCAL_AGGRESSIVE</tt> is defined before <span class="file">python.h</span> is
+included, a set of more aggressive optimizations are enabled for the
+module; you should benchmark the results to find out if these
+optimizations actually make the code faster.  (Contributed by Fredrik
+Lundh at the NeedForSpeed sprint.)
+
+<p>
+</li>
+<li><tt class="cfunction">PyErr_NewException(<var>name</var>, <var>base</var>,
+<var>dict</var>)</tt> can now accept a tuple of base classes as its <var>base</var>
+argument.  (Contributed by Georg Brandl.)
+
+<p>
+</li>
+<li>The <tt class="cfunction">PyErr_Warn()</tt> function for issuing warnings
+is now deprecated in favour of <tt class="cfunction">PyErr_WarnEx(category,
+message, stacklevel)</tt> which lets you specify the number of stack
+frames separating this function and the caller.  A <var>stacklevel</var> of
+1 is the function calling <tt class="cfunction">PyErr_WarnEx()</tt>, 2 is the
+function above that, and so forth.  (Added by Neal Norwitz.)
+
+<p>
+</li>
+<li>The CPython interpreter is still written in C, but 
+the code can now be compiled with a C++ compiler without errors.  
+(Implemented by Anthony Baxter, Martin von&nbsp;Löwis, Skip Montanaro.)
+
+<p>
+</li>
+<li>The <tt class="cfunction">PyRange_New()</tt> function was removed.  It was
+never documented, never used in the core code, and had dangerously lax
+error checking.  In the unlikely case that your extensions were using
+it, you can replace it by something like the following:
+<div class="verbatim"><pre>
+range = PyObject_CallFunction((PyObject*) &amp;PyRange_Type, "lll", 
+                              start, stop, step);
+</pre></div>
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<h2><a name="SECTION0001510000000000000000"></a><a name="ports"></a>
+<br>
+14.1 Port-Specific Changes
+</h2>
+
+<p>
+
+<ul>
+<li>MacOS X (10.3 and higher): dynamic loading of modules
+now uses the <tt class="cfunction">dlopen()</tt> function instead of MacOS-specific
+functions.
+
+<p>
+</li>
+<li>MacOS X: a <b class="programopt">--enable-universalsdk</b> switch was added
+to the <b class="program">configure</b> script that compiles the interpreter as a
+universal binary able to run on both PowerPC and Intel processors.
+(Contributed by Ronald Oussoren.)
+
+<p>
+</li>
+<li>Windows: <span class="file">.dll</span> is no longer supported as a filename extension for 
+extension modules.  <span class="file">.pyd</span> is now the only filename extension that will
+be searched for.
+
+<p>
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13 New, Improved, and"
+  href="modules.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15 porting to Python"
+  href="porting.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="modules.html">13 New, Improved, and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="porting.html">15 Porting to Python</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

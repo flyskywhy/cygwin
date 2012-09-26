@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="doctest-advanced-api.html" />
+<link rel="prev" href="doctest-basic-api.html" />
+<link rel="parent" href="module-doctest.html" />
+<link rel="next" href="doctest-advanced-api.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.2.5 Unittest API</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.4 basic API"
+  href="doctest-basic-api.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2 doctest  "
+  href="module-doctest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.6 advanced API"
+  href="doctest-advanced-api.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-basic-api.html">23.2.4 Basic API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-doctest.html">23.2 doctest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-advanced-api.html">23.2.6 Advanced API</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0025250000000000000000"></a><a name="doctest-unittest-api"></a>
+<br>
+23.2.5 Unittest API
+</h2>
+
+<p>
+As your collection of doctest'ed modules grows, you'll want a way to run
+all their doctests systematically.  Prior to Python 2.4, <tt class="module"><a href="module-doctest.html">doctest</a></tt>
+had a barely documented <tt class="class">Tester</tt> class that supplied a rudimentary
+way to combine doctests from multiple modules. <tt class="class">Tester</tt> was feeble,
+and in practice most serious Python testing frameworks build on the
+<tt class="module"><a href="module-unittest.html">unittest</a></tt> module, which supplies many flexible ways to combine
+tests from multiple sources.  So, in Python 2.4, <tt class="module"><a href="module-doctest.html">doctest</a></tt>'s
+<tt class="class">Tester</tt> class is deprecated, and <tt class="module"><a href="module-doctest.html">doctest</a></tt> provides two
+functions that can be used to create <tt class="module"><a href="module-unittest.html">unittest</a></tt> test suites from
+modules and text files containing doctests.  These test suites can then be
+run using <tt class="module"><a href="module-unittest.html">unittest</a></tt> test runners:
+
+<p>
+<div class="verbatim"><pre>
+import unittest
+import doctest
+import my_module_with_doctests, and_another
+
+suite = unittest.TestSuite()
+for mod in my_module_with_doctests, and_another:
+    suite.addTest(doctest.DocTestSuite(mod))
+runner = unittest.TextTestRunner()
+runner.run(suite)
+</pre></div>
+
+<p>
+There are two main functions for creating <tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt>
+instances from text files and modules with doctests:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4954' xml:id='l2h-4954' class="function">DocFileSuite</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>module_relative</var><big>]</big><var></var><big>[</big><var>,
+                              package</var><big>]</big><var></var><big>[</big><var>, setUp</var><big>]</big><var></var><big>[</big><var>,
+                              tearDown</var><big>]</big><var></var><big>[</big><var>, globs</var><big>]</big><var></var><big>[</big><var>,
+                              optionflags</var><big>]</big><var></var><big>[</big><var>, parser</var><big>]</big><var></var><big>[</big><var>,
+                              encoding</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Convert doctest tests from one or more text files to a
+  <tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt>.
+
+<p>
+The returned <tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt> is to be run by the
+  unittest framework and runs the interactive examples in each file.  If an
+  example in any file fails, then the synthesized unit test fails, and a
+  <tt class="exception">failureException</tt> exception is raised showing the name of the
+  file containing the test and a (sometimes approximate) line number.
+
+<p>
+Pass one or more paths (as strings) to text files to be examined.
+
+<p>
+Options may be provided as keyword arguments:
+
+<p>
+Optional argument <var>module_relative</var> specifies how
+  the filenames in <var>paths</var> should be interpreted:
+
+<p>
+
+<ul>
+<li>If <var>module_relative</var> is <code>True</code> (the default), then
+        each filename specifies an OS-independent module-relative
+        path.  By default, this path is relative to the calling
+        module's directory; but if the <var>package</var> argument is
+        specified, then it is relative to that package.  To ensure
+        OS-independence, each filename should use <code>/</code> characters
+        to separate path segments, and may not be an absolute path
+        (i.e., it may not begin with <code>/</code>).
+</li>
+<li>If <var>module_relative</var> is <code>False</code>, then each filename
+        specifies an OS-specific path.  The path may be absolute or
+        relative; relative paths are resolved with respect to the
+        current working directory.
+  
+</li>
+</ul>
+
+<p>
+Optional argument <var>package</var> is a Python package or the name
+  of a Python package whose directory should be used as the base
+  directory for module-relative filenames.  If no package is
+  specified, then the calling module's directory is used as the base
+  directory for module-relative filenames.  It is an error to specify
+  <var>package</var> if <var>module_relative</var> is <code>False</code>.
+
+<p>
+Optional argument <var>setUp</var> specifies a set-up function for
+  the test suite.  This is called before running the tests in each
+  file.  The <var>setUp</var> function will be passed a <tt class="class">DocTest</tt>
+  object.  The setUp function can access the test globals as the
+  <var>globs</var> attribute of the test passed.
+
+<p>
+Optional argument <var>tearDown</var> specifies a tear-down function
+  for the test suite.  This is called after running the tests in each
+  file.  The <var>tearDown</var> function will be passed a <tt class="class">DocTest</tt>
+  object.  The setUp function can access the test globals as the
+  <var>globs</var> attribute of the test passed.
+
+<p>
+Optional argument <var>globs</var> is a dictionary containing the
+  initial global variables for the tests.  A new copy of this
+  dictionary is created for each test.  By default, <var>globs</var> is
+  a new empty dictionary.
+
+<p>
+Optional argument <var>optionflags</var> specifies the default
+  doctest options for the tests, created by or-ing together
+  individual option flags.  See section&nbsp;<a href="doctest-options.html#doctest-options">23.2.3</a>.
+  See function <tt class="function">set_unittest_reportflags()</tt> below for
+  a better way to set reporting options.
+
+<p>
+Optional argument <var>parser</var> specifies a <tt class="class">DocTestParser</tt> (or
+  subclass) that should be used to extract tests from the files.  It
+  defaults to a normal parser (i.e., <code><tt class="class">DocTestParser</tt>()</code>).
+
+<p>
+Optional argument <var>encoding</var> specifies an encoding that should
+  be used to convert the file to unicode.
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+The global <code>__file__</code> was added to the
+  globals provided to doctests loaded from a text file using
+  <tt class="function">DocFileSuite()</tt>.</span>
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+The parameter <var>encoding</var> was added.</span>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4955' xml:id='l2h-4955' class="function">DocTestSuite</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>module</var><big>]</big><var></var><big>[</big><var>,
+                              globs</var><big>]</big><var></var><big>[</big><var>, extraglobs</var><big>]</big><var></var><big>[</big><var>,
+                              test_finder</var><big>]</big><var></var><big>[</big><var>, setUp</var><big>]</big><var></var><big>[</big><var>,
+                              tearDown</var><big>]</big><var></var><big>[</big><var>, checker</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Convert doctest tests for a module to a
+  <tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt>.
+
+<p>
+The returned <tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt> is to be run by the
+  unittest framework and runs each doctest in the module.  If any of the
+  doctests fail, then the synthesized unit test fails, and a
+  <tt class="exception">failureException</tt> exception is raised showing the name of the
+  file containing the test and a (sometimes approximate) line number.
+
+<p>
+Optional argument <var>module</var> provides the module to be tested.  It
+  can be a module object or a (possibly dotted) module name.  If not
+  specified, the module calling this function is used.
+
+<p>
+Optional argument <var>globs</var> is a dictionary containing the
+  initial global variables for the tests.  A new copy of this
+  dictionary is created for each test.  By default, <var>globs</var> is
+  a new empty dictionary.
+
+<p>
+Optional argument <var>extraglobs</var> specifies an extra set of
+  global variables, which is merged into <var>globs</var>.  By default, no
+  extra globals are used.
+
+<p>
+Optional argument <var>test_finder</var> is the <tt class="class">DocTestFinder</tt>
+  object (or a drop-in replacement) that is used to extract doctests
+  from the module.
+
+<p>
+Optional arguments <var>setUp</var>, <var>tearDown</var>, and <var>optionflags</var>
+  are the same as for function <tt class="function">DocFileSuite()</tt> above.
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+The parameters <var>globs</var>, <var>extraglobs</var>,
+    <var>test_finder</var>, <var>setUp</var>, <var>tearDown</var>, and
+    <var>optionflags</var> were added; this function now uses the same search
+    technique as <tt class="function">testmod()</tt>.</span>
+
+</dl>
+
+<p>
+Under the covers, <tt class="function">DocTestSuite()</tt> creates a
+<tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt> out of <tt class="class">doctest.DocTestCase</tt>
+instances, and <tt class="class">DocTestCase</tt> is a subclass of
+<tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestCase</tt>. <tt class="class">DocTestCase</tt> isn't documented
+here (it's an internal detail), but studying its code can answer questions
+about the exact details of <tt class="module"><a href="module-unittest.html">unittest</a></tt> integration.
+
+<p>
+Similarly, <tt class="function">DocFileSuite()</tt> creates a
+<tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt> out of <tt class="class">doctest.DocFileCase</tt>
+instances, and <tt class="class">DocFileCase</tt> is a subclass of <tt class="class">DocTestCase</tt>.
+
+<p>
+So both ways of creating a <tt class="class"><tt class="module"><a href="module-unittest.html">unittest</a></tt>.TestSuite</tt> run
+instances of <tt class="class">DocTestCase</tt>.  This is important for a subtle reason:
+when you run <tt class="module"><a href="module-doctest.html">doctest</a></tt> functions yourself, you can control the
+<tt class="module"><a href="module-doctest.html">doctest</a></tt> options in use directly, by passing option flags to
+<tt class="module"><a href="module-doctest.html">doctest</a></tt> functions.  However, if you're writing a
+<tt class="module"><a href="module-unittest.html">unittest</a></tt> framework, <tt class="module"><a href="module-unittest.html">unittest</a></tt> ultimately controls
+when and how tests get run.  The framework author typically wants to
+control <tt class="module"><a href="module-doctest.html">doctest</a></tt> reporting options (perhaps, e.g., specified by
+command line options), but there's no way to pass options through
+<tt class="module"><a href="module-unittest.html">unittest</a></tt> to <tt class="module"><a href="module-doctest.html">doctest</a></tt> test runners.
+
+<p>
+For this reason, <tt class="module"><a href="module-doctest.html">doctest</a></tt> also supports a notion of
+<tt class="module"><a href="module-doctest.html">doctest</a></tt> reporting flags specific to <tt class="module"><a href="module-unittest.html">unittest</a></tt>
+support, via this function:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4956' xml:id='l2h-4956' class="function">set_unittest_reportflags</tt></b>(</nobr></td>
+  <td><var>flags</var>)</td></tr></table></dt>
+<dd>
+  Set the <tt class="module"><a href="module-doctest.html">doctest</a></tt> reporting flags to use.
+
+<p>
+Argument <var>flags</var> or's together option flags.  See
+  section&nbsp;<a href="doctest-options.html#doctest-options">23.2.3</a>.  Only "reporting flags" can be used.
+
+<p>
+This is a module-global setting, and affects all future doctests run by
+  module <tt class="module"><a href="module-unittest.html">unittest</a></tt>:  the <tt class="method">runTest()</tt> method of
+  <tt class="class">DocTestCase</tt> looks at the option flags specified for the test case
+  when the <tt class="class">DocTestCase</tt> instance was constructed.  If no reporting
+  flags were specified (which is the typical and expected case),
+  <tt class="module"><a href="module-doctest.html">doctest</a></tt>'s <tt class="module"><a href="module-unittest.html">unittest</a></tt> reporting flags are or'ed into
+  the option flags, and the option flags so augmented are passed to the
+  <tt class="class">DocTestRunner</tt> instance created to run the doctest.  If any
+  reporting flags were specified when the <tt class="class">DocTestCase</tt> instance was
+  constructed, <tt class="module"><a href="module-doctest.html">doctest</a></tt>'s <tt class="module"><a href="module-unittest.html">unittest</a></tt> reporting flags
+  are ignored.
+
+<p>
+The value of the <tt class="module"><a href="module-unittest.html">unittest</a></tt> reporting flags in effect before the
+  function was called is returned by the function.
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.2.4 basic API"
+  href="doctest-basic-api.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.2 doctest  "
+  href="module-doctest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.2.6 advanced API"
+  href="doctest-advanced-api.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="doctest-basic-api.html">23.2.4 Basic API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-doctest.html">23.2 doctest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="doctest-advanced-api.html">23.2.6 Advanced API</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

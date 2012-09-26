@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-fnmatch.html" />
+<link rel="prev" href="module-tempfile.html" />
+<link rel="parent" href="filesys.html" />
+<link rel="next" href="module-fnmatch.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.7 glob -- Unix style pathname pattern expansion</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.6 tempfile  "
+  href="module-tempfile.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.8 fnmatch  "
+  href="module-fnmatch.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-tempfile.html">11.6 tempfile  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-fnmatch.html">11.8 fnmatch  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0013700000000000000000">
+11.7 <tt class="module">glob</tt> --
+         <span class="Unix">Unix</span> style pathname pattern expansion</a>
+</h1>
+
+<p>
+<a name="module-glob"></a>
+
+<p>
+The <tt class="module">glob</tt> module finds all the pathnames matching a specified
+pattern according to the rules used by the <span class="Unix">Unix</span> shell.  No tilde
+expansion is done, but <code>*</code>, <code>?</code>, and character ranges
+expressed with <code>[]</code> will be correctly matched.  This is done by
+using the <tt class="function">os.listdir()</tt> and <tt class="function">fnmatch.fnmatch()</tt>
+functions in concert, and not by actually invoking a subshell.  (For
+tilde and shell variable expansion, use <tt class="function">os.path.expanduser()</tt>
+and <tt class="function">os.path.expandvars()</tt>.)
+<a id='l2h-2285' xml:id='l2h-2285'></a>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2283' xml:id='l2h-2283' class="function">glob</tt></b>(</nobr></td>
+  <td><var>pathname</var>)</td></tr></table></dt>
+<dd>
+Return a possibly-empty list of path names that match <var>pathname</var>,
+which must be a string containing a path specification.
+<var>pathname</var> can be either absolute (like
+<span class="file">/usr/src/Python-1.5/Makefile</span>) or relative (like
+<span class="file">../../Tools/*/*.gif</span>), and can contain shell-style wildcards.
+Broken symlinks are included in the results (as in the shell).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2284' xml:id='l2h-2284' class="function">iglob</tt></b>(</nobr></td>
+  <td><var>pathname</var>)</td></tr></table></dt>
+<dd>
+Return an iterator which yields the same values as <tt class="function">glob()</tt>
+without actually storing them all simultaneously.
+
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+For example, consider a directory containing only the following files:
+<span class="file">1.gif</span>, <span class="file">2.txt</span>, and <span class="file">card.gif</span>.  <tt class="function">glob()</tt>
+will produce the following results.  Notice how any leading components
+of the path are preserved.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import glob
+&gt;&gt;&gt; glob.glob('./[0-9].*')
+['./1.gif', './2.txt']
+&gt;&gt;&gt; glob.glob('*.gif')
+['1.gif', 'card.gif']
+&gt;&gt;&gt; glob.glob('?.gif')
+['1.gif']
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-fnmatch.html">fnmatch</a></tt>:</b>
+    <dd>Shell-style filename (not path) expansion.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.6 tempfile  "
+  href="module-tempfile.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.8 fnmatch  "
+  href="module-fnmatch.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-tempfile.html">11.6 tempfile  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-fnmatch.html">11.8 fnmatch  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node320.html" />
+<link rel="prev" href="pickle-protocol.html" />
+<link rel="parent" href="pickle-protocol.html" />
+<link rel="next" href="node320.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.1.5.1 Pickling and unpickling normal class instances</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.5 the pickle protocol"
+  href="pickle-protocol.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1.5 the pickle protocol"
+  href="pickle-protocol.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.1.5.2 pickling and unpickling"
+  href="node320.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pickle-protocol.html">13.1.5 The pickle protocol</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="pickle-protocol.html">13.1.5 The pickle protocol</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node320.html">13.1.5.2 Pickling and unpickling</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0015151000000000000000"></a><a name="pickle-inst"></a>
+<br>
+13.1.5.1 Pickling and unpickling normal class
+    instances
+</h3>
+
+<p>
+When a pickled class instance is unpickled, its <tt class="method">__init__()</tt>
+method is normally <em>not</em> invoked.  If it is desirable that the
+<tt class="method">__init__()</tt> method be called on unpickling, an old-style class
+can define a method <tt class="method">__getinitargs__()</tt>, which should return a
+<em>tuple</em> containing the arguments to be passed to the class
+constructor (<tt class="method">__init__()</tt> for example).  The
+<tt class="method">__getinitargs__()</tt> method is called at
+pickle time; the tuple it returns is incorporated in the pickle for
+the instance.
+<a id='l2h-2469' xml:id='l2h-2469'></a><a id='l2h-2471' xml:id='l2h-2471'></a>
+<p>
+<a id='l2h-2473' xml:id='l2h-2473'></a>
+<p>
+New-style types can provide a <tt class="method">__getnewargs__()</tt> method that is
+used for protocol 2.  Implementing this method is needed if the type
+establishes some internal invariants when the instance is created, or
+if the memory allocation is affected by the values passed to the
+<tt class="method">__new__()</tt> method for the type (as it is for tuples and
+strings).  Instances of a new-style type <tt class="class">C</tt> are created using
+
+<p>
+<div class="verbatim"><pre><tt>
+ obj = C.__new__(C, *<var>args</var>)
+ </tt></pre></div>
+
+<p>
+where <var>args</var> is the result of calling <tt class="method">__getnewargs__()</tt> on
+the original object; if there is no <tt class="method">__getnewargs__()</tt>, an
+empty tuple is assumed.
+
+<p>
+<a id='l2h-2475' xml:id='l2h-2475'></a><a id='l2h-2477' xml:id='l2h-2477'></a>
+<p>
+Classes can further influence how their instances are pickled; if the
+class defines the method <tt class="method">__getstate__()</tt>, it is called and the
+return state is pickled as the contents for the instance, instead of
+the contents of the instance's dictionary.  If there is no
+<tt class="method">__getstate__()</tt> method, the instance's <tt class="member">__dict__</tt> is
+pickled.
+
+<p>
+Upon unpickling, if the class also defines the method
+<tt class="method">__setstate__()</tt>, it is called with the unpickled
+state.<a name="tex2html113"
+  href="#foot36583"><sup>13.5</sup></a>  If there is no <tt class="method">__setstate__()</tt> method, the
+pickled state must be a dictionary and its items are assigned to the
+new instance's dictionary.  If a class defines both
+<tt class="method">__getstate__()</tt> and <tt class="method">__setstate__()</tt>, the state object
+needn't be a dictionary and these methods can do what they
+want.<a name="tex2html114"
+  href="#foot36749"><sup>13.6</sup></a>
+<p>
+<div class="warning"><b class="label">Warning:</b>
+
+  For new-style classes, if <tt class="method">__getstate__()</tt> returns a false
+  value, the <tt class="method">__setstate__()</tt> method will not be called.
+</div>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot36583">...
+state.</a><A
+ href="pickle-inst.html#tex2html113"><sup>13.5</sup></a></dt>
+<dd>These methods can also be used to implement copying
+class instances.
+
+</dd>
+<dt><a name="foot36749">...
+want.</a><A
+ href="pickle-inst.html#tex2html114"><sup>13.6</sup></a></dt>
+<dd>This protocol is also used by the shallow and deep
+copying operations defined in the
+<tt class="module"><a href="module-copy.html">copy</a></tt> module.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.5 the pickle protocol"
+  href="pickle-protocol.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1.5 the pickle protocol"
+  href="pickle-protocol.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.1.5.2 pickling and unpickling"
+  href="node320.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pickle-protocol.html">13.1.5 The pickle protocol</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="pickle-protocol.html">13.1.5 The pickle protocol</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node320.html">13.1.5.2 Pickling and unpickling</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

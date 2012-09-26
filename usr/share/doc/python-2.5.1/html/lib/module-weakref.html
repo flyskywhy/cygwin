@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-UserDict.html" />
+<link rel="prev" href="module-Queue.html" />
+<link rel="parent" href="datatypes.html" />
+<link rel="next" href="weakref-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.11 weakref -- Weak references</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.10.1 queue Objects"
+  href="QueueObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.11.1 weak Reference Objects"
+  href="weakref-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="QueueObjects.html">5.10.1 Queue Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-objects.html">5.11.1 Weak Reference Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0071100000000000000000">
+5.11 <tt class="module">weakref</tt> --
+         Weak references</a>
+</h1>
+
+<p>
+<a name="module-weakref"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.1.</span>
+
+<p>
+The <tt class="module">weakref</tt> module allows the Python programmer to create
+<i class="dfn">weak references</i> to objects.
+
+<p>
+In the following, the term <i class="dfn">referent</i> means the
+object which is referred to by a weak reference.
+
+<p>
+A weak reference to an object is not enough to keep the object alive:
+when the only remaining references to a referent are weak references,
+garbage collection is free to destroy the referent and reuse its memory
+for something else.  A primary use for weak references is to implement
+caches or mappings holding large objects, where it's desired that a
+large object not be kept alive solely because it appears in a cache or
+mapping.  For example, if you have a number of large binary image objects,
+you may wish to associate a name with each.  If you used a Python
+dictionary to map names to images, or images to names, the image objects
+would remain alive just because they appeared as values or keys in the
+dictionaries.  The <tt class="class">WeakKeyDictionary</tt> and
+<tt class="class">WeakValueDictionary</tt> classes supplied by the <tt class="module">weakref</tt>
+module are an alternative, using weak references to construct mappings
+that don't keep objects alive solely because they appear in the mapping
+objects.  If, for example, an image object is a value in a
+<tt class="class">WeakValueDictionary</tt>, then when the last remaining
+references to that image object are the weak references held by weak
+mappings, garbage collection can reclaim the object, and its corresponding
+entries in weak mappings are simply deleted.
+
+<p>
+<tt class="class">WeakKeyDictionary</tt> and <tt class="class">WeakValueDictionary</tt> use weak
+references in their implementation, setting up callback functions on
+the weak references that notify the weak dictionaries when a key or value
+has been reclaimed by garbage collection.  Most programs should find that
+using one of these weak dictionary types is all they need - it's
+not usually necessary to create your own weak references directly.  The
+low-level machinery used by the weak dictionary implementations is exposed
+by the <tt class="module">weakref</tt> module for the benefit of advanced uses.
+
+<p>
+Not all objects can be weakly referenced; those objects which can
+include class instances, functions written in Python (but not in C),
+methods (both bound and unbound), sets, frozensets, file objects,
+generators, type objects, DBcursor objects from the <tt class="module">bsddb</tt> module,
+sockets, arrays, deques, and regular expression pattern objects.
+
+<span class="versionnote">Changed in version 2.4:
+Added support for files, sockets, arrays, and patterns.</span>
+
+<p>
+Several builtin types such as <tt class="class">list</tt> and <tt class="class">dict</tt> do not
+directly support weak references but can add support through subclassing:
+
+<p>
+<div class="verbatim"><pre>
+class Dict(dict):
+    pass
+
+obj = Dict(red=1, green=2, blue=3)   # this object is weak referencable
+</pre></div>
+
+<p>
+Extension types can easily be made to support weak references; see
+``<a class="ulink" href="../ext/weakref-support.html"
+  >Weak Reference Support</a>'' in
+<em class="citetitle"><a
+ href="../ext/ext.html"
+ title="Extending and Embedding the Python
+Interpreter"
+ >Extending and Embedding the Python
+Interpreter</a></em>.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-817' xml:id='l2h-817' class="class">ref</tt></b>(</nobr></td>
+  <td><var>object</var><big>[</big><var>, callback</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return a weak reference to <var>object</var>.  The original object can be
+  retrieved by calling the reference object if the referent is still
+  alive; if the referent is no longer alive, calling the reference
+  object will cause <tt class="constant">None</tt> to be returned.  If <var>callback</var> is
+  provided and not <tt class="constant">None</tt>, and the returned weakref object is
+  still alive, the callback will be called when the object is about to be
+  finalized; the weak reference object will be passed as the only
+  parameter to the callback; the referent will no longer be available.
+
+<p>
+It is allowable for many weak references to be constructed for the
+  same object.  Callbacks registered for each weak reference will be
+  called from the most recently registered callback to the oldest
+  registered callback.
+
+<p>
+Exceptions raised by the callback will be noted on the standard
+  error output, but cannot be propagated; they are handled in exactly
+  the same way as exceptions raised from an object's
+  <tt class="method">__del__()</tt> method.
+
+<p>
+Weak references are hashable if the <var>object</var> is hashable.  They
+  will maintain their hash value even after the <var>object</var> was
+  deleted.  If <tt class="function">hash()</tt> is called the first time only after
+  the <var>object</var> was deleted, the call will raise
+  <tt class="exception">TypeError</tt>.
+
+<p>
+Weak references support tests for equality, but not ordering.  If
+  the referents are still alive, two references have the same
+  equality relationship as their referents (regardless of the
+  <var>callback</var>).  If either referent has been deleted, the
+  references are equal only if the reference objects are the same
+  object.
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+This is now a subclassable type rather than a
+                  factory function; it derives from <tt class="class">object</tt>.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-818' xml:id='l2h-818' class="function">proxy</tt></b>(</nobr></td>
+  <td><var>object</var><big>[</big><var>, callback</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return a proxy to <var>object</var> which uses a weak reference.  This
+  supports use of the proxy in most contexts instead of requiring the
+  explicit dereferencing used with weak reference objects.  The
+  returned object will have a type of either <code>ProxyType</code> or
+  <code>CallableProxyType</code>, depending on whether <var>object</var> is
+  callable.  Proxy objects are not hashable regardless of the
+  referent; this avoids a number of problems related to their
+  fundamentally mutable nature, and prevent their use as dictionary
+  keys.  <var>callback</var> is the same as the parameter of the same name
+  to the <tt class="function">ref()</tt> function.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-819' xml:id='l2h-819' class="function">getweakrefcount</tt></b>(</nobr></td>
+  <td><var>object</var>)</td></tr></table></dt>
+<dd>
+  Return the number of weak references and proxies which refer to
+  <var>object</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-820' xml:id='l2h-820' class="function">getweakrefs</tt></b>(</nobr></td>
+  <td><var>object</var>)</td></tr></table></dt>
+<dd>
+  Return a list of all weak reference and proxy objects which refer to
+  <var>object</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-821' xml:id='l2h-821' class="class">WeakKeyDictionary</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>dict</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Mapping class that references keys weakly.  Entries in the
+  dictionary will be discarded when there is no longer a strong
+  reference to the key.  This can be used to associate additional data
+  with an object owned by other parts of an application without adding
+  attributes to those objects.  This can be especially useful with
+  objects that override attribute accesses.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+Caution:  Because a <tt class="class">WeakKeyDictionary</tt> is built on top
+        of a Python dictionary, it must not change size when iterating
+        over it.  This can be difficult to ensure for a
+        <tt class="class">WeakKeyDictionary</tt> because actions performed by the
+        program during iteration may cause items in the dictionary
+        to vanish "by magic" (as a side effect of garbage collection).</span>
+</dl>
+
+<p>
+<tt class="class">WeakKeyDictionary</tt> objects have the following additional
+methods.  These expose the internal references directly.  The
+references are not guaranteed to be ``live'' at the time they are
+used, so the result of calling the references needs to be checked
+before being used.  This can be used to avoid creating references that
+will cause the garbage collector to keep the keys around longer than
+needed.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-822' xml:id='l2h-822' class="method">iterkeyrefs</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return an iterator that yields the weak references to the keys.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-823' xml:id='l2h-823' class="method">keyrefs</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return a list of weak references to the keys.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-824' xml:id='l2h-824' class="class">WeakValueDictionary</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>dict</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Mapping class that references values weakly.  Entries in the
+  dictionary will be discarded when no strong reference to the value
+  exists any more.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+Caution:  Because a <tt class="class">WeakValueDictionary</tt> is built on top
+        of a Python dictionary, it must not change size when iterating
+        over it.  This can be difficult to ensure for a
+        <tt class="class">WeakValueDictionary</tt> because actions performed by the
+        program during iteration may cause items in the dictionary
+        to vanish "by magic" (as a side effect of garbage collection).</span>
+</dl>
+
+<p>
+<tt class="class">WeakValueDictionary</tt> objects have the following additional
+methods.  These method have the same issues as the
+<tt class="method">iterkeyrefs()</tt> and <tt class="method">keyrefs()</tt> methods of
+<tt class="class">WeakKeyDictionary</tt> objects.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-825' xml:id='l2h-825' class="method">itervaluerefs</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return an iterator that yields the weak references to the values.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-826' xml:id='l2h-826' class="method">valuerefs</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return a list of weak references to the values.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-827' xml:id='l2h-827'>ReferenceType</tt></b></dt>
+<dd>
+  The type object for weak references objects.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-828' xml:id='l2h-828'>ProxyType</tt></b></dt>
+<dd>
+  The type object for proxies of objects which are not callable.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-829' xml:id='l2h-829'>CallableProxyType</tt></b></dt>
+<dd>
+  The type object for proxies of callable objects.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-830' xml:id='l2h-830'>ProxyTypes</tt></b></dt>
+<dd>
+  Sequence containing all the type objects for proxies.  This can make
+  it simpler to test if an object is a proxy without being dependent
+  on naming both proxy types.
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-831' xml:id='l2h-831' class="exception">ReferenceError</tt></b></dt>
+<dd>
+  Exception raised when a proxy object is used but the underlying
+  object has been collected.  This is the same as the standard
+  <tt class="exception">ReferenceError</tt> exception.
+</dd></dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0205.html"
+        title="Weak References"
+        >PEP 0205, <em>Weak References</em></a>
+    <dd>The proposal and rationale for this
+                feature, including links to earlier implementations
+                and information about similar features in other
+                languages.
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="weakref-objects.html">5.11.1 Weak Reference Objects</a>
+<li><a href="weakref-example.html">5.11.2 Example</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.10.1 queue Objects"
+  href="QueueObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5. data Types"
+  href="datatypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.11.1 weak Reference Objects"
+  href="weakref-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="QueueObjects.html">5.10.1 Queue Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="datatypes.html">5. Data Types</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-objects.html">5.11.1 Weak Reference Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

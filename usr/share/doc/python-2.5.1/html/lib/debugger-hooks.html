@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="debugger-commands.html" />
+<link rel="parent" href="module-pdb.html" />
+<link rel="next" href="profile.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>24.2 How It Works </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="24.1 debugger Commands"
+  href="debugger-commands.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="24. the Python Debugger"
+  href="module-pdb.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="debugger-commands.html">24.1 Debugger Commands</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pdb.html">24. The Python Debugger</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="profile.html">25. The Python Profilers</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0026200000000000000000"></a><a name="debugger-hooks"></a>
+<br>
+24.2 How It Works 
+</h1>
+
+<p>
+Some changes were made to the interpreter:
+
+<p>
+
+<ul>
+<li><code>sys.settrace(<var>func</var>)</code> sets the global trace function
+</li>
+<li>there can also a local trace function (see later)
+</li>
+</ul>
+
+<p>
+Trace functions have three arguments: <var>frame</var>, <var>event</var>, and
+<var>arg</var>. <var>frame</var> is the current stack frame.  <var>event</var> is a
+string: <code>'call'</code>, <code>'line'</code>, <code>'return'</code>, <code>'exception'</code>,
+ <code>'c_call'</code>, <code>'c_return'</code>, or <code>'c_exception'</code>. <var>arg</var>
+ depends on the event type.
+
+<p>
+The global trace function is invoked (with <var>event</var> set to
+<code>'call'</code>) whenever a new local scope is entered; it should return
+a reference to the local trace function to be used that scope, or
+<code>None</code> if the scope shouldn't be traced.
+
+<p>
+The local trace function should return a reference to itself (or to
+another function for further tracing in that scope), or <code>None</code> to
+turn off tracing in that scope.
+
+<p>
+Instance methods are accepted (and very useful!) as trace functions.
+
+<p>
+The events have the following meaning:
+
+<p>
+<dl>
+<dt><strong><code>'call'</code></strong></dt>
+<dd>A function is called (or some other code block entered).  The global
+trace function is called; <var>arg</var> is <code>None</code>;
+the return value specifies the local trace function.
+
+<p>
+</dd>
+<dt><strong><code>'line'</code></strong></dt>
+<dd>The interpreter is about to execute a new line of code (sometimes
+multiple line events on one line exist).  The local trace function is
+called; <var>arg</var> is <code>None</code>; the return value specifies the new
+local trace function.
+
+<p>
+</dd>
+<dt><strong><code>'return'</code></strong></dt>
+<dd>A function (or other code block) is about to return.  The local trace
+function is called; <var>arg</var> is the value that will be returned.  The
+trace function's return value is ignored.
+
+<p>
+</dd>
+<dt><strong><code>'exception'</code></strong></dt>
+<dd>An exception has occurred.  The local trace function is called;
+<var>arg</var> is a triple <code>(<var>exception</var>, <var>value</var>,
+<var>traceback</var>)</code>; the return value specifies the new local trace
+function.
+
+<p>
+</dd>
+<dt><strong><code>'c_call'</code></strong></dt>
+<dd>A C function is about to be called.  This may be an extension function
+or a builtin.  <var>arg</var> is the C function object.
+
+<p>
+</dd>
+<dt><strong><code>'c_return'</code></strong></dt>
+<dd>A C function has returned. <var>arg</var> is <code>None</code>.
+
+<p>
+</dd>
+<dt><strong><code>'c_exception'</code></strong></dt>
+<dd>A C function has thrown an exception.  <var>arg</var> is <code>None</code>.
+
+<p>
+</dd>
+</dl>
+
+<p>
+Note that as an exception is propagated down the chain of callers, an
+<code>'exception'</code> event is generated at each level.
+
+<p>
+For more information on code and frame objects, refer to the
+<em class="citetitle"><a
+ href="../ref/ref.html"
+ title="Python Reference Manual"
+ >Python Reference Manual</a></em>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="24.1 debugger Commands"
+  href="debugger-commands.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="24. the Python Debugger"
+  href="module-pdb.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="25. the Python Profilers"
+  href="profile.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="debugger-commands.html">24.1 Debugger Commands</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pdb.html">24. The Python Debugger</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="profile.html">25. The Python Profilers</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

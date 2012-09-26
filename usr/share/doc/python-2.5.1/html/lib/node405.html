@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node406.html" />
+<link rel="prev" href="module-logging.html" />
+<link rel="parent" href="module-logging.html" />
+<link rel="next" href="node406.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.5.1 Logger Objects</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.2 basic example"
+  href="node406.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node406.html">14.5.2 Basic example</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0016510000000000000000">
+14.5.1 Logger Objects</a>
+</h2>
+
+<p>
+Loggers have the following attributes and methods. Note that Loggers are
+never instantiated directly, but always through the module-level function
+<tt class="function">logging.getLogger(name)</tt>.
+
+<p>
+<dl><dt><b><tt id='l2h-2873' xml:id='l2h-2873'>propagate</tt></b></dt>
+<dd>
+If this evaluates to false, logging messages are not passed by this
+logger or by child loggers to higher level (ancestor) loggers. The
+constructor sets this attribute to 1.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2874' xml:id='l2h-2874' class="method">setLevel</tt></b>(</nobr></td>
+  <td><var>lvl</var>)</td></tr></table></dt>
+<dd>
+Sets the threshold for this logger to <var>lvl</var>. Logging messages
+which are less severe than <var>lvl</var> will be ignored. When a logger is
+created, the level is set to <tt class="constant">NOTSET</tt> (which causes all messages
+to be processed when the logger is the root logger, or delegation to the
+parent when the logger is a non-root logger). Note that the root logger
+is created with level <tt class="constant">WARNING</tt>.
+
+<p>
+The term "delegation to the parent" means that if a logger has a level
+of NOTSET, its chain of ancestor loggers is traversed until either an
+ancestor with a level other than NOTSET is found, or the root is
+reached.
+
+<p>
+If an ancestor is found with a level other than NOTSET, then that
+ancestor's level is treated as the effective level of the logger where
+the ancestor search began, and is used to determine how a logging
+event is handled.
+
+<p>
+If the root is reached, and it has a level of NOTSET, then all
+messages will be processed. Otherwise, the root's level will be used
+as the effective level.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2875' xml:id='l2h-2875' class="method">isEnabledFor</tt></b>(</nobr></td>
+  <td><var>lvl</var>)</td></tr></table></dt>
+<dd>
+Indicates if a message of severity <var>lvl</var> would be processed by
+this logger.  This method checks first the module-level level set by
+<tt class="function">logging.disable(lvl)</tt> and then the logger's effective level as
+determined by <tt class="method">getEffectiveLevel()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2876' xml:id='l2h-2876' class="method">getEffectiveLevel</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Indicates the effective level for this logger. If a value other than
+<tt class="constant">NOTSET</tt> has been set using <tt class="method">setLevel()</tt>, it is returned.
+Otherwise, the hierarchy is traversed towards the root until a value
+other than <tt class="constant">NOTSET</tt> is found, and that value is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2877' xml:id='l2h-2877' class="method">debug</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, *args</var><big>[</big><var>, **kwargs</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Logs a message with level <tt class="constant">DEBUG</tt> on this logger.
+The <var>msg</var> is the message format string, and the <var>args</var> are the
+arguments which are merged into <var>msg</var> using the string formatting
+operator. (Note that this means that you can use keywords in the
+format string, together with a single dictionary argument.)
+
+<p>
+There are two keyword arguments in <var>kwargs</var> which are inspected:
+<var>exc_info</var> which, if it does not evaluate as false, causes exception
+information to be added to the logging message. If an exception tuple (in the
+format returned by <tt class="function">sys.exc_info()</tt>) is provided, it is used;
+otherwise, <tt class="function">sys.exc_info()</tt> is called to get the exception
+information.
+
+<p>
+The other optional keyword argument is <var>extra</var> which can be used to pass
+a dictionary which is used to populate the __dict__ of the LogRecord created
+for the logging event with user-defined attributes. These custom attributes
+can then be used as you like. For example, they could be incorporated into
+logged messages. For example:
+
+<p>
+<div class="verbatim"><pre>
+ FORMAT = "%(asctime)-15s %(clientip)s %(user)-8s %(message)s"
+ logging.basicConfig(format=FORMAT)
+ dict = { 'clientip' : '192.168.0.1', 'user' : 'fbloggs' }
+ logger = logging.getLogger("tcpserver")
+ logger.warning("Protocol problem: %s", "connection reset", extra=d)
+</pre></div>
+
+<p>
+would print something like
+<div class="verbatim"><pre>
+2006-02-08 22:20:02,165 192.168.0.1 fbloggs  Protocol problem: connection reset
+</pre></div>
+
+<p>
+The keys in the dictionary passed in <var>extra</var> should not clash with the keys
+used by the logging system. (See the <tt class="class">Formatter</tt> documentation for more
+information on which keys are used by the logging system.)
+
+<p>
+If you choose to use these attributes in logged messages, you need to exercise
+some care. In the above example, for instance, the <tt class="class">Formatter</tt> has been
+set up with a format string which expects 'clientip' and 'user' in the
+attribute dictionary of the LogRecord. If these are missing, the message will
+not be logged because a string formatting exception will occur. So in this
+case, you always need to pass the <var>extra</var> dictionary with these keys.
+
+<p>
+While this might be annoying, this feature is intended for use in specialized
+circumstances, such as multi-threaded servers where the same code executes
+in many contexts, and interesting conditions which arise are dependent on this
+context (such as remote client IP address and authenticated user name, in the
+above example). In such circumstances, it is likely that specialized
+<tt class="class">Formatter</tt>s would be used with particular <tt class="class">Handler</tt>s.
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+<var>extra</var> was added.</span>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2878' xml:id='l2h-2878' class="method">info</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, *args</var><big>[</big><var>, **kwargs</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Logs a message with level <tt class="constant">INFO</tt> on this logger.
+The arguments are interpreted as for <tt class="method">debug()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2879' xml:id='l2h-2879' class="method">warning</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, *args</var><big>[</big><var>, **kwargs</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Logs a message with level <tt class="constant">WARNING</tt> on this logger.
+The arguments are interpreted as for <tt class="method">debug()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2880' xml:id='l2h-2880' class="method">error</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, *args</var><big>[</big><var>, **kwargs</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Logs a message with level <tt class="constant">ERROR</tt> on this logger.
+The arguments are interpreted as for <tt class="method">debug()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2881' xml:id='l2h-2881' class="method">critical</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, *args</var><big>[</big><var>, **kwargs</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Logs a message with level <tt class="constant">CRITICAL</tt> on this logger.
+The arguments are interpreted as for <tt class="method">debug()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2882' xml:id='l2h-2882' class="method">log</tt></b>(</nobr></td>
+  <td><var>lvl, msg</var><big>[</big><var>, *args</var><big>[</big><var>, **kwargs</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Logs a message with integer level <var>lvl</var> on this logger.
+The other arguments are interpreted as for <tt class="method">debug()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2883' xml:id='l2h-2883' class="method">exception</tt></b>(</nobr></td>
+  <td><var>msg</var><big>[</big><var>, *args</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Logs a message with level <tt class="constant">ERROR</tt> on this logger.
+The arguments are interpreted as for <tt class="method">debug()</tt>. Exception info
+is added to the logging message. This method should only be called
+from an exception handler.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2884' xml:id='l2h-2884' class="method">addFilter</tt></b>(</nobr></td>
+  <td><var>filt</var>)</td></tr></table></dt>
+<dd>
+Adds the specified filter <var>filt</var> to this logger.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2885' xml:id='l2h-2885' class="method">removeFilter</tt></b>(</nobr></td>
+  <td><var>filt</var>)</td></tr></table></dt>
+<dd>
+Removes the specified filter <var>filt</var> from this logger.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2886' xml:id='l2h-2886' class="method">filter</tt></b>(</nobr></td>
+  <td><var>record</var>)</td></tr></table></dt>
+<dd>
+Applies this logger's filters to the record and returns a true value if
+the record is to be processed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2887' xml:id='l2h-2887' class="method">addHandler</tt></b>(</nobr></td>
+  <td><var>hdlr</var>)</td></tr></table></dt>
+<dd>
+Adds the specified handler <var>hdlr</var> to this logger.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2888' xml:id='l2h-2888' class="method">removeHandler</tt></b>(</nobr></td>
+  <td><var>hdlr</var>)</td></tr></table></dt>
+<dd>
+Removes the specified handler <var>hdlr</var> from this logger.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2889' xml:id='l2h-2889' class="method">findCaller</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Finds the caller's source filename and line number. Returns the filename,
+line number and function name as a 3-element tuple.
+
+<span class="versionnote">Changed in version 2.5:
+The function name was added. In earlier versions, the
+filename and line number were returned as a 2-element tuple..</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2890' xml:id='l2h-2890' class="method">handle</tt></b>(</nobr></td>
+  <td><var>record</var>)</td></tr></table></dt>
+<dd>
+Handles a record by passing it to all handlers associated with this logger
+and its ancestors (until a false value of <var>propagate</var> is found).
+This method is used for unpickled records received from a socket, as well
+as those created locally. Logger-level filtering is applied using
+<tt class="method">filter()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2891' xml:id='l2h-2891' class="method">makeRecord</tt></b>(</nobr></td>
+  <td><var>name, lvl, fn, lno, msg, args, exc_info
+                               </var><big>[</big><var>, func, extra</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a factory method which can be overridden in subclasses to create
+specialized <tt class="class">LogRecord</tt> instances.
+
+<span class="versionnote">Changed in version 2.5:
+<var>func</var> and <var>extra</var> were added.</span>
+
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.2 basic example"
+  href="node406.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node406.html">14.5.2 Basic example</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

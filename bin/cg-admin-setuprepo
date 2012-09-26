@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+#
+# Setup a public repository
+# Copyright (c) Petr Baudis, 2005
+#
+# Setup a public GIT repository, that is, one that has no attached working
+# copy and you typically only push into it and pull from it. You need to run
+# this command before you will be able to push into the repository for the
+# first time, but you will be also unable to pull from the repository until
+# you push into it at first.
+#
+# Therefore the workflow is to first init a regular private repository, then
+# use this command to create the public one, then add the appropriate remote
+# branch (`cg-branch-add origin ...`) in your private repository and then
+# push to the public repository.
+#
+# Use `cg-init` if you want to instead create a new GIT project.
+#
+# The command will create the repository to reside in REPOSITORY (either local
+# path or git+ssh URL; the directory must not exist before calling this
+# command). By default, it will be world-readable, but writable only by you. If
+# you want to make it possible for multiple users to push, create a group for
+# them and use the '-g' parameter, which will make `cg-admin-setuprepo` set up
+# the permissions properly.
+#
+# Note that in case you are using cg-admin-setuprepo with SSH URL instead of
+# a local path, you need a full shell access at the remote machine, the
+# restricted git shell access is not enough.
+#
+# The repository will also be set up so that `git update-server-info` will
+# be automagically re-ran after each push, in short making it suitable for
+# HTTP access.
+#
+# Note that you might need to do other additional steps, like touching the
+# 'git daemon-export-ok' file if you want to make the repository accessible
+# by the git daemon (serving the 'git://...' URIs).
+#
+# OPTIONS
+# -------
+# -g GROUP:: Specify group ownership for the repository
+#	Name of the UNIX group covering the users authorized to push into
+#	the repository. If unspecified, only you (who ran this command) will
+#	have write (push) access.
+#
+# NOTES
+# -----
+# It may happen that you are using version of GIT missing the default
+# post-update hook, or that the relevant template hooks are not available
+# on your system or with your GIT installation. In that case, in order to
+# have your repository properly accessible with HTTP, you need to add this
+# to .git/hooks/post-update (and then make it eXecutable):
+#
+#	#!/bin/sh
+#	exec git update-server-info
+
+# Testsuite: TODO
+
+USAGE="cg-admin-setuprepo [-g GROUP] REPOSITORY"
+_git_repo_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+shared=
+unixgroup=
+while optparse; do
+	if optparse -g=; then
+		unixgroup="$OPTARG"
+		shared=--shared
+	else
+		optfail
+	fi
+done
+
+
+uri="${ARGS[0]}"
+if echo "$uri" | grep -q "^git+ssh://"; then
+	shell=ssh
+	shellarg="$(echo "$uri" | sed 's!^git+ssh://\([^/]*\)/.*!\1!')"
+	uri="$(echo "$uri" | sed 's!^git+ssh://[^/]*!!')"
+else
+	shell=bash
+	shellarg=
+fi
+
+
+# Careful here, no cg-Xlib functions! Also, mind that the variables
+# are substituted _before_ executing the script, not as we go. Which
+# is somewhat unfortunate in case the user passed us a path containing
+# quotes or backslashes, but only sick people do that and they receive
+# what they deserve. ;-)
+_git="$uri"
+cat <<_SCRIPT_EOF_ | $shell $shellarg
+
+die() { echo "$*" >&2; exit 1; }
+
+export GIT_DIR="$uri"
+
+[ "$_git" ] || die "missing name of the repository directory"
+[ -e "$_git" ] && die "$_git already exists"
+
+
+if [ "$unixgroup" ]; then
+	umask 002
+else
+	umask 022
+fi
+
+mkdir "$_git" || exit 1
+if [ "$unixgroup" ]; then
+	chgrp "$unixgroup" "$_git" && chmod 2775 "$_git" || exit 1
+fi
+
+git init-db $shared || die "git init-db failed"
+
+# Enable git update-server-info after each push.
+if ! chmod a+x "$_git/hooks/post-update"; then
+	echo "Due to a missing post-update hook, HTTP pull will not work properly on this repository." >&2
+	echo "See the NOTES section of cg-admin-setuprepo(1)'s documentation for more details." >&2
+fi
+true
+
+_SCRIPT_EOF_

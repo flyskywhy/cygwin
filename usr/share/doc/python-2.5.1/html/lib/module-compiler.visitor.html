@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node889.html" />
+<link rel="prev" href="node884.html" />
+<link rel="parent" href="compiler.html" />
+<link rel="next" href="node889.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>31.4 Using Visitors to Walk ASTs</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="31.3.3 Examples"
+  href="node887.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="31. python compiler package"
+  href="compiler.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="31.5 bytecode Generation"
+  href="node889.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node887.html">31.3.3 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="compiler.html">31. Python compiler package</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node889.html">31.5 Bytecode Generation</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0033400000000000000000">
+31.4 Using Visitors to Walk ASTs</a>
+</h1>
+
+<p>
+<a name="module-compiler.visitor"></a>
+<p>
+The visitor pattern is ...  The <tt class="module"><a href="module-compiler.html">compiler</a></tt> package uses a
+variant on the visitor pattern that takes advantage of Python's
+introspection features to eliminate the need for much of the visitor's
+infrastructure.
+
+<p>
+The classes being visited do not need to be programmed to accept
+visitors.  The visitor need only define visit methods for classes it
+is specifically interested in; a default visit method can handle the
+rest. 
+
+<p>
+XXX The magic <tt class="method">visit()</tt> method for visitors.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5504' xml:id='l2h-5504' class="function">walk</tt></b>(</nobr></td>
+  <td><var>tree, visitor</var><big>[</big><var>, verbose</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5505' xml:id='l2h-5505' class="class">ASTVisitor</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+The <tt class="class">ASTVisitor</tt> is responsible for walking over the tree in the
+correct order.  A walk begins with a call to <tt class="method">preorder()</tt>.  For
+each node, it checks the <var>visitor</var> argument to <tt class="method">preorder()</tt>
+for a method named `visitNodeType,' where NodeType is the name of the
+node's class, e.g. for a <tt class="class">While</tt> node a <tt class="method">visitWhile()</tt>
+would be called.  If the method exists, it is called with the node as
+its first argument.
+
+<p>
+The visitor method for a particular node type can control how child
+nodes are visited during the walk.  The <tt class="class">ASTVisitor</tt> modifies
+the visitor argument by adding a visit method to the visitor; this
+method can be used to visit a particular child node.  If no visitor is
+found for a particular node type, the <tt class="method">default()</tt> method is
+called. 
+</dl>
+
+<p>
+<tt class="class">ASTVisitor</tt> objects have the following methods:
+
+<p>
+XXX describe extra arguments
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5506' xml:id='l2h-5506' class="method">default</tt></b>(</nobr></td>
+  <td><var>node</var><big>[</big><var>, ...</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5507' xml:id='l2h-5507' class="method">dispatch</tt></b>(</nobr></td>
+  <td><var>node</var><big>[</big><var>, ...</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5508' xml:id='l2h-5508' class="method">preorder</tt></b>(</nobr></td>
+  <td><var>tree, visitor</var>)</td></tr></table></dt>
+<dd>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="31.3.3 Examples"
+  href="node887.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="31. python compiler package"
+  href="compiler.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="31.5 bytecode Generation"
+  href="node889.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node887.html">31.3.3 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="compiler.html">31. Python compiler package</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node889.html">31.5 Bytecode Generation</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

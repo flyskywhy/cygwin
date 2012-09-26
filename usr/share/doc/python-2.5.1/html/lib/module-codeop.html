@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-code.html" />
+<link rel="parent" href="custominterp.html" />
+<link rel="next" href="restricted.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>27.2 codeop -- Compile Python code</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="27.1.2 interactive Console Objects"
+  href="console-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="27. custom Python Interpreters"
+  href="custominterp.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="28. restricted Execution"
+  href="restricted.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="console-objects.html">27.1.2 Interactive Console Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="custominterp.html">27. Custom Python Interpreters</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="restricted.html">28. Restricted Execution</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0029200000000000000000">
+27.2 <tt class="module">codeop</tt> --
+         Compile Python code</a>
+</h1>
+
+<p>
+<a name="module-codeop"></a>
+
+<p>
+The <tt class="module">codeop</tt> module provides utilities upon which the Python
+read-eval-print loop can be emulated, as is done in the
+<tt class="module"><a href="module-code.html">code</a></tt> module.  As a result, you probably don't want to use
+the module directly; if you want to include such a loop in your
+program you probably want to use the <tt class="module"><a href="module-code.html">code</a></tt> module instead.
+
+<p>
+There are two parts to this job: 
+
+<p>
+
+<ol>
+<li>Being able to tell if a line of input completes a Python 
+        statement: in short, telling whether to print
+        `<code>&gt;&gt;&gt;&nbsp;</code>' or `<code>...&nbsp;</code>' next.
+</li>
+<li>Remembering which future statements the user has entered, so 
+        subsequent input can be compiled with these in effect.
+</li>
+</ol>
+
+<p>
+The <tt class="module">codeop</tt> module provides a way of doing each of these
+things, and a way of doing them both.
+
+<p>
+To do just the former:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5327' xml:id='l2h-5327' class="function">compile_command</tt></b>(</nobr></td>
+  <td><var>source</var><big>[</big><var>, filename</var><big>[</big><var>, symbol</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Tries to compile <var>source</var>, which should be a string of Python
+code and return a code object if <var>source</var> is valid
+Python code. In that case, the filename attribute of the code object
+will be <var>filename</var>, which defaults to <code>'&lt;input&gt;'</code>.
+Returns <code>None</code> if <var>source</var> is <em>not</em> valid Python
+code, but is a prefix of valid Python code.
+
+<p>
+If there is a problem with <var>source</var>, an exception will be raised.
+<tt class="exception">SyntaxError</tt> is raised if there is invalid Python syntax,
+and <tt class="exception">OverflowError</tt> or <tt class="exception">ValueError</tt> if there is an
+invalid literal.
+
+<p>
+The <var>symbol</var> argument determines whether <var>source</var> is compiled
+as a statement (<code>'single'</code>, the default) or as an expression
+(<code>'eval'</code>).  Any other value will cause <tt class="exception">ValueError</tt> to 
+be raised.
+
+<p>
+<strong>Caveat:</strong>
+It is possible (but not likely) that the parser stops parsing
+with a successful outcome before reaching the end of the source;
+in this case, trailing symbols may be ignored instead of causing an
+error.  For example, a backslash followed by two newlines may be
+followed by arbitrary garbage.  This will be fixed once the API
+for the parser is better.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5328' xml:id='l2h-5328' class="class">Compile</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Instances of this class have <tt class="method">__call__()</tt> methods identical in
+signature to the built-in function <tt class="function">compile()</tt>, but with the
+difference that if the instance compiles program text containing a
+<tt class="module">__future__</tt> statement, the instance 'remembers' and compiles
+all subsequent program texts with the statement in force.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-5329' xml:id='l2h-5329' class="class">CommandCompiler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Instances of this class have <tt class="method">__call__()</tt> methods identical in
+signature to <tt class="function">compile_command()</tt>; the difference is that if
+the instance compiles program text containing a <code>__future__</code>
+statement, the instance 'remembers' and compiles all subsequent
+program texts with the statement in force.
+</dl>
+
+<p>
+A note on version compatibility: the <tt class="class">Compile</tt> and
+<tt class="class">CommandCompiler</tt> are new in Python 2.2.  If you want to enable
+the future-tracking features of 2.2 but also retain compatibility with
+2.1 and earlier versions of Python you can either write
+
+<p>
+<div class="verbatim"><pre>
+try:
+    from codeop import CommandCompiler
+    compile_command = CommandCompiler()
+    del CommandCompiler
+except ImportError:
+    from codeop import compile_command
+</pre></div>
+
+<p>
+which is a low-impact change, but introduces possibly unwanted global
+state into your program, or you can write:
+
+<p>
+<div class="verbatim"><pre>
+try:
+    from codeop import CommandCompiler
+except ImportError:
+    def CommandCompiler():
+        from codeop import compile_command
+        return compile_command
+</pre></div>
+
+<p>
+and then call <code>CommandCompiler</code> every time you need a fresh
+compiler object.
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="27.1.2 interactive Console Objects"
+  href="console-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="27. custom Python Interpreters"
+  href="custominterp.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="28. restricted Execution"
+  href="restricted.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="console-objects.html">27.1.2 Interactive Console Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="custominterp.html">27. Custom Python Interpreters</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="restricted.html">28. Restricted Execution</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

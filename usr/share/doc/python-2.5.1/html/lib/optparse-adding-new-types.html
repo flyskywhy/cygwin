@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="optparse-adding-new-actions.html" />
+<link rel="prev" href="optparse-extending-optparse.html" />
+<link rel="parent" href="optparse-extending-optparse.html" />
+<link rel="next" href="optparse-adding-new-actions.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.3.5.1 Adding new types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.5 extending optparse"
+  href="optparse-extending-optparse.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.5 extending optparse"
+  href="optparse-extending-optparse.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.5.2 adding new actions"
+  href="optparse-adding-new-actions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-extending-optparse.html">14.3.5 Extending optparse</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-extending-optparse.html">14.3.5 Extending optparse</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-adding-new-actions.html">14.3.5.2 Adding new actions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0016351000000000000000"></a><a name="optparse-adding-new-types"></a>
+<br>
+14.3.5.1 Adding new types
+</h3>
+
+<p>
+To add new types, you need to define your own subclass of <tt class="module">optparse</tt>'s Option
+class.  This class has a couple of attributes that define <tt class="module">optparse</tt>'s types:
+<tt class="member">TYPES</tt> and <tt class="member">TYPE_CHECKER</tt>.
+
+<p>
+<tt class="member">TYPES</tt> is a tuple of type names; in your subclass, simply define a new
+tuple <tt class="member">TYPES</tt> that builds on the standard one.
+
+<p>
+<tt class="member">TYPE_CHECKER</tt> is a dictionary mapping type names to type-checking
+functions.  A type-checking function has the following signature:
+<div class="verbatim"><pre>
+def check_mytype(option, opt, value)
+</pre></div>
+
+<p>
+where <code>option</code> is an <tt class="class">Option</tt> instance, <code>opt</code> is an option string
+(e.g., <code>"-f"</code>), and <code>value</code> is the string from the command line that
+must be checked and converted to your desired type.  <code>check_mytype()</code>
+should return an object of the hypothetical type <code>mytype</code>.  The value
+returned by a type-checking function will wind up in the OptionValues
+instance returned by <tt class="method">OptionParser.parse_args()</tt>, or be passed to a
+callback as the <code>value</code> parameter.
+
+<p>
+Your type-checking function should raise OptionValueError if it
+encounters any problems.  OptionValueError takes a single string
+argument, which is passed as-is to OptionParser's <tt class="method">error()</tt> method,
+which in turn prepends the program name and the string <code>"error:"</code> and
+prints everything to stderr before terminating the process.
+
+<p>
+Here's a silly example that demonstrates adding a <code>complex</code> option
+type to parse Python-style complex numbers on the command line.  (This
+is even sillier than it used to be, because <tt class="module">optparse</tt> 1.3 added built-in
+support for complex numbers, but never mind.)
+
+<p>
+First, the necessary imports:
+<div class="verbatim"><pre>
+from copy import copy
+from optparse import Option, OptionValueError
+</pre></div>
+
+<p>
+You need to define your type-checker first, since it's referred to later
+(in the <tt class="member">TYPE_CHECKER</tt> class attribute of your Option subclass):
+<div class="verbatim"><pre>
+def check_complex(option, opt, value):
+    try:
+        return complex(value)
+    except ValueError:
+        raise OptionValueError(
+            "option %s: invalid complex value: %r" % (opt, value))
+</pre></div>
+
+<p>
+Finally, the Option subclass:
+<div class="verbatim"><pre>
+class MyOption (Option):
+    TYPES = Option.TYPES + ("complex",)
+    TYPE_CHECKER = copy(Option.TYPE_CHECKER)
+    TYPE_CHECKER["complex"] = check_complex
+</pre></div>
+
+<p>
+(If we didn't make a <tt class="function">copy()</tt> of <tt class="member">Option.TYPE_CHECKER</tt>, we would end
+up modifying the <tt class="member">TYPE_CHECKER</tt> attribute of <tt class="module">optparse</tt>'s Option class.
+This being Python, nothing stops you from doing that except good manners
+and common sense.)
+
+<p>
+That's it!  Now you can write a script that uses the new option type
+just like any other <tt class="module">optparse</tt>-based script, except you have to instruct your
+OptionParser to use MyOption instead of Option:
+<div class="verbatim"><pre>
+parser = OptionParser(option_class=MyOption)
+parser.add_option("-c", type="complex")
+</pre></div>
+
+<p>
+Alternately, you can build your own option list and pass it to
+OptionParser; if you don't use <tt class="method">add_option()</tt> in the above way, you
+don't need to tell OptionParser which option class to use:
+<div class="verbatim"><pre>
+option_list = [MyOption("-c", action="store", type="complex", dest="c")]
+parser = OptionParser(option_list=option_list)
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.3.5 extending optparse"
+  href="optparse-extending-optparse.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.3.5 extending optparse"
+  href="optparse-extending-optparse.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.3.5.2 adding new actions"
+  href="optparse-adding-new-actions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="optparse-extending-optparse.html">14.3.5 Extending optparse</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="optparse-extending-optparse.html">14.3.5 Extending optparse</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="optparse-adding-new-actions.html">14.3.5.2 Adding new actions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

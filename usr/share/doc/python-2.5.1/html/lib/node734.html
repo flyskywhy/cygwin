@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node735.html" />
+<link rel="prev" href="node733.html" />
+<link rel="parent" href="node732.html" />
+<link rel="next" href="node735.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>21.1.2.2 The GNUTranslations class</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="21.1.2.1 the NullTranslations class"
+  href="node733.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="21.1.2 class-based API"
+  href="node732.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="21.1.2.3 solaris message catalog"
+  href="node735.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node733.html">21.1.2.1 The NullTranslations class</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node732.html">21.1.2 Class-based API</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node735.html">21.1.2.3 Solaris message catalog</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION0023122000000000000000">
+21.1.2.2 The <tt class="class">GNUTranslations</tt> class</a>
+</h3>
+
+<p>
+The <tt class="module">gettext</tt> module provides one additional class derived from
+<tt class="class">NullTranslations</tt>: <tt class="class">GNUTranslations</tt>.  This class
+overrides <tt class="method">_parse()</tt> to enable reading GNU <b class="program">gettext</b>
+format <span class="file">.mo</span> files in both big-endian and little-endian format.
+It also coerces both message ids and message strings to Unicode.
+
+<p>
+<tt class="class">GNUTranslations</tt> parses optional meta-data out of the
+translation catalog.  It is convention with GNU <b class="program">gettext</b> to
+include meta-data as the translation for the empty string.  This
+meta-data is in <a class="rfc" id='rfcref-104105' xml:id='rfcref-104105'
+href="http://www.faqs.org/rfcs/rfc822.html">RFC 822</a>-style <code>key: value</code> pairs, and should
+contain the <code>Project-Id-Version</code> key.  If the key
+<code>Content-Type</code> is found, then the <code>charset</code> property is used
+to initialize the ``protected'' <tt class="member">_charset</tt> instance variable,
+defaulting to <code>None</code> if not found.  If the charset encoding is
+specified, then all message ids and message strings read from the
+catalog are converted to Unicode using this encoding.  The
+<tt class="method">ugettext()</tt> method always returns a Unicode, while the
+<tt class="method">gettext()</tt> returns an encoded 8-bit string.  For the message
+id arguments of both methods, either Unicode strings or 8-bit strings
+containing only US-ASCII characters are acceptable.  Note that the
+Unicode version of the methods (i.e. <tt class="method">ugettext()</tt> and
+<tt class="method">ungettext()</tt>) are the recommended interface to use for
+internationalized Python programs.
+
+<p>
+The entire set of key/value pairs are placed into a dictionary and set
+as the ``protected'' <tt class="member">_info</tt> instance variable.
+
+<p>
+If the <span class="file">.mo</span> file's magic number is invalid, or if other problems
+occur while reading the file, instantiating a <tt class="class">GNUTranslations</tt> class
+can raise <tt class="exception">IOError</tt>.
+
+<p>
+The following methods are overridden from the base class implementation:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4831' xml:id='l2h-4831' class="method">gettext</tt></b>(</nobr></td>
+  <td><var>message</var>)</td></tr></table></dt>
+<dd>
+Look up the <var>message</var> id in the catalog and return the
+corresponding message string, as an 8-bit string encoded with the
+catalog's charset encoding, if known.  If there is no entry in the
+catalog for the <var>message</var> id, and a fallback has been set, the
+look up is forwarded to the fallback's <tt class="method">gettext()</tt> method.
+Otherwise, the <var>message</var> id is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4832' xml:id='l2h-4832' class="method">lgettext</tt></b>(</nobr></td>
+  <td><var>message</var>)</td></tr></table></dt>
+<dd>
+Equivalent to <tt class="method">gettext()</tt>, but the translation is returned
+in the preferred system encoding, if no other encoding was explicitly
+set with <tt class="method">set_output_charset()</tt>.
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4833' xml:id='l2h-4833' class="method">ugettext</tt></b>(</nobr></td>
+  <td><var>message</var>)</td></tr></table></dt>
+<dd>
+Look up the <var>message</var> id in the catalog and return the
+corresponding message string, as a Unicode string.  If there is no
+entry in the catalog for the <var>message</var> id, and a fallback has been
+set, the look up is forwarded to the fallback's <tt class="method">ugettext()</tt>
+method.  Otherwise, the <var>message</var> id is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4834' xml:id='l2h-4834' class="method">ngettext</tt></b>(</nobr></td>
+  <td><var>singular, plural, n</var>)</td></tr></table></dt>
+<dd>
+Do a plural-forms lookup of a message id.  <var>singular</var> is used as
+the message id for purposes of lookup in the catalog, while <var>n</var> is
+used to determine which plural form to use.  The returned message
+string is an 8-bit string encoded with the catalog's charset encoding,
+if known.
+
+<p>
+If the message id is not found in the catalog, and a fallback is
+specified, the request is forwarded to the fallback's
+<tt class="method">ngettext()</tt> method.  Otherwise, when <var>n</var> is 1 <var>singular</var> is
+returned, and <var>plural</var> is returned in all other cases.
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4835' xml:id='l2h-4835' class="method">lngettext</tt></b>(</nobr></td>
+  <td><var>singular, plural, n</var>)</td></tr></table></dt>
+<dd>
+Equivalent to <tt class="method">gettext()</tt>, but the translation is returned
+in the preferred system encoding, if no other encoding was explicitly
+set with <tt class="method">set_output_charset()</tt>.
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4836' xml:id='l2h-4836' class="method">ungettext</tt></b>(</nobr></td>
+  <td><var>singular, plural, n</var>)</td></tr></table></dt>
+<dd>
+Do a plural-forms lookup of a message id.  <var>singular</var> is used as
+the message id for purposes of lookup in the catalog, while <var>n</var> is
+used to determine which plural form to use.  The returned message
+string is a Unicode string.
+
+<p>
+If the message id is not found in the catalog, and a fallback is
+specified, the request is forwarded to the fallback's
+<tt class="method">ungettext()</tt> method.  Otherwise, when <var>n</var> is 1 <var>singular</var> is
+returned, and <var>plural</var> is returned in all other cases.
+
+<p>
+Here is an example:
+
+<p>
+<div class="verbatim"><pre>
+n = len(os.listdir('.'))
+cat = GNUTranslations(somefile)
+message = cat.ungettext(
+    'There is %(num)d file in this directory',
+    'There are %(num)d files in this directory',
+    n) % {'num': n}
+</pre></div>
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="21.1.2.1 the NullTranslations class"
+  href="node733.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="21.1.2 class-based API"
+  href="node732.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="21.1.2.3 solaris message catalog"
+  href="node735.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node733.html">21.1.2.1 The NullTranslations class</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node732.html">21.1.2 Class-based API</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node735.html">21.1.2.3 Solaris message catalog</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

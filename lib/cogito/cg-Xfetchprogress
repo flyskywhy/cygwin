@@ -1,0 +1,116 @@
+#!/usr/bin/env perl
+#
+# Show a cute progressbar for cg-fetch
+# Copyright (c) Petr Baudis, 2005
+#
+# This file shows a progressbar for cg-fetch based on output of rsync
+# or native git fetchers. It is written in perl because I cannot figure
+# out a way to check a file size without slowing the fetch by a factor
+# of four.
+
+use warnings;
+use strict;
+
+# Even line-buffering is bad since we output no newlines normally.
+$| = 1;
+
+my $_git_objects = shift;
+
+my $objects = 0;
+my $size = 0;
+my $osize = 0;
+my $percentage = '';
+
+my $object = '';
+my $timeout = 1;
+
+my $rin = '';
+vec($rin, fileno(STDIN), 1) = 1;
+my $ein = $rin;
+while (1) {
+	my ($rout, $eout);
+	# POSIX might be mad at us about <> vs. select(), but what can go
+	# wrong with $|==1?
+	if (not select($rout = $rin, undef, $eout = $ein, $timeout)) {
+		# Timeout, show file progress
+		$timeout = 0.25; # Update more frequently
+		if ($object) {
+			my ($objid) = ($object =~ /([a-f0-9]{12})[^\/]*$/);
+			my $fobject = "$_git_objects/$object";
+			if (-e $fobject or -e ($fobject .= ".temp")) {
+				my $fsize = (stat("$fobject"))[7];
+				$size = $osize + $fsize;
+				progress(', now fetching '.$objid.'... ('.$fsize.' bytes)');
+			}
+		}
+
+	} elsif (vec($eout, fileno(STDIN), 1)) {
+finish:
+		# Error - fetch agent is probably finished
+		print "\n";
+		exit 0;
+
+	} else {
+		# Next line from the fetch agent
+		$timeout = 1; # ...seconds before we show per-file progress
+		getline() or goto finish;
+	}
+}
+
+
+sub getline {
+	$_ = <STDIN>;
+	return 0 if not defined $_;
+	chomp;
+
+	# git fetcher
+	if (m#^(link|symlink|copy|got) ([a-f0-9]{2})([a-f0-9]{38})#) {
+		$object = "$2/$3";
+
+	} elsif (m#^(ref|walk) ([a-f0-9]{2})([a-f0-9]{38})#) {
+		return 1; # redundant information
+
+	# rsync
+	} elsif (m#^([a-f0-9]{2})/([a-f0-9]{38})$#) {
+		$object = $_;
+		# Estimate percentage done using the position of
+		# the object subdir. It might not get all the way
+		# up to 100% ...
+		$percentage = ', ' . int(hex($1) * 100 / 0xff) . '% done';
+
+	# rsync packs
+	} elsif (m#^pack/pack-(.+)$#) {
+		$object = $_;
+		print "Getting pack file $_\033[K\n";
+		progress('');
+		return 1;
+
+	# some rsync versions output this
+	} elsif (m#^([a-f0-9]{2})/$#) {
+		return 1;
+
+	# misc. output
+	} else {
+		if (m#^Getting index for pack ([a-f0-9]{40})#) {
+			$object = "pack/pack-$1.idx";
+		} elsif (m#^Getting pack ([a-f0-9]{40})#) {
+			$object = "pack/pack-$1.pack";
+		}
+
+		print "$_\033[K\n";
+		progress('');
+		return 1;
+	}
+
+	my $fobject = "$_git_objects/$object";
+	-e $fobject and $size += (stat($fobject))[7];
+	$osize = $size;
+	$objects++;
+
+	progress('');
+	return 1;
+}
+
+sub progress {
+	print "progress: $objects objects, $size bytes$percentage$_[0]\033[K\r";
+}

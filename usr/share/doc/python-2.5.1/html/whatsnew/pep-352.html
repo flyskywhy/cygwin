@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-353.html" />
+<link rel="prev" href="pep-343.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-353.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>9 PEP 352: Exceptions as New-Style Classes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8 pep 343: The"
+  href="pep-343.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10 pep 353: Using"
+  href="pep-353.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-343.html">8 PEP 343: The</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-353.html">10 PEP 353: Using</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0001000000000000000000"></a><a name="pep-352"></a>
+<br>
+9 PEP 352: Exceptions as New-Style Classes
+</h1>
+
+<p>
+Exception classes can now be new-style classes, not just classic
+classes, and the built-in <tt class="exception">Exception</tt> class and all the
+standard built-in exceptions (<tt class="exception">NameError</tt>,
+<tt class="exception">ValueError</tt>, etc.) are now new-style classes.
+
+<p>
+The inheritance hierarchy for exceptions has been rearranged a bit.
+In 2.5, the inheritance relationships are:
+
+<p>
+<div class="verbatim"><pre>
+BaseException       # New in Python 2.5
+|- KeyboardInterrupt
+|- SystemExit
+|- Exception
+   |- (all other current built-in exceptions)
+</pre></div>
+
+<p>
+This rearrangement was done because people often want to catch all
+exceptions that indicate program errors.  <tt class="exception">KeyboardInterrupt</tt> and
+<tt class="exception">SystemExit</tt> aren't errors, though, and usually represent an explicit
+action such as the user hitting Control-C or code calling
+<tt class="function">sys.exit()</tt>.  A bare <code>except:</code> will catch all exceptions,
+so you commonly need to list <tt class="exception">KeyboardInterrupt</tt> and
+<tt class="exception">SystemExit</tt> in order to re-raise them.  The usual pattern is:
+
+<p>
+<div class="verbatim"><pre>
+try:
+    ...
+except (KeyboardInterrupt, SystemExit):
+    raise
+except: 
+    # Log error...  
+    # Continue running program...
+</pre></div>
+
+<p>
+In Python 2.5, you can now write <code>except Exception</code> to achieve
+the same result, catching all the exceptions that usually indicate errors 
+but leaving <tt class="exception">KeyboardInterrupt</tt> and
+<tt class="exception">SystemExit</tt> alone.  As in previous versions,
+a bare <code>except:</code> still catches all exceptions.
+
+<p>
+The goal for Python 3.0 is to require any class raised as an exception
+to derive from <tt class="exception">BaseException</tt> or some descendant of
+<tt class="exception">BaseException</tt>, and future releases in the
+Python 2.x series may begin to enforce this constraint.  Therefore, I
+suggest you begin making all your exception classes derive from
+<tt class="exception">Exception</tt> now.  It's been suggested that the bare
+<code>except:</code> form should be removed in Python 3.0, but Guido van&nbsp;Rossum
+hasn't decided whether to do this or not.
+
+<p>
+Raising of strings as exceptions, as in the statement <code>raise
+"Error occurred"</code>, is deprecated in Python 2.5 and will trigger a
+warning.  The aim is to be able to remove the string-exception feature
+in a few releases.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0352.html"
+        title="Required superclass for Exceptions"
+        >PEP 352, <em>Required Superclass for Exceptions</em></a>
+    <dd>PEP written by 
+Brett Cannon and Guido van&nbsp;Rossum; implemented by Brett Cannon.
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="8 pep 343: The"
+  href="pep-343.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10 pep 353: Using"
+  href="pep-353.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-343.html">8 PEP 343: The</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-353.html">10 PEP 353: Using</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="abstract-buffer.html" />
+<link rel="prev" href="mapping.html" />
+<link rel="parent" href="abstract.html" />
+<link rel="next" href="abstract-buffer.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.5 Iterator Protocol </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.4 mapping Protocol"
+  href="mapping.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.6 buffer Protocol"
+  href="abstract-buffer.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mapping.html">6.4 Mapping Protocol</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="abstract-buffer.html">6.6 Buffer Protocol</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008500000000000000000"></a><a name="iterator"></a>
+<br>
+6.5 Iterator Protocol 
+</h1>
+
+<p>
+
+<span class="versionnote">New in version 2.2.</span>
+
+<p>
+There are only a couple of functions specifically for working with
+iterators.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-355' xml:id='l2h-355' class="cfunction">PyIter_Check</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Return true if the object <var>o</var> supports the iterator protocol.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-356' xml:id='l2h-356' class="cfunction">PyIter_Next</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return the next value from the iteration <var>o</var>.  If the object is
+  an iterator, this retrieves the next value from the iteration, and
+  returns <tt class="constant">NULL</tt> with no exception set if there are no remaining
+  items.  If the object is not an iterator, <tt class="exception">TypeError</tt> is
+  raised, or if there is an error in retrieving the item, returns
+  <tt class="constant">NULL</tt> and passes along the exception.
+</dd></dl>
+
+<p>
+To write a loop which iterates over an iterator, the C code should
+look something like this:
+
+<p>
+<div class="verbatim"><pre>
+PyObject *iterator = PyObject_GetIter(obj);
+PyObject *item;
+
+if (iterator == NULL) {
+    /* propagate error */
+}
+
+while (item = PyIter_Next(iterator)) {
+    /* do something with item */
+    ...
+    /* release reference when done */
+    Py_DECREF(item);
+}
+
+Py_DECREF(iterator);
+
+if (PyErr_Occurred()) {
+    /* propagate error */
+}
+else {
+    /* continue doing useful work */
+}
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.4 mapping Protocol"
+  href="mapping.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. abstract Objects Layer"
+  href="abstract.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.6 buffer Protocol"
+  href="abstract-buffer.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mapping.html">6.4 Mapping Protocol</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="abstract.html">6. Abstract Objects Layer</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="abstract-buffer.html">6.6 Buffer Protocol</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

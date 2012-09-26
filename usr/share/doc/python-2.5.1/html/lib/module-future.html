@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-gc.html" />
+<link rel="prev" href="module-traceback.html" />
+<link rel="parent" href="python.html" />
+<link rel="next" href="module-gc.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>26.8 __future__ -- Future statement definitions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.7.1 traceback Example"
+  href="traceback-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26. python Runtime Services"
+  href="python.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.9 gc  "
+  href="module-gc.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="traceback-example.html">26.7.1 Traceback Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="python.html">26. Python Runtime Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-gc.html">26.9 gc  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0028800000000000000000">
+26.8 <tt class="module">__future__</tt> --
+         Future statement definitions</a>
+</h1>
+
+<p>
+<a name="module-future"></a>
+
+<p>
+<tt class="module">__future__</tt> is a real module, and serves three purposes:
+
+<p>
+
+<ul>
+<li>To avoid confusing existing tools that analyze import statements
+      and expect to find the modules they're importing.
+
+<p>
+</li>
+<li>To ensure that future_statements run under releases prior to 2.1
+      at least yield runtime exceptions (the import of
+      <tt class="module">__future__</tt> will fail, because there was no module of
+      that name prior to 2.1). 
+
+<p>
+</li>
+<li>To document when incompatible changes were introduced, and when they
+      will be -- or were -- made mandatory.  This is a form of executable
+      documentation, and can be inspected programatically via importing
+      <tt class="module">__future__</tt> and examining its contents.
+
+<p>
+</li>
+</ul>
+
+<p>
+Each statement in <span class="file">__future__.py</span> is of the form:
+
+<p>
+<div class="verbatim"><pre><tt>
+ FeatureName = "_Feature(" <var>OptionalRelease</var> "," <var>MandatoryRelease</var> ","
+                         <var>CompilerFlag</var> ")"
+ </tt></pre></div>
+
+<p>
+where, normally, <var>OptionalRelease</var> is less than
+<var>MandatoryRelease</var>, and both are 5-tuples of the same form as
+<code>sys.version_info</code>:
+
+<p>
+<div class="verbatim"><pre>
+    (PY_MAJOR_VERSION, # the 2 in 2.1.0a3; an int
+     PY_MINOR_VERSION, # the 1; an int
+     PY_MICRO_VERSION, # the 0; an int
+     PY_RELEASE_LEVEL, # "alpha", "beta", "candidate" or "final"; string
+     PY_RELEASE_SERIAL # the 3; an int
+    )
+</pre></div>
+
+<p>
+<var>OptionalRelease</var> records the first release in which the feature
+was accepted.
+
+<p>
+In the case of a <var>MandatoryRelease</var> that has not yet occurred,
+<var>MandatoryRelease</var> predicts the release in which the feature will
+become part of the language.
+
+<p>
+Else <var>MandatoryRelease</var> records when the feature became part of
+the language; in releases at or after that, modules no longer need a
+future statement to use the feature in question, but may continue to
+use such imports.
+
+<p>
+<var>MandatoryRelease</var> may also be <code>None</code>, meaning that a planned
+feature got dropped.
+
+<p>
+Instances of class <tt class="class">_Feature</tt> have two corresponding methods,
+<tt class="method">getOptionalRelease()</tt> and <tt class="method">getMandatoryRelease()</tt>.
+
+<p>
+<var>CompilerFlag</var> is the (bitfield) flag that should be passed in the
+fourth argument to the builtin function <tt class="function">compile()</tt> to enable
+the feature in dynamically compiled code.  This flag is stored in the
+<tt class="member">compiler_flag</tt> attribute on <tt class="class">_Feature</tt> instances.
+
+<p>
+No feature description will ever be deleted from <tt class="module">__future__</tt>.
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.7.1 traceback Example"
+  href="traceback-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26. python Runtime Services"
+  href="python.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.9 gc  "
+  href="module-gc.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="traceback-example.html">26.7.1 Traceback Example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="python.html">26. Python Runtime Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-gc.html">26.9 gc  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

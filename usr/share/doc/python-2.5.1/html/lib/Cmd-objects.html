@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-cmd.html" />
+<link rel="parent" href="module-cmd.html" />
+<link rel="next" href="module-shlex.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>22.1.1 Cmd Objects</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="22.1 cmd  "
+  href="module-cmd.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="22.1 cmd  "
+  href="module-cmd.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="22.2 shlex  "
+  href="module-shlex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-cmd.html">22.1 cmd  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cmd.html">22.1 cmd  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-shlex.html">22.2 shlex  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0024110000000000000000"></a>
+<a name="Cmd-objects"></a>
+<br>
+22.1.1 Cmd Objects
+</h2>
+
+<p>
+A <tt class="class">Cmd</tt> instance has the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4892' xml:id='l2h-4892' class="method">cmdloop</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>intro</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Repeatedly issue a prompt, accept input, parse an initial prefix off
+the received input, and dispatch to action methods, passing them the
+remainder of the line as argument.
+
+<p>
+The optional argument is a banner or intro string to be issued before the
+first prompt (this overrides the <tt class="member">intro</tt> class member).
+
+<p>
+If the <tt class="module"><a href="module-readline.html">readline</a></tt> module is loaded, input will automatically
+inherit <b class="program">bash</b>-like history-list editing (e.g. <kbd>Control-P</kbd>
+scrolls back to the last command, <kbd>Control-N</kbd> forward to the next
+one, <kbd>Control-F</kbd> moves the cursor to the right non-destructively,
+<kbd>Control-B</kbd> moves the cursor to the left non-destructively, etc.).
+
+<p>
+An end-of-file on input is passed back as the string <code>'EOF'</code>.
+
+<p>
+An interpreter instance will recognize a command name "<tt class="samp">foo</tt>" if
+and only if it has a method <tt class="method">do_foo()</tt>.  As a special case,
+a line beginning with the character "<tt class="character">?</tt>" is dispatched to
+the method <tt class="method">do_help()</tt>.  As another special case, a line
+beginning with the character "<tt class="character">!</tt>" is dispatched to the
+method <tt class="method">do_shell()</tt> (if such a method is defined).
+
+<p>
+This method will return when the <tt class="method">postcmd()</tt> method returns a
+true value.  The <var>stop</var> argument to <tt class="method">postcmd()</tt> is the
+return value from the command's corresponding <tt class="method">do_*()</tt> method.
+
+<p>
+If completion is enabled, completing commands will be done
+automatically, and completing of commands args is done by calling
+<tt class="method">complete_foo()</tt> with arguments <var>text</var>, <var>line</var>,
+<var>begidx</var>, and <var>endidx</var>.  <var>text</var> is the string prefix we
+are attempting to match: all returned matches must begin with it.
+<var>line</var> is the current input line with leading whitespace removed,
+<var>begidx</var> and <var>endidx</var> are the beginning and ending indexes
+of the prefix text, which could be used to provide different
+completion depending upon which position the argument is in.
+
+<p>
+All subclasses of <tt class="class">Cmd</tt> inherit a predefined <tt class="method">do_help()</tt>.
+This method, called with an argument <code>'bar'</code>, invokes the
+corresponding method <tt class="method">help_bar()</tt>.  With no argument,
+<tt class="method">do_help()</tt> lists all available help topics (that is, all
+commands with corresponding <tt class="method">help_*()</tt> methods), and also lists
+any undocumented commands.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4893' xml:id='l2h-4893' class="method">onecmd</tt></b>(</nobr></td>
+  <td><var>str</var>)</td></tr></table></dt>
+<dd>
+Interpret the argument as though it had been typed in response to the
+prompt.  This may be overridden, but should not normally need to be;
+see the <tt class="method">precmd()</tt> and <tt class="method">postcmd()</tt> methods for useful
+execution hooks.  The return value is a flag indicating whether
+interpretation of commands by the interpreter should stop.  If there
+is a <tt class="method">do_*()</tt> method for the command <var>str</var>, the return
+value of that method is returned, otherwise the return value from the
+<tt class="method">default()</tt> method is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4894' xml:id='l2h-4894' class="method">emptyline</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Method called when an empty line is entered in response to the prompt.
+If this method is not overridden, it repeats the last nonempty command
+entered.  
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4895' xml:id='l2h-4895' class="method">default</tt></b>(</nobr></td>
+  <td><var>line</var>)</td></tr></table></dt>
+<dd>
+Method called on an input line when the command prefix is not
+recognized. If this method is not overridden, it prints an
+error message and returns.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4896' xml:id='l2h-4896' class="method">completedefault</tt></b>(</nobr></td>
+  <td><var>text, line, begidx, endidx</var>)</td></tr></table></dt>
+<dd>
+Method called to complete an input line when no command-specific
+<tt class="method">complete_*()</tt> method is available.  By default, it returns an
+empty list.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4897' xml:id='l2h-4897' class="method">precmd</tt></b>(</nobr></td>
+  <td><var>line</var>)</td></tr></table></dt>
+<dd>
+Hook method executed just before the command line <var>line</var> is
+interpreted, but after the input prompt is generated and issued.  This
+method is a stub in <tt class="class">Cmd</tt>; it exists to be overridden by
+subclasses.  The return value is used as the command which will be
+executed by the <tt class="method">onecmd()</tt> method; the <tt class="method">precmd()</tt>
+implementation may re-write the command or simply return <var>line</var>
+unchanged.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4898' xml:id='l2h-4898' class="method">postcmd</tt></b>(</nobr></td>
+  <td><var>stop, line</var>)</td></tr></table></dt>
+<dd>
+Hook method executed just after a command dispatch is finished.  This
+method is a stub in <tt class="class">Cmd</tt>; it exists to be overridden by
+subclasses.  <var>line</var> is the command line which was executed, and
+<var>stop</var> is a flag which indicates whether execution will be
+terminated after the call to <tt class="method">postcmd()</tt>; this will be the
+return value of the <tt class="method">onecmd()</tt> method.  The return value of
+this method will be used as the new value for the internal flag which
+corresponds to <var>stop</var>; returning false will cause interpretation
+to continue.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4899' xml:id='l2h-4899' class="method">preloop</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Hook method executed once when <tt class="method">cmdloop()</tt> is called.  This
+method is a stub in <tt class="class">Cmd</tt>; it exists to be overridden by
+subclasses.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4900' xml:id='l2h-4900' class="method">postloop</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Hook method executed once when <tt class="method">cmdloop()</tt> is about to return.
+This method is a stub in <tt class="class">Cmd</tt>; it exists to be overridden by
+subclasses.
+</dl>
+
+<p>
+Instances of <tt class="class">Cmd</tt> subclasses have some public instance variables:
+
+<p>
+<dl><dt><b><tt id='l2h-4901' xml:id='l2h-4901' class="member">prompt</tt></b></dt>
+<dd>
+The prompt issued to solicit input.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4902' xml:id='l2h-4902' class="member">identchars</tt></b></dt>
+<dd>
+The string of characters accepted for the command prefix.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4903' xml:id='l2h-4903' class="member">lastcmd</tt></b></dt>
+<dd>
+The last nonempty command prefix seen. 
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4904' xml:id='l2h-4904' class="member">intro</tt></b></dt>
+<dd>
+A string to issue as an intro or banner.  May be overridden by giving
+the <tt class="method">cmdloop()</tt> method an argument.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4905' xml:id='l2h-4905' class="member">doc_header</tt></b></dt>
+<dd>
+The header to issue if the help output has a section for documented
+commands.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4906' xml:id='l2h-4906' class="member">misc_header</tt></b></dt>
+<dd>
+The header to issue if the help output has a section for miscellaneous 
+help topics (that is, there are <tt class="method">help_*()</tt> methods without
+corresponding <tt class="method">do_*()</tt> methods).
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4907' xml:id='l2h-4907' class="member">undoc_header</tt></b></dt>
+<dd>
+The header to issue if the help output has a section for undocumented 
+commands (that is, there are <tt class="method">do_*()</tt> methods without
+corresponding <tt class="method">help_*()</tt> methods).
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4908' xml:id='l2h-4908' class="member">ruler</tt></b></dt>
+<dd>
+The character used to draw separator lines under the help-message
+headers.  If empty, no ruler line is drawn.  It defaults to
+"<tt class="character">=</tt>".
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4909' xml:id='l2h-4909' class="member">use_rawinput</tt></b></dt>
+<dd>
+A flag, defaulting to true.  If true, <tt class="method">cmdloop()</tt> uses
+<tt class="function">raw_input()</tt> to display a prompt and read the next command;
+if false, <tt class="method">sys.stdout.write()</tt> and
+<tt class="method">sys.stdin.readline()</tt> are used. (This means that by
+importing <tt class="module"><a href="module-readline.html">readline</a></tt>, on systems that support it, the
+interpreter will automatically support <b class="program">Emacs</b>-like line editing 
+and command-history keystrokes.)
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="22.1 cmd  "
+  href="module-cmd.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="22.1 cmd  "
+  href="module-cmd.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="22.2 shlex  "
+  href="module-shlex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-cmd.html">22.1 cmd  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cmd.html">22.1 cmd  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-shlex.html">22.2 shlex  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

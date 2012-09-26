@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="break.html" />
+<link rel="prev" href="yield.html" />
+<link rel="parent" href="simple.html" />
+<link rel="next" href="break.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.9 The raise statement </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.8 the yield statement"
+  href="yield.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. simple statements"
+  href="simple.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.10 the break statement"
+  href="break.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="yield.html">6.8 The yield statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="simple.html">6. Simple statements</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="break.html">6.10 The break statement</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION008900000000000000000"></a><a name="raise"></a>
+<br>
+6.9 The <tt class="keyword">raise</tt> statement 
+</h1>
+<a id='l2h-534' xml:id='l2h-534'></a>
+<p>
+<dl><dd class="grammar">
+<div class="productions">
+<table>
+<tr>
+    <td><a id='tok-raise_stmt' xml:id='tok-raise_stmt'>raise_stmt</a></td>
+    <td>::=</td>
+    <td>"raise" [<a class='grammartoken' href="Booleans.html#tok-expression">expression</a> ["," <a class='grammartoken' href="Booleans.html#tok-expression">expression</a>
+              ["," <a class='grammartoken' href="Booleans.html#tok-expression">expression</a>]]]</td></tr>
+</table>
+</div>
+<a class="grammar-footer"
+  href="grammar.txt" type="text/plain"
+  >Download entire grammar as text.</a>
+</dd></dl>
+
+<p>
+If no expressions are present, <tt class="keyword">raise</tt> re-raises the last
+exception that was active in the current scope.  If no exception is
+active in the current scope, a <tt class="exception">TypeError</tt> exception is
+raised indicating that this is an error (if running under IDLE, a
+<tt class="exception">Queue.Empty</tt> exception is raised instead).
+<a id='l2h-537' xml:id='l2h-537'></a>
+<a id='l2h-535' xml:id='l2h-535'></a>
+<p>
+Otherwise, <tt class="keyword">raise</tt> evaluates the expressions to get three
+objects, using <code>None</code> as the value of omitted expressions.  The
+first two objects are used to determine the <em>type</em> and
+<em>value</em> of the exception.
+
+<p>
+If the first object is an instance, the type of the exception is the
+class of the instance, the instance itself is the value, and the
+second object must be <code>None</code>.
+
+<p>
+If the first object is a class, it becomes the type of the exception.
+The second object is used to determine the exception value: If it is
+an instance of the class, the instance becomes the exception value.
+If the second object is a tuple, it is used as the argument list for
+the class constructor; if it is <code>None</code>, an empty argument list is
+used, and any other object is treated as a single argument to the
+constructor.  The instance so created by calling the constructor is
+used as the exception value.
+
+<p>
+If a third object is present and not <code>None</code>, it must be a
+traceback<a id='l2h-536' xml:id='l2h-536'></a> object (see section&nbsp;<a href="types.html#traceback">3.2</a>), and
+it is substituted instead of the current location as the place where
+the exception occurred.  If the third object is present and not a
+traceback object or <code>None</code>, a <tt class="exception">TypeError</tt> exception is
+raised.  The three-expression form of <tt class="keyword">raise</tt> is useful to
+re-raise an exception transparently in an except clause, but
+<tt class="keyword">raise</tt> with no expressions should be preferred if the
+exception to be re-raised was the most recently active exception in
+the current scope.
+
+<p>
+Additional information on exceptions can be found in
+section&nbsp;<a href="exceptions.html#exceptions">4.2</a>, and information about handling exceptions is
+in section&nbsp;<a href="try.html#try">7.4</a>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.8 the yield statement"
+  href="yield.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6. simple statements"
+  href="simple.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.10 the break statement"
+  href="break.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="yield.html">6.8 The yield statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="simple.html">6. Simple statements</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="break.html">6.10 The break statement</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

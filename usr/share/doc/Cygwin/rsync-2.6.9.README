@@ -1,0 +1,109 @@
+rsync
+------------------------------------------
+rsync is a file transfer program. rsync uses the 'rsync algorithm' which
+provides a very fast method for bringing remote files into sync. It does this by
+sending just the differences in the files across the link, without requiring
+that both sets of files are present at one of the ends of the link beforehand.
+
+Runtime requirements:
+  cygwin-1.5.24-2
+  libpopt0-1.6.4-4
+
+Build requirements:
+  cygwin-1.5.24-2
+  popt-1.6.4-4
+
+Canonical homepage:
+  http://rsync.samba.org/
+
+Canonical download:
+  http://rsync.samba.org/ftp/rsync/
+  
+------------------------------------
+
+Build instructions:
+  unpack rsync-2.6.9-1-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  ./rsync-2.6.9-1.sh all
+  
+  if present, original package detached signature is automatically included but
+  to generate a package fully signed you must use:
+  SIG=1 ./rsync-2.6.9-1.sh all
+
+Package signature checking instructions:
+  ./rsync-2.6.9-1.sh checksig
+  it should contain Martin's Pool signature on original source
+  and my signature on the patch and on the script itself
+
+This will create:
+  /usr/src/rsync-2.6.9-1.tar.bz2
+  /usr/src/rsync-2.6.9-1-src.tar.bz2
+
+------------------
+
+Mini-HOWTO to use as a service:
+
+1) be sure to have a valid /etc/rsyncd.conf ("man rsyncd.conf" for help)
+2) to install service: ("cygrunsrv --help" for help)
+   cygrunsrv -I "rsyncd" -p /usr/bin/rsync -a '--daemon --no-detach'
+3) to remove service:
+   cygrunsrv -R "rsyncd"
+
+-------------------------------------------
+
+Port Notes:
+
+----- version 2.6.9-2 -----
+Security fix patch (kudos to David Rothenberger for pointing it to me):
+http://www.suse.de/%7Ekrahmer/rsync-2.6.9-fname-obo.diff
+
+----- version 2.6.9-1 -----
+No patch used.
+
+----- version 2.6.3-1 -----
+Kept Sjoerd Mullender's patch for the textmode issue as the only patch.
+
+----- version 2.6.2-3 -----
+Added Sjoerd Mullender's patch for the new textmode issue:
+http://www.cygwin.com/ml/cygwin/2004-09/msg01022.html
+
+----- version 2.6.2-2 -----
+Added patch for the August 2004 security advisory:
+http://rsync.samba.org/#security_aug04
+
+----- version 2.6.2-1 -----
+No patch used.
+
+----- version 2.6.0-1 -----
+No patch used.
+
+----- version 2.5.7-2 -----
+Moved man pages under the /usr/share tree.
+
+----- version 2.5.7-1 -----
+Identical to 2.5.6-2, almost:
+1. security advisory:
+http://www.mail-archive.com/rsync@lists.samba.org/msg08782.html
+2. moved documentation under the /usr/share tree
+
+----- version 2.5.6-2 -----
+Compiled against cygwin-1.5.0 experimental library,
+with support for 64-bit file offsets and more.
+
+----- version 2.5.6-1 -----
+Compiled with gcc version 3.2 from now on
+
+----- version 2.5.5-2 -----
+Compiled with gcc version 3.2 20020818 (prerelease)
+Included Anthony Heading's patch to avoid dead child processes
+http://sources.redhat.com/ml/cygwin/2002-09/msg01155.html
+
+----- version 2.5.5-1 -----
+No special patch was needed for this version.
+
+Daemon mode sometimes produces "read error: Connection reset by peer" at the
+very end of transfer.
+
+Cygwin port maintained by: Lapo Luchini <lapo@lapo.it>

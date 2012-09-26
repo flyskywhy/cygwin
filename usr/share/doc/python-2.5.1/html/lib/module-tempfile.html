@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-glob.html" />
+<link rel="prev" href="module-filecmp.html" />
+<link rel="parent" href="filesys.html" />
+<link rel="next" href="module-glob.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>11.6 tempfile -- Generate temporary files and directories</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.5.1 the dircmp class"
+  href="dircmp-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.7 glob  "
+  href="module-glob.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dircmp-objects.html">11.5.1 The dircmp class</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-glob.html">11.7 glob  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0013600000000000000000">
+11.6 <tt class="module">tempfile</tt> --
+         Generate temporary files and directories</a>
+</h1>
+
+<p>
+<a name="module-tempfile"></a>
+
+<p>
+<a id='l2h-2267' xml:id='l2h-2267'></a><a id='l2h-2268' xml:id='l2h-2268'></a>
+<p>
+This module generates temporary files and directories.  It works on
+all supported platforms.
+
+<p>
+In version 2.3 of Python, this module was overhauled for enhanced
+security.  It now provides three new functions,
+<tt class="function">NamedTemporaryFile()</tt>, <tt class="function">mkstemp()</tt>, and
+<tt class="function">mkdtemp()</tt>, which should eliminate all remaining need to use
+the insecure <tt class="function">mktemp()</tt> function.  Temporary file names created
+by this module no longer contain the process ID; instead a string of
+six random characters is used.
+
+<p>
+Also, all the user-callable functions now take additional arguments
+which allow direct control over the location and name of temporary
+files.  It is no longer necessary to use the global <var>tempdir</var> and
+<var>template</var> variables.  To maintain backward compatibility, the
+argument order is somewhat odd; it is recommended to use keyword
+arguments for clarity.
+
+<p>
+The module defines the following user-callable functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2269' xml:id='l2h-2269' class="function">TemporaryFile</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>mode=<code>'w+b'</code></var><big>[</big><var>,
+                                bufsize=<code>-1</code></var><big>[</big><var>,
+                                suffix</var><big>[</big><var>, prefix</var><big>[</big><var>, dir</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a file (or file-like) object that can be used as a temporary
+storage area.  The file is created using <tt class="function">mkstemp</tt>. It will
+be destroyed as soon as it is closed (including an implicit close when
+the object is garbage collected).  Under <span class="Unix">Unix</span>, the directory entry
+for the file is removed immediately after the file is created.  Other
+platforms do not support this; your code should not rely on a
+temporary file created using this function having or not having a
+visible name in the file system.
+
+<p>
+The <var>mode</var> parameter defaults to <code>'w+b'</code> so that the file
+created can be read and written without being closed.  Binary mode is
+used so that it behaves consistently on all platforms without regard
+for the data that is stored.  <var>bufsize</var> defaults to <code>-1</code>,
+meaning that the operating system default is used.
+
+<p>
+The <var>dir</var>, <var>prefix</var> and <var>suffix</var> parameters are passed to
+<tt class="function">mkstemp()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2270' xml:id='l2h-2270' class="function">NamedTemporaryFile</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>mode=<code>'w+b'</code></var><big>[</big><var>,
+                                     bufsize=<code>-1</code></var><big>[</big><var>,
+                                     suffix</var><big>[</big><var>, prefix</var><big>[</big><var>,
+                                     dir</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This function operates exactly as <tt class="function">TemporaryFile()</tt> does,
+except that the file is guaranteed to have a visible name in the file
+system (on <span class="Unix">Unix</span>, the directory entry is not unlinked).  That name can
+be retrieved from the <tt class="member">name</tt> member of the file object.  Whether
+the name can be used to open the file a second time, while the
+named temporary file is still open, varies across platforms (it can
+be so used on <span class="Unix">Unix</span>; it cannot on Windows NT or later).
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2271' xml:id='l2h-2271' class="function">mkstemp</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>suffix</var><big>[</big><var>,
+                          prefix</var><big>[</big><var>, dir</var><big>[</big><var>, text</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Creates a temporary file in the most secure manner possible.  There
+are no race conditions in the file's creation, assuming that the
+platform properly implements the <tt class="constant">O_EXCL</tt> flag for
+<tt class="function">os.open()</tt>.  The file is readable and writable only by the
+creating user ID.  If the platform uses permission bits to indicate
+whether a file is executable, the file is executable by no one.  The
+file descriptor is not inherited by child processes.
+
+<p>
+Unlike <tt class="function">TemporaryFile()</tt>, the user of <tt class="function">mkstemp()</tt> is
+responsible for deleting the temporary file when done with it.
+
+<p>
+If <var>suffix</var> is specified, the file name will end with that suffix,
+otherwise there will be no suffix.  <tt class="function">mkstemp()</tt> does not put a
+dot between the file name and the suffix; if you need one, put it at
+the beginning of <var>suffix</var>.
+
+<p>
+If <var>prefix</var> is specified, the file name will begin with that
+prefix; otherwise, a default prefix is used.
+
+<p>
+If <var>dir</var> is specified, the file will be created in that directory;
+otherwise, a default directory is used.  The default directory is chosen
+from a platform-dependent list, but the user of the application can control
+the directory location by setting the <var>TMPDIR</var>, <var>TEMP</var> or <var>TMP</var>
+environment variables.  There is thus no guarantee that the generated
+filename will have any nice properties, such as not requiring quoting when
+passed to external commands via <code>os.popen()</code>.
+
+<p>
+If <var>text</var> is specified, it indicates whether to open the file in
+binary mode (the default) or text mode.  On some platforms, this makes
+no difference.
+
+<p>
+<tt class="function">mkstemp()</tt> returns a tuple containing an OS-level handle to
+an open file (as would be returned by <tt class="function">os.open()</tt>) and the
+absolute pathname of that file, in that order.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2272' xml:id='l2h-2272' class="function">mkdtemp</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>suffix</var><big>[</big><var>, prefix</var><big>[</big><var>, dir</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Creates a temporary directory in the most secure manner possible.
+There are no race conditions in the directory's creation.  The
+directory is readable, writable, and searchable only by the
+creating user ID.
+
+<p>
+The user of <tt class="function">mkdtemp()</tt> is responsible for deleting the
+temporary directory and its contents when done with it.
+
+<p>
+The <var>prefix</var>, <var>suffix</var>, and <var>dir</var> arguments are the same
+as for <tt class="function">mkstemp()</tt>.
+
+<p>
+<tt class="function">mkdtemp()</tt> returns the absolute pathname of the new directory.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2273' xml:id='l2h-2273' class="function">mktemp</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>suffix</var><big>[</big><var>, prefix</var><big>[</big><var>, dir</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<div class="versionnote"><b>Deprecated since release 2.3.</b>
+Use <tt class="function">mkstemp()</tt> instead.</div><p></p>
+Return an absolute pathname of a file that did not exist at the time
+the call is made.  The <var>prefix</var>, <var>suffix</var>, and <var>dir</var>
+arguments are the same as for <tt class="function">mkstemp()</tt>.
+
+<p>
+<span class="warning"><b class="label">Warning:</b>
+Use of this function may introduce a security hole in your
+program.  By the time you get around to doing anything with the file
+name it returns, someone else may have beaten you to the punch.</span>
+</dl>
+
+<p>
+The module uses two global variables that tell it how to construct a
+temporary name.  They are initialized at the first call to any of the
+functions above.  The caller may change them, but this is discouraged;
+use the appropriate function arguments, instead.
+
+<p>
+<dl><dt><b><tt id='l2h-2274' xml:id='l2h-2274'>tempdir</tt></b></dt>
+<dd>
+When set to a value other than <code>None</code>, this variable defines the
+default value for the <var>dir</var> argument to all the functions defined
+in this module.
+
+<p>
+If <code>tempdir</code> is unset or <code>None</code> at any call to any of the
+above functions, Python searches a standard list of directories and
+sets <var>tempdir</var> to the first one which the calling user can create
+files in.  The list is:
+
+<p>
+
+<ol>
+<li>The directory named by the <a class="envvar" id='l2h-2278' xml:id='l2h-2278'>TMPDIR</a> environment variable.
+</li>
+<li>The directory named by the <a class="envvar" id='l2h-2279' xml:id='l2h-2279'>TEMP</a> environment variable.
+</li>
+<li>The directory named by the <a class="envvar" id='l2h-2280' xml:id='l2h-2280'>TMP</a> environment variable.
+</li>
+<li>A platform-specific location:
+    
+<ul>
+<li>On RiscOS, the directory named by the
+          <a class="envvar" id='l2h-2281' xml:id='l2h-2281'>Wimp$ScrapDir</a> environment variable.
+</li>
+<li>On Windows, the directories
+          <span class="file">C:<span class="MATH"><IMG
+ WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$\backslash$"></span>TEMP</span>,
+          <span class="file">C:<span class="MATH"><IMG
+ WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$\backslash$"></span>TMP</span>,
+          <span class="file"><span class="MATH"><IMG
+ WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$\backslash$"></span>TEMP</span>, and
+          <span class="file"><span class="MATH"><IMG
+ WIDTH="12" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$\backslash$"></span>TMP</span>, in that order.
+</li>
+<li>On all other platforms, the directories
+          <span class="file">/tmp</span>, <span class="file">/var/tmp</span>, and <span class="file">/usr/tmp</span>, in that order.
+    
+</li>
+</ul>
+</li>
+<li>As a last resort, the current working directory.
+</li>
+</ol>
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2275' xml:id='l2h-2275' class="function">gettempdir</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the directory currently selected to create temporary files in.
+If <code>tempdir</code> is not <code>None</code>, this simply returns its contents;
+otherwise, the search described above is performed, and the result
+returned.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2276' xml:id='l2h-2276'>template</tt></b></dt>
+<dd>
+<div class="versionnote"><b>Deprecated since release 2.0.</b>
+Use <tt class="function">gettempprefix()</tt> instead.</div><p></p>
+When set to a value other than <code>None</code>, this variable defines the
+prefix of the final component of the filenames returned by
+<tt class="function">mktemp()</tt>.  A string of six random letters and digits is
+appended to the prefix to make the filename unique.  On Windows,
+the default prefix is <span class="file">~T</span>; on all other systems
+it is <span class="file">tmp</span>.
+
+<p>
+Older versions of this module used to require that <code>template</code> be
+set to <code>None</code> after a call to <tt class="function">os.fork()</tt>; this has not
+been necessary since version 1.5.2.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2277' xml:id='l2h-2277' class="function">gettempprefix</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the filename prefix used to create temporary files.  This does
+not contain the directory component.  Using this function is preferred
+over reading the <var>template</var> variable directly.
+
+<span class="versionnote">New in version 1.5.2.</span>
+
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="11.5.1 the dircmp class"
+  href="dircmp-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="11. file and Directory"
+  href="filesys.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="11.7 glob  "
+  href="module-glob.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dircmp-objects.html">11.5.1 The dircmp class</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="filesys.html">11. File and Directory</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-glob.html">11.7 glob  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

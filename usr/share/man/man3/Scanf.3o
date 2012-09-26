@@ -1,0 +1,487 @@
+.TH "Module" Scanf "2004-08-26" OCamldoc "OCaml library"
+.SH NAME
+Scanf \- Formatted input functions.
+.SH Module
+Module   Scanf
+.SH Documentation
+.sp
+Module
+.BI "Scanf"
+ : 
+.B sig  end
+
+.sp
+Formatted input functions.
+.sp
+
+.sp
+
+.sp
+.sp
+.I module Scanning : 
+.B sig  end
+
+.sp
+Scanning buffers.
+.sp
+
+.sp
+
+.I exception Scan_failure 
+.B of 
+.B string
+
+.sp
+The exception that formatted input functions raise when the input
+cannot be read according to the given format.
+.sp
+
+.sp
+
+.I val bscanf 
+: 
+.B Scanning.scanbuf ->
+.B   ('a, Scanning.scanbuf, 'b) Pervasives.format -> 'a -> 'b
+.sp
+
+.B bscanf ib format f
+reads tokens from the scanning buffer 
+.B ib
+according
+to the format string 
+.B format
+, converts these tokens to values, and
+applies the function 
+.B f
+to these values.
+The result of this application of 
+.B f
+is the result of the whole construct.
+.sp
+For instance, if 
+.B p
+is the function 
+.B fun s i -> i + 1
+, then
+.B Scanf.sscanf "x = 1" "%s = %i" p
+returns 
+.B 2
+.
+.sp
+Raise 
+.B Scanf.Scan_failure
+if the given input does not match the format.
+.sp
+Raise 
+.B Failure
+if a conversion to a number is not possible.
+.sp
+Raise 
+.B End_of_file
+if the end of input is encountered while scanning
+and the input matches the given format so far.
+.sp
+The format is a character string which contains three types of
+objects:.TP
+""
+plain characters, which are simply matched with the
+characters of the input,
+.TP
+""
+conversion specifications, each of which causes reading and
+conversion of one argument for 
+.B f
+,
+.TP
+""
+scanning indications to specify boundaries of tokens.
+
+Among plain characters the space character (ASCII code 32) has a
+special meaning: it matches ``whitespace'', that is any number of tab,
+space, newline and carriage return characters. Hence, a space in the format
+matches any amount of whitespace in the input.
+.sp
+Conversion specifications consist in the 
+.B %
+character, followed by
+an optional flag, an optional field width, and followed by one or
+two conversion characters. The conversion characters and their
+meanings are:
+.sp
+.TP
+""
+.B d
+: reads an optionally signed decimal integer.
+.TP
+""
+.B i
+: reads an optionally signed integer
+(usual input formats for hexadecimal (
+.B 0x[d]+
+and 
+.B 0X[d]+
+),
+octal (
+.B 0o[d]+
+), and binary 
+.B 0b[d]+
+notations are understood).
+.TP
+""
+.B u
+: reads an unsigned decimal integer.
+.TP
+""
+.B x
+or 
+.B X
+: reads an unsigned hexadecimal integer.
+.TP
+""
+.B o
+: reads an unsigned octal integer.
+.TP
+""
+.B s
+: reads a string argument (by default strings end with a space).
+.TP
+""
+.B S
+: reads a delimited string argument (delimiters and special
+escaped characters follow the lexical conventions of Caml).
+.TP
+""
+.B c
+: reads a single character. To test the current input character
+without reading it, specify a null field width, i.e. use
+specification 
+.B %0c
+. Raise 
+.B Invalid_argument
+, if the field width
+specification is greater than 1.
+.TP
+""
+.B C
+: reads a single delimited character (delimiters and special
+escaped characters follow the lexical conventions of Caml).
+.TP
+""
+.B f
+, 
+.B e
+, 
+.B E
+, 
+.B g
+, 
+.B G
+: reads an optionally signed
+floating-point number in decimal notation, in the style 
+.B dddd.ddd
+.B      e/E+-dd
+.
+.TP
+""
+.B F
+: reads a floating point number according to the lexical
+conventions of Caml (hence the decimal point is mandatory if the
+exponent part is not mentioned).
+.TP
+""
+.B B
+: reads a boolean argument (
+.B true
+or 
+.B false
+).
+.TP
+""
+.B b
+: reads a boolean argument (for backward compatibility; do not use
+in new programs).
+.TP
+""
+.B ld
+, 
+.B li
+, 
+.B lu
+, 
+.B lx
+, 
+.B lX
+, 
+.B lo
+: reads an 
+.B int32
+argument to
+the format specified by the second letter (decimal, hexadecimal, etc).
+.TP
+""
+.B nd
+, 
+.B ni
+, 
+.B nu
+, 
+.B nx
+, 
+.B nX
+, 
+.B no
+: reads a 
+.B nativeint
+argument to
+the format specified by the second letter.
+.TP
+""
+.B Ld
+, 
+.B Li
+, 
+.B Lu
+, 
+.B Lx
+, 
+.B LX
+, 
+.B Lo
+: reads an 
+.B int64
+argument to
+the format specified by the second letter.
+.TP
+""
+.B [ range ]
+: reads characters that matches one of the characters
+mentioned in the range of characters 
+.B range
+(or not mentioned in
+it, if the range starts with 
+.B ^
+). Returns a 
+.B string
+that can be
+empty, if no character in the input matches the range. Hence,
+.B ['0'-'9']
+returns a string representing a decimal number or an empty
+string if no decimal digit is found. 
+If a closing bracket appears in a range, it must occur as the
+first character of the range (or just after the 
+.B ^
+in case of
+range negation); hence 
+.B []]
+matches a 
+.B ]
+character and
+.B [^]]
+matches any character that is not 
+.B ]
+.
+.TP
+""
+.B l
+: applies 
+.B f
+to the number of lines read so far.
+.TP
+""
+.B n
+: applies 
+.B f
+to the number of characters read so far.
+.TP
+""
+.B N
+: applies 
+.B f
+to the number of tokens read so far.
+.TP
+""
+.B !
+: matches the end of input condition.
+.TP
+""
+.B %
+: matches one 
+.B %
+character in the input.
+
+Following the 
+.B %
+character introducing a conversion, there may be
+the special flag 
+.B _
+: the conversion that follows occurs as usual,
+but the resulting value is discarded.
+.sp
+The field widths are composed of an optional integer literal
+indicating the maximal width of the token to read.
+For instance, 
+.B %6d
+reads an integer, having at most 6 decimal digits;
+and 
+.B %4f
+reads a float with at most 4 characters.
+.sp
+Scanning indications appear just after the string conversions 
+.B s
+and
+.B [ range ]
+to delimit the end of the token. A scanning
+indication is introduced by a 
+.B @
+character, followed by some
+constant character 
+.B c
+. It means that the string token should end
+just before the next matching 
+.B c
+(which is skipped). If no 
+.B c
+character is encountered, the string token spreads as much as
+possible. For instance, 
+.B "%s@\t"
+reads a string up to the next
+tabulation character. If a scanning indication 
+.B @c
+does not
+follow a string conversion, it is ignored and treated as a plain
+.B c
+character.
+.sp
+Notes:
+.sp
+.TP
+""
+the scanning indications introduce slight differences in the
+syntax of 
+.B Scanf
+format strings compared to those used by the
+.B Printf
+module. However, scanning indications are similar to those
+of the 
+.B Format
+module; hence, when producing formatted text to be
+scanned by 
+.B !Scanf.bscanf
+, it is wise to use printing functions
+from 
+.B Format
+(or, if you need to use functions from 
+.B Printf
+,
+banish or carefully double check the format strings that contain
+.B '@'
+characters).
+.TP
+""
+in addition to relevant digits, 
+.B '_'
+characters may appear
+inside numbers (this is reminiscent to the usual Caml
+conventions). If stricter scanning is desired, use the range
+conversion facility instead of the number conversions.
+.TP
+""
+the 
+.B scanf
+facility is not intended for heavy duty lexical
+analysis and parsing. If it appears not expressive enough for your
+needs, several alternative exists: regular expressions (module
+.B Str
+), stream parsers, 
+.B ocamllex
+-generated lexers,
+.B ocamlyacc
+-generated parsers.
+
+.sp
+
+.sp
+
+.I val fscanf 
+: 
+.B Pervasives.in_channel ->
+.B   ('a, Scanning.scanbuf, 'b) Pervasives.format -> 'a -> 'b
+.sp
+Same as 
+.B Scanf.bscanf
+, but inputs from the given channel.
+.sp
+Warning: since all scanning functions operate from a scanning
+buffer, be aware that each 
+.B fscanf
+invocation must allocate a new
+fresh scanning buffer (unless careful use of partial evaluation in
+the program). Hence, there are chances that some characters seem
+to be skipped (in fact they are pending in the previously used
+buffer). This happens in particular when calling 
+.B fscanf
+again
+after a scan involving a format that necessitates some look ahead
+(such as a format that ends by skipping whitespace in the input).
+.sp
+To avoid confusion, consider using 
+.B bscanf
+with an explicitly
+created scanning buffer. Use for instance 
+.B Scanning.from_file f
+to allocate the scanning buffer reading from file 
+.B f
+.
+.sp
+This method is not only clearer it is also faster, since scanning
+buffers to files are optimized for fast bufferized reading.
+.sp
+
+.sp
+
+.I val sscanf 
+: 
+.B string -> ('a, Scanning.scanbuf, 'b) Pervasives.format -> 'a -> 'b
+.sp
+Same as 
+.B Scanf.bscanf
+, but inputs from the given string.
+.sp
+
+.sp
+
+.I val scanf 
+: 
+.B ('a, Scanning.scanbuf, 'b) Pervasives.format -> 'a -> 'b
+.sp
+Same as 
+.B Scanf.bscanf
+, but reads from the predefined scanning
+buffer 
+.B Scanf.Scanning.stdib
+that is connected to 
+.B stdin
+.
+.sp
+
+.sp
+
+.I val kscanf 
+: 
+.B Scanning.scanbuf ->
+.B   (Scanning.scanbuf -> exn -> 'a) ->
+.B   ('b, Scanning.scanbuf, 'a) Pervasives.format -> 'b -> 'a
+.sp
+Same as 
+.B Scanf.bscanf
+, but takes an additional function argument
+.B ef
+that is called in case of error: if the scanning process or
+some conversion fails, the scanning function aborts and applies the
+error handling function 
+.B ef
+to the scanning buffer and the
+exception that aborted the scanning process.
+.sp
+
+.sp

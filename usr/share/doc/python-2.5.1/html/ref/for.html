@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ref.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ref.html" title='Python reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="try.html" />
+<link rel="prev" href="while.html" />
+<link rel="parent" href="compound.html" />
+<link rel="next" href="try.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3 The for statement</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.2 the while statement"
+  href="while.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. compound statements"
+  href="compound.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.4 the try statement"
+  href="try.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="while.html">7.2 The while statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="compound.html">7. Compound statements</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="try.html">7.4 The try statement</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION009300000000000000000"></a><a name="for"></a>
+<br>
+7.3 The <tt class="keyword">for</tt> statement
+</h1>
+<a id='l2h-602' xml:id='l2h-602'></a><a id='l2h-603' xml:id='l2h-603'></a>
+<p>
+The <tt class="keyword">for</tt> statement is used to iterate over the elements of a
+sequence (such as a string, tuple or list) or other iterable object:
+<a id='l2h-604' xml:id='l2h-604'></a>
+<p>
+<dl><dd class="grammar">
+<div class="productions">
+<table>
+<tr>
+    <td><a id='tok-for_stmt' xml:id='tok-for_stmt'>for_stmt</a></td>
+    <td>::=</td>
+    <td>"for" <a class='grammartoken' href="assignment.html#tok-target_list">target_list</a> "in" <a class='grammartoken' href="exprlists.html#tok-expression_list">expression_list</a>
+              ":" <a class='grammartoken' href="compound.html#tok-suite">suite</a></td></tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td><code>["else" ":" <a class='grammartoken' href="compound.html#tok-suite">suite</a>]</code></td></tr>
+</table>
+</div>
+<a class="grammar-footer"
+  href="grammar.txt" type="text/plain"
+  >Download entire grammar as text.</a>
+</dd></dl>
+
+<p>
+The expression list is evaluated once; it should yield an iterable
+object.  An iterator is created for the result of the
+<code>expression_list</code>.  The suite is then executed once for each
+item provided by the iterator, in the
+order of ascending indices.  Each item in turn is assigned to the
+target list using the standard rules for assignments, and then the
+suite is executed.  When the items are exhausted (which is immediately
+when the sequence is empty), the suite in the <tt class="keyword">else</tt> clause, if
+present, is executed, and the loop terminates.
+<a id='l2h-605' xml:id='l2h-605'></a><a id='l2h-606' xml:id='l2h-606'></a><a id='l2h-607' xml:id='l2h-607'></a>
+<p>
+A <tt class="keyword">break</tt> statement executed in the first suite terminates the
+loop without executing the <tt class="keyword">else</tt> clause's suite.  A
+<tt class="keyword">continue</tt> statement executed in the first suite skips the rest
+of the suite and continues with the next item, or with the <tt class="keyword">else</tt>
+clause if there was no next item.
+<a id='l2h-608' xml:id='l2h-608'></a><a id='l2h-609' xml:id='l2h-609'></a>
+<p>
+The suite may assign to the variable(s) in the target list; this does
+not affect the next item assigned to it.
+
+<p>
+The target list is not deleted when the loop is finished, but if the
+sequence is empty, it will not have been assigned to at all by the
+loop.  Hint: the built-in function <tt class="function">range()</tt> returns a
+sequence of integers suitable to emulate the effect of Pascal's
+<code>for i := a to b do</code>;
+e.g., <code>range(3)</code> returns the list <code>[0, 1, 2]</code>.
+<a id='l2h-610' xml:id='l2h-610'></a><a id='l2h-611' xml:id='l2h-611'></a>
+<p>
+<span class="warning"><b class="label">Warning:</b>
+There is a subtlety when the sequence is being modified
+by the loop (this can only occur for mutable sequences, i.e. lists).
+An internal counter is used to keep track of which item is used next,
+and this is incremented on each iteration.  When this counter has
+reached the length of the sequence the loop terminates.  This means that
+if the suite deletes the current (or a previous) item from the
+sequence, the next item will be skipped (since it gets the index of
+the current item which has already been treated).  Likewise, if the
+suite inserts an item in the sequence before the current item, the
+current item will be treated again the next time through the loop.
+This can lead to nasty bugs that can be avoided by making a temporary
+copy using a slice of the whole sequence, e.g.,
+<a id='l2h-612' xml:id='l2h-612'></a></span>
+
+<p>
+<div class="verbatim"><pre>
+for x in a[:]:
+    if x &lt; 0: a.remove(x)
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.2 the while statement"
+  href="while.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. compound statements"
+  href="compound.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.4 the try statement"
+  href="try.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="while.html">7.2 The while statement</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="compound.html">7. Compound statements</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="try.html">7.4 The try statement</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

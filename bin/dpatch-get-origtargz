@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -e
+
+DPGO_BASENAME="$(basename $0)"
+
+# makes sure that there is a .orig.tar.gz in a given directory.
+# This script is to be invoked from a package build directory as it uses
+# dpkg-parsechangelog
+
+# Usage: dpatch-get-origtargz origtardir
+
+ORIGTARDIR="$1"
+shift
+if [ -z "$ORIGTARDIR" ] || [ -n "$1" ]; then
+  echo >&2 "${DPGO_BASENAME}: Usage: dpatch-get-origtargz <origtardir>"
+  exit 1
+fi
+
+PACKAGENAME="$(dpkg-parsechangelog | sed -n '/^Source:/{s/^Source:[[:space:]]\+\(.*\)/\1/;p;q}')"
+UPSTREAMVERSION="$(dpkg-parsechangelog | sed -n '/^Version:/{s/^Version:[[:space:]]\+\([0-9]\+:\)\?\([^-]\+\).*/\2/;p;q}')"
+ORIGTARGZ="${PACKAGENAME}_${UPSTREAMVERSION}.orig.tar.gz"
+if [ -f "${ORIGTARDIR}/$ORIGTARGZ" ]; then
+  true
+elif [ -f "${DPGO_ORIGTARDIR}/$ORIGTARGZ" ]; then
+  cp $(readlink -f "${DPGO_ORIGTARDIR}/$ORIGTARGZ") $ORIGTARDIR
+elif [ ! -z "${DPGO_ORIGTARGZPATH}" ]; then
+    for dir in $(echo ${DPGO_ORIGTARGZPATH} | cut -d: -f 1- --output-delimiter=' '); do
+	echo DEBUG: try $dir 
+	if [ -f "$dir/$ORIGTARGZ" ]; then
+	    cp $(readlink -f "$dir/$ORIGTARGZ") "$ORIGTARDIR/$ORIGTARGZ"
+	    break
+	fi
+    done
+fi
+ 
+# path and other methods failed, try heuristics and apt
+
+if [ ! -f  "${ORIGTARDIR}/$ORIGTARGZ" ]; then
+    if [ -f "../$ORIGTARGZ" ]; then
+	cp $(readlink -f "../$ORIGTARGZ") $ORIGTARDIR
+    elif [ -x $(which apt-get) ]; then
+	if (cd $ORIGTARDIR && apt-get --tar-only source "$PACKAGENAME"); then
+	    if ! [ -f "${ORIGTARDIR}/$ORIGTARGZ" ]; then
+		echo >&2 "${DPGO_BASENAME}: Error: apt-get source $PACKAGENAME failed to provide the correct version of $ORIGTARGZ"
+	    fi
+	else
+	    echo >&2 "${DPGO_BASENAME}: Error: apt-get source $PACKAGENAME failed"
+	fi
+    fi
+fi
+
+# as a last resort, use debian/watch
+
+if [ ! -f "${ORIGTARDIR}/$ORIGTARGZ" -a -f "debian/watch" -a -x "$(which curl)" ] && ! curl --fail "$(< debian/watch sed -n "/^\\(http\\|ftp\\)/{s/^\\([^(]\\+\\)([^)]*)\\([^ ]*\\).*/\\1${UPSTREAMVERSION}\\2/;s/\\\\//g;p;q;}")" > ${ORIGTARDIR}/$ORIGTARGZ; then
+  echo >&2 "${DPGO_BASENAME}: Error: cannot curl $ORIGTARGZ from debian/watch location"
+fi
+
+if [ ! -f "${ORIGTARDIR}/$ORIGTARGZ" ]; then
+  echo >&2 "${DPGO_BASENAME}: Error: unable to obtain $ORIGTARGZ from anywhere"
+  exit 1
+fi
+
+exit 0
+
+# arch-tag: 48d225e9-2c31-42fc-b999-e1c367cb2c20

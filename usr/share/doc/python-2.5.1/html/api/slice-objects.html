@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="weakref-objects.html" />
+<link rel="prev" href="descriptor-objects.html" />
+<link rel="parent" href="otherObjects.html" />
+<link rel="next" href="weakref-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.5.8 Slice Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.7 descriptor Objects"
+  href="descriptor-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.9 weak Reference Objects"
+  href="weakref-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="descriptor-objects.html">7.5.7 Descriptor Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-objects.html">7.5.9 Weak Reference Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009580000000000000000"></a><a name="slice-objects"></a>
+<br>
+7.5.8 Slice Objects 
+</h2>
+
+<p>
+<dl><dt>PyTypeObject <b><tt id='l2h-738' xml:id='l2h-738' class="cdata">PySlice_Type</tt></b></dt>
+<dd>
+  The type object for slice objects.  This is the same as
+  <code>slice</code> and <code>types.SliceType</code>.
+  <a id='l2h-740' xml:id='l2h-740'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-741' xml:id='l2h-741' class="cfunction">PySlice_Check</tt></b>(</nobr></td><td>PyObject *<var>ob</var>)</td></tr></table></dt>
+<dd>
+  Return true if <var>ob</var> is a slice object; <var>ob</var> must not be
+  <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-742' xml:id='l2h-742' class="cfunction">PySlice_New</tt></b>(</nobr></td><td>PyObject *<var>start</var>, PyObject *<var>stop</var>,
+                                          PyObject *<var>step</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a new slice object with the given values.  The <var>start</var>,
+  <var>stop</var>, and <var>step</var> parameters are used as the values of the
+  slice object attributes of the same names.  Any of the values may be
+  <tt class="constant">NULL</tt>, in which case the <code>None</code> will be used for the
+  corresponding attribute.  Return <tt class="constant">NULL</tt> if the new object could
+  not be allocated.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-743' xml:id='l2h-743' class="cfunction">PySlice_GetIndices</tt></b>(</nobr></td><td>PySliceObject *<var>slice</var>, Py_ssize_t <var>length</var>,
+                                           Py_ssize_t *<var>start</var>, Py_ssize_t *<var>stop</var>, Py_ssize_t *<var>step</var>)</td></tr></table></dt>
+<dd>
+Retrieve the start, stop and step indices from the slice object
+<var>slice</var>, assuming a sequence of length <var>length</var>. Treats
+indices greater than <var>length</var> as errors.
+
+<p>
+Returns 0 on success and -1 on error with no exception set (unless one
+of the indices was not <tt class="constant">None</tt> and failed to be converted to
+an integer, in which case -1 is returned with an exception set).
+
+<p>
+You probably do not want to use this function.  If you want to use
+slice objects in versions of Python prior to 2.3, you would probably
+do well to incorporate the source of <tt class="cfunction">PySlice_GetIndicesEx</tt>,
+suitably renamed, in the source of your extension.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-744' xml:id='l2h-744' class="cfunction">PySlice_GetIndicesEx</tt></b>(</nobr></td><td>PySliceObject *<var>slice</var>, Py_ssize_t <var>length</var>,
+                                             Py_ssize_t *<var>start</var>, Py_ssize_t *<var>stop</var>, Py_ssize_t *<var>step</var>,
+                                             Py_ssize_t *<var>slicelength</var>)</td></tr></table></dt>
+<dd>
+Usable replacement for <tt class="cfunction">PySlice_GetIndices</tt>.  Retrieve the
+start, stop, and step indices from the slice object <var>slice</var>
+assuming a sequence of length <var>length</var>, and store the length of
+the slice in <var>slicelength</var>.  Out of bounds indices are clipped in
+a manner consistent with the handling of normal slices.
+
+<p>
+Returns 0 on success and -1 on error with exception set.
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.7 descriptor Objects"
+  href="descriptor-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.9 weak Reference Objects"
+  href="weakref-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="descriptor-objects.html">7.5.7 Descriptor Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="weakref-objects.html">7.5.9 Weak Reference Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

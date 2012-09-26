@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="mailbox-deprecated.html" />
+<link rel="parent" href="module-mailbox.html" />
+<link rel="next" href="module-mhlib.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3.5 Examples</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.4 deprecated classes and"
+  href="mailbox-deprecated.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.4 mhlib  "
+  href="module-mhlib.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-deprecated.html">7.3.4 Deprecated classes and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-mhlib.html">7.4 mhlib  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009350000000000000000"></a>
+<a name="mailbox-examples"></a>
+<br>
+7.3.5 Examples
+</h2>
+
+<p>
+A simple example of printing the subjects of all messages in a mailbox that
+seem interesting:
+
+<p>
+<div class="verbatim"><pre>
+import mailbox
+for message in mailbox.mbox('~/mbox'):
+    subject = message['subject']       # Could possibly be None.
+    if subject and 'python' in subject.lower():
+        print subject
+</pre></div>
+
+<p>
+To copy all mail from a Babyl mailbox to an MH mailbox, converting all
+of the format-specific information that can be converted:
+
+<p>
+<div class="verbatim"><pre>
+import mailbox
+destination = mailbox.MH('~/Mail')
+destination.lock()
+for message in mailbox.Babyl('~/RMAIL'):
+    destination.add(MHMessage(message))
+destination.flush()
+destination.unlock()
+</pre></div>
+
+<p>
+This example sorts mail from several mailing lists into different
+mailboxes, being careful to avoid mail corruption due to concurrent
+modification by other programs, mail loss due to interruption of the
+program, or premature termination due to malformed messages in the
+mailbox:
+
+<p>
+<div class="verbatim"><pre>
+import mailbox
+import email.Errors
+
+list_names = ('python-list', 'python-dev', 'python-bugs')
+
+boxes = dict((name, mailbox.mbox('~/email/%s' % name)) for name in list_names)
+inbox = mailbox.Maildir('~/Maildir', factory=None)
+
+for key in inbox.iterkeys():
+    try:
+        message = inbox[key]
+    except email.Errors.MessageParseError:
+        continue                # The message is malformed. Just leave it.
+
+    for name in list_names:
+        list_id = message['list-id']
+        if list_id and name in list_id:
+            # Get mailbox to use
+            box = boxes[name]
+
+            # Write copy to disk before removing original.
+            # If there's a crash, you might duplicate a message, but
+            # that's better than losing a message completely.
+            box.lock()
+            box.add(message)
+            box.flush()         
+            box.unlock()
+
+            # Remove original message
+            inbox.lock()
+            inbox.discard(key)
+            inbox.flush()
+            inbox.unlock()
+            break               # Found destination, so stop looking.
+
+for box in boxes.itervalues():
+    box.close()
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.4 deprecated classes and"
+  href="mailbox-deprecated.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.4 mhlib  "
+  href="module-mhlib.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-deprecated.html">7.3.4 Deprecated classes and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-mailbox.html">7.3 mailbox  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-mhlib.html">7.4 mhlib  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

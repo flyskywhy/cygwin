@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="cObjects.html" />
+<link rel="prev" href="slice-objects.html" />
+<link rel="parent" href="otherObjects.html" />
+<link rel="next" href="cObjects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.5.9 Weak Reference Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.8 slice Objects"
+  href="slice-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.10 CObjects"
+  href="cObjects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="slice-objects.html">7.5.8 Slice Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="cObjects.html">7.5.10 CObjects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009590000000000000000"></a><a name="weakref-objects"></a>
+<br>
+7.5.9 Weak Reference Objects 
+</h2>
+
+<p>
+Python supports <em>weak references</em> as first-class objects.  There
+are two specific object types which directly implement weak
+references.  The first is a simple reference object, and the second
+acts as a proxy for the original object as much as it can.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-745' xml:id='l2h-745' class="cfunction">PyWeakref_Check</tt></b>(</nobr></td><td>ob)</td></tr></table></dt>
+<dd>
+  Return true if <var>ob</var> is either a reference or proxy object.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-746' xml:id='l2h-746' class="cfunction">PyWeakref_CheckRef</tt></b>(</nobr></td><td>ob)</td></tr></table></dt>
+<dd>
+  Return true if <var>ob</var> is a reference object.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-747' xml:id='l2h-747' class="cfunction">PyWeakref_CheckProxy</tt></b>(</nobr></td><td>ob)</td></tr></table></dt>
+<dd>
+  Return true if <var>ob</var> is a proxy object.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-748' xml:id='l2h-748' class="cfunction">PyWeakref_NewRef</tt></b>(</nobr></td><td>PyObject *<var>ob</var>,
+                                               PyObject *<var>callback</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a weak reference object for the object <var>ob</var>.  This will
+  always return a new reference, but is not guaranteed to create a new
+  object; an existing reference object may be returned.  The second
+  parameter, <var>callback</var>, can be a callable object that receives
+  notification when <var>ob</var> is garbage collected; it should accept a
+  single parameter, which will be the weak reference object itself.
+  <var>callback</var> may also be <code>None</code> or <tt class="constant">NULL</tt>.  If <var>ob</var>
+  is not a weakly-referencable object, or if <var>callback</var> is not
+  callable, <code>None</code>, or <tt class="constant">NULL</tt>, this will return <tt class="constant">NULL</tt> and
+  raise <tt class="exception">TypeError</tt>.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-749' xml:id='l2h-749' class="cfunction">PyWeakref_NewProxy</tt></b>(</nobr></td><td>PyObject *<var>ob</var>,
+                                                 PyObject *<var>callback</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a weak reference proxy object for the object <var>ob</var>.  This
+  will always return a new reference, but is not guaranteed to create
+  a new object; an existing proxy object may be returned.  The second
+  parameter, <var>callback</var>, can be a callable object that receives
+  notification when <var>ob</var> is garbage collected; it should accept a
+  single parameter, which will be the weak reference object itself.
+  <var>callback</var> may also be <code>None</code> or <tt class="constant">NULL</tt>.  If <var>ob</var> is not
+  a weakly-referencable object, or if <var>callback</var> is not callable,
+  <code>None</code>, or <tt class="constant">NULL</tt>, this will return <tt class="constant">NULL</tt> and raise
+  <tt class="exception">TypeError</tt>.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-750' xml:id='l2h-750' class="cfunction">PyWeakref_GetObject</tt></b>(</nobr></td><td>PyObject *<var>ref</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the referenced object from a weak reference, <var>ref</var>.  If
+  the referent is no longer live, returns <code>None</code>.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-751' xml:id='l2h-751' class="cfunction">PyWeakref_GET_OBJECT</tt></b>(</nobr></td><td>PyObject *<var>ref</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Similar to <tt class="cfunction">PyWeakref_GetObject()</tt>, but implemented as a
+  macro that does no error checking.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.8 slice Objects"
+  href="slice-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.10 CObjects"
+  href="cObjects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="slice-objects.html">7.5.8 Slice Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="cObjects.html">7.5.10 CObjects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

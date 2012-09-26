@@ -1,0 +1,62 @@
+################################################################################
+#
+# cvs.cygclass - functions for building packages from CVS checkouts
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: cvs.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+_USE_cvs_FETCH=1
+
+if ! defined CVS_URI
+then
+	error "CVS_URI must be defined"
+fi
+
+CVS_MODULE=${CVS_MODULE:-${ORIG_PN:-${PN}}}
+
+cvs_tarball="${CVS_MODULE//\//-}-${PV}.tar.bz2"
+
+SRC_URI="${cvs_tarball} "
+SRC_DIR="${CVS_MODULE}"
+
+cvs_fetch() {
+	local cvs_branch
+	local cvs_date
+
+	check_prog_req cvs
+
+	if defined CVS_BRANCH
+	then
+		cvs_branch="-r ${CVS_BRANCH}"
+	fi
+
+	if defined CVS_DATE
+	then
+		cvs_date="-D ${CVS_DATE}"
+	fi
+
+	# T likely doesn't exist at this point, so create it first
+	mkdir -p ${T}
+	cd ${T}
+	verbose cvs -d ${CVS_URI} checkout ${cvs_branch} ${cvs_date} ${CVS_MODULE}
+
+	tar jcf ${top}/${cvs_tarball} --exclude=CVS --exclude=.cvsignore ${CVS_MODULE}
+}

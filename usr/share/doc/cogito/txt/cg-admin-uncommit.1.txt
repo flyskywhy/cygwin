@@ -1,0 +1,63 @@
+cg-admin-uncommit(1)
+====================
+
+NAME
+----
+cg-admin-uncommit - undo a commit or a series of commits
+
+SYNOPSIS
+--------
+cg-admin-uncommit [-t] [COMMIT_ID]
+
+DESCRIPTION
+-----------
+Takes a commit ID which is the earliest commit to be removed from
+the repository. If no parameter is passed, it uncommits the latest
+commit ('HEAD'). Read the CAVEATS section before using it for the
+first time.
+
+This command is a close relative of `cg-switch -f` (which does
+essentially the same thing, but is slightly more powerful at the
+expense of a more elaborate usage). Do not confuse either with the
+operation performed by gitlink:cg-seek[1], which is meant only for temporary
+excursions to the project history.
+
+OPTIONS
+-------
+
+--
+-t::
+	This optional parameter makes gitlink:cg-admin-uncommit[1] to roll back
+	the tree as well to the previous commit. Without this option
+	(by default) 'Cogito' keeps the tree in its current state,
+	therefore generating tree with local changes against the target
+	commit, consisting of the changes in the rolled back commits.
+
+
+-h, --help::
+	Print usage summary.
+
+--long-help::
+	Print user manual. The same as found in gitlink:cg-admin-uncommit[1].
+--
+
+
+CAVEATS
+-------
+This command can be dangerous! It is safe to do as long as you do not
+push the commit out in the meantime, but you should 'NEVER' uncommit an
+already pushed out commit. Things will break for the fetchers since you
+just broke the fast-forward merging mechanism (the new commit is not
+descendant of the previous one), and the push command will refuse to
+push again after you uncommitted a pushed out commit, too. At the moment
+you pushed the commit out it's etched to the history, live with that.
+
+COPYRIGHT
+---------
+Copyright (C) Matt Porter, 2005
+Copyright (C) Petr Baudis, 2005
+
+SEE ALSO
+--------
+cg-admin-uncommit is part of gitlink:cogito[7],
+a toolkit for managing gitlink:git[7] trees.

@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-structured-data-types.html" />
+<link rel="prev" href="ctypes-data-types.html" />
+<link rel="parent" href="ctypes-ctypes-reference.html" />
+<link rel="next" href="ctypes-structured-data-types.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.2.7 Fundamental data types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.6 data types"
+  href="ctypes-data-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.8 structured data types"
+  href="ctypes-structured-data-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-data-types.html">14.14.2.6 Data types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-structured-data-types.html">14.14.2.8 Structured data types</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00161427000000000000000"></a><a name="ctypes-fundamental-data-types"></a>
+<br>
+14.14.2.7 Fundamental data types
+</h3>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3354' xml:id='l2h-3354' class="class">_SimpleCData</tt></b>
+<dd>
+This non-public class is the base class of all fundamental ctypes
+data types. It is mentioned here because it contains the common
+attributes of the fundamental ctypes data types.  <code>_SimpleCData</code>
+is a subclass of <code>_CData</code>, so it inherits their methods and
+attributes.
+</dl>
+
+<p>
+Instances have a single attribute:
+
+<p>
+<dl><dt><b><tt id='l2h-3355' xml:id='l2h-3355' class="member">value</tt></b></dt>
+<dd>
+This attribute contains the actual value of the instance. For
+integer and pointer types, it is an integer, for character types,
+it is a single character string, for character pointer types it
+is a Python string or unicode string.
+
+<p>
+When the <code>value</code> attribute is retrieved from a ctypes instance,
+usually a new object is returned each time.  <code>ctypes</code> does <em>not</em>
+implement original object return, always a new object is
+constructed.  The same is true for all other ctypes object
+instances.
+</dl>
+
+<p>
+Fundamental data types, when returned as foreign function call
+results, or, for example, by retrieving structure field members or
+array items, are transparently converted to native Python types.  In
+other words, if a foreign function has a <tt class="member">restype</tt> of <tt class="class">c_char_p</tt>,
+you will always receive a Python string, <em>not</em> a <tt class="class">c_char_p</tt>
+instance.
+
+<p>
+Subclasses of fundamental data types do <em>not</em> inherit this behaviour.
+So, if a foreign functions <tt class="member">restype</tt> is a subclass of <tt class="class">c_void_p</tt>,
+you will receive an instance of this subclass from the function call.
+Of course, you can get the value of the pointer by accessing the
+<code>value</code> attribute.
+
+<p>
+These are the fundamental ctypes data types:
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3356' xml:id='l2h-3356' class="class">c_byte</tt></b>
+<dd>
+Represents the C signed char datatype, and interprets the value as
+small integer. The constructor accepts an optional integer
+initializer; no overflow checking is done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3357' xml:id='l2h-3357' class="class">c_char</tt></b>
+<dd>
+Represents the C char datatype, and interprets the value as a single
+character. The constructor accepts an optional string initializer,
+the length of the string must be exactly one character.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3358' xml:id='l2h-3358' class="class">c_char_p</tt></b>
+<dd>
+Represents the C char * datatype, which must be a pointer to a
+zero-terminated string. The constructor accepts an integer
+address, or a string.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3359' xml:id='l2h-3359' class="class">c_double</tt></b>
+<dd>
+Represents the C double datatype. The constructor accepts an
+optional float initializer.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3360' xml:id='l2h-3360' class="class">c_float</tt></b>
+<dd>
+Represents the C double datatype. The constructor accepts an
+optional float initializer.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3361' xml:id='l2h-3361' class="class">c_int</tt></b>
+<dd>
+Represents the C signed int datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done. On
+platforms where <code>sizeof(int) == sizeof(long)</code> it is an alias to
+<tt class="class">c_long</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3362' xml:id='l2h-3362' class="class">c_int8</tt></b>
+<dd>
+Represents the C 8-bit <code>signed int</code> datatype. Usually an alias for
+<tt class="class">c_byte</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3363' xml:id='l2h-3363' class="class">c_int16</tt></b>
+<dd>
+Represents the C 16-bit signed int datatype. Usually an alias for
+<tt class="class">c_short</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3364' xml:id='l2h-3364' class="class">c_int32</tt></b>
+<dd>
+Represents the C 32-bit signed int datatype. Usually an alias for
+<tt class="class">c_int</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3365' xml:id='l2h-3365' class="class">c_int64</tt></b>
+<dd>
+Represents the C 64-bit <code>signed int</code> datatype. Usually an alias
+for <tt class="class">c_longlong</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3366' xml:id='l2h-3366' class="class">c_long</tt></b>
+<dd>
+Represents the C <code>signed long</code> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3367' xml:id='l2h-3367' class="class">c_longlong</tt></b>
+<dd>
+Represents the C <code>signed long long</code> datatype. The constructor accepts
+an optional integer initializer; no overflow checking is done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3368' xml:id='l2h-3368' class="class">c_short</tt></b>
+<dd>
+Represents the C <code>signed short</code> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3369' xml:id='l2h-3369' class="class">c_size_t</tt></b>
+<dd>
+Represents the C <code>size_t</code> datatype.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3370' xml:id='l2h-3370' class="class">c_ubyte</tt></b>
+<dd>
+Represents the C <code>unsigned char</code> datatype, it interprets the
+value as small integer. The constructor accepts an optional
+integer initializer; no overflow checking is done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3371' xml:id='l2h-3371' class="class">c_uint</tt></b>
+<dd>
+Represents the C <code>unsigned int</code> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done. On
+platforms where <code>sizeof(int) == sizeof(long)</code> it is an alias for
+<tt class="class">c_ulong</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3372' xml:id='l2h-3372' class="class">c_uint8</tt></b>
+<dd>
+Represents the C 8-bit unsigned int datatype. Usually an alias for
+<tt class="class">c_ubyte</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3373' xml:id='l2h-3373' class="class">c_uint16</tt></b>
+<dd>
+Represents the C 16-bit unsigned int datatype. Usually an alias for
+<tt class="class">c_ushort</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3374' xml:id='l2h-3374' class="class">c_uint32</tt></b>
+<dd>
+Represents the C 32-bit unsigned int datatype. Usually an alias for
+<tt class="class">c_uint</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3375' xml:id='l2h-3375' class="class">c_uint64</tt></b>
+<dd>
+Represents the C 64-bit unsigned int datatype. Usually an alias for
+<tt class="class">c_ulonglong</tt>.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3376' xml:id='l2h-3376' class="class">c_ulong</tt></b>
+<dd>
+Represents the C <code>unsigned long</code> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3377' xml:id='l2h-3377' class="class">c_ulonglong</tt></b>
+<dd>
+Represents the C <code>unsigned long long</code> datatype. The constructor
+accepts an optional integer initializer; no overflow checking is
+done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3378' xml:id='l2h-3378' class="class">c_ushort</tt></b>
+<dd>
+Represents the C <code>unsigned short</code> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3379' xml:id='l2h-3379' class="class">c_void_p</tt></b>
+<dd>
+Represents the C <code>void *</code> type. The value is represented as
+integer. The constructor accepts an optional integer initializer.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3380' xml:id='l2h-3380' class="class">c_wchar</tt></b>
+<dd>
+Represents the C <code>wchar_t</code> datatype, and interprets the value as a
+single character unicode string. The constructor accepts an
+optional string initializer, the length of the string must be
+exactly one character.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3381' xml:id='l2h-3381' class="class">c_wchar_p</tt></b>
+<dd>
+Represents the C <code>wchar_t *</code> datatype, which must be a pointer to
+a zero-terminated wide character string. The constructor accepts
+an integer address, or a string.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3382' xml:id='l2h-3382' class="class">HRESULT</tt></b>
+<dd>
+Windows only: Represents a <tt class="class">HRESULT</tt> value, which contains success
+or error information for a function or method call.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3383' xml:id='l2h-3383' class="class">py_object</tt></b>
+<dd>
+Represents the C <code>PyObject *</code> datatype.  Calling this without an
+argument creates a <code>NULL</code> <code>PyObject *</code> pointer.
+</dl>
+
+<p>
+The <code>ctypes.wintypes</code> module provides quite some other Windows
+specific data types, for example <code>HWND</code>, <code>WPARAM</code>, or <code>DWORD</code>.
+Some useful structures like <code>MSG</code> or <code>RECT</code> are also defined.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.6 data types"
+  href="ctypes-data-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.8 structured data types"
+  href="ctypes-structured-data-types.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-data-types.html">14.14.2.6 Data types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-structured-data-types.html">14.14.2.8 Structured data types</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

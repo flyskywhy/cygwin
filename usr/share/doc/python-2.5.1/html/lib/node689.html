@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="tkinter-basic-mapping.html" />
+<link rel="prev" href="node686.html" />
+<link rel="parent" href="module-Tkinter.html" />
+<link rel="next" href="tkinter-basic-mapping.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>20.1.3 A (Very) Quick Look at Tcl/Tk</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="20.1.2.2 a Simple Hello"
+  href="node688.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="20.1 tkinter  "
+  href="module-Tkinter.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="20.1.4 mapping Basic Tk"
+  href="tkinter-basic-mapping.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node688.html">20.1.2.2 A Simple Hello</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-Tkinter.html">20.1 Tkinter  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="tkinter-basic-mapping.html">20.1.4 Mapping Basic Tk</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0022130000000000000000">
+20.1.3 A (Very) Quick Look at Tcl/Tk</a>
+</h2> 
+<p>
+The class hierarchy looks complicated, but in actual practice,
+application programmers almost always refer to the classes at the very
+bottom of the hierarchy. 
+
+<p>
+Notes:
+
+<ul>
+<li>These classes are provided for the purposes of
+organizing certain functions under one namespace. They aren't meant to
+be instantiated independently.
+
+<p>
+</li>
+<li>The <tt class="class">Tk</tt> class is meant to be instantiated only once in
+an application. Application programmers need not instantiate one
+explicitly, the system creates one whenever any of the other classes
+are instantiated.
+
+<p>
+</li>
+<li>The <tt class="class">Widget</tt> class is not meant to be instantiated, it
+is meant only for subclassing to make ``real'' widgets (in C++, this
+is called an `abstract class').
+</li>
+</ul>
+
+<p>
+To make use of this reference material, there will be times when you
+will need to know how to read short passages of Tk and how to identify
+the various parts of a Tk command.  
+(See section&nbsp;<a href="tkinter-basic-mapping.html#tkinter-basic-mapping">20.1.4</a> for the
+<tt class="module"><a href="module-Tkinter.html">Tkinter</a></tt> equivalents of what's below.)
+
+<p>
+Tk scripts are Tcl programs.  Like all Tcl programs, Tk scripts are
+just lists of tokens separated by spaces.  A Tk widget is just its
+<em>class</em>, the <em>options</em> that help configure it, and the
+<em>actions</em> that make it do useful things. 
+
+<p>
+To make a widget in Tk, the command is always of the form: 
+
+<p>
+<div class="verbatim"><pre>
+                classCommand newPathname options
+</pre></div>
+
+<p>
+<dl>
+<dt><strong><var>classCommand</var></strong></dt>
+<dd>denotes which kind of widget to make (a button, a label, a menu...)
+
+<p>
+</dd>
+<dt><strong><var>newPathname</var></strong></dt>
+<dd>is the new name for this widget.  All names in Tk must be unique.  To
+help enforce this, widgets in Tk are named with <em>pathnames</em>, just
+like files in a file system.  The top level widget, the <em>root</em>,
+is called <code>.</code> (period) and children are delimited by more
+periods.  For example, <code>.myApp.controlPanel.okButton</code> might be
+the name of a widget.
+
+<p>
+</dd>
+<dt><strong><var>options</var></strong></dt>
+<dd>configure the widget's appearance and in some cases, its
+behavior.  The options come in the form of a list of flags and values.
+Flags are preceded by a `-', like <span class="Unix">Unix</span> shell command flags, and
+values are put in quotes if they are more than one word.
+</dd>
+</dl>
+
+<p>
+For example: 
+
+<p>
+<div class="verbatim"><pre>
+    button   .fred   -fg red -text "hi there"
+       ^       ^     \_____________________/
+       |       |                |
+     class    new            options
+    command  widget  (-opt val -opt val ...)
+</pre></div> 
+
+<p>
+Once created, the pathname to the widget becomes a new command.  This
+new <var>widget command</var> is the programmer's handle for getting the new
+widget to perform some <var>action</var>.  In C, you'd express this as
+someAction(fred, someOptions), in C++, you would express this as
+fred.someAction(someOptions), and in Tk, you say: 
+
+<p>
+<div class="verbatim"><pre>
+    .fred someAction someOptions
+</pre></div> 
+
+<p>
+Note that the object name, <code>.fred</code>, starts with a dot.
+
+<p>
+As you'd expect, the legal values for <var>someAction</var> will depend on
+the widget's class: <code>.fred disable</code> works if fred is a
+button (fred gets greyed out), but does not work if fred is a label
+(disabling of labels is not supported in Tk). 
+
+<p>
+The legal values of <var>someOptions</var> is action dependent.  Some
+actions, like <code>disable</code>, require no arguments, others, like
+a text-entry box's <code>delete</code> command, would need arguments
+to specify what range of text to delete.  
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="20.1.2.2 a Simple Hello"
+  href="node688.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="20.1 tkinter  "
+  href="module-Tkinter.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="20.1.4 mapping Basic Tk"
+  href="tkinter-basic-mapping.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node688.html">20.1.2.2 A Simple Hello</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-Tkinter.html">20.1 Tkinter  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="tkinter-basic-mapping.html">20.1.4 Mapping Basic Tk</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-sched.html" />
+<link rel="parent" href="module-sched.html" />
+<link rel="next" href="module-mutex.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.8.1 Scheduler Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.8 sched  "
+  href="module-sched.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.8 sched  "
+  href="module-sched.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.9 mutex  "
+  href="module-mutex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-sched.html">5.8 sched  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sched.html">5.8 sched  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-mutex.html">5.9 mutex  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION007810000000000000000"></a><a name="scheduler-objects"></a>
+<br>
+5.8.1 Scheduler Objects 
+</h2>
+
+<p>
+<tt class="class">scheduler</tt> instances have the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-792' xml:id='l2h-792' class="method">enterabs</tt></b>(</nobr></td>
+  <td><var>time, priority, action, argument</var>)</td></tr></table></dt>
+<dd>
+Schedule a new event. The <var>time</var> argument should be a numeric type
+compatible with the return value of the <var>timefunc</var> function passed 
+to the constructor. Events scheduled for
+the same <var>time</var> will be executed in the order of their
+<var>priority</var>.
+
+<p>
+Executing the event means executing
+<code><var>action</var>(*<var>argument</var>)</code>.  <var>argument</var> must be a
+sequence holding the parameters for <var>action</var>.
+
+<p>
+Return value is an event which may be used for later cancellation of
+the event (see <tt class="method">cancel()</tt>).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-793' xml:id='l2h-793' class="method">enter</tt></b>(</nobr></td>
+  <td><var>delay, priority, action, argument</var>)</td></tr></table></dt>
+<dd>
+Schedule an event for <var>delay</var> more time units. Other then the
+relative time, the other arguments, the effect and the return value
+are the same as those for <tt class="method">enterabs()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-794' xml:id='l2h-794' class="method">cancel</tt></b>(</nobr></td>
+  <td><var>event</var>)</td></tr></table></dt>
+<dd>
+Remove the event from the queue. If <var>event</var> is not an event
+currently in the queue, this method will raise a
+<tt class="exception">RuntimeError</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-795' xml:id='l2h-795' class="method">empty</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return true if the event queue is empty.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-796' xml:id='l2h-796' class="method">run</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Run all scheduled events. This function will wait 
+(using the <tt class="function">delayfunc</tt> function passed to the constructor)
+for the next event, then execute it and so on until there are no more
+scheduled events.
+
+<p>
+Either <var>action</var> or <var>delayfunc</var> can raise an exception.  In
+either case, the scheduler will maintain a consistent state and
+propagate the exception.  If an exception is raised by <var>action</var>,
+the event will not be attempted in future calls to <tt class="method">run()</tt>.
+
+<p>
+If a sequence of events takes longer to run than the time available
+before the next event, the scheduler will simply fall behind.  No
+events will be dropped; the calling code is responsible for canceling 
+events which are no longer pertinent.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.8 sched  "
+  href="module-sched.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.8 sched  "
+  href="module-sched.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.9 mutex  "
+  href="module-mutex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-sched.html">5.8 sched  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-sched.html">5.8 sched  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-mutex.html">5.9 mutex  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="decimal-recipes.html" />
+<link rel="parent" href="module-decimal.html" />
+<link rel="next" href="module-random.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.8 Decimal FAQ </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.7 Recipes"
+  href="decimal-recipes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.4 random  "
+  href="module-random.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-recipes.html">6.3.7 Recipes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-random.html">6.4 random  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION008380000000000000000"></a><a name="decimal-faq"></a>
+<br>
+6.3.8 Decimal FAQ 
+</h2>
+
+<p>
+Q.  It is cumbersome to type <code>decimal.Decimal('1234.5')</code>.  Is there a way
+to minimize typing when using the interactive interpreter?
+
+<p>
+A.  Some users abbreviate the constructor to just a single letter:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; D = decimal.Decimal
+&gt;&gt;&gt; D('1.23') + D('3.45')
+Decimal("4.68")
+</pre></div>
+
+<p>
+Q.  In a fixed-point application with two decimal places, some inputs
+have many places and need to be rounded.  Others are not supposed to have
+excess digits and need to be validated.  What methods should be used?
+
+<p>
+A.  The <tt class="method">quantize()</tt> method rounds to a fixed number of decimal places.
+If the <tt class="constant">Inexact</tt> trap is set, it is also useful for validation:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; TWOPLACES = Decimal(10) ** -2       # same as Decimal('0.01')
+
+&gt;&gt;&gt; # Round to two places
+&gt;&gt;&gt; Decimal("3.214").quantize(TWOPLACES)
+Decimal("3.21")
+
+&gt;&gt;&gt; # Validate that a number does not exceed two places 
+&gt;&gt;&gt; Decimal("3.21").quantize(TWOPLACES, context=Context(traps=[Inexact]))
+Decimal("3.21")
+
+&gt;&gt;&gt; Decimal("3.214").quantize(TWOPLACES, context=Context(traps=[Inexact]))
+Traceback (most recent call last):
+   ...
+Inexact: Changed in rounding
+</pre></div>
+
+<p>
+Q.  Once I have valid two place inputs, how do I maintain that invariant
+throughout an application?
+
+<p>
+A.  Some operations like addition and subtraction automatically preserve fixed
+point.  Others, like multiplication and division, change the number of decimal
+places and need to be followed-up with a <tt class="method">quantize()</tt> step.
+
+<p>
+Q.  There are many ways to express the same value.  The numbers
+<tt class="constant">200</tt>, <tt class="constant">200.000</tt>, <tt class="constant">2E2</tt>, and <tt class="constant">.02E+4</tt> all
+have the same value at various precisions. Is there a way to transform them to
+a single recognizable canonical value?
+
+<p>
+A.  The <tt class="method">normalize()</tt> method maps all equivalent values to a single
+representative:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; values = map(Decimal, '200 200.000 2E2 .02E+4'.split())
+&gt;&gt;&gt; [v.normalize() for v in values]
+[Decimal("2E+2"), Decimal("2E+2"), Decimal("2E+2"), Decimal("2E+2")]
+</pre></div>
+
+<p>
+Q.  Some decimal values always print with exponential notation.  Is there
+a way to get a non-exponential representation?
+
+<p>
+A.  For some values, exponential notation is the only way to express
+the number of significant places in the coefficient.  For example,
+expressing <tt class="constant">5.0E+3</tt> as <tt class="constant">5000</tt> keeps the value
+constant but cannot show the original's two-place significance.
+
+<p>
+Q.  Is there a way to convert a regular float to a <tt class="class">Decimal</tt>?
+
+<p>
+A.  Yes, all binary floating point numbers can be exactly expressed as a
+Decimal.  An exact conversion may take more precision than intuition would
+suggest, so trapping <tt class="constant">Inexact</tt> will signal a need for more precision:
+
+<p>
+<div class="verbatim"><pre>
+def floatToDecimal(f):
+    "Convert a floating point number to a Decimal with no loss of information"
+    # Transform (exactly) a float to a mantissa (0.5 &lt;= abs(m) &lt; 1.0) and an
+    # exponent.  Double the mantissa until it is an integer.  Use the integer
+    # mantissa and exponent to compute an equivalent Decimal.  If this cannot
+    # be done exactly, then retry with more precision.
+
+    mantissa, exponent = math.frexp(f)
+    while mantissa != int(mantissa):
+        mantissa *= 2.0
+        exponent -= 1
+    mantissa = int(mantissa)
+
+    oldcontext = getcontext()
+    setcontext(Context(traps=[Inexact]))
+    try:
+        while True:
+            try:
+               return mantissa * Decimal(2) ** exponent
+            except Inexact:
+                getcontext().prec += 1
+    finally:
+        setcontext(oldcontext)
+</pre></div>
+
+<p>
+Q.  Why isn't the <tt class="function">floatToDecimal()</tt> routine included in the module?
+
+<p>
+A.  There is some question about whether it is advisable to mix binary and
+decimal floating point.  Also, its use requires some care to avoid the
+representation issues associated with binary floating point:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; floatToDecimal(1.1)
+Decimal("1.100000000000000088817841970012523233890533447265625")
+</pre></div>
+
+<p>
+Q.  Within a complex calculation, how can I make sure that I haven't gotten a
+spurious result because of insufficient precision or rounding anomalies.
+
+<p>
+A.  The decimal module makes it easy to test results.  A best practice is to
+re-run calculations using greater precision and with various rounding modes.
+Widely differing results indicate insufficient precision, rounding mode
+issues, ill-conditioned inputs, or a numerically unstable algorithm.
+
+<p>
+Q.  I noticed that context precision is applied to the results of operations
+but not to the inputs.  Is there anything to watch out for when mixing
+values of different precisions?
+
+<p>
+A.  Yes.  The principle is that all values are considered to be exact and so
+is the arithmetic on those values.  Only the results are rounded.  The
+advantage for inputs is that ``what you type is what you get''.  A
+disadvantage is that the results can look odd if you forget that the inputs
+haven't been rounded:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; getcontext().prec = 3
+&gt;&gt;&gt; Decimal('3.104') + D('2.104')
+Decimal("5.21")
+&gt;&gt;&gt; Decimal('3.104') + D('0.000') + D('2.104')
+Decimal("5.20")
+</pre></div>
+
+<p>
+The solution is either to increase precision or to force rounding of inputs
+using the unary plus operation:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; getcontext().prec = 3
+&gt;&gt;&gt; +Decimal('1.23456789')      # unary plus triggers rounding
+Decimal("1.23")
+</pre></div>
+
+<p>
+Alternatively, inputs can be rounded upon creation using the
+<tt class="method">Context.create_decimal()</tt> method:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; Context(prec=5, rounding=ROUND_DOWN).create_decimal('1.2345678')
+Decimal("1.2345")
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.7 Recipes"
+  href="decimal-recipes.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.4 random  "
+  href="module-random.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="decimal-recipes.html">6.3.7 Recipes</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-random.html">6.4 random  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

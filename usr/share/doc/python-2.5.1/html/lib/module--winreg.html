@@ -1,0 +1,647 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-winsound.html" />
+<link rel="prev" href="module-msvcrt.html" />
+<link rel="parent" href="node922.html" />
+<link rel="next" href="handle-object.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>36.3 _winreg - Windows registry access</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="36.2.3 other Functions"
+  href="msvcrt-other.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="36. ms Windows Specific"
+  href="node922.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="36.3.1 registry Handle Objects"
+  href="handle-object.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="msvcrt-other.html">36.2.3 Other Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node922.html">36. MS Windows Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="handle-object.html">36.3.1 Registry Handle Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0038300000000000000000">
+36.3 <tt class="module">_winreg</tt> -
+         Windows registry access</a>
+</h1>
+
+<p>
+<a name="module-winreg"></a>  
+<p class="availability">Availability: <span
+ class="platform">Windows</span>.</p>
+
+<p>
+
+<span class="versionnote">New in version 2.0.</span>
+
+<p>
+These functions expose the Windows registry API to Python.  Instead of
+using an integer as the registry handle, a handle object is used to
+ensure that the handles are closed correctly, even if the programmer
+neglects to explicitly close them.
+
+<p>
+This module exposes a very low-level interface to the Windows
+registry; it is expected that in the future a new <code>winreg</code> 
+module will be created offering a higher-level interface to the
+registry API.
+
+<p>
+This module offers the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5823' xml:id='l2h-5823' class="function">CloseKey</tt></b>(</nobr></td>
+  <td><var>hkey</var>)</td></tr></table></dt>
+<dd>
+ Closes a previously opened registry key.
+ The hkey argument specifies a previously opened key.
+
+<p>
+Note that if <var>hkey</var> is not closed using this method (or via
+ <tt class="method">handle.Close()</tt>), it is closed when the <var>hkey</var> object
+ is destroyed by Python.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5824' xml:id='l2h-5824' class="function">ConnectRegistry</tt></b>(</nobr></td>
+  <td><var>computer_name, key</var>)</td></tr></table></dt>
+<dd>
+  Establishes a connection to a predefined registry handle on 
+  another computer, and returns a <i class="dfn">handle object</i>
+
+<p>
+<var>computer_name</var> is the name of the remote computer, of the 
+ form <code>r"\\computername"</code>.  If <code>None</code>, the local computer
+ is used.
+
+<p>
+<var>key</var> is the predefined handle to connect to.
+
+<p>
+The return value is the handle of the opened key.
+ If the function fails, an <tt class="exception">EnvironmentError</tt> exception is 
+ raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5825' xml:id='l2h-5825' class="function">CreateKey</tt></b>(</nobr></td>
+  <td><var>key, sub_key</var>)</td></tr></table></dt>
+<dd>
+ Creates or opens the specified key, returning a <i class="dfn">handle object</i>
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>sub_key</var> is a string that names the key this method opens 
+ or creates.
+
+<p>
+If <var>key</var> is one of the predefined keys, <var>sub_key</var> may 
+ be <code>None</code>. In that case, the handle returned is the same key handle 
+ passed in to the function.
+
+<p>
+If the key already exists, this function opens the existing key.
+
+<p>
+The return value is the handle of the opened key.
+ If the function fails, an <tt class="exception">EnvironmentError</tt> exception is 
+ raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5826' xml:id='l2h-5826' class="function">DeleteKey</tt></b>(</nobr></td>
+  <td><var>key, sub_key</var>)</td></tr></table></dt>
+<dd>
+ Deletes the specified key.
+
+<p>
+<var>key</var> is an already open key, or any one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>sub_key</var> is a string that must be a subkey of the key 
+ identified by the <var>key</var> parameter.  This value must not be 
+ <code>None</code>, and the key may not have subkeys.
+
+<p>
+<em>This method can not delete keys with subkeys.</em>
+
+<p>
+If the method succeeds, the entire key, including all of its values,
+ is removed.  If the method fails, an <tt class="exception">EnvironmentError</tt> 
+ exception is raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5827' xml:id='l2h-5827' class="function">DeleteValue</tt></b>(</nobr></td>
+  <td><var>key, value</var>)</td></tr></table></dt>
+<dd>
+  Removes a named value from a registry key.
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>value</var> is a string that identifies the value to remove.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5828' xml:id='l2h-5828' class="function">EnumKey</tt></b>(</nobr></td>
+  <td><var>key, index</var>)</td></tr></table></dt>
+<dd>
+  Enumerates subkeys of an open registry key, returning a string.
+
+<p>
+<var>key</var> is an already open key, or any one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>index</var> is an integer that identifies the index of the key to 
+ retrieve.
+
+<p>
+The function retrieves the name of one subkey each time it 
+ is called.  It is typically called repeatedly until an 
+ <tt class="exception">EnvironmentError</tt> exception 
+ is raised, indicating, no more values are available.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5829' xml:id='l2h-5829' class="function">EnumValue</tt></b>(</nobr></td>
+  <td><var>key, index</var>)</td></tr></table></dt>
+<dd>
+  Enumerates values of an open registry key, returning a tuple.
+
+<p>
+<var>key</var> is an already open key, or any one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>index</var> is an integer that identifies the index of the value 
+ to retrieve.
+
+<p>
+The function retrieves the name of one subkey each time it is 
+ called. It is typically called repeatedly, until an 
+ <tt class="exception">EnvironmentError</tt> exception is raised, indicating 
+ no more values.
+
+<p>
+The result is a tuple of 3 items:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Index</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><tt class="constant">0</tt></td>
+        <td class="left"  >A string that identifies the value name</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="constant">1</tt></td>
+        <td class="left"  >An object that holds the value data, and whose
+              type depends on the underlying registry type</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="constant">2</tt></td>
+        <td class="left"  >An integer that identifies the type of the value data</td></tr></tbody>
+</table></div>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5830' xml:id='l2h-5830' class="function">FlushKey</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+  Writes all the attributes of a key to the registry.
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+It is not necessary to call RegFlushKey to change a key.
+ Registry changes are flushed to disk by the registry using its lazy 
+ flusher.  Registry changes are also flushed to disk at system 
+ shutdown.  Unlike <tt class="function">CloseKey()</tt>, the <tt class="function">FlushKey()</tt> method 
+ returns only when all the data has been written to the registry.
+ An application should only call <tt class="function">FlushKey()</tt> if it requires absolute 
+ certainty that registry changes are on disk.
+
+<p>
+<em>If you don't know whether a <tt class="function">FlushKey()</tt> call is required, it 
+ probably isn't.</em>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5831' xml:id='l2h-5831' class="function">RegLoadKey</tt></b>(</nobr></td>
+  <td><var>key, sub_key, file_name</var>)</td></tr></table></dt>
+<dd>
+ Creates a subkey under the specified key and stores registration 
+ information from a specified file into that subkey.
+
+<p>
+<var>key</var> is an already open key, or any of the predefined
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>sub_key</var> is a string that identifies the sub_key to load.
+
+<p>
+<var>file_name</var> is the name of the file to load registry data from.
+  This file must have been created with the <tt class="function">SaveKey()</tt> function.
+  Under the file allocation table (FAT) file system, the filename may not
+  have an extension.
+
+<p>
+A call to LoadKey() fails if the calling process does not have the
+ <tt class="constant">SE_RESTORE_PRIVILEGE</tt> privilege. Note that privileges
+ are different than permissions - see the Win32 documentation for
+ more details.
+
+<p>
+If <var>key</var> is a handle returned by <tt class="function">ConnectRegistry()</tt>, 
+ then the path specified in <var>fileName</var> is relative to the 
+ remote computer.
+
+<p>
+The Win32 documentation implies <var>key</var> must be in the 
+ <tt class="constant">HKEY_USER</tt> or <tt class="constant">HKEY_LOCAL_MACHINE</tt> tree.
+ This may or may not be true.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5832' xml:id='l2h-5832' class="function">OpenKey</tt></b>(</nobr></td>
+  <td><var>key, sub_key</var><big>[</big><var>, res<code> = 0</code></var><big>]</big><var></var><big>[</big><var>, sam<code> = <tt class="constant">KEY_READ</tt></code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Opens the specified key, returning a <i class="dfn">handle object</i>
+
+<p>
+<var>key</var> is an already open key, or any one of the predefined
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>sub_key</var> is a string that identifies the sub_key to open.
+
+<p>
+<var>res</var> is a reserved integer, and must be zero.  The default is zero.
+
+<p>
+<var>sam</var> is an integer that specifies an access mask that describes 
+ the desired security access for the key.  Default is <tt class="constant">KEY_READ</tt>
+
+<p>
+The result is a new handle to the specified key.
+
+<p>
+If the function fails, <tt class="exception">EnvironmentError</tt> is raised.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5833' xml:id='l2h-5833' class="function">OpenKeyEx</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  The functionality of <tt class="function">OpenKeyEx()</tt> is provided via
+  <tt class="function">OpenKey()</tt>, by the use of default arguments.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5834' xml:id='l2h-5834' class="function">QueryInfoKey</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+ Returns information about a key, as a tuple.
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+The result is a tuple of 3 items:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Index</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><tt class="constant">0</tt></td>
+        <td class="left"  >An integer giving the number of sub keys this key has.</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="constant">1</tt></td>
+        <td class="left"  >An integer giving the number of values this key has.</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="constant">2</tt></td>
+        <td class="left"  >A long integer giving when the key was last modified (if
+              available) as 100's of nanoseconds since Jan 1, 1600.</td></tr></tbody>
+</table></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5835' xml:id='l2h-5835' class="function">QueryValue</tt></b>(</nobr></td>
+  <td><var>key, sub_key</var>)</td></tr></table></dt>
+<dd>
+ Retrieves the unnamed value for a key, as a string
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>sub_key</var> is a string that holds the name of the subkey with which 
+ the value is associated.  If this parameter is <code>None</code> or empty, the 
+ function retrieves the value set by the <tt class="function">SetValue()</tt> method 
+ for the key identified by <var>key</var>.
+
+<p>
+Values in the registry have name, type, and data components. This 
+ method retrieves the data for a key's first value that has a NULL name.
+ But the underlying API call doesn't return the type, Lame Lame Lame,
+ DO NOT USE THIS!!!
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5836' xml:id='l2h-5836' class="function">QueryValueEx</tt></b>(</nobr></td>
+  <td><var>key, value_name</var>)</td></tr></table></dt>
+<dd>
+  Retrieves the type and data for a specified value name associated with 
+  an open registry key.
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>value_name</var> is a string indicating the value to query.
+
+<p>
+The result is a tuple of 2 items:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Index</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><tt class="constant">0</tt></td>
+        <td class="left"  >The value of the registry item.</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="constant">1</tt></td>
+        <td class="left"  >An integer giving the registry type for this value.</td></tr></tbody>
+</table></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5837' xml:id='l2h-5837' class="function">SaveKey</tt></b>(</nobr></td>
+  <td><var>key, file_name</var>)</td></tr></table></dt>
+<dd>
+  Saves the specified key, and all its subkeys to the specified file.
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>file_name</var> is the name of the file to save registry data to.
+  This file cannot already exist. If this filename includes an extension,
+  it cannot be used on file allocation table (FAT) file systems by the
+  <tt class="method">LoadKey()</tt>, <tt class="method">ReplaceKey()</tt> or 
+  <tt class="method">RestoreKey()</tt> methods.
+
+<p>
+If <var>key</var> represents a key on a remote computer, the path 
+ described by <var>file_name</var> is relative to the remote computer.
+ The caller of this method must possess the <tt class="constant">SeBackupPrivilege</tt> 
+ security privilege.  Note that privileges are different than permissions 
+ - see the Win32 documentation for more details.
+
+<p>
+This function passes NULL for <var>security_attributes</var> to the API.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5838' xml:id='l2h-5838' class="function">SetValue</tt></b>(</nobr></td>
+  <td><var>key, sub_key, type, value</var>)</td></tr></table></dt>
+<dd>
+ Associates a value with a specified key.
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>sub_key</var> is a string that names the subkey with which the value 
+ is associated.
+
+<p>
+<var>type</var> is an integer that specifies the type of the data.
+ Currently this must be <tt class="constant">REG_SZ</tt>, meaning only strings are
+ supported.  Use the <tt class="function">SetValueEx()</tt> function for support for
+ other data types.
+
+<p>
+<var>value</var> is a string that specifies the new value.
+
+<p>
+If the key specified by the <var>sub_key</var> parameter does not exist,
+ the SetValue function creates it.
+
+<p>
+Value lengths are limited by available memory. Long values (more than
+ 2048 bytes) should be stored as files with the filenames stored in
+ the configuration registry.  This helps the registry perform
+ efficiently.
+
+<p>
+The key identified by the <var>key</var> parameter must have been 
+ opened with <tt class="constant">KEY_SET_VALUE</tt> access.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5839' xml:id='l2h-5839' class="function">SetValueEx</tt></b>(</nobr></td>
+  <td><var>key, value_name, reserved, type, value</var>)</td></tr></table></dt>
+<dd>
+ Stores data in the value field of an open registry key.
+
+<p>
+<var>key</var> is an already open key, or one of the predefined 
+ <tt class="constant">HKEY_*</tt> constants.
+
+<p>
+<var>sub_key</var> is a string that names the subkey with which the 
+ value is associated.
+
+<p>
+<var>type</var> is an integer that specifies the type of the data.  
+ This should be one of the following constants defined in this module:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Constant</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_BINARY</tt></td>
+        <td class="left"  >Binary data in any form.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_DWORD</tt></td>
+        <td class="left"  >A 32-bit number.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_DWORD_LITTLE_ENDIAN</tt></td>
+        <td class="left"  >A 32-bit number in little-endian format.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_DWORD_BIG_ENDIAN</tt></td>
+        <td class="left"  >A 32-bit number in big-endian format.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_EXPAND_SZ</tt></td>
+        <td class="left"  >Null-terminated string containing references
+                          to environment variables ("<tt class="samp">%PATH%</tt>").</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_LINK</tt></td>
+        <td class="left"  >A Unicode symbolic link.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_MULTI_SZ</tt></td>
+        <td class="left"  >A sequence of null-terminated strings, 
+	terminated by two null characters.  (Python handles 
+	this termination automatically.)</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_NONE</tt></td>
+        <td class="left"  >No defined value type.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_RESOURCE_LIST</tt></td>
+        <td class="left"  >A device-driver resource list.</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">REG_SZ</tt></td>
+        <td class="left"  >A null-terminated string.</td></tr></tbody>
+</table></div>
+
+<p>
+<var>reserved</var> can be anything - zero is always passed to the 
+ API.
+
+<p>
+<var>value</var> is a string that specifies the new value.
+
+<p>
+This method can also set additional value and type information for the
+ specified key.  The key identified by the key parameter must have been
+ opened with <tt class="constant">KEY_SET_VALUE</tt> access.
+
+<p>
+To open the key, use the <tt class="function">CreateKeyEx()</tt> or 
+ <tt class="function">OpenKey()</tt> methods.
+
+<p>
+Value lengths are limited by available memory. Long values (more than
+ 2048 bytes) should be stored as files with the filenames stored in
+ the configuration registry.  This helps the registry perform efficiently.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="handle-object.html">36.3.1 Registry Handle Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="36.2.3 other Functions"
+  href="msvcrt-other.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="36. ms Windows Specific"
+  href="node922.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="36.3.1 registry Handle Objects"
+  href="handle-object.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="msvcrt-other.html">36.2.3 Other Functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node922.html">36. MS Windows Specific</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="handle-object.html">36.3.1 Registry Handle Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

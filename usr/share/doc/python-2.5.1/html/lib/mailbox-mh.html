@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="mailbox-babyl.html" />
+<link rel="prev" href="mailbox-mbox.html" />
+<link rel="parent" href="mailbox-objects.html" />
+<link rel="next" href="mailbox-babyl.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3.1.3 MH</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.1.2 mbox"
+  href="mailbox-mbox.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.1.4 Babyl"
+  href="mailbox-babyl.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-mbox.html">7.3.1.2 mbox</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-babyl.html">7.3.1.4 Babyl</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION009313000000000000000"></a>
+<a name="mailbox-mh"></a>
+<br>
+7.3.1.3 <tt class="class">MH</tt>
+</h3>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1383' xml:id='l2h-1383' class="class">MH</tt></b>(</nobr></td>
+  <td><var>path</var><big>[</big><var>, factory=None</var><big>[</big><var>, create=True</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+A subclass of <tt class="class">Mailbox</tt> for mailboxes in MH format. Parameter
+<var>factory</var> is a callable object that accepts a file-like message
+representation (which behaves as if opened in binary mode) and returns a custom
+representation. If <var>factory</var> is <code>None</code>, <tt class="class">MHMessage</tt> is used as
+the default message representation. If <var>create</var> is <code>True</code>, the mailbox
+is created if it does not exist.
+</dl>
+
+<p>
+MH is a directory-based mailbox format invented for the MH Message Handling
+System, a mail user agent. Each message in an MH mailbox resides in its own
+file. An MH mailbox may contain other MH mailboxes (called <i class="dfn">folders</i>) in
+addition to messages. Folders may be nested indefinitely. MH mailboxes also
+support <i class="dfn">sequences</i>, which are named lists used to logically group messages
+without moving them to sub-folders. Sequences are defined in a file called
+<span class="file">.mh_sequences</span> in each folder.
+
+<p>
+The <tt class="class">MH</tt> class manipulates MH mailboxes, but it does not attempt to
+emulate all of <b class="program">mh</b>'s behaviors. In particular, it does not modify and
+is not affected by the <span class="file">context</span> or <span class="file">.mh_profile</span> files that are used
+by <b class="program">mh</b> to store its state and configuration.
+
+<p>
+<tt class="class">MH</tt> instances have all of the methods of <tt class="class">Mailbox</tt> in addition to
+the following:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1384' xml:id='l2h-1384' class="method">list_folders</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a list of the names of all folders.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1385' xml:id='l2h-1385' class="method">get_folder</tt></b>(</nobr></td>
+  <td><var>folder</var>)</td></tr></table></dt>
+<dd>
+Return an <tt class="class">MH</tt> instance representing the folder whose name is
+<var>folder</var>. A <tt class="exception">NoSuchMailboxError</tt> exception is raised if the
+folder does not exist.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1386' xml:id='l2h-1386' class="method">add_folder</tt></b>(</nobr></td>
+  <td><var>folder</var>)</td></tr></table></dt>
+<dd>
+Create a folder whose name is <var>folder</var> and return an <tt class="class">MH</tt> instance
+representing it.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1387' xml:id='l2h-1387' class="method">remove_folder</tt></b>(</nobr></td>
+  <td><var>folder</var>)</td></tr></table></dt>
+<dd>
+Delete the folder whose name is <var>folder</var>. If the folder contains any
+messages, a <tt class="exception">NotEmptyError</tt> exception will be raised and the folder
+will not be deleted.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1388' xml:id='l2h-1388' class="method">get_sequences</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a dictionary of sequence names mapped to key lists. If there are no
+sequences, the empty dictionary is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1389' xml:id='l2h-1389' class="method">set_sequences</tt></b>(</nobr></td>
+  <td><var>sequences</var>)</td></tr></table></dt>
+<dd>
+Re-define the sequences that exist in the mailbox based upon <var>sequences</var>, a
+dictionary of names mapped to key lists, like returned by
+<tt class="method">get_sequences()</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1390' xml:id='l2h-1390' class="method">pack</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Rename messages in the mailbox as necessary to eliminate gaps in numbering.
+Entries in the sequences list are updated correspondingly. <span class="note"><b class="label">Note:</b>
+Already-issued
+keys are invalidated by this operation and should not be subsequently used.</span>
+</dl>
+
+<p>
+Some <tt class="class">Mailbox</tt> methods implemented by <tt class="class">MH</tt> deserve special remarks:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1391' xml:id='l2h-1391' class="method">remove</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1392' xml:id='l2h-1392' class="method">__delitem__</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1393' xml:id='l2h-1393' class="method">discard</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>These methods immediately delete the message. The MH convention of marking a
+message for deletion by prepending a comma to its name is not used.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1394' xml:id='l2h-1394' class="method">lock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1395' xml:id='l2h-1395' class="method">unlock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>Three locking mechanisms are used--dot locking and, if available, the
+<tt class="cfunction">flock()</tt> and <tt class="cfunction">lockf()</tt> system calls. For MH mailboxes,
+locking the mailbox means locking the <span class="file">.mh_sequences</span> file and, only for
+the duration of any operations that affect them, locking individual message
+files.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1396' xml:id='l2h-1396' class="method">get_file</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+Depending upon the host platform, it may not be possible to remove the
+underlying message while the returned file remains open.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1397' xml:id='l2h-1397' class="method">flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+All changes to MH mailboxes are immediately applied, so this method does
+nothing.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1398' xml:id='l2h-1398' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<tt class="class">MH</tt> instances do not keep any open files, so this method is equivelant
+to <tt class="method">unlock()</tt>.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<dl compact="compact" class="seeurl">
+    <dt><a href='http://www.nongnu.org/nmh/'
+        >nmh - Message Handling System</a></dt>
+    <dd>Home page
+of <b class="program">nmh</b>, an updated version of the original <b class="program">mh</b>.</dd>
+  </dl>
+<dl compact="compact" class="seeurl">
+    <dt><a href='http://www.ics.uci.edu/~mh/book/'
+        >MH &amp; nmh: Email for Users &amp;
+Programmers</a></dt>
+    <dd>A GPL-licensed book on <b class="program">mh</b> and <b class="program">nmh</b>, with some
+information on the mailbox format.</dd>
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.1.2 mbox"
+  href="mailbox-mbox.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.1.4 Babyl"
+  href="mailbox-babyl.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-mbox.html">7.3.1.2 mbox</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-babyl.html">7.3.1.4 Babyl</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

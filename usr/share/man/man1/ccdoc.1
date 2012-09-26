@@ -1,0 +1,778 @@
+.\\" Automatically created by $Id: makeman.pl,v 1.5 2004/09/30 07:34:13 jlinoff Exp $"
+.TH ccdoc 1 2004/09/29 "http://ccdoc.sourceforge.net"
+.SH NAME
+ccdoc \- C++ interface documentation tool
+.SH SYNOPSIS
+.B ccdoc [db
+.I file
+.B ] [
+.I -switches
+.B ]
+.B ...
+.br
+  
+.br
+.I OR
+.br
+  
+.br
+.in +3
+.I phase1: 
+.B ccdoc [-db
+.I file
+.B ] [
+.I -phase1_switches
+.B ]
+.I header_file1
+.B ...
+.br
+.I phase2: 
+.B ccdoc [-db
+.I file
+.B ] [-index]
+.br
+.I phase3: 
+.B ccdoc [-db
+.I file
+.B ] [-html 
+.I directory/
+.B ] [
+.I -phase3_switches
+.B ]
+.br
+.in -3
+.SH DESCRIPTION
+.B ccdoc
+automatically generates HTML web documentation from C++ programs by
+parsing the source file headers. It was designed to aid collaboration
+between package users and package developers by documenting the
+interface.
+.br
+  
+.br
+The source code for this program is provided free charge from
+http://ccdoc.sourceforge.net.
+.br
+  
+.br
+The program operates in three phases. The first phase translates the
+C++ files to an intermediate format that is stored in the db file.  It
+is usually run multiple times over header files in different
+directories and is called the input phase.
+This phase automatically recognizes the C++ structure to create the
+documentation but you can add additional comments by using directives
+that have a javadoc like syntax.
+.br
+  
+.br
+The second phase cross indexes all the parsed entities and is called
+the index phase.
+.br
+  
+.br
+The third phase generates the HTML and is called the output phase.
+.br
+  
+.br
+Detailed information about the switches, program phases and comment syntax
+can be found in the on-line help or in the users manual at
+http://ccdoc.sourceforge.net.
+.SH OPTIONS
+To understand how to use the options for the different phases, see
+the on-line help or the users manual at http://ccdoc.sourceforge.net.
+.IP "-D<name>[=<value>]"
+Define a macro and, optionally, define its value.
+.br
+   
+.br
+
+.br
+Phase: parse
+.IP "-U<name>"
+Undefine a macro.
+.br
+Phase: parse
+.IP "-args"
+Dump the command line arguments. This is enabled automatically in verbose (-v) mode.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-bg <color>"
+The background color. The default is the default for the browser.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]cdsm"
+Turn on or off the creation of default special members for classes. Specifically this tells ccdoc to create (or not create) entries for default constructors, copy constructors, destructors and copy operators if they were not explicitly defined in the class. The default is -cdsm.
+.br
+   
+.br
+
+.br
+Phase: parse
+.IP "-cid"
+Deprecated. Same as -verbose.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-ctf <file>"
+Deprecated. Same as -db.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-db <file>"
+The name of the ccdoc database.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-dospaths"
+The file paths contain backslashes that need to be converted to forwards slashes for HTML.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]doxygen"
+Enable limited doxygen compatibility mode. The default is -doxygen. This switch specifies that @file blocks are ignored.
+.br
+   
+.br
+Some other doxygen compatible syntax is already supported whether this switch is specified or not, namely: the @endlink directive, the single line suffix comment forms (//!< and ///<) and the multiple line suffix comment forms (/*!< and /**<).
+.br
+   
+.br
+This allows users more flexibility in converting between doxygen and ccdoc.
+.br
+   
+.br
+
+.br
+Phase: parse
+.IP "-fg <color>"
+Same as -fgtext.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-fglink <color>"
+The foreground link color. The default is the default for the browser.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-fgtext <color>"
+The foreground text color. The default is the default for the browser.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-fgvlink <color>"
+The foreground vlink color. The default is the default for the browser. These are used links.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-files <list>"
+Designates a file that contains the list of files to parse.
+.br
+   
+.br
+
+.br
+Phase: parse
+.IP "-h,-help"
+Displays the extensive on-line help and exits. The on-line covers the different program phases, the comment directives and the program switches.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-header <file>"
+The HTML used for the customized header just after the <body> stmt. This is where clients insert their own custom information on each page. See the -meta command for information on how to insert meta variables in the <head> section.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-htm <prefix>"
+Same as -html <prefix>.
+.IP "-html <prefix>"
+The HTML path prefix. This is used to designate the  path where the HTML files will be stored. The directory suffix must be included if this is a directory path. Always use a forward slash to separate directories, even when you are running under a DOS window, because the HTTP path hierarchy separator is a forward slash.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-imageurl <URL>"
+Same as -imgurl <URL>.
+.IP "-imgurl <URL>"
+The URL that describes of the GIF images. This version of ccdoc does not use images so this switch has no effect.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-index"
+Generate the indices.
+.br
+Phase: index
+.IP "-[no]jdsds"
+Enable javadoc short description syntax. This causes ccdoc to conform to the javadoc specification for processing short descriptions.
+.br
+   
+.br
+This is the new default behavior as of r24.
+.br
+   
+.br
+A javadoc short description is terminated by a period followed by a space, tab, newline or tag (directive).
+.br
+   
+.br
+If -nojdsds is specified, the old-style ccdoc short description handling is enabled. That is, short descriptions are terminated by a blank line.
+.br
+   
+.br
+
+.br
+Phase: parse
+.IP "-log <file>"
+All information output by the program is also sent to the specified log file. Multiple log files can be specified. By default all output is sent to cout.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-[no]macros"
+Deprecated. Same as -[no]rptmac.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-maxpathlen <num>"
+Maximum file path size. The default is 128. When the file path size exceeds the limit, the file name is truncated and a checksum is added to guarantee that the file name is unique. If maxpathlen is set to zero, no limit checking is performed.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-meta <file>"
+The HTML used for the customized header just after the <head> stmt. This is where clients insert their own custom information for meta variables on each page. If -meta is specified, ccdoc will not generate the the http-equiv meta variable for HTML 4.01 compliance and it will ignore the -rptctcs.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-nocout"
+Turn off output to cout. This is used to test the help output without displaying anything to the console.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-pkg <name>"
+Define the package name for the entities in the source files. If no package is specified a default name is used or the @pkg <name> directive in the ccdoc comment is used. Children (like class methods) inherit the package from their parent.
+.br
+   
+.br
+
+.br
+Phase: parse
+.IP "-[no]private"
+Deprecated. Same as -[no]rptpri.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]protected"
+Deprecated. Same as -[no]rptpro.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]public"
+Deprecated. Same as -[no]rptpub.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-putenv <env>"
+Set an environment variable from the command line. This is useful for setting up regression tests in scripts on various platforms.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-root <name>"
+Change the name of the root package from 'root' to something else.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rootfile <name>"
+Change the top level output file name from <prefix>ccdoc.root.pkg.html to whatever the user wants. This can be used to create the ccdoc.index.html file by specifying: -rootfile ccdoc.index.html. This switch allows you to completely specify the path. The -html prefix is ignored.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rootpurl"
+<URL>
+.br
+Phase: output
+.IP "-rooturl <URL>"
+The hyperlink for the parent of the root package. Setting this allows the generated HTML to seamlessly integrate to a higher level document by providing a back  link to the users parent page.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptcfuns"
+Report comments for undocumented namespaces. When -rptcfuns is specified, all related namespaces comments are reported. This includes namespaces that do not contain ccdoc comments which can be somewhat busy. When -norptcfuns is specified, only related namespaces with ccdoc comments are reported. The only exception is when none of the namespaces have ccdoc comments. In that case, only the first undocumented namespace is reported (for backward compatibility). The default is -norptcfuns.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptcsd"
+Report class summary details. When -rptcsd is specified, the class summary page reports type, access and short description information. When -norptcsd is specified the class summary page only reports the names. The default is -rptcsd.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptcsi <num>"
+The class summary indent switch. Define the indent  level of each entry in the class summary report and the contents column. The default indent level is 4.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rptctcs <string>"
+Allow the user to specify the Content-Type char set. This allows international languages to be supported. The default char set is \"iso-8859-1\". This switch is ignored if the -meta switch is specified.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rptdefa <string>"
+Set the default string for the author field in top level entities. The default is \"unascribed\".
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rptdefasd <string>"
+Set the default string for the automatically generated short description field in top level entities. The default is \"automatically generated\".
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rptdefsd <string>"
+Set the default string for the short description field in top level entities. The default is \"undocumented\".
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rptdefv <string>"
+Set the default string for the version field in top level entities. The default is \"unknown\".
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptdpa"
+If the package author is not specified, report the author as unascribed. The default is -norptdpa which tells ccdoc to ignore authors on packages unless they are explicitly specified.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptdpd"
+If the package description is not specified, report the description as unknown. The default is -norptdpd which tells ccdoc to ignore descriptions on packages unless they are explicitly specified.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptdpv"
+If the package version is not specified, report the version as unknown. The default is -norptdpv which tells ccdoc to ignore version on packages unless they are explicitly specified.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptfwcf"
+The fixed width code font switch. Use a fixed width  font when reporting code fragments. The default is -norptfwcf.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rpthpc"
+Report package contents hierarchically like the the class summary page. The default is -rpthpc.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptim"
+Report all inherited methods as though they were defined locally. The default is -rptim.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptmac"
+Report macros. Default is -norptmac because there can be large numbers of guards in header files. If a system is designed with ccdoc in mind, the header guards can be surrounded by ccdoc guards (#ifndef __ccdoc__) which would make this data more useful.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptmac1"
+Report macros heuristically. This means that ccdoc attempts to filter out header guards and windows DLLIMPORT/DLLEXPORT macros by filtering out macro names with the prefixes: dll_, DLL_, include_, INCLUDE_, included_, INCLUDED_ and the suffixes: dll, _DLL, _h, _H, _hh, _HH, _include, _INCLUDE, _included, _INCLUDED, _included_, _INCLUDED_.
+.br
+   
+.br
+The default is -norptmac1. When this switch is enabled, it also enables -rptmac. This is a better choice than -rptmac.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rptmlci <num>"
+Maximum length of the content ids. This switch is used to avoid strange looking tables of content when the id is very long. 
+.br
+   
+.br
+When the string exceeds this length, only the first <num> characters are printed followed by .. to indicate truncation.
+.br
+   
+.br
+The default length is 32. A value of zero means don't impose the limit. If no inherited from column exists, the value of the -rptmlcifi is added to make this field bigger.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-rptmlcifi <num>"
+Maximum length of the contents \"inherited from\" column id. This switch is used to avoid strange looking tables of content when the parent id is very long.
+.br
+   
+.br
+When the string exceeds this length, only the first <num> characters are printed followed by .. to indicate truncation.
+.br
+   
+.br
+The default length is 32. A value of zero means don't impose the limit.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptpri"
+Report private items. The default is -norptpri.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptpro"
+Report protected items. The default is -norptpro.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptpub"
+Report public items. The default is -rptpub.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptsci"
+Report the class information in sorted order. The default is -rptsci. If -norptsci is specified the class contents and details are not sorted.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptsrc"
+Report the source information for each entity in the table of contents. This causes an additional column to be added to the table. The default is -norptsrc because this information is already reported for each entity in its description. It exists to provide debugging support for when no description is generated.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rpttyp"
+Report typedefs. Default is -rpttyp.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]rptun"
+Report unions. Default is -rptun.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-sourceurl <URL>"
+Same as -srcurl <URL>.
+.IP "-srcurl <URL>"
+The URL where the source files can be found. If this is specified, hyperlinks are created for Source entries.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]tcms"
+Turn on or off the processing of template class methods that are defined outside of the class declaration.
+.br
+   
+.br
+
+.br
+Phase: parse
+.IP "-trailer <file>"
+The HTML used for the customized trailer.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]typedefs"
+Deprecated. Same as -[no]rpttyp.
+.br
+   
+.br
+
+.br
+Phase: output
+.IP "-[no]unions"
+Deprecated. Same as -[no]rptun.
+.br
+Phase: output
+.IP "-[no]v"
+Turn verbose mode on or off. The default is off.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-version"
+Report the program version. The version contains the program name, the version, the revision, the release date and the compilation id. Here is an example of what -version reports: % ccdoc -version ccdoc v08r41 2004/09/29 bin_opt_msvc_MSWin32-multi-thread-4.0
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-[no]vf"
+Turn db verbose format mode on or off. The default is on because it speeds up the writing significantly and is only slightly larger. This switch enables verbose mode in the database file to make things easier to read for debugging.
+.br
+   
+.br
+
+.br
+Phase: all
+.IP "-[no]warn"
+Turn warnings on or off. The default is on.
+.br
+Phase: all
+.SH DIRECTIVES
+These are the directives that drive the output format.
+They are found in the comments associated with the entities.
+The basic format is:
+.br
+  
+.br
+.in +3
+/**
+.br
+ *<brief_description>
+.br
+ *<long_description>
+.br
+ *<directives>
+.br
+ */
+.br
+.in -3
+.br
+  
+.br
+Where the brief description is a single sentence terminated by a period,
+the long description is anything else, including HTML tags and the
+directives are special ccdoc tags.
+.br
+  
+.br
+These comments are associated with C++ entity declarations for classes,
+variables, functions, enumerated types and typedefs as shown in the
+simple example below for a class.
+.br
+  
+.br
+.in +3
+/**
+.br
+ * Briefly, do important foo stuff.
+.br
+ * Long winded, do really important foo stuff.
+.br
+ * @author Ima Programmer
+.br
+ * @version 1.2
+.br
+ * @see Bar
+.br
+ * @see Spam
+.br
+ */
+.br
+.in -3
+.br
+  
+.br
+For more information about the directives see the on-line help
+or the users manual at http://ccdoc.sourceforge.net.
+.IP "/** .. */"
+Encloses a javadoc style ccdoc comment.
+.IP "/**< .. */"
+Encloses a doxygen style suffix ccdoc comment.
+.IP "/*!< .. */"
+Encloses a doxygen style suffix ccdoc comment.
+.IP "//@{ .. //@}"
+Encloses a ccdoc comment for C++ style line comments.
+.IP "//@-"
+Single line suffix C++ style comment form.
+.IP "///<"
+Same as //@- (doxygen compatible).
+.IP "//!<"
+Same as //@- (doxygen compatible).
+.IP "/**@#-*/"
+Turn off ccdoc token parsing.
+.IP "/**@#+*/"
+Turn on ccdoc token parsing.
+.IP "/**@#=<ch>*/"
+Insert <ch> into the input stream.
+.IP "{@link...}"
+The in-line link specification.
+.IP "@@"
+Translate HTML special characters for code fragments.
+.IP "@$"
+Same @link.
+.IP "@author"
+Specify an author.
+.IP "@deprecated"
+Describes the alternatives to use.
+.IP "@exception"
+Deprecated, same as @throws.
+.IP "@link,@endlink"
+Generate a hyperlink to a ccdoc entity.
+.IP "@param"
+Document a function or class method parameter.
+.IP "@pkg"
+Specifies the name of a package.
+.IP "@pkgdoc"
+This comment documents a specific package.
+.IP "@pkgdoctid"
+Redefine the output title id for a pkgdoc.
+.IP "@return"
+Deprecated, same as @returns.
+.IP "@returns"
+Documents the return value from a method or function.
+.IP "@see"
+Add a hyperlink entry to the See section.
+.IP "@since"
+When this became available.
+.IP "@suffix"
+This is a suffix comment.
+.IP "@throws"
+Document an exception.
+.IP "@todo"
+Describes todo information.
+.IP "@version"
+The entity version.
+.SH AUTHOR
+Joe Linoff
+.SH LICENSE

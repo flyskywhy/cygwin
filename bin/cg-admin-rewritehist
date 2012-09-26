@@ -1,0 +1,302 @@
+#!/usr/bin/env bash
+#
+# Rewrite revision history
+# Copyright (c) Petr Baudis, 2006
+#
+# Lets you rewrite GIT revision history by creating a new branch from
+# your current branch by applying custom filters on each revision.
+# Those filters can modify each tree (e.g. removing a file or running
+# a perl rewrite on all files) or information about each commit.
+# Otherwise, all information (including original commit times or merge
+# information) will be preserved.
+#
+# The command takes the new branch name as a mandatory argument and
+# the filters as optional arguments. If you specify no filters, the
+# commits will be recommitted without any changes, which would normally
+# have no effect and result with the new branch pointing to the same
+# branch as your current branch. (Nevertheless, this may be useful in
+# the future for compensating for some Git bugs or such, therefore
+# such a usage is permitted.)
+#
+# WARNING! The rewritten history will have different ids for all the
+# objects and will not converge with the original branch. You will not
+# be able to easily push and distribute the rewritten branch. Please do
+# not use this command if you do not know the full implications, and
+# avoid using it anyway - do not do what a simple single commit on top
+# of the current version would fix.
+#
+# Always verify that the rewritten version is correct before disposing
+# the original branch.
+#
+# OPTIONS
+# -------
+# -d TEMPDIR:: The path to the temporary tree used for rewriting
+#	When applying a tree filter, the command needs to temporary
+#	checkout the tree to some directory, which may consume
+#	considerable space in case of large projects. By default it
+#	does this in the '.git rewrite/' directory but you can override
+#	that choice by this parameter.
+#
+# -r STARTREV:: The commit id to start the rewrite at
+#	Normally, the command will rewrite the entire history. If you
+#	pass this argument, though, this will be the first commit it
+#	will rewrite and keep the previous commits intact.
+#
+# -k KEEPREV:: A commit id until which _not_ to rewrite history
+#	If you pass this argument, this commit and all of its
+#	predecessors are kept intact.
+#
+# Filters
+# ~~~~~~~
+# The filters are applied in the order as listed below. The COMMAND
+# argument is always evaluated in shell using the 'eval' command.
+# The $GIT_COMMIT environment variable is permanently set to contain
+# the id of the commit being rewritten. The author/committer environment
+# variables are set before the first filter is run.
+#
+# A 'map' function is available that takes an "original sha1 id" argument
+# and outputs a "rewritten sha1 id" if the commit has been already
+# rewritten, fails otherwise; the 'map' function can return several
+# ids on separate lines if your commit filter emitted multiple commits
+# (see below).
+#
+# --env-filter COMMAND:: The filter for modifying environment
+#	This is the filter for modifying the environment in which
+#	the commit will be performed. Specifically, you might want
+#	to rewrite the author/committer name/email/time environment
+#	variables (see `cg-commit` for details). Do not forget to
+#	re-export the variables.
+#
+# --tree-filter COMMAND:: The filter for rewriting tree (and its contents)
+#	This is the filter for rewriting the tree and its contents.
+#	The COMMAND argument is evaluated in shell with the working
+#	directory set to the root of the checked out tree. The new tree
+#	is then used as-is (new files are auto-added, disappeared files
+#	are auto-removed - .gitignore files nor any other ignore rules
+#	HAVE NO EFFECT!).
+#
+# --index-filter COMMAND:: The filter for rewriting index
+#	This is the filter for rewriting the Git's directory index.
+#	It is similar to the tree filter but does not check out the
+#	tree, which makes it much faster. However, you must use the
+#	lowlevel Git index manipulation commands to do your work.
+#
+# --parent-filter COMMAND:: The filter for rewriting parents
+#	This is the filter for rewriting the commit's parent list.
+#	It will receive the parent string on stdin and shall output
+#	the new parent string on stdout. The parent string is in
+#	format accepted by `git commit-tree`: empty for initial
+#	commit, "-p parent" for a normal commit and "-p parent1
+#	-p parent2 -p parent3 ..." for a merge commit.
+#
+# --msg-filter COMMAND:: The filter for rewriting commit message
+#	This is the filter for rewriting the commit messages.
+#	The COMMAND argument is evaluated in shell with the original
+#	commit message on standard input; its standard output is
+#	is used as the new commit message.
+#
+# --commit-filter COMMAND:: The filter for performing the commit
+#	If this filter is passed, it will be called instead of the
+#	`git commit-tree` command, with those arguments:
+#
+#		TREE_ID [-p PARENT_COMMIT_ID]...
+#
+#	and the log message on stdin. The commit id is expected on
+#	stdout. As a special extension, the commit filter may emit
+#	multiple commit ids; in that case, all of them will be used
+#	as parents instead of the original commit in further commits.
+#
+# EXAMPLE USAGE
+# -------------
+# Suppose you want to remove a file (containing confidential information
+# or copyright violation) from all commits:
+#
+#	cg-admin-rewritehist --tree-filter 'rm filename' newbranch
+#
+# A significantly faster version:
+#
+#	cg-admin-rewritehist --index-filter 'git update-index --remove filename' newbranch
+#
+# Now, you will get the rewritten history saved in the branch 'newbranch'
+# (your current branch is left untouched).
+#
+# To "etch-graft" a commit to the revision history (set a commit to be
+# the parent of the current initial commit and propagate that):
+#
+#	cg-admin-rewritehist --parent-filter sed\ 's/^$/-p graftcommitid/' newbranch
+#
+# (if the parent string is empty - therefore we are dealing with the
+# initial commit - add graftcommit as a parent). Note that this assumes
+# history with a single root (that is, no cg-merge -j happened). If this
+# is not the case, use:
+#
+#	cg-admin-rewritehist --parent-filter 'cat; [ "$GIT_COMMIT" = "COMMIT" ] && echo "-p GRAFTCOMMIT"' newbranch
+#
+# To remove commits authored by "Darl McBribe" from the history:
+#
+#	cg-admin-rewritehist --commit-filter 'if [ "$GIT_AUTHOR_NAME" = "Darl McBribe" ]; then shift; while [ -n "$1" ]; do shift; echo "$1"; shift; done; else git commit-tree "$@"; fi' newbranch
+#
+# (the shift magic first throws away the tree id and then the -p
+# parameters). Note that this handles merges properly! In case Darl
+# committed a merge between P1 and P2, it will be propagated properly
+# and all children of the merge will become merge commits with P1,P2
+# as their parents instead of the merge commit.
+#
+# To restrict rewriting to only part of the history, use -r or -k or both.
+# Consider this history:
+#
+#	     D--E--F--G--H
+#	    /     /
+#	A--B-----C
+#
+# To rewrite only commits F,G,H, use:
+#
+#	cg-admin-rewritehist -r F ...
+#
+# To rewrite commits E,F,G,H, use one of these:
+#
+#	cg-admin-rewritehist -r E -k C ...
+#	cg-admin-rewritehist -k D -k C ...
+
+# Testsuite: TODO
+
+set -e
+
+USAGE="cg-admin-rewritehist [-d TEMPDIR] [-r STARTREV]... [-k KEEPREV]... [FILTERS] DESTBRANCH"
+_git_wc_unneeded=1
+_git_requires_root=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+
+map()
+{
+	[ -r "$workdir/../map/$1" ] || return 1
+	cat "$workdir/../map/$1"
+}
+
+
+tempdir=.git rewrite
+declare -a unchanged
+filter_env=
+filter_tree=
+filter_index=
+filter_parent=
+filter_msg=cat
+filter_commit='git commit-tree "$@"'
+while optparse; do
+	if optparse -d=; then
+		tempdir="$OPTARG"
+	elif optparse -r=; then
+		unchanged=(${unchanged[@]} $(cg-object-id -p "$OPTARG")) || exit 1
+	elif optparse -k=; then
+		unchanged=(${unchanged[@]} $(cg-object-id -c "$OPTARG")) || exit 1
+	elif optparse --env-filter=; then
+		filter_env="$OPTARG"
+	elif optparse --tree-filter=; then
+		filter_tree="$OPTARG"
+	elif optparse --index-filter=; then
+		filter_index="$OPTARG"
+	elif optparse --parent-filter=; then
+		filter_parent="$OPTARG"
+	elif optparse --msg-filter=; then
+		filter_msg="$OPTARG"
+	elif optparse --commit-filter=; then
+		filter_commit="$OPTARG"
+	else
+		optfail
+	fi
+done
+
+dstbranch="${ARGS[0]}"
+[ -n "$dstbranch" ] || die "missing branch name"
+[ ! -s "$_git/refs/heads/$dstbranch" ] || die "branch $dstbranch already exists"
+[ ! -s "$_git/branches/$dstbranch" ] || die "branch $dstbranch is already a remote branch"
+
+[ ! -e "$tempdir" ] || die "$tempdir already exists, please remove it"
+mkdir -p "$tempdir/t"
+cd "$tempdir/t"
+workdir="$(pwd)"
+
+[ -n "$GIT_DIR" ] || export GIT_DIR=.git
+[[ "$GIT_DIR" == /* ]] || export GIT_DIR="$(pwd)/../../$GIT_DIR"
+export GIT_INDEX_FILE="$(pwd)/../index"
+git read-tree # seed the index file
+
+ret=0
+
+
+mkdir ../map # map old->new commit ids for rewriting parents
+
+# seed with identity mappings for the parents where we start off
+for commit in ${unchanged[@]}; do
+	echo $commit > ../map/$commit
+done
+
+git rev-list --topo-order HEAD ${unchanged[@]/#/^} | tac >../revs
+commits=$(cat ../revs | wc -l)
+
+if [ $commits -eq 0 ]; then
+	die "Found nothing to rewrite"
+fi
+
+i=0
+while read commit; do
+	i=$((i+1))
+	echo -n "$commit ($i/$commits) "
+
+	git read-tree -i -m $commit
+
+	export GIT_COMMIT=$commit
+	git cat-file commit "$commit" >../commit
+
+	eval "$(pick_author <../commit)"
+	eval "$(pick_id committer COMMITTER <../commit)"
+	eval "$filter_env"
+
+	if [ "$filter_tree" ]; then
+		git checkout-index -f -u -a
+		# files that $commit removed are now still in the working tree;
+		# remove them, else they would be added again
+		git ls-files -z --others | xargs -0 rm -f
+		eval "$filter_tree"
+		git diff-index -r $commit | cut -f 2- | tr '\n' '\0' | \
+			xargs -0 git update-index --add --replace --remove
+		git ls-files -z --others | \
+			xargs -0 git update-index --add --replace --remove
+	fi
+
+	eval "$filter_index"
+
+	parentstr=
+	for parent in $(cg-object-id -p $commit); do
+		if [ -r "../map/$parent" ]; then
+			for reparent in $(cat "../map/$parent"); do
+				parentstr="$parentstr -p $reparent"
+			done
+		else
+			die "assertion failed: parent $parent for commit $commit not found in rewritten ones"
+		fi
+	done
+	if [ "$filter_parent" ]; then
+		parentstr="$(echo "$parentstr" | eval "$filter_parent")"
+	fi
+
+	sed -e '1,/^$/d' <../commit | \
+		eval "$filter_msg" | \
+		sh -c "$filter_commit" git commit-tree $(git write-tree) $parentstr | \
+		tee ../map/$commit
+done <../revs
+
+git update-ref refs/heads/"$dstbranch" $(head -n 1 ../map/$(tail -n 1 ../revs))
+if [ "$(cat ../map/$(tail -n 1 ../revs) | wc -l)" -gt 1 ]; then
+	echo "WARNING: Your commit filter caused the head commit to expand to several rewritten commits. Only the first such commit was recorded as the current $dstbranch head but you will need to resolve the situation now (probably by manually merging the other commits). These are all the commits:" >&2
+	sed 's/^/	/' ../map/$(tail -n 1 ../revs) >&2
+	ret=1
+fi
+
+cd ../..
+rm -rf "$tempdir"
+echo "Rewritten history saved to the $dstbranch branch"
+
+exit $ret

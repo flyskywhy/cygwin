@@ -1,0 +1,49 @@
+[for the 0.5.x branch]
+
+* remove acinclude.m4 (it doesn't work with my autoconf environment)
+
+* Include a library for random and mpi routines and then remove
+  the dependency to Libgcrypt. (HIGH PRIORITY)
+
+* Use separate makefiles for cipherlib, mdlib.
+
+* Add the SHA1 digest of the current keyring as the first entry
+  to the index files. With this new record, we can easily decide
+  whether to rebuild the index or not.
+
+* The filter stuff seems to be very slow and I can't think of any
+  positive performance issues. Rethink the stuff or use GPG like
+  filter stuff which works on buffer and not on FILE* structs.  
+
+* src/main.c
+** cdk_handle_set_keydb. It's not really logical that you can set
+   two handle without any special params. Think of another name?
+   cdk_handle_set_auto_keydb?
+
+* src/cipher.c
+** Currently we can only encode files with a maximum of 4GB. The
+   libc functions only support 32 bit. We need to support partial bodies
+   if the file is bigger. (partly done: implement and test the last part!)
+   ts: do the same for literal packets or move these parts into
+   stream.c
+
+* src/encrypt.c
+** Support multiple signatures in one file. But this has no high priority.
+** Implement a way for detached sigs that allow to pass a filename of
+   of the plaintext rather than strip off the extension of the sigfile.
+
+
+[later]
+* src/trustb.c
+** I'm not really sure if we should include something which is only
+   GPG specific. But this way we don't need to implement trust calculation.
+
+* src/new-packet.c
+** Find a way to make sure the copy of a secret key is also stored
+   in secure memory. (We currently solve this with cloning).
+
+* add more doc headers for the external interface.
+
+* grep the code for all 'fixme/todo's and replace them with real code.
+
+

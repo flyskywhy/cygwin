@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pickle-example.html" />
+<link rel="prev" href="pickle-protocol.html" />
+<link rel="parent" href="module-pickle.html" />
+<link rel="next" href="pickle-example.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.1.6 Subclassing Unpicklers </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.5.3 pickling and unpickling"
+  href="node321.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1 pickle  "
+  href="module-pickle.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.1.7 Example"
+  href="pickle-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node321.html">13.1.5.3 Pickling and unpickling</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pickle.html">13.1 pickle  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pickle-example.html">13.1.7 Example</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0015160000000000000000"></a><a name="pickle-sub"></a>
+<br>
+13.1.6 Subclassing Unpicklers 
+</h2>
+
+<p>
+By default, unpickling will import any class that it finds in the
+pickle data.  You can control exactly what gets unpickled and what
+gets called by customizing your unpickler.  Unfortunately, exactly how
+you do this is different depending on whether you're using
+<tt class="module">pickle</tt> or <tt class="module">cPickle</tt>.<a name="tex2html117"
+  href="#foot36756"><sup>13.9</sup></a>
+<p>
+In the <tt class="module">pickle</tt> module, you need to derive a subclass from
+<tt class="class">Unpickler</tt>, overriding the <tt class="method">load_global()</tt>
+method.  <tt class="method">load_global()</tt> should read two lines from the pickle
+data stream where the first line will the name of the module
+containing the class and the second line will be the name of the
+instance's class.  It then looks up the class, possibly importing the
+module and digging out the attribute, then it appends what it finds to
+the unpickler's stack.  Later on, this class will be assigned to the
+<tt class="member">__class__</tt> attribute of an empty class, as a way of magically
+creating an instance without calling its class's <tt class="method">__init__()</tt>.
+Your job (should you choose to accept it), would be to have
+<tt class="method">load_global()</tt> push onto the unpickler's stack, a known safe
+version of any class you deem safe to unpickle.  It is up to you to
+produce such a class.  Or you could raise an error if you want to
+disallow all unpickling of instances.  If this sounds like a hack,
+you're right.  Refer to the source code to make this work.
+
+<p>
+Things are a little cleaner with <tt class="module">cPickle</tt>, but not by much.
+To control what gets unpickled, you can set the unpickler's
+<tt class="member">find_global</tt> attribute to a function or <code>None</code>.  If it is
+<code>None</code> then any attempts to unpickle instances will raise an
+<tt class="exception">UnpicklingError</tt>.  If it is a function,
+then it should accept a module name and a class name, and return the
+corresponding class object.  It is responsible for looking up the
+class and performing any necessary imports, and it may raise an
+error to prevent instances of the class from being unpickled.
+
+<p>
+The moral of the story is that you should be really careful about the
+source of the strings your application unpickles.
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot36756">...cPickle.</a><A
+ href="pickle-sub.html#tex2html117"><sup>13.9</sup></a></dt>
+<dd>A word of caution: the
+mechanisms described here use internal attributes and methods, which
+are subject to change in future versions of Python.  We intend to
+someday provide a common interface for controlling this behavior,
+which will work in either <tt class="module">pickle</tt> or <tt class="module">cPickle</tt>.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.1.5.3 pickling and unpickling"
+  href="node321.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.1 pickle  "
+  href="module-pickle.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.1.7 Example"
+  href="pickle-example.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node321.html">13.1.5.3 Pickling and unpickling</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pickle.html">13.1 pickle  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pickle-example.html">13.1.7 Example</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

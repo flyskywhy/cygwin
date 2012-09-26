@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="defaultdict-objects.html" />
+<link rel="parent" href="defaultdict-objects.html" />
+<link rel="next" href="module-heapq.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.3.2.1 defaultdict Examples </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.3.2 defaultdict objects"
+  href="defaultdict-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.3.2 defaultdict objects"
+  href="defaultdict-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.4 heapq  "
+  href="module-heapq.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="defaultdict-objects.html">5.3.2 defaultdict objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="defaultdict-objects.html">5.3.2 defaultdict objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-heapq.html">5.4 heapq  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION007321000000000000000"></a><a name="defaultdict-examples"></a>
+<br>
+5.3.2.1 <tt class="class">defaultdict</tt> Examples 
+</h3>
+
+<p>
+Using <tt class="class">list</tt> as the <tt class="member">default_factory</tt>, it is easy to group
+a sequence of key-value pairs into a dictionary of lists:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
+&gt;&gt;&gt; d = defaultdict(list)
+&gt;&gt;&gt; for k, v in s:
+        d[k].append(v)
+
+&gt;&gt;&gt; d.items()
+[('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
+</pre></div>
+
+<p>
+When each key is encountered for the first time, it is not already in the
+mapping; so an entry is automatically created using the
+<tt class="member">default_factory</tt> function which returns an empty <tt class="class">list</tt>.  The
+<tt class="method">list.append()</tt> operation then attaches the value to the new list.  When
+keys are encountered again, the look-up proceeds normally (returning the list
+for that key) and the <tt class="method">list.append()</tt> operation adds another value to
+the list. This technique is simpler and faster than an equivalent technique
+using <tt class="method">dict.setdefault()</tt>:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; d = {}
+&gt;&gt;&gt; for k, v in s:
+	d.setdefault(k, []).append(v)
+
+&gt;&gt;&gt; d.items()
+[('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
+</pre></div>
+
+<p>
+Setting the <tt class="member">default_factory</tt> to <tt class="class">int</tt> makes the
+<tt class="class">defaultdict</tt> useful for counting (like a bag or multiset in other
+languages):
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; s = 'mississippi'
+&gt;&gt;&gt; d = defaultdict(int)
+&gt;&gt;&gt; for k in s:
+        d[k] += 1
+
+&gt;&gt;&gt; d.items()
+[('i', 4), ('p', 2), ('s', 4), ('m', 1)]
+</pre></div>
+
+<p>
+When a letter is first encountered, it is missing from the mapping, so the
+<tt class="member">default_factory</tt> function calls <tt class="function">int()</tt> to supply a default
+count of zero.  The increment operation then builds up the count for each
+letter.
+
+<p>
+The function <tt class="function">int()</tt> which always returns zero is just a special
+case of constant functions.  A faster and more flexible way to create
+constant functions is to use <tt class="function">itertools.repeat()</tt> which can supply
+any constant value (not just zero):
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def constant_factory(value):
+...     return itertools.repeat(value).next
+&gt;&gt;&gt; d = defaultdict(constant_factory('&lt;missing&gt;'))
+&gt;&gt;&gt; d.update(name='John', action='ran')
+&gt;&gt;&gt; '%(name)s %(action)s to %(object)s' % d
+'John ran to &lt;missing&gt;'
+</pre></div>
+
+<p>
+Setting the <tt class="member">default_factory</tt> to <tt class="class">set</tt> makes the
+<tt class="class">defaultdict</tt> useful for building a dictionary of sets:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; s = [('red', 1), ('blue', 2), ('red', 3), ('blue', 4), ('red', 1), ('blue', 4)]
+&gt;&gt;&gt; d = defaultdict(set)
+&gt;&gt;&gt; for k, v in s:
+        d[k].add(v)
+
+&gt;&gt;&gt; d.items()
+[('blue', set([2, 4])), ('red', set([1, 3]))]
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.3.2 defaultdict objects"
+  href="defaultdict-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.3.2 defaultdict objects"
+  href="defaultdict-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.4 heapq  "
+  href="module-heapq.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="defaultdict-objects.html">5.3.2 defaultdict objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="defaultdict-objects.html">5.3.2 defaultdict objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-heapq.html">5.4 heapq  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

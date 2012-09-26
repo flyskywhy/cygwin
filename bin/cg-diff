@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+#
+# Show changes in the diff format
+# Copyright (c) Petr Baudis, 2005
+#
+# Outputs a diff for converting the first tree to the second one.
+# By default compares the current working tree to the state at the
+# last commit. The output will automatically be displayed in a pager
+# unless it is piped to a program.
+#
+# OPTIONS
+# -------
+# -c:: Colorize
+#	Colorize the output. You can customize the colors using the
+#	$CG_COLORS environment variable (see below).
+#
+# --diffcore ARGS:: Diffcore arguments to pass the Git diff command
+#	Pass the given diffcore arguments the called Git diff command.
+#	See e.g. git diff-tree(1) documentation for the list of possible
+#	arguments; '-R', '-B', and '-C' might be of particular interest
+#	('-M' is already passed by default).
+#
+# --no-renames:: Do not detect renames
+#	By default, `cg-diff` will automatically detect file renames.
+#	Diff produced by the rename-aware `cg-diff` will be unappliable
+#	using patch(1) (you need to use `cg-patch`) and the renames
+#	detection can add slight extra performance penalty. This switch
+#	will turn the rename detection off.
+#
+# -p:: Diff against commit parent
+#	Show diff to the parent of the current commit (or the commit
+#	specified by the -r parameter).
+#
+# -s:: Summarize and show diff stat
+#	Summarize the diff by showing a histogram for removed and added
+#	lines (similar to the output of diffstat(1)) and information
+#	about added and renamed files and mode changes.
+#
+# -r FROM_ID[..TO_ID]:: Limit to revision range
+#	Specify the revisions to diff using either '-r rev1..rev2' or
+#	'-r rev1 -r rev2'. If no revision is specified, the current
+#	working tree is implied. Note that no revision is different from
+#	empty revision which means '-r rev..' compares between 'rev' and
+#	'HEAD', while '-r rev' compares between 'rev' and working tree.
+#
+# -m:: Base the diff at the merge base
+#	Base the diff at the merge base of the -r arguments (defaulting
+#	to HEAD and origin).
+#
+# ENVIRONMENT VARIABLES
+# ---------------------
+# PAGER::
+#	The pager to display log information in, defaults to `less`.
+#
+# PAGER_FLAGS::
+#	Flags to pass to the pager.
+#
+# CG_COLORS::
+#	Colon-separated list of 'name=color' pairs, where name is
+#	one of diffhdr, diffhdradd, diffhdrmod, diffhdrrem, diffadd,
+#	diffmod, diffrem, diffhunk, diffctx, default, and value is
+#	an ECMA-48 SGR sequence (see e.g. console_codes(4)).
+#
+# CG_COLORS_AUTO::
+#	Even if -c was passed or specified in ~/.cgrc, if this option
+#	is set, use colors only when the output is a terminal and it
+#	supports colors.
+#
+# CG_LESS::
+#	This is what the $LESS environment variable value will be set
+#	to before invoking $PAGER. It defaults to $LESS concatenated
+#	with the `R` flag to allow displaying of colorized output.
+#
+# CONFIGURATION VARIABLES
+# -----------------------
+# The following GIT configuration file variables are recognized:
+#
+# diff.usecolor::
+#	If enabled, colorify the output like with -c if the output
+#	is a terminal.
+#
+# NOTES
+# -----
+# The ':' is equivalent to '..' in revisions range specification (to make
+# things more comfortable to SVN users). See cogito(7) for more details
+# about revision specification.
+
+# Testsuite: TODO
+
+USAGE="cg-diff [-c] [-m] [-s] [-p] [-r FROM_ID[..TO_ID]] [FILE]..."
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+
+setup_colors()
+{
+	colorify_setup "$colorify_diffcolors"
+	# It could've been turned on by diff.usecolor
+	opt_color=1
+}
+
+colorize()
+{
+	if [ "$opt_color" ]; then
+		sed -e '
+			s/^diff --git.*/'$coldiffhdr'&'$coldefault'/
+			s/^+++.*/'$coldiffhdradd'&'$coldefault'/
+			s/^---.*/'$coldiffhdrrem'&'$coldefault'/
+			s/^[+].*/'$coldiffadd'&'$coldefault'/
+			s/^[-].*/'$coldiffrem'&'$coldefault'/
+			s/^new\( file\)\{0,1\} mode .*/'$coldiffadd'&'$coldefault'/
+			s/^\(deleted file\|old\) mode .*/'$coldiffrem'&'$coldefault'/
+			s/^rename to .*/'$coldiffadd'&'$coldefault'/
+			s/^rename from .*/'$coldiffrem'&'$coldefault'/
+			s/^\(@@ -.* +.* @@\)\(.*\)/'$coldiffhunk'\1'$coldiffctx'\2'$coldefault'/
+		'
+	else
+		cat
+	fi
+}
+
+
+id1=" " # means HEAD
+id2=" " # means working copy
+diffcore=
+parent=
+opt_color=
+mergebase=
+style=-p
+renames=-M
+
+while optparse; do
+	if optparse -c; then
+		opt_color=1
+	elif optparse --diffcore=; then
+		diffcore="$OPTARG"
+	elif optparse -p; then
+		[ "$mergebase" ] && optconflict -m
+		parent=1
+	elif optparse -R || optparse --no-renames; then
+		renames=
+	elif optparse -s; then
+		style="--stat"
+	elif optparse -r=; then
+		if echo "$OPTARG" | fgrep -q '..'; then
+			id2="${OPTARG#*..}"
+			id1="${OPTARG%..*}"
+		elif echo "$OPTARG" | grep -q ':'; then
+			id2="${OPTARG#*:}"
+			id1="${OPTARG%:*}"
+		elif [ "$id1" = " " ]; then
+			id1="$OPTARG"
+		elif [ "$id2" = " " ]; then
+			id2="$OPTARG"
+		else
+			die "too many revisions"
+		fi
+	elif optparse -m; then
+		[ "$parent" ] && optconflict -p
+		mergebase=1
+	else
+		optfail
+	fi
+done
+
+
+colorify_detect "$opt_color" diff && setup_colors
+
+[ "$id1" = " " ] && id1=HEAD
+
+if [ "$parent" ]; then
+	[ "$id2" = " " ] || die "too many revisions"
+	id2="$id1"
+
+	ids="$(cg-object-id -p "$id2")" || exit 1
+	[ "$(echo "$ids" | wc -l)" -gt 1 ] && \
+		warn "choosing the first parent of a merge commit. This may not be what you want."
+	id1="$(echo "$ids" | head -n 1)" || exit 1
+
+elif [ "$mergebase" ]; then
+	[ "$id2" = " " ] && { id2="$(choose_origin refs/heads "what to diff against?")" || exit 1; }
+
+	id1="$(cg-object-id -c "$id1")" || exit 1
+	id2="$(cg-object-id -c "$id2")" || exit 1
+
+	conservative_merge_base "$id1" "$id2" || exit 1
+	[ "$_cg_base_conservative" ] &&
+		warn -b "multiple merge bases, picking the most conservative one"
+	id1="$_cg_baselist"
+
+else
+	id1="$(cg-object-id -t "$id1")" || exit 1
+fi
+
+
+if [ "$id2" = " " ]; then
+	[ "$_git_no_wc" ] && die "only cg-diff between two revisions allowed outside a working copy"
+
+	# Make sure we only diff modified files
+	git update-index --refresh >/dev/null
+
+	diffprog=git diff-index
+	diffargs=(-m "$id1")
+
+else
+	id2="$(cg-object-id -t "$id2")" || exit 1
+	[ "$id1" = "$id2" ] && exit 0
+
+	diffprog=git diff-tree
+	diffargs=("$id1" "$id2")
+fi
+
+
+diffargs[${#diffargs[@]}]="--"
+if [ ! "$ARGS" ]; then
+	diffargs[${#diffargs[@]}]="${_git_relpath:-.}"
+else
+	for file in "${ARGS[@]}"; do
+		diffargs[${#diffargs[@]}]="$_git_relpath$file"
+	done
+fi
+
+# FIXME: Update ret based on what did we match. And take "$@"
+# to account after all.
+#ret=
+$diffprog -r $renames $diffcore $style "${diffargs[@]}" | colorize | pager
+#[ "$ret" ] && die "no files matched"
+#exit $ret
+exit 0

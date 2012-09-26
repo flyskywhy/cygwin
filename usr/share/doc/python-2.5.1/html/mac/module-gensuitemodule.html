@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="mac.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="mac.html" title='Macintosh library Modules' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-aetools.html" />
+<link rel="prev" href="scripting.html" />
+<link rel="parent" href="scripting.html" />
+<link rel="next" href="module-aetools.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.1 gensuitemodule -- Generate OSA stub packages</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3. macpython OSA Modules"
+  href="scripting.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. macpython OSA Modules"
+  href="scripting.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.2 aetools  "
+  href="module-aetools.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Macintosh Library Modules</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="scripting.html">3. MacPython OSA Modules</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="scripting.html">3. MacPython OSA Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-aetools.html">3.2 aetools  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION005100000000000000000">
+3.1 <tt class="module">gensuitemodule</tt> --
+         Generate OSA stub packages</a>
+</h1>
+
+<p>
+<a name="module-gensuitemodule"></a>  
+<p class="availability">Availability: <span
+ class="platform">Macintosh</span>.</p>
+
+<p>
+The <tt class="module">gensuitemodule</tt> module creates a Python package implementing
+stub code for the AppleScript suites that are implemented by a specific
+application, according to its AppleScript dictionary.
+
+<p>
+It is usually invoked by the user through the <b class="program">PythonIDE</b>, but
+it can also be run as a script from the command line (pass
+<b class="programopt">--help</b> for help on the options) or imported from Python
+code. For an example of its use see <span class="file">Mac/scripts/genallsuites.py</span>
+in a source distribution, which generates the stub packages that are
+included in the standard library.
+
+<p>
+It defines the following public functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-138' xml:id='l2h-138' class="function">is_scriptable</tt></b>(</nobr></td>
+  <td><var>application</var>)</td></tr></table></dt>
+<dd>
+Returns true if <code>application</code>, which should be passed as a pathname,
+appears to be scriptable. Take the return value with a grain of salt:
+<b class="program">Internet Explorer</b> appears not to be scriptable but definitely is.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-139' xml:id='l2h-139' class="function">processfile</tt></b>(</nobr></td>
+  <td><var>application</var><big>[</big><var>, output, basepkgname, 
+        edit_modnames, creatorsignature, dump, verbose</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Create a stub package for <code>application</code>, which should be passed as
+a full pathname. For a <span class="file">.app</span> bundle this is the pathname to the
+bundle, not to the executable inside the bundle; for an unbundled CFM
+application you pass the filename of the application binary.
+
+<p>
+This function asks the application for its OSA terminology resources,
+decodes these resources and uses the resultant data to create the Python
+code for the package implementing the client stubs.
+
+<p>
+<code>output</code> is the pathname where the resulting package is stored, if
+not specified a standard "save file as" dialog is presented to
+the user. <code>basepkgname</code> is the base package on which this package
+will build, and defaults to <tt class="module">StdSuites</tt>. Only when generating
+<tt class="module">StdSuites</tt> itself do you need to specify this.
+<code>edit_modnames</code> is a dictionary that can be used to change
+modulenames that are too ugly after name mangling.
+<code>creator_signature</code> can be used to override the 4-char creator
+code, which is normally obtained from the <span class="file">PkgInfo</span> file in the
+package or from the CFM file creator signature. When <code>dump</code> is
+given it should refer to a file object, and <code>processfile</code> will stop
+after decoding the resources and dump the Python representation of the
+terminology resources to this file. <code>verbose</code> should also be a file
+object, and specifying it will cause <code>processfile</code> to tell you what
+it is doing.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-140' xml:id='l2h-140' class="function">processfile_fromresource</tt></b>(</nobr></td>
+  <td><var>application</var><big>[</big><var>, output, 
+	basepkgname, edit_modnames, creatorsignature, dump, verbose</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This function does the same as <code>processfile</code>, except that it uses a
+different method to get the terminology resources. It opens <code>application</code>
+as a resource file and reads all <code>"aete"</code> and <code>"aeut"</code> resources
+from this file.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3. macpython OSA Modules"
+  href="scripting.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. macpython OSA Modules"
+  href="scripting.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.2 aetools  "
+  href="module-aetools.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Macintosh Library Modules</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="scripting.html">3. MacPython OSA Modules</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="scripting.html">3. MacPython OSA Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-aetools.html">3.2 aetools  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

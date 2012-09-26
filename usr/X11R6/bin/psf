@@ -1,0 +1,810 @@
+#!/usr/bin/perl
+# $Header: /home/maics/tcm/cvsroot_DEV/tcm/bin/psf,v 1.1.1.1 2001/10/06 21:10:55 tcm Exp $
+# states:
+#	1	HeaderComment
+#	2	HeaderBody
+#	3	PageComments
+#	4	PageBody
+#	5	Trailer
+eval "exec /usr/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+			# this emulates #! processing on NIH machines.
+			# (remove #! line above if indigestible)
+
+$, = ' ';		# set output field separator
+$\ = "\n";		# set output record separator
+
+sub handler { # 1st argument is signal name
+	local($sig)= @_ ;
+	if ( $reverse ) {
+	    for ( $i=$pagecount ; $i>=1 ; $i-- ) {
+		unlink "$tmphead$$.$i" ;
+	    }
+	}
+}
+
+sub protect_string { # convert a string into PostScrip accepted form
+	local($result) = @_ ;
+	$result =~ s/\\/\\\\/g ;
+	$result =~ s/\(/\\(/g ;
+	$result =~ s/\)/\\)/g ;
+	$result =~ s/	/\\t/g ;
+	$result =~ s/\n/\\\\n/g ;
+	$result;
+}
+
+sub start_page { # Start a page of output
+	$pagecount++ ;
+	if ( $reverse ) {
+		if ( ! open( tmpfile, ">$tmphead$$.$pagecount" ) ) {
+			print stderr 'psf: cannot create temporary file '.
+				"$tmphead$$.$pagecount" ;
+			exit 9 ;
+		}
+		$OUTPUT= 'tmpfile' ;
+	}
+
+}
+
+sub phe {
+	#!!Eophtrans'; /* End of Page Header Comments */
+	if ( $land || $upside ) {
+	    print $OUTPUT '%%BeginPageSetup' ;
+	    printf $OUTPUT "gsave %g rotate %g %g translate\n",
+		$rotate_value, $x_shift, $y_shift ;
+	    print $OUTPUT '%%EndPageSetup' ;
+	}
+}
+sub eop {
+	#!!Eop'; /* End of previous Page */
+	if ( $land || $upside ) {
+	    print $OUTPUT '%%PageTrailer' ;
+	    print $OUTPUT 'grestore' ;
+	}
+	if ( $twoinone ) {
+		print $OUTPUT '%%EndDocument' ;
+		if ( $twofirst ) {
+			$twofirst=0 ;
+		} else {
+			$twofirst=1 ;
+			print $OUTPUT $p_encaps_e . 'restore showpage' ;
+		}
+	}
+}
+sub eoh {
+	if ( $eoh_done ) { return ; }
+	$eoh_done=1 ;
+	#!!Eoh'; /* Just before the first %%Page or %%Trailer */
+	if ( !$early_device_done ) { do early_device() ; }
+	if ( $copies>1 ) {
+		if ( $copies>100 ) {
+			print stderr 'psf: Sorry, we will not print that many';
+		} else {
+			if ( ! $started_setup ) {
+				$started_setup=1 ;
+				print $OUTPUT '%%BeginSetup' ;
+			}
+			print $OUTPUT '/#copies ' . ($copies+0) . " def" ;
+		}
+	}
+	if ( $set_security ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		@Fld=split(',',$passwd);
+		if ( $#Fld>1 ) {
+			$passwd=$Fld[1] ; $sec_mess=$Fld[2] ;
+		}
+		$numval= $passwd+0 ;
+		if ( $numval ne $passwd || $numval<0 || $numval>99999999 ) {
+			print stderr "psf: the security string must be a number between 0 and 99999999" ;
+			exit 8 ;
+		}
+		$sec_mess= &protect_string($sec_mess) ;
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict dup begin ' . 
+			"/checksecurity known {($passwd) ($sec_mess) checksecurity} if  ".
+			'end} if' ;
+	}
+	if ( $manfeed>0 ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict dup begin ' . 
+			'dup /manualfeed known {/manualfeed true def} if  ' .
+			'/setpapertray known {1 setpapertray} if  ' .
+			'end} if' ;
+	}
+	if ( $set_inputtray ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		if ( $manfeed ) {
+			print stderr "the -m and -inputtray options conflict" ;
+		}
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict dup begin ' . 
+			"/setpapertray known {$inputtray setpapertray} if  ".
+			'end} if' ;
+	}
+	if ( $transparency ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		print $OUTPUT "<< /MediaType (Transparency) >> setpagedevice";
+	}
+	if ( $set_sort ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+# The specified output tray is used as the bin to start sorting in.
+# If no outputtray is given, logical bin 1 is used.
+		if ( $set_outputtray ) {
+			$set_outputtray=0 ;
+		} else {
+			$outputtray=2 ;
+		}
+		if ( $sort_param == -1 ) {
+			if ( $copies==0 ) {
+				$sort_copies=20 ;
+			} else {
+				$sort_copies=$copies ;
+			}
+		} else {
+			$sort_copies=$sort_param ;
+		}
+		$endtray= $outputtray + $sort_copies -1 ;
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict dup begin ' . 
+			"/sortmethod known {1 $outputtray $endtray sortmethod} if  ".
+			'end} if' ;
+	}
+	if ( $set_outputtray ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict dup begin ' . 
+			"/setoutputtray known {$outputtray setoutputtray} if  ".
+			'end} if' ;
+	}
+	if ( $set_select ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict begin true} {false} ifelse' ;
+		print $OUTPUT '10 dict begin /psf-s-count count def ' .
+			'/psf-d-count countdictstack 1 add def' ;
+  		print $OUTPUT "{ $select_string } stopped" ;
+		print $OUTPUT 'countdictstack -1 psf-d-count {pop end} for ' .
+			'count -1 psf-s-count {pop exch pop} for' ;
+  		print $OUTPUT 'end { end } if' ;
+	}
+	if ( $land || $twoinone ) {
+		# reverse the tumble operation for landscape and -2 mode
+		if ( $tumble eq 'true' ) {
+			$tumble='false' ;
+		} else {
+			$tumble='true' ;
+		}
+	}
+	if ( $set_duplex ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict dup begin ' . 
+			($duplex eq 'true' ? "dup\n" : "\n" ) .
+			"/setduplexmode known {$duplex setduplexmode} if\n".
+			($duplex eq 'true' ?
+			  "/settumble known {$tumble settumble} if  ": '' ).
+			'end} if' ;
+	} elsif ( $set_tumble ) {
+		if ( ! $started_setup ) {
+			$started_setup=1 ;
+			print $OUTPUT '%%BeginSetup' ;
+		}
+		print $OUTPUT '/statusdict where' .
+		    ' { pop statusdict dup begin ' . 
+			"/settumble known {$tumble settumble} if  ".
+			'end} if' ;
+	}
+	if ( $started_setup ) {
+		print $OUTPUT '%%EndSetup' ;
+	}
+}
+
+sub early_device {
+	local($comment_opened) = 0 ;
+	if ( !$early_device_done ) {
+		$early_device_done=1 ;
+		if ( $ips != -1 ) {
+			if ( !$comment_opened ) {
+				print $OUTPUT '%%BeginSetup' ;
+			}
+			$comment_opened= 1 ;
+			print $OUTPUT "<< /Policies << /PageSize $ips >> >> setpagedevice";
+		}
+		if ( $noreport != 0 ) {
+			if ( !$comment_opened ) {
+				print $OUTPUT '%%BeginSetup' ;
+			}
+			$comment_opened= 1 ;
+			print $OUTPUT "<< /Policies << /PolicyReport { pop } >> >> setpagedevice";
+		}
+		if ( $comment_opened ) {
+			print $OUTPUT '%%EndSetup' ;
+		}
+	}
+}
+
+sub trailpages {
+	if ( $pages_done==0 ) {
+		print $OUTPUT '%%Pages: '. $pagecount . ' ' . $pageorder ;
+		$pages_done=1 ;
+	}
+}
+
+sub trailbb {
+	if ( $bb_done==0 ) {
+		$bb_comment= $file_bb ;
+		do out_bb() ;
+		$bb_done=1 ;
+	}
+}
+
+sub det_new_corner {
+	$mapped_x= $cos_val * $_[1] - $sin_val * $_[2] ;
+	$mapped_y= $sin_val * $_[1] + $cos_val * $_[2] ;
+	if ( $mapped_x < $new_bb_llx ) { $new_bb_llx = $mapped_x ; }
+	if ( $mapped_x > $new_bb_urx ) { $new_bb_urx = $mapped_x ; }
+	if ( $mapped_y < $new_bb_lly ) { $new_bb_lly = $mapped_y ; }
+	if ( $mapped_y > $new_bb_ury ) { $new_bb_ury = $mapped_y ; }
+}
+
+sub upper_int {
+	 ( $_[1]<0 ? int $_[1] : int ($_[1] + 0.99999) ) ;
+}
+
+sub lower_int {
+	 ( $_[1]<0 ? int ($_[1] - 0.99999) : int $_[1] ) ;
+}
+
+sub mod_bb {
+	# The -2 option simply assumes unchanged bounding boxes
+	@Fld=split(' ',$bb_comment);
+	$Pi= 2*atan2(1,0) ;
+	$bb_llx= $Fld[2] ; $bb_lly=$Fld[3] ;
+	$bb_urx= $Fld[4] ; $bb_ury=$Fld[5] ;
+	$bb_llx += $x_shift ; $bb_lly += $y_shift ;
+	$bb_urx += $x_shift ; $bb_ury += $y_shift ;
+	$cos_val= cos( ($rotate_value/360)*2*$Pi) ;
+	$sin_val= sin( ($rotate_value/360)*2*$Pi) ;
+	# rotate each corner and determine max/min values 
+	$new_bb_llx= $cos_val * $bb_llx - $sin_val * $bb_lly ;
+	$new_bb_lly= $sin_val * $bb_llx + $cos_val * $bb_lly ;
+	$new_bb_urx= $new_bb_llx ; $new_bb_ury= $new_bb_lly ;
+	do det_new_corner($bb_urx,$bb_lly) ;
+	do det_new_corner($bb_urx,$bb_ury) ;
+	do det_new_corner($bb_llx,$bb_ury) ;
+#	$new_bb_llx += $x_shift ; $new_bb_lly += $y_shift ;
+#	$new_bb_urx += $x_shift ; $new_bb_ury += $y_shift ;
+	print $OUTPUT $Fld[1],
+		&lower_int($new_bb_llx), &lower_int($new_bb_lly),
+		&upper_int($new_bb_urx), &upper_int($new_bb_ury) ;
+}
+
+sub out_bb {
+	if ( $land || $upside || $twoinone ) {
+		if ( $doubles && !( $state==1 || $state==3) ) {
+			print $OUTPUT $bb_comment;
+		}
+		do mod_bb() ;
+	} else {
+		print $OUTPUT $bb_comment;
+	}
+}
+
+$tumble='false' ; # default tumble mode for duplex printing
+$login  =  getlogin  ||  (getpwuid($<))[0]   || $ENV{'LOGNAME'} ;
+if ( $login eq '' ) {
+	$login= "Somebody";
+}
+$sec_mess=$login ;
+$ips= -1 ;
+
+argloop:
+while($_=$ARGV[0],/^-/){
+# When you add options here: do not forget the check at the END!!
+	last if /^-$/;
+	shift ;
+	last if /^--$/;
+	if ( /^-outputtray(.*)/ ) {
+		$set_outputtray=1 ;
+		$outputtray= ($1 eq "" ? ($ARGV[0],shift) : $1) ;
+		next argloop ;
+	}
+	if ( /^-o(.*)/ ) {
+		$orange= ($1 eq"" ? ($ARGV[0],shift) : $1);
+		next argloop ;
+	}
+	if ( /^-#(.*)/ ) {
+		$copies= ($1 eq"" ? ($ARGV[0],shift) : $1) ;
+		next argloop ;
+	}
+	if ( /^-courierold$/ ) {
+		$courierold=1 ;
+		next argloop ;
+	}
+	if ( /^-c$/ ) {
+		$manfeed=1 ;
+		next argloop ;
+	}
+	if ( /^-p$/ ) {
+		$printit=1 ;
+		next argloop ;
+	}
+	if ( /^-r$/ ) {
+		$reverse=1 ;
+		next argloop ;
+	}
+	if ( /^-land$/ ) {
+		$land=1 ;
+		next argloop ;
+	}
+	if ( /^-2$/ ) {
+		$twoinone=1 ;
+		next argloop ;
+	}
+	if ( /^-upside/ ) {
+		$upside=1 ;
+		next argloop ;
+	}
+	if ( /^-transparency/ ) {
+		$transparency=1 ;
+		next argloop ;
+	}
+	if ( /^-b(.*)/ ) {
+		$letter=($1 eq"" ? 'vu' : $1);
+		next argloop ;
+	}
+	if ( /^-inputtray(.*)/ ) {
+		$set_inputtray=1 ;
+		$inputtray= ($1 eq"" ? ($ARGV[0],shift) : $1) ;
+		next argloop ;
+	}
+	if ( /^-select/ ) {
+		$set_select=1 ;
+		$select_string= $ARGV[0],shift ;
+		next argloop ;
+	}
+	if ( /^-duplex/ ) {
+		$set_duplex=1 ;
+		$duplex='true' ;
+		next argloop ;
+	}
+	if ( /^-noduplex/ ) {
+		$set_duplex=1 ;
+		$duplex='false' ;
+		next argloop ;
+	}
+	if ( /^-tumble/ ) {
+		$set_tumble=1 ;
+		$tumble='true' ;
+		next argloop ;
+	}
+	if ( /^-sort(.*)/ ) {
+		$set_sort=1 ;
+		$sort_param= ($1 eq"" ? -1 : $1);
+		next argloop ;
+	}
+	if ( /^-security(.*)/ ) {
+		$set_security=1 ;
+		$passwd= ($1 eq "" ? ($ARGV[0],shift): $1 );
+		next argloop ;
+	}
+	if ( /^-nondsc/ ) {
+		$nondsc=1 ;
+		next argloop ;
+	}
+	if ( /^-ips_error/ ) {
+		if ( $ips != -1 ) {
+			print stderr "warning; two ips options" ;
+		}
+		$ips=0 ;
+		next argloop ;
+	}
+	if ( /^-ips_ignore/ ) {
+		if ( $ips != -1 ) {
+			print stderr "warning; two ips options" ;
+		}
+		$ips=1 ;
+		next argloop ;
+	}
+	if ( /^-ips_fit/ ) {
+		if ( $ips != -1 ) {
+			print stderr "warning; two ips options" ;
+		}
+		$ips=3 ;
+		next argloop ;
+	}
+	if ( /^-noreport/ ) {
+		$noreport=1 ;
+		next argloop ;
+	}
+	if ( /^-m(.*)/ ) {
+		$m=1 ;
+		($1 eq"" ? ($message= $ARGV[0],shift) : ($message=$1));
+		$message =~ s/[\\\(\)]/\\$&/g ;
+		next argloop ;
+	}
+	print stderr "psf: unknown argument \"$_\", ignored" ;
+	
+}
+$[ = 1;			# set array base to 1
+
+if ( $orange ne "" ) {
+	@r1= split( /,/, $orange ) ;
+	$rangecount=1 ;
+	for( @r1 ) {
+		$startp[$rangecount]= $_ ;
+		$endp[$rangecount]= $_ ;
+		/(.*)-(.*)/ &&
+			( $startp[$rangecount] = ( $1 ne "" ? $1 : -1) ,
+		          $endp[$rangecount]= ( $2 ne "" ? $2 : 32767) ) ;
+
+		$rangecount++ ;
+	}
+}
+
+$doubles = 0 ;	# Allow double comments
+$state = 1; # /* Header comment */
+$pages_seen=0;	# %%Pages seen 
+$bb_seen =0;	# %%BoundingBox seen
+$printing = 1;
+$doccount = 0;
+$change_pages = ( $orange ne "" || $twoinone ) ? 1 : 0 ;
+$change_bb = $land || $upside ;
+$pagecount=0 ;
+$OUTPUT= 'stdout' ;
+$tmphead= '/usr/tmp/psf.' ;
+$libhead= '/usr/local/lib/ProcSets' ;
+$twofirst= 1 ;		# The first of two pages
+$page_length = 11.7 ;	# Page length in inches
+$page_width = 8.2755 ;	# Page width
+
+# The two strings used below may be empty on `wise' machines
+$p_encaps_b = '100 dict begin /TwoState exch def ' ;
+$p_encaps_e = 'TwoState end ' ;
+
+if ( $land || $upside ) {
+    if ( $land ) {
+	if ( $upside ) {
+	    $rotate_value= -90 ;
+	    $x_shift= - $page_width * 72 ;
+	    $y_shift= 0 ;
+	} else {
+	    $rotate_value= 90 ;
+	    $x_shift= 0 ;
+	    $y_shift= -$page_length * 72 ;
+	}
+    } else {
+	$rotate_value= 180 ;
+	$x_shift= - $page_width * 72 ;
+	$y_shift= -$page_length * 72 ;
+    }
+}
+
+if ( $reverse ) {
+	$SIG{'INT'}='handler';
+	$SIG{'QUIT'}='handler';
+	$SIG{'TERM'}='handler';
+	$SIG{'HUP'}='handler';
+}
+
+if ( $printit ) {
+	$infeed[1]= 'psprint '. join(' ',@ARGV) . ' |' ;
+} else {
+	if ( $#ARGV<$[ ) { $infeed[1]=('-'); }
+	else 		 { @infeed= @ARGV ; }
+}
+while ($argument= shift infeed ) {
+  if ( ! open(INPUT,$argument) ) {
+    print stderr 'psf: cannot open "' . $argument . '"' ;
+    next ;
+  }
+  line: while(<INPUT>) {
+    chop;	# strip record separator
+    if ($doccount > 0) {
+	if (/^%%BeginDocument/) {
+	    $doccount++;
+	}
+	if (/^%%EndDocument/) {
+	    $doccount--;
+	}
+	if ($printing) {
+	    print $OUTPUT $_;
+	}
+	next line;
+    }
+    if ($. == 1 && !/^%!PS-Adobe-/) {
+	print stderr 'psf: Warning, the input is not structured';
+    }
+    if (/^%!/) {
+	if ($printing) {
+	    print $OUTPUT $_;
+	}
+	next line;
+    }
+    if ($state == 1 && $change_pages && $pages_seen==0 && /^%%Pages:/ ) {
+	$pages_seen=1 ;
+	print $OUTPUT '%%Pages: (atend)';
+	$pages_at_trail=1 ;
+	/%%Pages: \(atend\)/ && (next line) ;
+	/%%Pages: *[^ ]* *(.*)/ && ($pageorder=$1) ;
+	if ( $doubles )  { print $OUTPUT $_; }
+	next line;
+    }
+    if ($state == 1 && $change_bb && $bb_seen==0 && /^%%BoundingBox:/ ) {
+	$bb_seen=1 ;
+	if ( /^%%BoundingBox: \(atend\)/ ) {
+		$bb_at_trail=1 ;
+		print $OUTPUT $_;
+		next line ;
+	}
+	$bb_comment= $_ ;
+	$file_bb=$_ ;
+	do out_bb() ;
+	next line ;
+    }
+    if ($state == 1 && (!/^%%/ || /^%%EndComments/)) {
+	$thisline=$_ ;
+	if (!/^%%EndComments/) {
+	    print $OUTPUT '%%EndComments';
+	} else {
+		print $OUTPUT $_;
+	}
+	$state = 2; # /* Header Body */
+	if ( $courierold ) { # use setcourierold after first comment
+		print $OUTPUT '%%BeginStrange' ;
+		print $OUTPUT '{ setcourierold } stopped pop' ;
+		print $OUTPUT '%%EndStrange' ;
+	}
+	if ( !$early_device_done ) { do early_device() ; }
+	if ( $nondsc ) { do eoh() ; }
+	if ( $letter ) {
+		# We should add Helvetica-Bold to document fonts and
+		# add the ProcSet to DocumentSuppliedProcSets
+		if ( ! open ( tmpfile, "$libhead/$letter" . 'let.proc' ) ) {
+			print stderr 'psf: cannot find procset for -b' ;
+		} else {
+			while ( <tmpfile> ) {
+				chop;
+				print $OUTPUT $_;
+			}
+			close ( tmpfile ) ;
+		}
+	}
+
+	if ( $m ) {
+		# We should add Helvetica-Bold to document fonts and
+		# add the ProcSet to DocumentSuppliedProcSets
+		if ( ! open ( tmpfile, "$libhead/pagemess.proc" ) ) {
+			print stderr 'psf: cannot find procset for -m' ;
+		} else {
+			while ( <tmpfile> ) {
+			    chop;
+			    print $OUTPUT $_;
+			}
+			close ( tmpfile ) ;
+			print $OUTPUT "/msgstring ($message) def" ;
+		}
+	}
+	$_= $thisline ;
+	#'!!EndHeaderComment';
+	if (!/^%%EndComments/) {
+		print $OUTPUT $_;
+	}
+	next line;
+    }
+    if ($state <= 4 && /^%%Page:/) {
+	if ($state <=2 ) {
+	    do eoh() ;
+	}
+	if ($printing) {
+	    if ($state == 3) {
+		do phe() ;
+	    }
+	    if ($state >= 3) {
+		do eop() ;
+	    }
+	}
+	$state = 3; # /* Start of Page Comments */
+        @Fld = split(' ');
+	$pageno = $Fld[2];
+	if ( $pageno + 0 ne $pageno ) { $pageno=$Fld[3] ; }
+	if ($rangecount > 0) {
+	    $printing = 0;
+	    for ($i = 1; $i < $rangecount; $i++) {
+		if (($pageno >= $startp[$i]) && ($pageno <= $endp[$i])) {
+		    $printing = 1;
+		    last;
+		}
+	    }
+	}
+	else {
+	    $printing = 1;
+	}
+	if ($printing) {
+	    if ( $twoinone ) {
+		if ( $twofirst ) {
+		    do start_page() ;
+		    print $OUTPUT '%%Page: ' . $pagecount . ' ' . $pagecount;
+		    print $OUTPUT '%%BeginPageSetup' ;
+		    print $OUTPUT 'save ' . $p_encaps_b . '/showpage {} def' ;
+		    print $OUTPUT '90 rotate 0 ' . (- $page_length) .
+			' 72 mul 0.5 sqrt mul translate 0.5 sqrt dup scale' ;
+		    print $OUTPUT '%%EndPageSetup' ;
+		    print $OUTPUT '%%BeginDocument: two_in_one' ;
+		} else {
+		    print $OUTPUT $page_width .
+			' 72 mul 0 translate';
+		    print $OUTPUT '%%BeginDocument: two_in_one' ;
+		}		
+	    } else {
+		    do start_page() ;
+	    }
+	    if ( ! $twoinone && ( $reverse || $rangecount>0 ) ) {
+		print $OUTPUT $Fld[1], $Fld[2], $pagecount ;
+	    } else {
+	        print $OUTPUT $_;
+	    }
+	    #!!Bop'  . $pageno;
+	    if ( $letter ) {
+		print $pageno . ' let_over';
+	    }
+	}
+	next line;
+    }
+    if ($state >= 3 && $state<=4 && $printing ) {
+	if ( /^%%PageBoundingBox:/ && !/\(atend\)/ ) {
+		$bb_comment= $_ ;
+		do out_bb() ;
+	}
+    }
+    if ($state == 3 && !/^%%/) {
+	if ($printing) {
+	    do phe() ;
+	}
+	$state = 4; # /* Page body */
+    }
+    if (/^%%BeginDocument/ && ($state == 3 || $state == 4)) {
+	$doccount++; # /* Start of included document */
+	if ($printing) {
+	    print $OUTPUT $_;
+	}
+	next line;
+    }
+    if ( $state<5 && /^%%Trailer/) {
+	$trail= $_ ;
+	if ($state <=2 ) {
+	    do eoh() ;
+	}
+	if ($printing) {
+	    if ($state == 3) {
+		do phe() ;
+	    }
+	    if ($state >= 3) {
+		do eop() ;
+	    }
+	}
+	if ( $twoinone && $twofirst==0 ) {
+		print $OUTPUT $p_encaps_e. 'restore showpage' ;
+	}
+
+	if ( $pages_at_trail ) { $pages_done=0 ; }
+	if ( $bb_at_trail ) { $bb_done=0 ; }
+
+	if ( $reverse ) {
+	    $OUTPUT= 'stdout' ;
+	    for ( $i=$pagecount ; $i>=1 ; $i-- ) {
+		if ( ! open ( tmpfile, "$tmphead$$.$i" ) ) {
+			print stderr 'psf: cannot re-open temporary file '.
+				"$tmphead$$.$i" ;
+			exit 9 ;
+		}
+		$_= <tmpfile> ;
+		chop ;
+		@Fld= split(' ');
+		print $OUTPUT $Fld[1], $Fld[2], $pagecount-$i+1 ;
+		while ( <tmpfile> ) {
+		    chop;
+		    print $OUTPUT $_;
+		}
+		unlink "$tmphead$$.$i" ;
+	    }
+	}
+	#!!Trailer';
+	$state = 5; # /* Trailer */
+	print $OUTPUT $trail;
+	$printing = 1;
+	next line;
+    }
+    if ($state== 5 && $pages_at_trail ) {
+	    if ( /^%%Pages:/ ) {
+		/%%Pages: *[^ ]* *(.*)/ && ($pageorder=$1) ;
+		if ( $doubles ) { print $OUTPUT $_; }
+		next line;
+	    }
+	    if ( !/^%%/ ) {
+		do trailpages() ;
+		next line;
+	    }
+    }
+    if ($state== 5 && $bb_at_trail ) {
+	    if ( /^%%BoundingBox:/ ) {
+		$bb_comment= $_ ;
+		if ( $doubles ) { print $OUTPUT $_; }
+		next line;
+	    }
+	    if ( !/^%%/ ) {
+		do trailbb() ;
+		next line;
+	    }
+    }
+    if ($printing == 1) {
+	print $OUTPUT $_;
+    }
+  }
+}
+$not_done='' ;
+if ( !$eoh_done ) {
+	if ( $copies>1 ) { $not_done = $not_done . '-# ' ; }
+	if ( $land ) { $not_done = $not_done . '-land ' ; }
+	if ( $upside ) { $not_done = $not_done . '-upside ' ; }
+	if ( $set_security ) { $not_done = $not_done . '-security ' ; }
+	if ( $manfeed>0 ) { $not_done = $not_done . '-c ' ; }
+	if ( $set_inputtray ) { $not_done = $not_done . '-inputtray ' ; }
+	if ( $transparency ) { $not_done = $not_done . '-transparency ' ; }
+	if ( $set_sort ) { $not_done = $not_done . '-sort ' ; }
+	if ( $set_outputtray ) { $not_done = $not_done . '-outputtray ' ; }
+	if ( $set_tumble ) { $not_done = $not_done . '-tumble ' ; }
+	if ( $set_select ) { $not_done = $not_done . '-outputtray ' ; }
+	if ( $courierold ) { $not_done = $not_done . '-courierold ' ; }
+}
+if ( $state<3 || $pagecount == 0 ) {
+	if ( $orange ne "" ) { $not_done = $not_done . '-o... ' ; }
+	if ( $reverse ) { $not_done = $not_done . '-r ' ; }
+	if ( $twoinone ) { $not_done = $not_done . '-2 ' ; }
+	if ( $letter ) { $not_done = $not_done . "-b$letter" ; }
+}
+if ($state<5) {
+   if ( !$nondsc ) {
+	print stderr "warning: Document does not conform to Structure Conventions" ;
+	$dsc_warning=1 ;
+   }
+} else {
+    if ( $pages_at_trail ) { do trailpages() ; }
+    if ( $bb_at_trail ) { do trailbb() ; }
+}
+if ( $not_done ne '' ) {
+	if ( !$dsc_warning ) {
+		if ( $nondsc ) {
+			print stderr "warning: Document is badly structured";
+		} else {
+			print stderr "warning: Document contains no pages" ;
+		}
+	}
+	print stderr "warning: ignored options: $not_done" ;
+}
+

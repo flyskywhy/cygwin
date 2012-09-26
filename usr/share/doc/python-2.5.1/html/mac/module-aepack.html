@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="mac.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="mac.html" title='Macintosh library Modules' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-aetypes.html" />
+<link rel="prev" href="module-aetools.html" />
+<link rel="parent" href="scripting.html" />
+<link rel="next" href="module-aetypes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.3 aepack -- Conversion between Python variables and AppleEvent data containers</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.2 aetools  "
+  href="module-aetools.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. macpython OSA Modules"
+  href="scripting.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4 aetypes  "
+  href="module-aetypes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Macintosh Library Modules</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-aetools.html">3.2 aetools  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="scripting.html">3. MacPython OSA Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-aetypes.html">3.4 aetypes  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION005300000000000000000">
+3.3 <tt class="module">aepack</tt> --
+         Conversion between Python variables and AppleEvent data containers</a>
+</h1>
+
+<p>
+<a name="module-aepack"></a>  
+<p class="availability">Availability: <span
+ class="platform">Macintosh</span>.</p>
+
+<p>
+The <tt class="module">aepack</tt> module defines functions for converting (packing)
+Python variables to AppleEvent descriptors and back (unpacking).
+Within Python the AppleEvent descriptor is handled by Python objects
+of built-in type <tt class="class">AEDesc</tt>, defined in module <tt class="module"><a href="module-Carbon.AE.html">Carbon.AE</a></tt>.
+
+<p>
+The <tt class="module">aepack</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-150' xml:id='l2h-150' class="function">pack</tt></b>(</nobr></td>
+  <td><var>x</var><big>[</big><var>, forcetype</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Returns an <tt class="class">AEDesc</tt> object  containing a conversion of Python
+value x. If <var>forcetype</var> is provided it specifies the descriptor
+type of the result. Otherwise, a default mapping of Python types to
+Apple Event descriptor types is used, as follows:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Python type</th>
+      <th class="left"  >descriptor type</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><tt class="class">FSSpec</tt></td>
+        <td class="left"  >typeFSS</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="class">FSRef</tt></td>
+        <td class="left"  >typeFSRef</td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="class">Alias</tt></td>
+        <td class="left"  >typeAlias</td></tr>
+    <tr><td class="left"   valign="baseline">integer</td>
+        <td class="left"  >typeLong (32 bit integer)</td></tr>
+    <tr><td class="left"   valign="baseline">float</td>
+        <td class="left"  >typeFloat (64 bit floating point)</td></tr>
+    <tr><td class="left"   valign="baseline">string</td>
+        <td class="left"  >typeText</td></tr>
+    <tr><td class="left"   valign="baseline">unicode</td>
+        <td class="left"  >typeUnicodeText</td></tr>
+    <tr><td class="left"   valign="baseline">list</td>
+        <td class="left"  >typeAEList</td></tr>
+    <tr><td class="left"   valign="baseline">dictionary</td>
+        <td class="left"  >typeAERecord</td></tr>
+    <tr><td class="left"   valign="baseline">instance</td>
+        <td class="left"  ><em>see below</em></td></tr></tbody>
+</table></div>  
+
+<p>
+If <var>x</var> is a Python instance then this function attempts to call an
+<tt class="method">__aepack__()</tt> method.  This method should return an
+<tt class="class">AEDesc</tt> object.
+
+<p>
+If the conversion <var>x</var> is not defined above, this function returns
+the Python string representation of a value (the repr() function)
+encoded as a text descriptor.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-151' xml:id='l2h-151' class="function">unpack</tt></b>(</nobr></td>
+  <td><var>x</var><big>[</big><var>, formodulename</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  <var>x</var> must be an object of type <tt class="class">AEDesc</tt>. This function
+  returns a Python object representation of the data in the Apple
+  Event descriptor <var>x</var>. Simple AppleEvent data types (integer,
+  text, float) are returned as their obvious Python counterparts.
+  Apple Event lists are returned as Python lists, and the list
+  elements are recursively unpacked.  Object references
+  (ex. <code>line 3 of document 1</code>) are returned as instances of
+  <tt class="class">aetypes.ObjectSpecifier</tt>, unless <code>formodulename</code>
+  is specified.  AppleEvent descriptors with
+  descriptor type typeFSS are returned as <tt class="class">FSSpec</tt>
+  objects.  AppleEvent record descriptors are returned as Python
+  dictionaries, with 4-character string keys and elements recursively
+  unpacked.
+
+<p>
+The optional <code>formodulename</code> argument is used by the stub packages
+  generated by <tt class="module">gensuitemodule</tt>, and ensures that the OSA classes
+  for object specifiers are looked up in the correct module. This ensures
+  that if, say, the Finder returns an object specifier for a window
+  you get an instance of <code>Finder.Window</code> and not a generic
+  <code>aetypes.Window</code>. The former knows about all the properties
+  and elements a window has in the Finder, while the latter knows
+  no such things.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-Carbon.AE.html">Carbon.AE</a></tt>:</b>
+    <dd>Built-in access to Apple Event Manager routines.
+  </dl>
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-aetypes.html">aetypes</a></tt>:</b>
+    <dd>Python definitions of codes for Apple Event
+                      descriptor types.
+  </dl>
+  <dl compact="compact" class="seetitle">
+    <dt><em class="citetitle"><a href="http://developer.apple.com/techpubs/mac/IAC/IAC-2.html"
+        >
+            Inside Macintosh: Interapplication
+            Communication</a></em></dt>
+    <dd>Information about inter-process
+            communications on the Macintosh.</dd>
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.2 aetools  "
+  href="module-aetools.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3. macpython OSA Modules"
+  href="scripting.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.4 aetypes  "
+  href="module-aetypes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Macintosh Library Modules</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-aetools.html">3.2 aetools  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="scripting.html">3. MacPython OSA Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-aetypes.html">3.4 aetypes  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

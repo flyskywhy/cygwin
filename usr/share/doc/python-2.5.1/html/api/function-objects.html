@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="method-objects.html" />
+<link rel="prev" href="instanceObjects.html" />
+<link rel="parent" href="otherObjects.html" />
+<link rel="next" href="method-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.5.3 Function Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.2 instance Objects"
+  href="instanceObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.4 method Objects"
+  href="method-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="instanceObjects.html">7.5.2 Instance Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="method-objects.html">7.5.4 Method Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009530000000000000000"></a><a name="function-objects"></a>
+<br>
+7.5.3 Function Objects 
+</h2>
+
+<p>
+<a id='l2h-673' xml:id='l2h-673'></a>There are a few functions specific to Python functions.
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-674' xml:id='l2h-674'>PyFunctionObject</a></tt></b></dt>
+<dd>
+  The C structure used for functions.
+</dl>
+
+<p>
+<dl><dt>PyTypeObject <b><tt id='l2h-675' xml:id='l2h-675' class="cdata">PyFunction_Type</tt></b></dt>
+<dd>
+  This is an instance of <tt class="ctype">PyTypeObject</tt> and represents the
+  Python function type.  It is exposed to Python programmers as
+  <code>types.FunctionType</code>.
+  <a id='l2h-677' xml:id='l2h-677'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-678' xml:id='l2h-678' class="cfunction">PyFunction_Check</tt></b>(</nobr></td><td>PyObject *<var>o</var>)</td></tr></table></dt>
+<dd>
+  Return true if <var>o</var> is a function object (has type
+  <tt class="cdata">PyFunction_Type</tt>).  The parameter must not be <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-679' xml:id='l2h-679' class="cfunction">PyFunction_New</tt></b>(</nobr></td><td>PyObject *<var>code</var>,
+                                             PyObject *<var>globals</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a new function object associated with the code object
+  <var>code</var>. <var>globals</var> must be a dictionary with the global
+  variables accessible to the function.
+
+<p>
+The function's docstring, name and <var>__module__</var> are retrieved
+  from the code object, the argument defaults and closure are set to
+  <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-680' xml:id='l2h-680' class="cfunction">PyFunction_GetCode</tt></b>(</nobr></td><td>PyObject *<var>op</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the code object associated with the function object <var>op</var>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-681' xml:id='l2h-681' class="cfunction">PyFunction_GetGlobals</tt></b>(</nobr></td><td>PyObject *<var>op</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the globals dictionary associated with the function object
+  <var>op</var>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-682' xml:id='l2h-682' class="cfunction">PyFunction_GetModule</tt></b>(</nobr></td><td>PyObject *<var>op</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the <var>__module__</var> attribute of the function object <var>op</var>.
+  This is normally a string containing the module name, but can be set
+  to any other object by Python code.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-683' xml:id='l2h-683' class="cfunction">PyFunction_GetDefaults</tt></b>(</nobr></td><td>PyObject *<var>op</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the argument default values of the function object <var>op</var>.
+  This can be a tuple of arguments or <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-684' xml:id='l2h-684' class="cfunction">PyFunction_SetDefaults</tt></b>(</nobr></td><td>PyObject *<var>op</var>,
+                                               PyObject *<var>defaults</var>)</td></tr></table></dt>
+<dd>
+  Set the argument default values for the function object <var>op</var>.
+  <var>defaults</var> must be <var>Py_None</var> or a tuple.
+
+<p>
+Raises <tt class="exception">SystemError</tt> and returns <code>-1</code> on failure.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-685' xml:id='l2h-685' class="cfunction">PyFunction_GetClosure</tt></b>(</nobr></td><td>PyObject *<var>op</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the closure associated with the function object <var>op</var>.
+  This can be <tt class="constant">NULL</tt> or a tuple of cell objects.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-686' xml:id='l2h-686' class="cfunction">PyFunction_SetClosure</tt></b>(</nobr></td><td>PyObject *<var>op</var>,
+                                              PyObject *<var>closure</var>)</td></tr></table></dt>
+<dd>
+  Set the closure associated with the function object <var>op</var>.
+  <var>closure</var> must be <var>Py_None</var> or a tuple of cell objects.
+
+<p>
+Raises <tt class="exception">SystemError</tt> and returns <code>-1</code> on failure.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.2 instance Objects"
+  href="instanceObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.4 method Objects"
+  href="method-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="instanceObjects.html">7.5.2 Instance Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="method-objects.html">7.5.4 Method Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

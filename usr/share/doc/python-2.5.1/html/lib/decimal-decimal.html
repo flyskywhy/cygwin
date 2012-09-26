@@ -1,0 +1,583 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="decimal-signals.html" />
+<link rel="prev" href="node126.html" />
+<link rel="parent" href="module-decimal.html" />
+<link rel="next" href="decimal-signals.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.3 Context objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.2 decimal objects"
+  href="node126.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.4 Signals"
+  href="decimal-signals.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node126.html">6.3.2 Decimal objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-signals.html">6.3.4 Signals</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION008330000000000000000"></a><a name="decimal-decimal"></a>
+<br>
+6.3.3 Context objects 
+</h2>
+
+<p>
+Contexts are environments for arithmetic operations.  They govern precision,
+set rules for rounding, determine which signals are treated as exceptions, and
+limit the range for exponents.
+
+<p>
+Each thread has its own current context which is accessed or changed using
+the <tt class="function">getcontext()</tt> and <tt class="function">setcontext()</tt> functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-992' xml:id='l2h-992' class="function">getcontext</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the current context for the active thread.
+</dl>            
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-993' xml:id='l2h-993' class="function">setcontext</tt></b>(</nobr></td>
+  <td><var>c</var>)</td></tr></table></dt>
+<dd>
+  Set the current context for the active thread to <var>c</var>.
+</dl>  
+
+<p>
+Beginning with Python 2.5, you can also use the <tt class="keyword">with</tt> statement
+and the <tt class="function">localcontext()</tt> function to temporarily change the
+active context.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-994' xml:id='l2h-994' class="function">localcontext</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>c</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return a context manager that will set the current context for
+  the active thread to a copy of <var>c</var> on entry to the with-statement
+  and restore the previous context when exiting the with-statement. If
+  no context is specified, a copy of the current context is used.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+For example, the following code sets the current decimal precision
+  to 42 places, performs a calculation, and then automatically restores
+  the previous context:
+<div class="verbatim"><pre>
+    from __future__ import with_statement
+    from decimal import localcontext
+
+    with localcontext() as ctx:
+        ctx.prec = 42   # Perform a high precision calculation
+        s = calculate_something()
+    s = +s  # Round the final result back to the default precision
+</pre></div>
+</dl>
+
+<p>
+New contexts can also be created using the <tt class="class">Context</tt> constructor
+described below. In addition, the module provides three pre-made
+contexts:
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-995' xml:id='l2h-995' class="class">BasicContext</tt></b>
+<dd>
+  This is a standard context defined by the General Decimal Arithmetic
+  Specification.  Precision is set to nine.  Rounding is set to
+  <tt class="constant">ROUND_HALF_UP</tt>.  All flags are cleared.  All traps are enabled
+  (treated as exceptions) except <tt class="constant">Inexact</tt>, <tt class="constant">Rounded</tt>, and
+  <tt class="constant">Subnormal</tt>.
+
+<p>
+Because many of the traps are enabled, this context is useful for debugging.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-996' xml:id='l2h-996' class="class">ExtendedContext</tt></b>
+<dd>
+  This is a standard context defined by the General Decimal Arithmetic
+  Specification.  Precision is set to nine.  Rounding is set to
+  <tt class="constant">ROUND_HALF_EVEN</tt>.  All flags are cleared.  No traps are enabled
+  (so that exceptions are not raised during computations).
+
+<p>
+Because the trapped are disabled, this context is useful for applications
+  that prefer to have result value of <tt class="constant">NaN</tt> or <tt class="constant">Infinity</tt>
+  instead of raising exceptions.  This allows an application to complete a
+  run in the presence of conditions that would otherwise halt the program.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-997' xml:id='l2h-997' class="class">DefaultContext</tt></b>
+<dd>
+  This context is used by the <tt class="class">Context</tt> constructor as a prototype for
+  new contexts.  Changing a field (such a precision) has the effect of
+  changing the default for new contexts creating by the <tt class="class">Context</tt>
+  constructor.
+
+<p>
+This context is most useful in multi-threaded environments.  Changing one of
+  the fields before threads are started has the effect of setting system-wide
+  defaults.  Changing the fields after threads have started is not recommended
+  as it would require thread synchronization to prevent race conditions.
+
+<p>
+In single threaded environments, it is preferable to not use this context
+  at all.  Instead, simply create contexts explicitly as described below.
+
+<p>
+The default values are precision=28, rounding=ROUND_HALF_EVEN, and enabled
+  traps for Overflow, InvalidOperation, and DivisionByZero.
+</dl>
+
+<p>
+In addition to the three supplied contexts, new contexts can be created
+with the <tt class="class">Context</tt> constructor.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-998' xml:id='l2h-998' class="class">Context</tt></b>(</nobr></td>
+  <td><var>prec=None, rounding=None, traps=None,
+        flags=None, Emin=None, Emax=None, capitals=1</var>)</td></tr></table></dt>
+<dd>
+  Creates a new context.  If a field is not specified or is <tt class="constant">None</tt>,
+  the default values are copied from the <tt class="constant">DefaultContext</tt>.  If the
+  <var>flags</var> field is not specified or is <tt class="constant">None</tt>, all flags are
+  cleared.
+
+<p>
+The <var>prec</var> field is a positive integer that sets the precision for
+  arithmetic operations in the context.
+
+<p>
+The <var>rounding</var> option is one of:
+  
+<ul>
+<li><tt class="constant">ROUND_CEILING</tt> (towards <tt class="constant">Infinity</tt>),
+</li>
+<li><tt class="constant">ROUND_DOWN</tt> (towards zero),
+</li>
+<li><tt class="constant">ROUND_FLOOR</tt> (towards <tt class="constant">-Infinity</tt>),
+</li>
+<li><tt class="constant">ROUND_HALF_DOWN</tt> (to nearest with ties going towards zero),
+</li>
+<li><tt class="constant">ROUND_HALF_EVEN</tt> (to nearest with ties going to nearest even integer),
+</li>
+<li><tt class="constant">ROUND_HALF_UP</tt> (to nearest with ties going away from zero), or
+</li>
+<li><tt class="constant">ROUND_UP</tt> (away from zero).
+  
+</li>
+</ul>
+
+<p>
+The <var>traps</var> and <var>flags</var> fields list any signals to be set.
+  Generally, new contexts should only set traps and leave the flags clear.
+
+<p>
+The <var>Emin</var> and <var>Emax</var> fields are integers specifying the outer
+  limits allowable for exponents.
+
+<p>
+The <var>capitals</var> field is either <tt class="constant">0</tt> or <tt class="constant">1</tt> (the
+  default). If set to <tt class="constant">1</tt>, exponents are printed with a capital
+  <tt class="constant">E</tt>; otherwise, a lowercase <tt class="constant">e</tt> is used:
+  <tt class="constant">Decimal('6.02e+23')</tt>.
+</dl>
+
+<p>
+The <tt class="class">Context</tt> class defines several general purpose methods as well as a
+large number of methods for doing arithmetic directly in a given context.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-999' xml:id='l2h-999' class="method">clear_flags</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Resets all of the flags to <tt class="constant">0</tt>.
+</dl>  
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1000' xml:id='l2h-1000' class="method">copy</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return a duplicate of the context.
+</dl>  
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1001' xml:id='l2h-1001' class="method">create_decimal</tt></b>(</nobr></td>
+  <td><var>num</var>)</td></tr></table></dt>
+<dd>
+  Creates a new Decimal instance from <var>num</var> but using <var>self</var> as
+  context. Unlike the <tt class="class">Decimal</tt> constructor, the context precision,
+  rounding method, flags, and traps are applied to the conversion.
+
+<p>
+This is useful because constants are often given to a greater precision than
+  is needed by the application.  Another benefit is that rounding immediately
+  eliminates unintended effects from digits beyond the current precision.
+  In the following example, using unrounded inputs means that adding zero
+  to a sum can change the result:
+
+<p>
+<div class="verbatim"><pre>
+    &gt;&gt;&gt; getcontext().prec = 3
+    &gt;&gt;&gt; Decimal("3.4445") + Decimal("1.0023")
+    Decimal("4.45")
+    &gt;&gt;&gt; Decimal("3.4445") + Decimal(0) + Decimal("1.0023")
+    Decimal("4.44")
+</pre></div>
+
+<p>
+</dl> 
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1002' xml:id='l2h-1002' class="method">Etiny</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Returns a value equal to "<tt class="samp">Emin - prec + 1</tt>" which is the minimum
+  exponent value for subnormal results.  When underflow occurs, the
+  exponent is set to <tt class="constant">Etiny</tt>.
+</dl> 
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1003' xml:id='l2h-1003' class="method">Etop</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Returns a value equal to "<tt class="samp">Emax - prec + 1</tt>".
+</dl> 
+
+<p>
+The usual approach to working with decimals is to create <tt class="class">Decimal</tt>
+instances and then apply arithmetic operations which take place within the
+current context for the active thread.  An alternate approach is to use
+context methods for calculating within a specific context.  The methods are
+similar to those for the <tt class="class">Decimal</tt> class and are only briefly recounted
+here.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1004' xml:id='l2h-1004' class="method">abs</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>
+  Returns the absolute value of <var>x</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1005' xml:id='l2h-1005' class="method">add</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Return the sum of <var>x</var> and <var>y</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1006' xml:id='l2h-1006' class="method">compare</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Compares values numerically.
+
+<p>
+Like <tt class="method">__cmp__()</tt> but returns a decimal instance:
+  <div class="verbatim"><pre>
+        a or b is a NaN ==&gt; Decimal("NaN")
+        a &lt; b           ==&gt; Decimal("-1")
+        a == b          ==&gt; Decimal("0")
+        a &gt; b           ==&gt; Decimal("1")
+</pre></div>                                          
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1007' xml:id='l2h-1007' class="method">divide</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Return <var>x</var> divided by <var>y</var>.
+</dl>   
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1008' xml:id='l2h-1008' class="method">divmod</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Divides two numbers and returns the integer part of the result.
+</dl> 
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1009' xml:id='l2h-1009' class="method">max</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Compare two values numerically and return the maximum.
+
+<p>
+If they are numerically equal then the left-hand operand is chosen as the
+  result.
+</dl> 
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1010' xml:id='l2h-1010' class="method">min</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Compare two values numerically and return the minimum.
+
+<p>
+If they are numerically equal then the left-hand operand is chosen as the
+  result.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1011' xml:id='l2h-1011' class="method">minus</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>
+  Minus corresponds to the unary prefix minus operator in Python.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1012' xml:id='l2h-1012' class="method">multiply</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Return the product of <var>x</var> and <var>y</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1013' xml:id='l2h-1013' class="method">normalize</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>
+  Normalize reduces an operand to its simplest form.
+
+<p>
+Essentially a <tt class="method">plus</tt> operation with all trailing zeros removed from
+  the result.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1014' xml:id='l2h-1014' class="method">plus</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>
+  Plus corresponds to the unary prefix plus operator in Python.  This
+  operation applies the context precision and rounding, so it is
+  <em>not</em> an identity operation.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1015' xml:id='l2h-1015' class="method">power</tt></b>(</nobr></td>
+  <td><var>x, y</var><big>[</big><var>, modulo</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Return "<tt class="samp">x ** y</tt>" to the <var>modulo</var> if given.
+
+<p>
+The right-hand operand must be a whole number whose integer part (after any
+  exponent has been applied) has no more than 9 digits and whose fractional
+  part (if any) is all zeros before any rounding. The operand may be positive,
+  negative, or zero; if negative, the absolute value of the power is used, and
+  the left-hand operand is inverted (divided into 1) before use.
+
+<p>
+If the increased precision needed for the intermediate calculations exceeds
+  the capabilities of the implementation then an <tt class="constant">InvalidOperation</tt>
+  condition is signaled.
+
+<p>
+If, when raising to a negative power, an underflow occurs during the
+  division into 1, the operation is not halted at that point but continues. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1016' xml:id='l2h-1016' class="method">quantize</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Returns a value equal to <var>x</var> after rounding and having the exponent of
+  <var>y</var>.
+
+<p>
+Unlike other operations, if the length of the coefficient after the quantize
+  operation would be greater than precision, then an
+  <tt class="constant">InvalidOperation</tt> is signaled. This guarantees that, unless there
+  is an error condition, the quantized exponent is always equal to that of the
+  right-hand operand.
+
+<p>
+Also unlike other operations, quantize never signals Underflow, even
+  if the result is subnormal and inexact.  
+</dl> 
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1017' xml:id='l2h-1017' class="method">remainder</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Returns the remainder from integer division.
+
+<p>
+The sign of the result, if non-zero, is the same as that of the original
+  dividend. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1018' xml:id='l2h-1018' class="method">remainder_near</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Computed the modulo as either a positive or negative value depending
+  on which is closest to zero.  For instance,
+  "<tt class="samp">Decimal(10).remainder_near(6)</tt>" returns <code>Decimal("-2")</code>
+  which is closer to zero than <code>Decimal("4")</code>.
+
+<p>
+If both are equally close, the one chosen will have the same sign
+  as <var>self</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1019' xml:id='l2h-1019' class="method">same_quantum</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Test whether <var>x</var> and <var>y</var> have the same exponent or whether both are
+  <tt class="constant">NaN</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1020' xml:id='l2h-1020' class="method">sqrt</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>
+  Return the square root of <var>x</var> to full precision.
+</dl>                    
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1021' xml:id='l2h-1021' class="method">subtract</tt></b>(</nobr></td>
+  <td><var>x, y</var>)</td></tr></table></dt>
+<dd>
+  Return the difference between <var>x</var> and <var>y</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1022' xml:id='l2h-1022' class="method">to_eng_string</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Convert to engineering-type string.
+
+<p>
+Engineering notation has an exponent which is a multiple of 3, so there
+  are up to 3 digits left of the decimal place.  For example, converts
+  <code>Decimal('123E+1')</code> to <code>Decimal("1.23E+3")</code>
+</dl>  
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1023' xml:id='l2h-1023' class="method">to_integral</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>                  
+  Rounds to the nearest integer without signaling <tt class="constant">Inexact</tt>
+  or <tt class="constant">Rounded</tt>.                                        
+</dl> 
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1024' xml:id='l2h-1024' class="method">to_sci_string</tt></b>(</nobr></td>
+  <td><var>x</var>)</td></tr></table></dt>
+<dd>
+  Converts a number to a string using scientific notation.
+</dl> 
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3.2 decimal objects"
+  href="node126.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.4 Signals"
+  href="decimal-signals.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node126.html">6.3.2 Decimal objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="decimal-signals.html">6.3.4 Signals</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

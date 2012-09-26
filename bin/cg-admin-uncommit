@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#
+# Undo a commit or a series of commits
+# Copyright (c) Matt Porter, 2005
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes a commit ID which is the earliest commit to be removed from
+# the repository. If no parameter is passed, it uncommits the latest
+# commit ('HEAD'). Read the CAVEATS section before using it for the
+# first time.
+#
+# This command is a close relative of `cg-switch -f` (which does
+# essentially the same thing, but is slightly more powerful at the
+# expense of a more elaborate usage). Do not confuse either with the
+# operation performed by `cg-seek`, which is meant only for temporary
+# excursions to the project history.
+#
+# OPTIONS
+# -------
+# -t:: Restore the working copy of the previous commit
+#	This optional parameter makes `cg-admin-uncommit` to roll back
+#	the tree as well to the previous commit. Without this option
+#	(by default) 'Cogito' keeps the tree in its current state,
+#	therefore generating tree with local changes against the target
+#	commit, consisting of the changes in the rolled back commits.
+#
+# CAVEATS
+# -------
+# This command can be dangerous! It is safe to do as long as you do not
+# push the commit out in the meantime, but you should 'NEVER' uncommit an
+# already pushed out commit. Things will break for the fetchers since you
+# just broke the fast-forward merging mechanism (the new commit is not
+# descendant of the previous one), and the push command will refuse to
+# push again after you uncommitted a pushed out commit, too. At the moment
+# you pushed the commit out it's etched to the history, live with that.
+
+# Testsuite: Marginal (part of t9210-update)
+
+USAGE="cg-admin-uncommit [-t] [COMMIT_ID]"
+_git_requires_root=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+[ -s "$_git/blocked" ] && die "uncommitting blocked: $("cat $_git/blocked")"
+
+rollback_tree=
+while optparse; do
+	if optparse -t; then
+		rollback_tree=1
+	else
+		optfail
+	fi
+done
+
+
+base="$(cg-object-id -c)" || exit 1
+
+commit="$(cg-object-id -c "${ARGS[0]}")" || exit 1
+[ "$(git rev-list $commit ^$base)" ] && \
+	die "$commit: not an ancestor of HEAD"
+
+parent="$(cg-object-id -p "$commit")" || exit 1
+[ "$parent" ] || die "cannot rewind behind the initial commit"
+[ "$(echo "$parent" | wc -l)" -gt 1 ] &&
+	die "cannot rewind merges; please 'cg-switch -f -r parentid $_git_head' instead"
+
+
+echo "Rewinding $base (HEAD) -> $parent" >&2
+
+tree_timewarp "backwards" "$rollback_tree" "$base" "$parent"
+exit 0

@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node743.html" />
+<link rel="prev" href="node732.html" />
+<link rel="parent" href="module-gettext.html" />
+<link rel="next" href="node738.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>21.1.3 Internationalizing your programs and modules</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="21.1.2.4 the Catalog constructor"
+  href="node736.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="21.1 gettext  "
+  href="module-gettext.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="21.1.3.1 localizing your module"
+  href="node738.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node736.html">21.1.2.4 The Catalog constructor</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-gettext.html">21.1 gettext  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node738.html">21.1.3.1 Localizing your module</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0023130000000000000000">
+21.1.3 Internationalizing your programs and modules</a>
+</h2>
+Internationalization (I18N) refers to the operation by which a program
+is made aware of multiple languages.  Localization (L10N) refers to
+the adaptation of your program, once internationalized, to the local
+language and cultural habits.  In order to provide multilingual
+messages for your Python programs, you need to take the following
+steps:
+
+<p>
+
+<ol>
+<li>prepare your program or module by specially marking
+          translatable strings
+</li>
+<li>run a suite of tools over your marked files to generate raw
+          messages catalogs
+</li>
+<li>create language specific translations of the message catalogs
+</li>
+<li>use the <tt class="module">gettext</tt> module so that message strings are
+          properly translated
+</li>
+</ol>
+
+<p>
+In order to prepare your code for I18N, you need to look at all the
+strings in your files.  Any string that needs to be translated
+should be marked by wrapping it in <code>_('...')</code> -- that is, a call
+to the function <tt class="function">_()</tt>.  For example:
+
+<p>
+<div class="verbatim"><pre>
+filename = 'mylog.txt'
+message = _('writing a log message')
+fp = open(filename, 'w')
+fp.write(message)
+fp.close()
+</pre></div>
+
+<p>
+In this example, the string <code>'writing a log message'</code> is marked as
+a candidate for translation, while the strings <code>'mylog.txt'</code> and
+<code>'w'</code> are not.
+
+<p>
+The Python distribution comes with two tools which help you generate
+the message catalogs once you've prepared your source code.  These may
+or may not be available from a binary distribution, but they can be
+found in a source distribution, in the <span class="file">Tools/i18n</span> directory.
+
+<p>
+The <b class="program">pygettext</b><a name="tex2html182"
+  href="#foot70436"><sup>21.3</sup></a> program
+scans all your Python source code looking for the strings you
+previously marked as translatable.  It is similar to the GNU
+<b class="program">gettext</b> program except that it understands all the
+intricacies of Python source code, but knows nothing about C or C++
+source code.  You don't need GNU <code>gettext</code> unless you're also
+going to be translating C code (such as C extension modules).
+
+<p>
+<b class="program">pygettext</b> generates textual Uniforum-style human readable
+message catalog <span class="file">.pot</span> files, essentially structured human
+readable files which contain every marked string in the source code,
+along with a placeholder for the translation strings.
+<b class="program">pygettext</b> is a command line script that supports a similar
+command line interface as <b class="program">xgettext</b>; for details on its use,
+run:
+
+<p>
+<div class="verbatim"><pre>
+pygettext.py --help
+</pre></div>
+
+<p>
+Copies of these <span class="file">.pot</span> files are then handed over to the
+individual human translators who write language-specific versions for
+every supported natural language.  They send you back the filled in
+language-specific versions as a <span class="file">.po</span> file.  Using the
+<b class="program">msgfmt.py</b><a name="tex2html183"
+  href="#foot70437"><sup>21.4</sup></a> program (in the <span class="file">Tools/i18n</span> directory), you take the
+<span class="file">.po</span> files from your translators and generate the
+machine-readable <span class="file">.mo</span> binary catalog files.  The <span class="file">.mo</span>
+files are what the <tt class="module">gettext</tt> module uses for the actual
+translation processing during run-time.
+
+<p>
+How you use the <tt class="module">gettext</tt> module in your code depends on
+whether you are internationalizing a single module or your entire application.
+The next two sections will discuss each case.
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot70436">...pygettext</a><A
+ HREF="node737.html#tex2html182"><sup>21.3</sup></a></dt>
+<dd>François Pinard has
+written a program called
+<b class="program">xpot</b> which does a similar job.  It is available as part of
+his <b class="program">po-utils</b> package at
+<a class="url" href="http://po-utils.progiciels-bpi.ca/">http://po-utils.progiciels-bpi.ca/</a>.
+
+</dd>
+<dt><a name="foot70437">...msgfmt.py</a><A
+ HREF="node737.html#tex2html183"><sup>21.4</sup></a></dt>
+<dd><b class="program">msgfmt.py</b> is binary
+compatible with GNU <b class="program">msgfmt</b> except that it provides a
+simpler, all-Python implementation.  With this and
+<b class="program">pygettext.py</b>, you generally won't need to install the GNU
+<b class="program">gettext</b> package to internationalize your Python
+applications.
+
+</dd>
+</dl>
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node738.html">21.1.3.1 Localizing your module</a>
+<li><a href="node739.html">21.1.3.2 Localizing your application</a>
+<li><a href="node740.html">21.1.3.3 Changing languages on the fly</a>
+<li><a href="node741.html">21.1.3.4 Deferred translations</a>
+<li><a href="node742.html">21.1.3.5 <tt class="function">gettext()</tt> vs. <tt class="function">lgettext()</tt></a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="21.1.2.4 the Catalog constructor"
+  href="node736.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="21.1 gettext  "
+  href="module-gettext.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="21.1.3.1 localizing your module"
+  href="node738.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node736.html">21.1.2.4 The Catalog constructor</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-gettext.html">21.1 gettext  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node738.html">21.1.3.1 Localizing your module</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

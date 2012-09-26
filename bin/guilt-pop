@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+#
+
+USAGE="[-f] [-a | --all | <patchname>]"
+. `dirname $0`/guilt
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-f)
+			force=t
+			;;
+		-a|--all)
+			all=t
+			;;
+		*)
+			break
+			;;
+	esac
+	shift
+done
+
+# "guilt-pop" or "guilt-pop foo"
+if [ -z "$all" ] && [ $# -gt 1 ]; then
+	usage
+fi
+
+# "guilt-pop -a"
+if [ ! -z "$all" ] && [ $# -gt 0 ]; then
+	usage
+fi
+
+patch="$1"
+[ ! -z "$all" ] && patch="-a"
+
+if [ ! -s "$applied" ]; then
+	echo "No patches applied."
+	exit 0
+elif [ "$patch" = "-a" ]; then
+	# we are supposed to pop all patches
+
+	sidx=`wc -l < $applied`
+	eidx=0
+elif [ -z "$patch" ]; then
+	# we are supposed to pop only the current patch on the stack
+
+	sidx=`wc -l < $applied`
+	eidx=`expr $sidx - 1`
+else
+	# we're supposed to pop only up to a patch, make sure the patch is
+	# in the series
+
+	eidx=`cat $applied | grep -ne "^[0-9a-f]\{40\}:$patch\$" | cut -d: -f 1`
+	if [ -z "$eidx" ]; then
+		die "Patch $patch is not in the series/is not applied"
+	fi
+
+	eidx=`expr $eidx - 1`
+	sidx=`wc -l < $applied`
+fi
+
+# make sure that there are no unapplied changes
+# if we are forcing the pop, reset first
+if [ ! -z "$force" ]; then
+	cd "$TOP_DIR" >&2 >/dev/null
+	git-reset --hard
+	cd - >&2 >/dev/null
+elif ! must_commit_first; then
+	die "Uncommited changes detected. Refresh first."
+fi
+
+l=`awk "BEGIN{n=0}(n==$eidx){print \\$0; exit}{n=n+1}END{}" < $applied`
+
+pop_many_patches `echo $l | cut -d: -f1`^ `expr $sidx - $eidx`
+
+p=`get_top`
+[ ! -z "$p" ] && echo "Now at $p." || echo "All patches popped."
+

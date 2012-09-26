@@ -1,0 +1,442 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="tut.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="tut.html" title='Python Tutorial' />
+<link rel='contents' href='node2.html' title="Contents" />
+<link rel='index' href='node19.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node17.html" />
+<link rel="prev" href="node15.html" />
+<link rel="parent" href="tut.html" />
+<link rel="next" href="node17.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>B. Floating Point Arithmetic: Issues and Limitations</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="A. interactive Input Editing"
+  href="node15.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python Tutorial"
+  href="tut.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="C. history and License"
+  href="node17.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Tutorial</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="node2.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="node19.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node15.html">A. Interactive Input Editing</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="tut.html">Python Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node17.html">C. History and License</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node16.html#SECTION0016100000000000000000">B.1 Representation Error</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+<hr>
+
+<h1><a name="SECTION0016000000000000000000"></a><a name="fp-issues"></a>
+<br>
+B. Floating Point Arithmetic:  Issues and Limitations
+</h1>
+
+<p>
+Floating-point numbers are represented in computer hardware as
+base 2 (binary) fractions.  For example, the decimal fraction
+
+<p>
+<div class="verbatim"><pre>
+0.125
+</pre></div>
+
+<p>
+has value 1/10 + 2/100 + 5/1000, and in the same way the binary fraction
+
+<p>
+<div class="verbatim"><pre>
+0.001
+</pre></div>
+
+<p>
+has value 0/2 + 0/4 + 1/8.  These two fractions have identical values,
+the only real difference being that the first is written in base 10
+fractional notation, and the second in base 2.
+
+<p>
+Unfortunately, most decimal fractions cannot be represented exactly as
+binary fractions.  A consequence is that, in general, the decimal
+floating-point numbers you enter are only approximated by the binary
+floating-point numbers actually stored in the machine.
+
+<p>
+The problem is easier to understand at first in base 10.  Consider the
+fraction 1/3.  You can approximate that as a base 10 fraction:
+
+<p>
+<div class="verbatim"><pre>
+0.3
+</pre></div>
+
+<p>
+or, better,
+
+<p>
+<div class="verbatim"><pre>
+0.33
+</pre></div>
+
+<p>
+or, better,
+
+<p>
+<div class="verbatim"><pre>
+0.333
+</pre></div>
+
+<p>
+and so on.  No matter how many digits you're willing to write down, the
+result will never be exactly 1/3, but will be an increasingly better
+approximation of 1/3.
+
+<p>
+In the same way, no matter how many base 2 digits you're willing to
+use, the decimal value 0.1 cannot be represented exactly as a base 2
+fraction.  In base 2, 1/10 is the infinitely repeating fraction
+
+<p>
+<div class="verbatim"><pre>
+0.0001100110011001100110011001100110011001100110011...
+</pre></div>
+
+<p>
+Stop at any finite number of bits, and you get an approximation.  This
+is why you see things like:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 0.1
+0.10000000000000001
+</pre></div>
+
+<p>
+On most machines today, that is what you'll see if you enter 0.1 at
+a Python prompt.  You may not, though, because the number of bits
+used by the hardware to store floating-point values can vary across
+machines, and Python only prints a decimal approximation to the true
+decimal value of the binary approximation stored by the machine.  On
+most machines, if Python were to print the true decimal value of
+the binary approximation stored for 0.1, it would have to display
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 0.1
+0.1000000000000000055511151231257827021181583404541015625
+</pre></div>
+
+<p>
+instead!  The Python prompt uses the builtin
+<tt class="function">repr()</tt> function to obtain a string version of everything it
+displays.  For floats, <code>repr(<var>float</var>)</code> rounds the true
+decimal value to 17 significant digits, giving
+
+<p>
+<div class="verbatim"><pre>
+0.10000000000000001
+</pre></div>
+
+<p>
+<code>repr(<var>float</var>)</code> produces 17 significant digits because it
+turns out that's enough (on most machines) so that
+<code>eval(repr(<var>x</var>)) == <var>x</var></code> exactly for all finite floats
+<var>x</var>, but rounding to 16 digits is not enough to make that true.
+
+<p>
+Note that this is in the very nature of binary floating-point: this is
+not a bug in Python, and it is not a bug in your code either.  You'll
+see the same kind of thing in all languages that support your
+hardware's floating-point arithmetic (although some languages may
+not <em>display</em> the difference by default, or in all output modes).
+
+<p>
+Python's builtin <tt class="function">str()</tt> function produces only 12
+significant digits, and you may wish to use that instead.  It's
+unusual for <code>eval(str(<var>x</var>))</code> to reproduce <var>x</var>, but the
+output may be more pleasant to look at:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print str(0.1)
+0.1
+</pre></div>
+
+<p>
+It's important to realize that this is, in a real sense, an illusion:
+the value in the machine is not exactly 1/10, you're simply rounding
+the <em>display</em> of the true machine value.
+
+<p>
+Other surprises follow from this one.  For example, after seeing
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 0.1
+0.10000000000000001
+</pre></div>
+
+<p>
+you may be tempted to use the <tt class="function">round()</tt> function to chop it
+back to the single digit you expect.  But that makes no difference:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; round(0.1, 1)
+0.10000000000000001
+</pre></div>
+
+<p>
+The problem is that the binary floating-point value stored for "0.1"
+was already the best possible binary approximation to 1/10, so trying
+to round it again can't make it better:  it was already as good as it
+gets.
+
+<p>
+Another consequence is that since 0.1 is not exactly 1/10,
+summing ten values of 0.1 may not yield exactly 1.0, either:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; sum = 0.0
+&gt;&gt;&gt; for i in range(10):
+...     sum += 0.1
+...
+&gt;&gt;&gt; sum
+0.99999999999999989
+</pre></div>
+
+<p>
+Binary floating-point arithmetic holds many surprises like this.  The
+problem with "0.1" is explained in precise detail below, in the
+"Representation Error" section.  See
+<em class="citetitle"><a
+ href="http://www.lahey.com/float.htm"
+ title="The Perils of Floating
+Point"
+ >The Perils of Floating
+Point</a></em> for a more complete account of other common surprises.
+
+<p>
+As that says near the end, ``there are no easy answers.''  Still,
+don't be unduly wary of floating-point!  The errors in Python float
+operations are inherited from the floating-point hardware, and on most
+machines are on the order of no more than 1 part in 2**53 per
+operation.  That's more than adequate for most tasks, but you do need
+to keep in mind that it's not decimal arithmetic, and that every float
+operation can suffer a new rounding error.
+
+<p>
+While pathological cases do exist, for most casual use of
+floating-point arithmetic you'll see the result you expect in the end
+if you simply round the display of your final results to the number of
+decimal digits you expect.  <tt class="function">str()</tt> usually suffices, and for
+finer control see the discussion of Python's <code>%</code> format
+operator: the <code>%g</code>, <code>%f</code> and <code>%e</code> format codes
+supply flexible and easy ways to round float results for display.
+
+<p>
+
+<h1><a name="SECTION0016100000000000000000"></a><a name="fp-error"></a>
+<br>
+B.1 Representation Error
+         
+</h1>
+
+<p>
+This section explains the ``0.1'' example in detail, and shows how
+you can perform an exact analysis of cases like this yourself.  Basic
+familiarity with binary floating-point representation is assumed.
+
+<p>
+<i class="dfn">Representation error</i> refers to the fact that some (most, actually)
+decimal fractions cannot be represented exactly as binary (base 2)
+fractions.  This is the chief reason why Python (or Perl, C, C++,
+Java, Fortran, and many others) often won't display the exact decimal
+number you expect:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 0.1
+0.10000000000000001
+</pre></div>
+
+<p>
+Why is that?  1/10 is not exactly representable as a binary fraction.
+Almost all machines today (November 2000) use IEEE-754 floating point
+arithmetic, and almost all platforms map Python floats to IEEE-754
+"double precision".  754 doubles contain 53 bits of precision, so on
+input the computer strives to convert 0.1 to the closest fraction it can
+of the form <var>J</var>/2**<var>N</var> where <var>J</var> is an integer containing
+exactly 53 bits.  Rewriting
+
+<p>
+<div class="verbatim"><pre>
+ 1 / 10 ~= J / (2**N)
+</pre></div>
+
+<p>
+as
+
+<p>
+<div class="verbatim"><pre>
+J ~= 2**N / 10
+</pre></div>
+
+<p>
+and recalling that <var>J</var> has exactly 53 bits (is <code>&gt;= 2**52</code> but
+<code>&lt; 2**53</code>), the best value for <var>N</var> is 56:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 2**52
+4503599627370496L
+&gt;&gt;&gt; 2**53
+9007199254740992L
+&gt;&gt;&gt; 2**56/10
+7205759403792793L
+</pre></div>
+
+<p>
+That is, 56 is the only value for <var>N</var> that leaves <var>J</var> with
+exactly 53 bits.  The best possible value for <var>J</var> is then that
+quotient rounded:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; q, r = divmod(2**56, 10)
+&gt;&gt;&gt; r
+6L
+</pre></div>
+
+<p>
+Since the remainder is more than half of 10, the best approximation is
+obtained by rounding up:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; q+1
+7205759403792794L
+</pre></div>
+
+<p>
+Therefore the best possible approximation to 1/10 in 754 double
+precision is that over 2**56, or
+
+<p>
+<div class="verbatim"><pre>
+7205759403792794 / 72057594037927936
+</pre></div>
+
+<p>
+Note that since we rounded up, this is actually a little bit larger than
+1/10; if we had not rounded up, the quotient would have been a little
+bit smaller than 1/10.  But in no case can it be <em>exactly</em> 1/10!
+
+<p>
+So the computer never ``sees'' 1/10:  what it sees is the exact
+fraction given above, the best 754 double approximation it can get:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; .1 * 2**56
+7205759403792794.0
+</pre></div>
+
+<p>
+If we multiply that fraction by 10**30, we can see the (truncated)
+value of its 30 most significant decimal digits:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; 7205759403792794 * 10**30 / 2**56
+100000000000000005551115123125L
+</pre></div>
+
+<p>
+meaning that the exact number stored in the computer is approximately
+equal to the decimal value 0.100000000000000005551115123125.  Rounding
+that to 17 significant digits gives the 0.10000000000000001 that Python
+displays (well, will display on any 754-conforming platform that does
+best-possible input and output conversions in its C library -- yours may
+not!).
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="A. interactive Input Editing"
+  href="node15.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="Python Tutorial"
+  href="tut.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="C. history and License"
+  href="node17.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Tutorial</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="node2.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="node19.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node15.html">A. Interactive Input Editing</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="tut.html">Python Tutorial</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node17.html">C. History and License</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

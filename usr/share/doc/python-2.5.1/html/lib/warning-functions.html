@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="warning-filter.html" />
+<link rel="parent" href="module-warnings.html" />
+<link rel="next" href="module-contextlib.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>26.4.3 Available Functions </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.4.2 the Warnings Filter"
+  href="warning-filter.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26.4 warnings  "
+  href="module-warnings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.5 contextlib  "
+  href="module-contextlib.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="warning-filter.html">26.4.2 The Warnings Filter</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-warnings.html">26.4 warnings  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-contextlib.html">26.5 contextlib  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0028430000000000000000"></a><a name="warning-functions"></a>
+<br>
+26.4.3 Available Functions 
+</h2>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5204' xml:id='l2h-5204' class="function">warn</tt></b>(</nobr></td>
+  <td><var>message</var><big>[</big><var>, category</var><big>[</big><var>, stacklevel</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Issue a warning, or maybe ignore it or raise an exception.  The
+<var>category</var> argument, if given, must be a warning category class
+(see above); it defaults to <tt class="exception">UserWarning</tt>.  Alternatively
+<var>message</var> can be a <tt class="exception">Warning</tt> instance, in which case
+<var>category</var> will be ignored and <code>message.__class__</code> will be used.
+In this case the message text will be <code>str(message)</code>. This function
+raises an exception if the particular warning issued is changed
+into an error by the warnings filter see above.  The <var>stacklevel</var>
+argument can be used by wrapper functions written in Python, like
+this:
+
+<p>
+<div class="verbatim"><pre>
+def deprecation(message):
+    warnings.warn(message, DeprecationWarning, stacklevel=2)
+</pre></div>
+
+<p>
+This makes the warning refer to <tt class="function">deprecation()</tt>'s caller,
+rather than to the source of <tt class="function">deprecation()</tt> itself (since
+the latter would defeat the purpose of the warning message).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5205' xml:id='l2h-5205' class="function">warn_explicit</tt></b>(</nobr></td>
+  <td><var>message, category, filename,
+ lineno</var><big>[</big><var>, module</var><big>[</big><var>, registry</var><big>[</big><var>,
+ module_globals</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a low-level interface to the functionality of
+<tt class="function">warn()</tt>, passing in explicitly the message, category,
+filename and line number, and optionally the module name and the
+registry (which should be the <code>__warningregistry__</code> dictionary of
+the module).  The module name defaults to the filename with <code>.py</code>
+stripped; if no registry is passed, the warning is never suppressed.
+<var>message</var> must be a string and <var>category</var> a subclass of
+<tt class="exception">Warning</tt> or <var>message</var> may be a <tt class="exception">Warning</tt> instance,
+in which case <var>category</var> will be ignored.
+
+<p>
+<var>module_globals</var>, if supplied, should be the global namespace in use
+by the code for which the warning is issued.  (This argument is used to
+support displaying source for modules found in zipfiles or other
+non-filesystem import sources, and was added in Python 2.5.)
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5206' xml:id='l2h-5206' class="function">showwarning</tt></b>(</nobr></td>
+  <td><var>message, category, filename,
+			     lineno</var><big>[</big><var>, file</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Write a warning to a file.  The default implementation calls
+<code>formatwarning(<var>message</var>, <var>category</var>, <var>filename</var>,
+<var>lineno</var>)</code> and writes the resulting string to <var>file</var>, which
+defaults to <code>sys.stderr</code>.  You may replace this function with an
+alternative implementation by assigning to
+<code>warnings.showwarning</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5207' xml:id='l2h-5207' class="function">formatwarning</tt></b>(</nobr></td>
+  <td><var>message, category, filename, lineno</var>)</td></tr></table></dt>
+<dd>
+Format a warning the standard way.  This returns a string  which may
+contain embedded newlines and ends in a newline.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5208' xml:id='l2h-5208' class="function">filterwarnings</tt></b>(</nobr></td>
+  <td><var>action</var><big>[</big><var>,
+                 message</var><big>[</big><var>, category</var><big>[</big><var>,
+                 module</var><big>[</big><var>, lineno</var><big>[</big><var>, append</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Insert an entry into the list of warnings filters.  The entry is
+inserted at the front by default; if <var>append</var> is true, it is
+inserted at the end.
+This checks the types of the arguments, compiles the message and
+module regular expressions, and inserts them as a tuple in the 
+list of warnings filters.  Entries closer to the front of the list
+override entries later in the list, if both match a particular
+warning.  Omitted arguments default to a value that matches
+everything.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5209' xml:id='l2h-5209' class="function">simplefilter</tt></b>(</nobr></td>
+  <td><var>action</var><big>[</big><var>,
+                 category</var><big>[</big><var>,
+                 lineno</var><big>[</big><var>, append</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Insert a simple entry into the list of warnings filters. The meaning
+of the function parameters is as for <tt class="function">filterwarnings()</tt>, but
+regular expressions are not needed as the filter inserted always
+matches any message in any module as long as the category and line
+number match.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5210' xml:id='l2h-5210' class="function">resetwarnings</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Reset the warnings filter.  This discards the effect of all previous
+calls to <tt class="function">filterwarnings()</tt>, including that of the
+<b class="programopt">-W</b> command line options and calls to
+<tt class="function">simplefilter()</tt>.
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="26.4.2 the Warnings Filter"
+  href="warning-filter.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="26.4 warnings  "
+  href="module-warnings.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="26.5 contextlib  "
+  href="module-contextlib.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="warning-filter.html">26.4.2 The Warnings Filter</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-warnings.html">26.4 warnings  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-contextlib.html">26.5 contextlib  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

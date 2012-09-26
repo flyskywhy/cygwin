@@ -1,0 +1,460 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="module-wsgiref.validate.html" />
+<link rel="parent" href="module-wsgiref.html" />
+<link rel="next" href="module-urllib.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.4.5 wsgiref.handlers - server/gateway base classes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.4 wsgiref.validate - WSGI"
+  href="module-wsgiref.validate.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.5 urllib  "
+  href="module-urllib.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.validate.html">18.4.4 wsgiref.validate - WSGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-urllib.html">18.5 urllib  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0020450000000000000000">
+18.4.5 <tt class="module">wsgiref.handlers</tt> - server/gateway base classes</a>
+</h2>
+<a name="module-wsgiref.handlers"></a>
+<p>
+This module provides base handler classes for implementing WSGI servers
+and gateways.  These base classes handle most of the work of
+communicating with a WSGI application, as long as they are given a
+CGI-like environment, along with input, output, and error streams.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3864' xml:id='l2h-3864' class="class">CGIHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+CGI-based invocation via <code>sys.stdin</code>, <code>sys.stdout</code>,
+<code>sys.stderr</code> and <code>os.environ</code>.  This is useful when you have
+a WSGI application and want to run it as a CGI script.  Simply invoke
+<code>CGIHandler().run(app)</code>, where <code>app</code> is the WSGI application
+object you wish to invoke.
+
+<p>
+This class is a subclass of <tt class="class">BaseCGIHandler</tt> that sets
+<code>wsgi.run_once</code> to true, <code>wsgi.multithread</code> to false, and
+<code>wsgi.multiprocess</code> to true, and always uses <tt class="module">sys</tt> and
+<tt class="module">os</tt> to obtain the necessary CGI streams and environment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3865' xml:id='l2h-3865' class="class">BaseCGIHandler</tt></b>(</nobr></td>
+  <td><var>stdin, stdout, stderr, environ
+</var><big>[</big><var>, multithread=True </var><big>[</big><var>, multiprocess=False</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Similar to <tt class="class">CGIHandler</tt>, but instead of using the <tt class="module">sys</tt> and
+<tt class="module">os</tt> modules, the CGI environment and I/O streams are specified
+explicitly.  The <var>multithread</var> and <var>multiprocess</var> values are
+used to set the <code>wsgi.multithread</code> and <code>wsgi.multiprocess</code>
+flags for any applications run by the handler instance.
+
+<p>
+This class is a subclass of <tt class="class">SimpleHandler</tt> intended for use with
+software other than HTTP ``origin servers''.  If you are writing a
+gateway protocol implementation (such as CGI, FastCGI, SCGI, etc.) that
+uses a <code>Status:</code> header to send an HTTP status, you probably want
+to subclass this instead of <tt class="class">SimpleHandler</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3866' xml:id='l2h-3866' class="class">SimpleHandler</tt></b>(</nobr></td>
+  <td><var>stdin, stdout, stderr, environ
+</var><big>[</big><var>,multithread=True </var><big>[</big><var>, multiprocess=False</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Similar to <tt class="class">BaseCGIHandler</tt>, but designed for use with HTTP origin
+servers.  If you are writing an HTTP server implementation, you will
+probably want to subclass this instead of <tt class="class">BaseCGIHandler</tt>
+
+<p>
+This class is a subclass of <tt class="class">BaseHandler</tt>.  It overrides the
+<tt class="method">__init__()</tt>, <tt class="method">get_stdin()</tt>, <tt class="method">get_stderr()</tt>,
+<tt class="method">add_cgi_vars()</tt>, <tt class="method">_write()</tt>, and <tt class="method">_flush()</tt>
+methods to support explicitly setting the environment and streams via
+the constructor.  The supplied environment and streams are stored in
+the <tt class="member">stdin</tt>, <tt class="member">stdout</tt>, <tt class="member">stderr</tt>, and
+<tt class="member">environ</tt> attributes.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3867' xml:id='l2h-3867' class="class">BaseHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This is an abstract base class for running WSGI applications.  Each
+instance will handle a single HTTP request, although in principle you
+could create a subclass that was reusable for multiple requests.
+
+<p>
+<tt class="class">BaseHandler</tt> instances have only one method intended for external
+use:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3868' xml:id='l2h-3868' class="method">run</tt></b>(</nobr></td>
+  <td><var>app</var>)</td></tr></table></dt>
+<dd>
+Run the specified WSGI application, <var>app</var>.
+</dl>
+
+<p>
+All of the other <tt class="class">BaseHandler</tt> methods are invoked by this method
+in the process of running the application, and thus exist primarily to
+allow customizing the process.
+
+<p>
+The following methods MUST be overridden in a subclass:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3869' xml:id='l2h-3869' class="method">_write</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Buffer the string <var>data</var> for transmission to the client.  It's okay
+if this method actually transmits the data; <tt class="class">BaseHandler</tt>
+just separates write and flush operations for greater efficiency
+when the underlying system actually has such a distinction.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3870' xml:id='l2h-3870' class="method">_flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Force buffered data to be transmitted to the client.  It's okay if this
+method is a no-op (i.e., if <tt class="method">_write()</tt> actually sends the data).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3871' xml:id='l2h-3871' class="method">get_stdin</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return an input stream object suitable for use as the <code>wsgi.input</code>
+of the request currently being processed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3872' xml:id='l2h-3872' class="method">get_stderr</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return an output stream object suitable for use as the
+<code>wsgi.errors</code> of the request currently being processed.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3873' xml:id='l2h-3873' class="method">add_cgi_vars</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Insert CGI variables for the current request into the <tt class="member">environ</tt>
+attribute.
+</dl>
+
+<p>
+Here are some other methods and attributes you may wish to override.
+This list is only a summary, however, and does not include every method
+that can be overridden.  You should consult the docstrings and source
+code for additional information before attempting to create a customized
+<tt class="class">BaseHandler</tt> subclass.
+
+<p>
+Attributes and methods for customizing the WSGI environment:
+
+<p>
+<dl><dt><b><tt id='l2h-3874' xml:id='l2h-3874' class="member">wsgi_multithread</tt></b></dt>
+<dd>
+The value to be used for the <code>wsgi.multithread</code> environment
+variable.  It defaults to true in <tt class="class">BaseHandler</tt>, but may have
+a different default (or be set by the constructor) in the other
+subclasses.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3875' xml:id='l2h-3875' class="member">wsgi_multiprocess</tt></b></dt>
+<dd>
+The value to be used for the <code>wsgi.multiprocess</code> environment
+variable.  It defaults to true in <tt class="class">BaseHandler</tt>, but may have
+a different default (or be set by the constructor) in the other
+subclasses.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3876' xml:id='l2h-3876' class="member">wsgi_run_once</tt></b></dt>
+<dd>
+The value to be used for the <code>wsgi.run_once</code> environment
+variable.  It defaults to false in <tt class="class">BaseHandler</tt>, but
+<tt class="class">CGIHandler</tt> sets it to true by default.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3877' xml:id='l2h-3877' class="member">os_environ</tt></b></dt>
+<dd>
+The default environment variables to be included in every request's
+WSGI environment.  By default, this is a copy of <code>os.environ</code> at
+the time that <tt class="module">wsgiref.handlers</tt> was imported, but subclasses can
+either create their own at the class or instance level.  Note that the
+dictionary should be considered read-only, since the default value is
+shared between multiple classes and instances.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3878' xml:id='l2h-3878' class="member">server_software</tt></b></dt>
+<dd>
+If the <tt class="member">origin_server</tt> attribute is set, this attribute's value
+is used to set the default <code>SERVER_SOFTWARE</code> WSGI environment
+variable, and also to set a default <code>Server:</code> header in HTTP
+responses.  It is ignored for handlers (such as <tt class="class">BaseCGIHandler</tt>
+and <tt class="class">CGIHandler</tt>) that are not HTTP origin servers.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3879' xml:id='l2h-3879' class="method">get_scheme</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return the URL scheme being used for the current request.  The default
+implementation uses the <tt class="function">guess_scheme()</tt> function from
+<tt class="module">wsgiref.util</tt> to guess whether the scheme should be ``http'' or
+``https'', based on the current request's <tt class="member">environ</tt> variables.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3880' xml:id='l2h-3880' class="method">setup_environ</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Set the <tt class="member">environ</tt> attribute to a fully-populated WSGI
+environment.  The default implementation uses all of the above methods
+and attributes, plus the <tt class="method">get_stdin()</tt>, <tt class="method">get_stderr()</tt>,
+and <tt class="method">add_cgi_vars()</tt> methods and the <tt class="member">wsgi_file_wrapper</tt>
+attribute.  It also inserts a <code>SERVER_SOFTWARE</code> key if not present,
+as long as the <tt class="member">origin_server</tt> attribute is a true value and the
+<tt class="member">server_software</tt> attribute is set.
+</dl>
+
+<p>
+Methods and attributes for customizing exception handling:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3881' xml:id='l2h-3881' class="method">log_exception</tt></b>(</nobr></td>
+  <td><var>exc_info</var>)</td></tr></table></dt>
+<dd>
+Log the <var>exc_info</var> tuple in the server log.  <var>exc_info</var> is a
+<code>(<var>type</var>, <var>value</var>, <var>traceback</var>)</code> tuple.  The default
+implementation simply writes the traceback to the request's
+<code>wsgi.errors</code> stream and flushes it.  Subclasses can override this
+method to change the format or retarget the output, mail the traceback
+to an administrator, or whatever other action may be deemed suitable.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3882' xml:id='l2h-3882' class="member">traceback_limit</tt></b></dt>
+<dd>
+The maximum number of frames to include in tracebacks output by the
+default <tt class="method">log_exception()</tt> method.  If <code>None</code>, all frames
+are included.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3883' xml:id='l2h-3883' class="method">error_output</tt></b>(</nobr></td>
+  <td><var>environ, start_response</var>)</td></tr></table></dt>
+<dd>
+This method is a WSGI application to generate an error page for the
+user.  It is only invoked if an error occurs before headers are sent
+to the client.
+
+<p>
+This method can access the current error information using
+<code>sys.exc_info()</code>, and should pass that information to
+<var>start_response</var> when calling it (as described in the ``Error
+Handling'' section of <a class="rfc" id='rfcref-102735' xml:id='rfcref-102735'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>).
+
+<p>
+The default implementation just uses the <tt class="member">error_status</tt>,
+<tt class="member">error_headers</tt>, and <tt class="member">error_body</tt> attributes to generate
+an output page.  Subclasses can override this to produce more dynamic
+error output.
+
+<p>
+Note, however, that it's not recommended from a security perspective to
+spit out diagnostics to any old user; ideally, you should have to do
+something special to enable diagnostic output, which is why the default
+implementation doesn't include any.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3884' xml:id='l2h-3884' class="member">error_status</tt></b></dt>
+<dd>
+The HTTP status used for error responses.  This should be a status
+string as defined in <a class="rfc" id='rfcref-102737' xml:id='rfcref-102737'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>; it defaults to a 500 code and message.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3885' xml:id='l2h-3885' class="member">error_headers</tt></b></dt>
+<dd>
+The HTTP headers used for error responses.  This should be a list of
+WSGI response headers (<code>(<var>name</var>, <var>value</var>)</code> tuples), as
+described in <a class="rfc" id='rfcref-102739' xml:id='rfcref-102739'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>.  The default list just sets the content type
+to <code>text/plain</code>.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3886' xml:id='l2h-3886' class="member">error_body</tt></b></dt>
+<dd>
+The error response body.  This should be an HTTP response body string.
+It defaults to the plain text, ``A server error occurred.  Please
+contact the administrator.''
+</dl>
+
+<p>
+Methods and attributes for <a class="rfc" id='rfcref-102741' xml:id='rfcref-102741'
+href="http://www.python.org/peps/pep-0333.html">PEP 333</a>'s ``Optional Platform-Specific File
+Handling'' feature:
+
+<p>
+<dl><dt><b><tt id='l2h-3887' xml:id='l2h-3887' class="member">wsgi_file_wrapper</tt></b></dt>
+<dd>
+A <code>wsgi.file_wrapper</code> factory, or <code>None</code>.  The default value
+of this attribute is the <tt class="class">FileWrapper</tt> class from
+<tt class="module">wsgiref.util</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3888' xml:id='l2h-3888' class="method">sendfile</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Override to implement platform-specific file transmission.  This method
+is called only if the application's return value is an instance of
+the class specified by the <tt class="member">wsgi_file_wrapper</tt> attribute.  It
+should return a true value if it was able to successfully transmit the
+file, so that the default transmission code will not be executed.
+The default implementation of this method just returns a false value.
+</dl>
+
+<p>
+Miscellaneous methods and attributes:
+
+<p>
+<dl><dt><b><tt id='l2h-3889' xml:id='l2h-3889' class="member">origin_server</tt></b></dt>
+<dd>
+This attribute should be set to a true value if the handler's
+<tt class="method">_write()</tt> and <tt class="method">_flush()</tt> are being used to communicate
+directly to the client, rather than via a CGI-like gateway protocol that
+wants the HTTP status in a special <code>Status:</code> header.
+
+<p>
+This attribute's default value is true in <tt class="class">BaseHandler</tt>, but
+false in <tt class="class">BaseCGIHandler</tt> and <tt class="class">CGIHandler</tt>.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3890' xml:id='l2h-3890' class="member">http_version</tt></b></dt>
+<dd>
+If <tt class="member">origin_server</tt> is true, this string attribute is used to
+set the HTTP version of the response set to the client.  It defaults to
+<code>"1.0"</code>.
+</dl>
+
+<p>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.4.4 wsgiref.validate - WSGI"
+  href="module-wsgiref.validate.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.4 wsgiref  "
+  href="module-wsgiref.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.5 urllib  "
+  href="module-urllib.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-wsgiref.validate.html">18.4.4 wsgiref.validate - WSGI</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-wsgiref.html">18.4 wsgiref  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-urllib.html">18.5 urllib  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

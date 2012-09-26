@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node532.html" />
+<link rel="prev" href="module-subprocess.html" />
+<link rel="parent" href="module-subprocess.html" />
+<link rel="next" href="node529.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>17.1.1 Using the subprocess Module</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.1 subprocess  "
+  href="module-subprocess.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.1 subprocess  "
+  href="module-subprocess.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.1.1.1 convenience Functions"
+  href="node529.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-subprocess.html">17.1 subprocess  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-subprocess.html">17.1 subprocess  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node529.html">17.1.1.1 Convenience Functions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0019110000000000000000">
+17.1.1 Using the subprocess Module</a>
+</h2>
+
+<p>
+This module defines one class called <tt class="class">Popen</tt>:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3627' xml:id='l2h-3627' class="class">Popen</tt></b>(</nobr></td>
+  <td><var>args, bufsize=0, executable=None,
+            stdin=None, stdout=None, stderr=None,
+            preexec_fn=None, close_fds=False, shell=False,
+            cwd=None, env=None, universal_newlines=False,
+            startupinfo=None, creationflags=0</var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Arguments are:
+
+<p>
+<var>args</var> should be a string, or a sequence of program arguments.  The
+program to execute is normally the first item in the args sequence or
+string, but can be explicitly set by using the executable argument.
+
+<p>
+On <span class="Unix">Unix</span>, with <var>shell=False</var> (default): In this case, the Popen
+class uses <tt class="method">os.execvp()</tt> to execute the child program.
+<var>args</var> should normally be a sequence.  A string will be treated as a
+sequence with the string as the only item (the program to execute).
+
+<p>
+On <span class="Unix">Unix</span>, with <var>shell=True</var>: If args is a string, it specifies the
+command string to execute through the shell.  If <var>args</var> is a
+sequence, the first item specifies the command string, and any
+additional items will be treated as additional shell arguments.
+
+<p>
+On Windows: the <tt class="class">Popen</tt> class uses CreateProcess() to execute
+the child program, which operates on strings.  If <var>args</var> is a
+sequence, it will be converted to a string using the
+<tt class="method">list2cmdline</tt> method.  Please note that not all MS Windows
+applications interpret the command line the same way:
+<tt class="method">list2cmdline</tt> is designed for applications using the same
+rules as the MS C runtime.
+
+<p>
+<var>bufsize</var>, if given, has the same meaning as the corresponding
+argument to the built-in open() function: <tt class="constant">0</tt> means unbuffered,
+<tt class="constant">1</tt> means line buffered, any other positive value means use a
+buffer of (approximately) that size.  A negative <var>bufsize</var> means to
+use the system default, which usually means fully buffered.  The default
+value for <var>bufsize</var> is <tt class="constant">0</tt> (unbuffered).
+
+<p>
+The <var>executable</var> argument specifies the program to execute. It is
+very seldom needed: Usually, the program to execute is defined by the
+<var>args</var> argument. If <code>shell=True</code>, the <var>executable</var>
+argument specifies which shell to use. On <span class="Unix">Unix</span>, the default shell
+is <span class="file">/bin/sh</span>.  On Windows, the default shell is specified by the
+<a class="envvar" id='l2h-3628' xml:id='l2h-3628'>COMSPEC</a> environment variable.
+
+<p>
+<var>stdin</var>, <var>stdout</var> and <var>stderr</var> specify the executed
+programs' standard input, standard output and standard error file
+handles, respectively.  Valid values are <code>PIPE</code>, an existing file
+descriptor (a positive integer), an existing file object, and
+<code>None</code>.  <code>PIPE</code> indicates that a new pipe to the child
+should be created.  With <code>None</code>, no redirection will occur; the
+child's file handles will be inherited from the parent.  Additionally,
+<var>stderr</var> can be <code>STDOUT</code>, which indicates that the stderr
+data from the applications should be captured into the same file
+handle as for stdout.
+
+<p>
+If <var>preexec_fn</var> is set to a callable object, this object will be
+called in the child process just before the child is executed.
+(<span class="Unix">Unix</span> only)
+
+<p>
+If <var>close_fds</var> is true, all file descriptors except <tt class="constant">0</tt>,
+<tt class="constant">1</tt> and <tt class="constant">2</tt> will be closed before the child process is
+executed. (<span class="Unix">Unix</span> only)
+
+<p>
+If <var>shell</var> is <tt class="constant">True</tt>, the specified command will be
+executed through the shell.
+
+<p>
+If <var>cwd</var> is not <code>None</code>, the child's current directory will be
+changed to <var>cwd</var> before it is executed.  Note that this directory
+is not considered when searching the executable, so you can't specify
+the program's path relative to <var>cwd</var>.
+
+<p>
+If <var>env</var> is not <code>None</code>, it defines the environment variables
+for the new process.
+
+<p>
+If <var>universal_newlines</var> is <tt class="constant">True</tt>, the file objects stdout
+and stderr are opened as text files, but lines may be terminated by
+any of <code>'\n'</code>, the <span class="Unix">Unix</span> end-of-line convention, <code>'\r'</code>,
+the Macintosh convention or <code>'\r\n'</code>, the Windows convention.
+All of these external representations are seen as <code>'\n'</code> by the
+Python program.  <span class="note"><b class="label">Note:</b>
+This feature is only available if Python is built
+with universal newline support (the default).  Also, the newlines
+attribute of the file objects <tt class="member">stdout</tt>, <tt class="member">stdin</tt> and
+<tt class="member">stderr</tt> are not updated by the communicate() method.</span>
+
+<p>
+The <var>startupinfo</var> and <var>creationflags</var>, if given, will be
+passed to the underlying CreateProcess() function.  They can specify
+things such as appearance of the main window and priority for the new
+process.  (Windows only)
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node529.html">17.1.1.1 Convenience Functions</a>
+<li><a href="node530.html">17.1.1.2 Exceptions</a>
+<li><a href="node531.html">17.1.1.3 Security</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.1 subprocess  "
+  href="module-subprocess.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.1 subprocess  "
+  href="module-subprocess.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.1.1.1 convenience Functions"
+  href="node529.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-subprocess.html">17.1 subprocess  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-subprocess.html">17.1 subprocess  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node529.html">17.1.1.1 Convenience Functions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node126.html" />
+<link rel="prev" href="module-decimal.html" />
+<link rel="parent" href="module-decimal.html" />
+<link rel="next" href="node126.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>6.3.1 Quick-start Tutorial </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.2 decimal objects"
+  href="node126.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node126.html">6.3.2 Decimal objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION008310000000000000000"></a><a name="decimal-tutorial"></a>
+<br>
+6.3.1 Quick-start Tutorial 
+</h2>
+
+<p>
+The usual start to using decimals is importing the module, viewing the current
+context with <tt class="function">getcontext()</tt> and, if necessary, setting new values
+for precision, rounding, or enabled traps:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from decimal import *
+&gt;&gt;&gt; getcontext()
+Context(prec=28, rounding=ROUND_HALF_EVEN, Emin=-999999999, Emax=999999999,
+        capitals=1, flags=[], traps=[Overflow, InvalidOperation,
+        DivisionByZero])
+
+&gt;&gt;&gt; getcontext().prec = 7       # Set a new precision
+</pre></div>
+
+<p>
+Decimal instances can be constructed from integers, strings, or tuples.  To
+create a Decimal from a <tt class="class">float</tt>, first convert it to a string.  This
+serves as an explicit reminder of the details of the conversion (including
+representation error).  Decimal numbers include special values such as
+<tt class="constant">NaN</tt> which stands for ``Not a number'', positive and negative
+<tt class="constant">Infinity</tt>, and <tt class="constant">-0</tt>.        
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; Decimal(10)
+Decimal("10")
+&gt;&gt;&gt; Decimal("3.14")
+Decimal("3.14")
+&gt;&gt;&gt; Decimal((0, (3, 1, 4), -2))
+Decimal("3.14")
+&gt;&gt;&gt; Decimal(str(2.0 ** 0.5))
+Decimal("1.41421356237")
+&gt;&gt;&gt; Decimal("NaN")
+Decimal("NaN")
+&gt;&gt;&gt; Decimal("-Infinity")
+Decimal("-Infinity")
+</pre></div>
+
+<p>
+The significance of a new Decimal is determined solely by the number
+of digits input.  Context precision and rounding only come into play during
+arithmetic operations.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; getcontext().prec = 6
+&gt;&gt;&gt; Decimal('3.0')
+Decimal("3.0")
+&gt;&gt;&gt; Decimal('3.1415926535')
+Decimal("3.1415926535")
+&gt;&gt;&gt; Decimal('3.1415926535') + Decimal('2.7182818285')
+Decimal("5.85987")
+&gt;&gt;&gt; getcontext().rounding = ROUND_UP
+&gt;&gt;&gt; Decimal('3.1415926535') + Decimal('2.7182818285')
+Decimal("5.85988")
+</pre></div>
+
+<p>
+Decimals interact well with much of the rest of Python.  Here is a small
+decimal floating point flying circus:
+
+<p>
+<div class="verbatim"><pre>    
+&gt;&gt;&gt; data = map(Decimal, '1.34 1.87 3.45 2.35 1.00 0.03 9.25'.split())
+&gt;&gt;&gt; max(data)
+Decimal("9.25")
+&gt;&gt;&gt; min(data)
+Decimal("0.03")
+&gt;&gt;&gt; sorted(data)
+[Decimal("0.03"), Decimal("1.00"), Decimal("1.34"), Decimal("1.87"),
+ Decimal("2.35"), Decimal("3.45"), Decimal("9.25")]
+&gt;&gt;&gt; sum(data)
+Decimal("19.29")
+&gt;&gt;&gt; a,b,c = data[:3]
+&gt;&gt;&gt; str(a)
+'1.34'
+&gt;&gt;&gt; float(a)
+1.3400000000000001
+&gt;&gt;&gt; round(a, 1)     # round() first converts to binary floating point
+1.3
+&gt;&gt;&gt; int(a)
+1
+&gt;&gt;&gt; a * 5
+Decimal("6.70")
+&gt;&gt;&gt; a * b
+Decimal("2.5058")
+&gt;&gt;&gt; c % a
+Decimal("0.77")
+</pre></div>
+
+<p>
+The <tt class="method">quantize()</tt> method rounds a number to a fixed exponent.  This
+method is useful for monetary applications that often round results to a fixed
+number of places:
+
+<p>
+<div class="verbatim"><pre> 
+&gt;&gt;&gt; Decimal('7.325').quantize(Decimal('.01'), rounding=ROUND_DOWN)
+Decimal("7.32")
+&gt;&gt;&gt; Decimal('7.325').quantize(Decimal('1.'), rounding=ROUND_UP)
+Decimal("8")
+</pre></div>
+
+<p>
+As shown above, the <tt class="function">getcontext()</tt> function accesses the current
+context and allows the settings to be changed.  This approach meets the
+needs of most applications.
+
+<p>
+For more advanced work, it may be useful to create alternate contexts using
+the Context() constructor.  To make an alternate active, use the
+<tt class="function">setcontext()</tt> function.
+
+<p>
+In accordance with the standard, the <tt class="module">Decimal</tt> module provides two
+ready to use standard contexts, <tt class="constant">BasicContext</tt> and
+<tt class="constant">ExtendedContext</tt>. The former is especially useful for debugging
+because many of the traps are enabled:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; myothercontext = Context(prec=60, rounding=ROUND_HALF_DOWN)
+&gt;&gt;&gt; setcontext(myothercontext)
+&gt;&gt;&gt; Decimal(1) / Decimal(7)
+Decimal("0.142857142857142857142857142857142857142857142857142857142857")
+
+&gt;&gt;&gt; ExtendedContext
+Context(prec=9, rounding=ROUND_HALF_EVEN, Emin=-999999999, Emax=999999999,
+        capitals=1, flags=[], traps=[])
+&gt;&gt;&gt; setcontext(ExtendedContext)
+&gt;&gt;&gt; Decimal(1) / Decimal(7)
+Decimal("0.142857143")
+&gt;&gt;&gt; Decimal(42) / Decimal(0)
+Decimal("Infinity")
+
+&gt;&gt;&gt; setcontext(BasicContext)
+&gt;&gt;&gt; Decimal(42) / Decimal(0)
+Traceback (most recent call last):
+  File "&lt;pyshell#143&gt;", line 1, in -toplevel-
+    Decimal(42) / Decimal(0)
+DivisionByZero: x / 0
+</pre></div>
+
+<p>
+Contexts also have signal flags for monitoring exceptional conditions
+encountered during computations.  The flags remain set until explicitly
+cleared, so it is best to clear the flags before each set of monitored
+computations by using the <tt class="method">clear_flags()</tt> method.
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; setcontext(ExtendedContext)
+&gt;&gt;&gt; getcontext().clear_flags()
+&gt;&gt;&gt; Decimal(355) / Decimal(113)
+Decimal("3.14159292")
+&gt;&gt;&gt; getcontext()
+Context(prec=9, rounding=ROUND_HALF_EVEN, Emin=-999999999, Emax=999999999,
+        capitals=1, flags=[Inexact, Rounded], traps=[])
+</pre></div>
+
+<p>
+The <var>flags</var> entry shows that the rational approximation to <tt class="constant">Pi</tt>
+was rounded (digits beyond the context precision were thrown away) and that
+the result is inexact (some of the discarded digits were non-zero).
+
+<p>
+Individual traps are set using the dictionary in the <tt class="member">traps</tt>
+field of a context:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; Decimal(1) / Decimal(0)
+Decimal("Infinity")
+&gt;&gt;&gt; getcontext().traps[DivisionByZero] = 1
+&gt;&gt;&gt; Decimal(1) / Decimal(0)
+Traceback (most recent call last):
+  File "&lt;pyshell#112&gt;", line 1, in -toplevel-
+    Decimal(1) / Decimal(0)
+DivisionByZero: x / 0
+</pre></div>
+
+<p>
+Most programs adjust the current context only once, at the beginning of the
+program.  And, in many applications, data is converted to <tt class="class">Decimal</tt> with
+a single cast inside a loop.  With context set and decimals created, the bulk
+of the program manipulates the data no differently than with other Python
+numeric types.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="6.3 decimal  "
+  href="module-decimal.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="6.3.2 decimal objects"
+  href="node126.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-decimal.html">6.3 decimal  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node126.html">6.3.2 Decimal objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

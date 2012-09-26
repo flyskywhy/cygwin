@@ -1,0 +1,66 @@
+#! /bin/sh
+## try and get a dpatch file from Debian diff.gz file.
+## Copyright 2003 Junichi Uekawa.
+## licensed under GPL version 2.
+
+# before running this code, you need to have prepared your debian/rules
+# as described in dpatch manual, and you need to have an empty
+# debian/patches/00list
+# 
+# You can also use this script to add new patches.
+#
+# enjoy,   
+#   15 Jan 2003, Junichi Uekawa
+
+set -e
+
+if [ ! -e /usr/bin/filterdiff ]; then
+	echo "dpatch-convert-diffgz: filterdiff not found, aborting!" >&2
+	echo " (consider installing patchutils)" >&2
+	exit 1
+fi
+
+while ! test -d ./debian -o "$(pwd)" = "/" ; do
+	cd ..;
+done
+
+DPCD_PATCHNO="$1"
+DPCD_PATCHNAME="$(basename $2 .dpatch)"
+DPCD_PATCHDIR=debian/patches
+
+if [ -z "$2" ]; then
+	cat <<EOF
+Usage:
+
+dpatch-convert-diffgz patchno patchname
+
+like: 
+dpatch-convert-diffgz 01 debian-patch
+EOF
+    exit 1
+fi
+
+if [ ! -d "$DPCD_PATCHDIR" ]; then
+	mkdir -p "$DPCD_PATCHDIR"
+fi
+
+fakeroot debian/rules unpatch
+dpkg-buildpackage -S -us -uc -rfakeroot
+
+DPCD_SOURCE=$(dpkg-parsechangelog | sed -n 's/^Source: //p')
+DPCD_VERSION=$(dpkg-parsechangelog | sed -n 's/^Version: \(.*:\)\?//p')
+
+echo
+echo "Building ${DPCD_PATCHDIR}/${DPCD_PATCHNO}_${DPCD_PATCHNAME}..."
+echo
+
+zcat ../"${DPCD_SOURCE}_${DPCD_VERSION}.diff.gz" | filterdiff -x '*/debian/*' \
+  | dpatch patch-template --prepend ${DPCD_PATCHNO}_${DPCD_PATCHNAME} \
+	"New patch generated from ${DPCD_SOURCE} ${DPCD_VERSION} diff.gz" \
+	| tee "${DPCD_PATCHDIR}/${DPCD_PATCHNO}_${DPCD_PATCHNAME}.dpatch" \
+	| patch -p1 -R
+
+echo "${DPCD_PATCHNO}_${DPCD_PATCHNAME}" >> ${DPCD_PATCHDIR}/00list
+fakeroot debian/rules patch
+
+# arch-tag: 5d7cf9b9-459c-4a5e-8a62-6bc1efa16e21

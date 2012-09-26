@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-function-prototypes.html" />
+<link rel="prev" href="ctypes-loading-shared-libraries.html" />
+<link rel="parent" href="ctypes-ctypes-reference.html" />
+<link rel="next" href="ctypes-function-prototypes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.2.3 Foreign functions</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.2 loading shared libraries"
+  href="ctypes-loading-shared-libraries.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.4 function prototypes"
+  href="ctypes-function-prototypes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-loading-shared-libraries.html">14.14.2.2 Loading shared libraries</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-function-prototypes.html">14.14.2.4 Function prototypes</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00161423000000000000000"></a><a name="ctypes-foreign-functions"></a>
+<br>
+14.14.2.3 Foreign functions
+</h3>
+
+<p>
+As explained in the previous section, foreign functions can be
+accessed as attributes of loaded shared libraries.  The function
+objects created in this way by default accept any number of arguments,
+accept any ctypes data instances as arguments, and return the default
+result type specified by the library loader.  They are instances of a
+private class:
+
+<p>
+<dl><dt><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3319' xml:id='l2h-3319' class="class">_FuncPtr</tt></b>
+<dd>
+Base class for C callable foreign functions.
+</dl>
+
+<p>
+Instances of foreign functions are also C compatible data types; they
+represent C function pointers.
+
+<p>
+This behaviour can be customized by assigning to special attributes of
+the foreign function object.
+
+<p>
+<dl><dt><b><tt id='l2h-3320' xml:id='l2h-3320' class="member">restype</tt></b></dt>
+<dd>
+Assign a ctypes type to specify the result type of the foreign
+function.  Use <code>None</code> for <code>void</code> a function not returning
+anything.
+
+<p>
+It is possible to assign a callable Python object that is not a
+ctypes type, in this case the function is assumed to return a
+C <code>int</code>, and the callable will be called with this integer,
+allowing to do further processing or error checking.  Using this
+is deprecated, for more flexible postprocessing or error checking
+use a ctypes data type as <tt class="member">restype</tt> and assign a callable to the
+<tt class="member">errcheck</tt> attribute.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3321' xml:id='l2h-3321' class="member">argtypes</tt></b></dt>
+<dd>
+Assign a tuple of ctypes types to specify the argument types that
+the function accepts.  Functions using the <code>stdcall</code> calling
+convention can only be called with the same number of arguments as
+the length of this tuple; functions using the C calling convention
+accept additional, unspecified arguments as well.
+
+<p>
+When a foreign function is called, each actual argument is passed
+to the <tt class="method">from_param</tt> class method of the items in the
+<tt class="member">argtypes</tt> tuple, this method allows to adapt the actual
+argument to an object that the foreign function accepts.  For
+example, a <tt class="class">c_char_p</tt> item in the <tt class="member">argtypes</tt> tuple will
+convert a unicode string passed as argument into an byte string
+using ctypes conversion rules.
+
+<p>
+New: It is now possible to put items in argtypes which are not
+ctypes types, but each item must have a <tt class="method">from_param</tt> method
+which returns a value usable as argument (integer, string, ctypes
+instance).  This allows to define adapters that can adapt custom
+objects as function parameters.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3322' xml:id='l2h-3322' class="member">errcheck</tt></b></dt>
+<dd>
+Assign a Python function or another callable to this attribute.
+The callable will be called with three or more arguments:
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt class="function">callable</tt></b>(</nobr></td>
+  <td><var>result, func, arguments</var>)</td></tr></table></dt>
+<dd>
+<code>result</code> is what the foreign function returns, as specified by the
+<tt class="member">restype</tt> attribute.
+
+<p>
+<code>func</code> is the foreign function object itself, this allows to
+reuse the same callable object to check or postprocess the results
+of several functions.
+
+<p>
+<code>arguments</code> is a tuple containing the parameters originally
+passed to the function call, this allows to specialize the
+behaviour on the arguments used.
+
+<p>
+The object that this function returns will be returned from the
+foreign function call, but it can also check the result value and
+raise an exception if the foreign function call failed.
+</dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-3323' xml:id='l2h-3323' class="exception">ArgumentError()</tt></b></dt>
+<dd>
+This exception is raised when a foreign function call cannot
+convert one of the passed arguments.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.2 loading shared libraries"
+  href="ctypes-loading-shared-libraries.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.4 function prototypes"
+  href="ctypes-function-prototypes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-loading-shared-libraries.html">14.14.2.2 Loading shared libraries</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-function-prototypes.html">14.14.2.4 Function prototypes</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

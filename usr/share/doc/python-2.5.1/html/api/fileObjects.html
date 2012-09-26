@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="instanceObjects.html" />
+<link rel="prev" href="otherObjects.html" />
+<link rel="parent" href="otherObjects.html" />
+<link rel="next" href="instanceObjects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.5.1 File Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.2 instance Objects"
+  href="instanceObjects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="instanceObjects.html">7.5.2 Instance Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009510000000000000000"></a><a name="fileObjects"></a>
+<br>
+7.5.1 File Objects 
+</h2>
+
+<p>
+<a id='l2h-644' xml:id='l2h-644'></a>Python's built-in file objects are implemented entirely on the
+<tt class="ctype">FILE*</tt> support from the C standard library.  This is an
+implementation detail and may change in future releases of Python.
+
+<p>
+<dl><dt><b><tt class="ctype"><a id='l2h-645' xml:id='l2h-645'>PyFileObject</a></tt></b></dt>
+<dd>
+  This subtype of <tt class="ctype">PyObject</tt> represents a Python file object.
+</dl>
+
+<p>
+<dl><dt>PyTypeObject <b><tt id='l2h-646' xml:id='l2h-646' class="cdata">PyFile_Type</tt></b></dt>
+<dd>
+  This instance of <tt class="ctype">PyTypeObject</tt> represents the Python file
+  type.  This is exposed to Python programs as <code>file</code> and
+  <code>types.FileType</code>.
+  <a id='l2h-648' xml:id='l2h-648'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-649' xml:id='l2h-649' class="cfunction">PyFile_Check</tt></b>(</nobr></td><td>PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+  Return true if its argument is a <tt class="ctype">PyFileObject</tt> or a subtype
+  of <tt class="ctype">PyFileObject</tt>.
+  
+<span class="versionnote">Changed in version 2.2:
+Allowed subtypes to be accepted.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-650' xml:id='l2h-650' class="cfunction">PyFile_CheckExact</tt></b>(</nobr></td><td>PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+  Return true if its argument is a <tt class="ctype">PyFileObject</tt>, but not a
+  subtype of <tt class="ctype">PyFileObject</tt>.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-651' xml:id='l2h-651' class="cfunction">PyFile_FromString</tt></b>(</nobr></td><td>char *<var>filename</var>, char *<var>mode</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  On success, return a new file object that is opened on the file
+  given by <var>filename</var>, with a file mode given by <var>mode</var>, where
+  <var>mode</var> has the same semantics as the standard C routine
+  <tt class="cfunction">fopen()</tt><a id='l2h-665' xml:id='l2h-665'></a>.  On failure, return <tt class="constant">NULL</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-652' xml:id='l2h-652' class="cfunction">PyFile_FromFile</tt></b>(</nobr></td><td>FILE *<var>fp</var>,
+                                              char *<var>name</var>, char *<var>mode</var>,
+                                              int (*close)(FILE*))</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Create a new <tt class="ctype">PyFileObject</tt> from the already-open standard C
+  file pointer, <var>fp</var>.  The function <var>close</var> will be called
+  when the file should be closed.  Return <tt class="constant">NULL</tt> on failure.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>FILE*&nbsp;<b><tt id='l2h-653' xml:id='l2h-653' class="cfunction">PyFile_AsFile</tt></b>(</nobr></td><td>PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+  Return the file object associated with <var>p</var> as a <tt class="ctype">FILE*</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-654' xml:id='l2h-654' class="cfunction">PyFile_GetLine</tt></b>(</nobr></td><td>PyObject *<var>p</var>, int <var>n</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Equivalent to <code><var>p</var>.readline(<big>[</big><var>n</var><big>]</big>)</code>, this
+  function reads one line from the object <var>p</var>.  <var>p</var> may be a
+  file object or any object with a <tt class="method">readline()</tt> method.  If
+  <var>n</var> is <code>0</code>, exactly one line is read, regardless of the
+  length of the line.  If <var>n</var> is greater than <code>0</code>, no more
+  than <var>n</var> bytes will be read from the file; a partial line can be
+  returned.  In both cases, an empty string is returned if the end of
+  the file is reached immediately.  If <var>n</var> is less than <code>0</code>,
+  however, one line is read regardless of length, but
+  <tt class="exception">EOFError</tt> is raised if the end of the file is reached
+  immediately.
+  <a id='l2h-656' xml:id='l2h-656'></a></dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-657' xml:id='l2h-657' class="cfunction">PyFile_Name</tt></b>(</nobr></td><td>PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">Borrowed reference.</span>
+</div>
+  Return the name of the file specified by <var>p</var> as a string
+  object.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>void&nbsp;<b><tt id='l2h-658' xml:id='l2h-658' class="cfunction">PyFile_SetBufSize</tt></b>(</nobr></td><td>PyFileObject *<var>p</var>, int <var>n</var>)</td></tr></table></dt>
+<dd>
+  Available on systems with <tt class="cfunction">setvbuf()</tt><a id='l2h-666' xml:id='l2h-666'></a>
+  only.  This should only be called immediately after file object
+  creation.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-659' xml:id='l2h-659' class="cfunction">PyFile_Encoding</tt></b>(</nobr></td><td>PyFileObject *<var>p</var>, char *<var>enc</var>)</td></tr></table></dt>
+<dd>
+  Set the file's encoding for Unicode output to <var>enc</var>. Return
+  1 on success and 0 on failure.
+  
+<span class="versionnote">New in version 2.3.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-660' xml:id='l2h-660' class="cfunction">PyFile_SoftSpace</tt></b>(</nobr></td><td>PyObject *<var>p</var>, int <var>newflag</var>)</td></tr></table></dt>
+<dd>
+  This function exists for internal use by the interpreter.  Set the
+  <tt class="member">softspace</tt> attribute of <var>p</var> to <var>newflag</var> and
+  <a id='l2h-662' xml:id='l2h-662'></a>return the
+  previous value.  <var>p</var> does not have to be a file object for this
+  function to work properly; any object is supported (thought its only
+  interesting if the <tt class="member">softspace</tt> attribute can be set).  This
+  function clears any errors, and will return <code>0</code> as the previous
+  value if the attribute either does not exist or if there were errors
+  in retrieving it.  There is no way to detect errors from this
+  function, but doing so should not be needed.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-663' xml:id='l2h-663' class="cfunction">PyFile_WriteObject</tt></b>(</nobr></td><td>PyObject *<var>obj</var>, PyObject *<var>p</var>,
+                                           int <var>flags</var>)</td></tr></table></dt>
+<dd>
+  Write object <var>obj</var> to file object <var>p</var>.  The only supported
+  flag for <var>flags</var> is
+  <tt class="constant">Py_PRINT_RAW</tt><a id='l2h-667' xml:id='l2h-667'></a>; if given, the
+  <tt class="function">str()</tt> of the object is written instead of the
+  <tt class="function">repr()</tt>.  Return <code>0</code> on success or <code>-1</code> on
+  failure; the appropriate exception will be set.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-664' xml:id='l2h-664' class="cfunction">PyFile_WriteString</tt></b>(</nobr></td><td>const char *<var>s</var>, PyObject *<var>p</var>)</td></tr></table></dt>
+<dd>
+  Write string <var>s</var> to file object <var>p</var>.  Return <code>0</code> on
+  success or <code>-1</code> on failure; the appropriate exception will be
+  set.
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.2 instance Objects"
+  href="instanceObjects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="instanceObjects.html">7.5.2 Instance Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

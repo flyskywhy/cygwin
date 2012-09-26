@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Change an existing remote branch repository URL
+# Copyright (c) Petr Baudis, 2005
+#
+# Takes the branch name and new source location as parameters.
+#
+# Terminology note: This command concerns remote branches, not the local
+# ones (those managed by `cg-switch`).
+
+# Testsuite: TODO
+
+USAGE="cg-branch-chg BRANCH_NAME NEW_LOCATION"
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+name="${ARGS[0]}"
+location="${ARGS[1]}"
+([ -n "$name" ] && [ -n "$location" ]) || usage
+
+[ -s "$_git/branches/$name" ] || die "branch does not exist"
+echo "$location" >"$_git/branches/$name"

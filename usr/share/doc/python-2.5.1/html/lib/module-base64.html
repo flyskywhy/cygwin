@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-binhex.html" />
+<link rel="prev" href="module-rfc822.html" />
+<link rel="parent" href="netdata.html" />
+<link rel="next" href="module-binhex.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.11 base64 -- RFC 3548: Base16, Base32, Base64 Data Encodings</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.10.2 addresslist Objects"
+  href="addresslist-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.12 binhex  "
+  href="module-binhex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="addresslist-objects.html">7.10.2 AddressList Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-binhex.html">7.12 binhex  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0091100000000000000000">
+7.11 <tt class="module">base64</tt> --
+	 RFC 3548: Base16, Base32, Base64 Data Encodings</a>
+</h1>
+
+<p>
+<a name="module-base64"></a>
+
+<p>
+<a id='l2h-1595' xml:id='l2h-1595'></a><a id='l2h-1610' xml:id='l2h-1610'></a>
+
+<p>
+This module provides data encoding and decoding as specified in
+<a class="rfc" id='rfcref-99787' xml:id='rfcref-99787'
+href="http://www.faqs.org/rfcs/rfc3548.html">RFC 3548</a>.  This standard defines the Base16, Base32, and Base64
+algorithms for encoding and decoding arbitrary binary strings into
+text strings that can be safely sent by email, used as parts of URLs,
+or included as part of an HTTP POST request.  The encoding algorithm is
+not the same as the <b class="program">uuencode</b> program.
+
+<p>
+There are two interfaces provided by this module.  The modern
+interface supports encoding and decoding string objects using all
+three alphabets.  The legacy interface provides for encoding and
+decoding to and from file-like objects as well as strings, but only
+using the Base64 standard alphabet.
+
+<p>
+The modern interface, which was introduced in Python 2.4, provides:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1596' xml:id='l2h-1596' class="function">b64encode</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, altchars</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Encode a string use Base64.
+
+<p>
+<var>s</var> is the string to encode.  Optional <var>altchars</var> must be a
+string of at least length 2 (additional characters are ignored) which
+specifies an alternative alphabet for the <code>+</code> and <code>/</code>
+characters.  This allows an application to e.g. generate URL or
+filesystem safe Base64 strings.  The default is <code>None</code>, for which
+the standard Base64 alphabet is used.
+
+<p>
+The encoded string is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1597' xml:id='l2h-1597' class="function">b64decode</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, altchars</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Decode a Base64 encoded string.
+
+<p>
+<var>s</var> is the string to decode.  Optional <var>altchars</var> must be a
+string of at least length 2 (additional characters are ignored) which
+specifies the alternative alphabet used instead of the <code>+</code> and
+<code>/</code> characters.
+
+<p>
+The decoded string is returned.  A <tt class="exception">TypeError</tt> is raised if
+<var>s</var> were incorrectly padded or if there are non-alphabet
+characters present in the string.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1598' xml:id='l2h-1598' class="function">standard_b64encode</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Encode string <var>s</var> using the standard Base64 alphabet.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1599' xml:id='l2h-1599' class="function">standard_b64decode</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Decode string <var>s</var> using the standard Base64 alphabet.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1600' xml:id='l2h-1600' class="function">urlsafe_b64encode</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Encode string <var>s</var> using a URL-safe alphabet, which substitutes
+<code>-</code> instead of <code>+</code> and <code>_</code> instead of <code>/</code> in the
+standard Base64 alphabet.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1601' xml:id='l2h-1601' class="function">urlsafe_b64decode</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Decode string <var>s</var> using a URL-safe alphabet, which substitutes
+<code>-</code> instead of <code>+</code> and <code>_</code> instead of <code>/</code> in the
+standard Base64 alphabet.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1602' xml:id='l2h-1602' class="function">b32encode</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Encode a string using Base32.  <var>s</var> is the string to encode.  The
+encoded string is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1603' xml:id='l2h-1603' class="function">b32decode</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, casefold</var><big>[</big><var>, map01</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Decode a Base32 encoded string.
+
+<p>
+<var>s</var> is the string to decode.  Optional <var>casefold</var> is a flag
+specifying whether a lowercase alphabet is acceptable as input.  For
+security purposes, the default is <code>False</code>.
+
+<p>
+<a class="rfc" id='rfcref-99789' xml:id='rfcref-99789'
+href="http://www.faqs.org/rfcs/rfc3548.html">RFC 3548</a> allows for optional mapping of the digit 0 (zero) to the
+letter O (oh), and for optional mapping of the digit 1 (one) to either
+the letter I (eye) or letter L (el).  The optional argument
+<var>map01</var> when not <code>None</code>, specifies which letter the digit 1 should
+be mapped to (when map01 is not <var>None</var>, the digit 0 is always
+mapped to the letter O).  For security purposes the default is
+<code>None</code>, so that 0 and 1 are not allowed in the input.
+
+<p>
+The decoded string is returned.  A <tt class="exception">TypeError</tt> is raised if
+<var>s</var> were incorrectly padded or if there are non-alphabet characters
+present in the string.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1604' xml:id='l2h-1604' class="function">b16encode</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Encode a string using Base16.
+
+<p>
+<var>s</var> is the string to encode.  The encoded string is returned.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1605' xml:id='l2h-1605' class="function">b16decode</tt></b>(</nobr></td>
+  <td><var>s</var><big>[</big><var>, casefold</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Decode a Base16 encoded string.
+
+<p>
+<var>s</var> is the string to decode.  Optional <var>casefold</var> is a flag
+specifying whether a lowercase alphabet is acceptable as input.  For
+security purposes, the default is <code>False</code>.
+
+<p>
+The decoded string is returned.  A <tt class="exception">TypeError</tt> is raised if
+<var>s</var> were incorrectly padded or if there are non-alphabet
+characters present in the string.
+</dl>
+
+<p>
+The legacy interface:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1606' xml:id='l2h-1606' class="function">decode</tt></b>(</nobr></td>
+  <td><var>input, output</var>)</td></tr></table></dt>
+<dd>
+Decode the contents of the <var>input</var> file and write the resulting
+binary data to the <var>output</var> file.
+<var>input</var> and <var>output</var> must either be file objects or objects that
+mimic the file object interface. <var>input</var> will be read until
+<code><var>input</var>.read()</code> returns an empty string.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1607' xml:id='l2h-1607' class="function">decodestring</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Decode the string <var>s</var>, which must contain one or more lines of
+base64 encoded data, and return a string containing the resulting
+binary data.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1608' xml:id='l2h-1608' class="function">encode</tt></b>(</nobr></td>
+  <td><var>input, output</var>)</td></tr></table></dt>
+<dd>
+Encode the contents of the <var>input</var> file and write the resulting
+base64 encoded data to the <var>output</var> file.
+<var>input</var> and <var>output</var> must either be file objects or objects that
+mimic the file object interface. <var>input</var> will be read until
+<code><var>input</var>.read()</code> returns an empty string.  <tt class="function">encode()</tt>
+returns the encoded data plus a trailing newline character
+(<code>'\n'</code>).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1609' xml:id='l2h-1609' class="function">encodestring</tt></b>(</nobr></td>
+  <td><var>s</var>)</td></tr></table></dt>
+<dd>
+Encode the string <var>s</var>, which can contain arbitrary binary data,
+and return a string containing one or more lines of
+base64-encoded data.  <tt class="function">encodestring()</tt> returns a
+string containing one or more lines of base64-encoded data
+always including an extra trailing newline (<code>'\n'</code>).
+</dl>
+
+<p>
+An example usage of the module:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import base64
+&gt;&gt;&gt; encoded = base64.b64encode('data to be encoded')
+&gt;&gt;&gt; encoded
+'ZGF0YSB0byBiZSBlbmNvZGVk'
+&gt;&gt;&gt; data = base64.b64decode(encoded)
+&gt;&gt;&gt; data
+'data to be encoded'
+</pre></div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-binascii.html">binascii</a></tt>:</b>
+    <dd>Support module containing ASCII-to-binary
+                       and binary-to-ASCII conversions.
+  </dl>
+  <dl compact="compact" class="seerfc">
+    <dt><a href="http://www.faqs.org/rfcs/rfc1521.html"
+        title="MIME (Multipurpose internet Mail Extensions) part One:
+          mechanisms for specifying and describing the format of
+          internet Message Bodies"
+        >RFC 1521, <em>MIME (Multipurpose Internet Mail Extensions) Part One:
+          Mechanisms for Specifying and Describing the Format of
+          Internet Message Bodies</em></a>
+    <dd>Section 5.2, ``Base64
+          Content-Transfer-Encoding,'' provides the definition of the
+          base64 encoding.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.10.2 addresslist Objects"
+  href="addresslist-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.12 binhex  "
+  href="module-binhex.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="addresslist-objects.html">7.10.2 AddressList Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-binhex.html">7.12 binhex  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

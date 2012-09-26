@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="popen3-objects.html" />
+<link rel="parent" href="module-popen2.html" />
+<link rel="next" href="module-asyncore.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>17.4.2 Flow Control Issues </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.4.1 popen3 and Popen4"
+  href="popen3-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.4 popen2  "
+  href="module-popen2.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.5 asyncore  "
+  href="module-asyncore.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="popen3-objects.html">17.4.1 Popen3 and Popen4</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-popen2.html">17.4 popen2  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-asyncore.html">17.5 asyncore  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0019420000000000000000"></a><a name="popen2-flow-control"></a>
+<br>
+17.4.2 Flow Control Issues 
+</h2>
+
+<p>
+Any time you are working with any form of inter-process communication,
+control flow needs to be carefully thought out.  This remains the case
+with the file objects provided by this module (or the <tt class="module"><a href="module-os.html">os</a></tt>
+module equivalents).
+
+<p>
+When reading output from a child process that writes a lot of data to
+standard error while the parent is reading from the child's standard
+output, a deadlock can occur.  A similar situation can occur with other
+combinations of reads and writes.  The essential factors are that more
+than <tt class="constant">_PC_PIPE_BUF</tt> bytes are being written by one process in
+a blocking fashion, while the other process is reading from the other
+process, also in a blocking fashion.
+
+<p>
+There are several ways to deal with this situation.
+
+<p>
+The simplest application change, in many cases, will be to follow this
+model in the parent process:
+
+<p>
+<div class="verbatim"><pre>
+import popen2
+
+r, w, e = popen2.popen3('python slave.py')
+e.readlines()
+r.readlines()
+r.close()
+e.close()
+w.close()
+</pre></div>
+
+<p>
+with code like this in the child:
+
+<p>
+<div class="verbatim"><pre>
+import os
+import sys
+
+# note that each of these print statements
+# writes a single long string
+
+print &gt;&gt;sys.stderr, 400 * 'this is a test\n'
+os.close(sys.stderr.fileno())
+print &gt;&gt;sys.stdout, 400 * 'this is another test\n'
+</pre></div>
+
+<p>
+In particular, note that <code>sys.stderr</code> must be closed after
+writing all data, or <tt class="method">readlines()</tt> won't return.  Also note
+that <tt class="function">os.close()</tt> must be used, as <code>sys.stderr.close()</code>
+won't close <code>stderr</code> (otherwise assigning to <code>sys.stderr</code>
+will silently close it, so no further errors can be printed).
+
+<p>
+Applications which need to support a more general approach should
+integrate I/O over pipes with their <tt class="function">select()</tt> loops, or use
+separate threads to read each of the individual files provided by
+whichever <tt class="function">popen*()</tt> function or <tt class="class">Popen*</tt> class was
+used.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-subprocess.html">subprocess</a></tt>:</b>
+    <dd>Module for spawning and managing subprocesses.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="17.4.1 popen3 and Popen4"
+  href="popen3-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="17.4 popen2  "
+  href="module-popen2.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="17.5 asyncore  "
+  href="module-asyncore.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="popen3-objects.html">17.4.1 Popen3 and Popen4</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-popen2.html">17.4 popen2  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-asyncore.html">17.5 asyncore  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

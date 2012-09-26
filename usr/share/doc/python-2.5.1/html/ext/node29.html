@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node32.html" />
+<link rel="prev" href="node28.html" />
+<link rel="parent" href="dnt-type-methods.html" />
+<link rel="next" href="node30.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.2.3 Attribute Management</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.2 object Presentation"
+  href="node28.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.3.1 generic Attribute Management"
+  href="node30.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node28.html">2.2.2 Object Presentation</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node30.html">2.2.3.1 Generic Attribute Management</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004230000000000000000">
+2.2.3 Attribute Management</a>
+</h2>
+
+<p>
+For every object which can support attributes, the corresponding type
+must provide the functions that control how the attributes are
+resolved.  There needs to be a function which can retrieve attributes
+(if any are defined), and another to set attributes (if setting
+attributes is allowed).  Removing an attribute is a special case, for
+which the new value passed to the handler is <tt class="constant">NULL</tt>.
+
+<p>
+Python supports two pairs of attribute handlers; a type that supports
+attributes only needs to implement the functions for one pair.  The
+difference is that one pair takes the name of the attribute as a
+<tt class="ctype">char*</tt>, while the other accepts a <tt class="ctype">PyObject*</tt>.  Each type
+can use whichever pair makes more sense for the implementation's
+convenience.
+
+<p>
+<div class="verbatim"><pre>
+    getattrfunc  tp_getattr;        /* char * version */
+    setattrfunc  tp_setattr;
+    /* ... */
+    getattrofunc tp_getattrofunc;   /* PyObject * version */
+    setattrofunc tp_setattrofunc;
+</pre></div>
+
+<p>
+If accessing attributes of an object is always a simple operation
+(this will be explained shortly), there are generic implementations
+which can be used to provide the <tt class="ctype">PyObject*</tt> version of the
+attribute management functions.  The actual need for type-specific
+attribute handlers almost completely disappeared starting with Python
+2.2, though there are many examples which have not been updated to use
+some of the new generic mechanism that is available.
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node30.html">2.2.3.1 Generic Attribute Management</a>
+<li><a href="node31.html">2.2.3.2 Type-specific Attribute Management</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.2.2 object Presentation"
+  href="node28.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.2 type Methods"
+  href="dnt-type-methods.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.2.3.1 generic Attribute Management"
+  href="node30.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node28.html">2.2.2 Object Presentation</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-type-methods.html">2.2 Type Methods</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node30.html">2.2.3.1 Generic Attribute Management</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

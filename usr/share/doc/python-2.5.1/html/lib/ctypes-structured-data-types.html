@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="ctypes-arrays-pointers.html" />
+<link rel="prev" href="ctypes-fundamental-data-types.html" />
+<link rel="parent" href="ctypes-ctypes-reference.html" />
+<link rel="next" href="ctypes-arrays-pointers.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.14.2.8 Structured data types</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.7 fundamental data types"
+  href="ctypes-fundamental-data-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.9 arrays and pointers"
+  href="ctypes-arrays-pointers.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-fundamental-data-types.html">14.14.2.7 Fundamental data types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-arrays-pointers.html">14.14.2.9 Arrays and pointers</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00161428000000000000000"></a><a name="ctypes-structured-data-types"></a>
+<br>
+14.14.2.8 Structured data types
+</h3>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3384' xml:id='l2h-3384' class="class">Union</tt></b>(</nobr></td>
+  <td><var>*args, **kw</var>)</td></tr></table></dt>
+<dd>
+Abstract base class for unions in native byte order.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3385' xml:id='l2h-3385' class="class">BigEndianStructure</tt></b>(</nobr></td>
+  <td><var>*args, **kw</var>)</td></tr></table></dt>
+<dd>
+Abstract base class for structures in <em>big endian</em> byte order.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3386' xml:id='l2h-3386' class="class">LittleEndianStructure</tt></b>(</nobr></td>
+  <td><var>*args, **kw</var>)</td></tr></table></dt>
+<dd>
+Abstract base class for structures in <em>little endian</em> byte order.
+</dl>
+
+<p>
+Structures with non-native byte order cannot contain pointer type
+fields, or any other data types containing pointer type fields.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3387' xml:id='l2h-3387' class="class">Structure</tt></b>(</nobr></td>
+  <td><var>*args, **kw</var>)</td></tr></table></dt>
+<dd>
+Abstract base class for structures in <em>native</em> byte order.
+</dl>
+
+<p>
+Concrete structure and union types must be created by subclassing one
+of these types, and at least define a <tt class="member">_fields_</tt> class variable.
+<code>ctypes</code> will create descriptors which allow reading and writing the
+fields by direct attribute accesses.  These are the
+
+<p>
+<dl><dt><b><tt id='l2h-3388' xml:id='l2h-3388' class="member">_fields_</tt></b></dt>
+<dd>
+A sequence defining the structure fields.  The items must be
+2-tuples or 3-tuples.  The first item is the name of the field,
+the second item specifies the type of the field; it can be any
+ctypes data type.
+
+<p>
+For integer type fields like <tt class="class">c_int</tt>, a third optional item can
+be given.  It must be a small positive integer defining the bit
+width of the field.
+
+<p>
+Field names must be unique within one structure or union.  This is
+not checked, only one field can be accessed when names are
+repeated.
+
+<p>
+It is possible to define the <tt class="member">_fields_</tt> class variable <em>after</em>
+the class statement that defines the Structure subclass, this
+allows to create data types that directly or indirectly reference
+themselves:
+<div class="verbatim"><pre>
+class List(Structure):
+    pass
+List._fields_ = [("pnext", POINTER(List)),
+                 ...
+                ]
+</pre></div>
+
+<p>
+The <tt class="member">_fields_</tt> class variable must, however, be defined before
+the type is first used (an instance is created, <code>sizeof()</code> is
+called on it, and so on).  Later assignments to the <tt class="member">_fields_</tt>
+class variable will raise an AttributeError.
+
+<p>
+Structure and union subclass constructors accept both positional
+and named arguments.  Positional arguments are used to initialize
+the fields in the same order as they appear in the <tt class="member">_fields_</tt>
+definition, named arguments are used to initialize the fields with
+the corresponding name.
+
+<p>
+It is possible to defined sub-subclasses of structure types, they
+inherit the fields of the base class plus the <tt class="member">_fields_</tt> defined
+in the sub-subclass, if any.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3389' xml:id='l2h-3389' class="member">_pack_</tt></b></dt>
+<dd>
+An optional small integer that allows to override the alignment of
+structure fields in the instance.  <tt class="member">_pack_</tt> must already be
+defined when <tt class="member">_fields_</tt> is assigned, otherwise it will have no
+effect.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-3390' xml:id='l2h-3390' class="member">_anonymous_</tt></b></dt>
+<dd>
+An optional sequence that lists the names of unnamed (anonymous)
+fields.  <code>_anonymous_</code> must be already defined when <tt class="member">_fields_</tt>
+is assigned, otherwise it will have no effect.
+
+<p>
+The fields listed in this variable must be structure or union type
+fields.  <code>ctypes</code> will create descriptors in the structure type
+that allows to access the nested fields directly, without the need
+to create the structure or union field.
+
+<p>
+Here is an example type (Windows):
+<div class="verbatim"><pre>
+class _U(Union):
+    _fields_ = [("lptdesc", POINTER(TYPEDESC)),
+                ("lpadesc", POINTER(ARRAYDESC)),
+                ("hreftype", HREFTYPE)]
+
+class TYPEDESC(Structure):
+    _fields_ = [("u", _U),
+                ("vt", VARTYPE)]
+
+    _anonymous_ = ("u",)
+</pre></div>
+
+<p>
+The <code>TYPEDESC</code> structure describes a COM data type, the <code>vt</code>
+field specifies which one of the union fields is valid.  Since the
+<code>u</code> field is defined as anonymous field, it is now possible to
+access the members directly off the TYPEDESC instance.
+<code>td.lptdesc</code> and <code>td.u.lptdesc</code> are equivalent, but the former
+is faster since it does not need to create a temporary union
+instance:
+<div class="verbatim"><pre>
+td = TYPEDESC()
+td.vt = VT_PTR
+td.lptdesc = POINTER(some_type)
+td.u.lptdesc = POINTER(some_type)
+</pre></div>
+</dl>
+
+<p>
+It is possible to defined sub-subclasses of structures, they inherit
+the fields of the base class.  If the subclass definition has a
+separate <tt class="member">_fields_</tt> variable, the fields specified in this are
+appended to the fields of the base class.
+
+<p>
+Structure and union constructors accept both positional and
+keyword arguments.  Positional arguments are used to initialize member
+fields in the same order as they are appear in <tt class="member">_fields_</tt>.  Keyword
+arguments in the constructor are interpreted as attribute assignments,
+so they will initialize <tt class="member">_fields_</tt> with the same name, or create new
+attributes for names not present in <tt class="member">_fields_</tt>.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.14.2.7 fundamental data types"
+  href="ctypes-fundamental-data-types.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.14.2 ctypes reference"
+  href="ctypes-ctypes-reference.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.14.2.9 arrays and pointers"
+  href="ctypes-arrays-pointers.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="ctypes-fundamental-data-types.html">14.14.2.7 Fundamental data types</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="ctypes-ctypes-reference.html">14.14.2 ctypes reference</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="ctypes-arrays-pointers.html">14.14.2.9 Arrays and pointers</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+#
+# Push changes to a remote repository
+# Copyright (c) Petr Baudis, 2005.
+#
+# It will push your commits on the current branch (or as specified by
+# the -r option) to one or more remote repositories, provided that your
+# commits follow the last commit in each of the remote repositories.
+#
+# Note that if a remote repository is associated with a working
+# tree copy, this command won't update that. Use cg-reset at the
+# remote side to bring it in sync (but throw away any local changes
+# in that tree). Consider setting up a standalone repository (see
+# `cg-admin-setuprepo`).
+#
+# You can set up update hooks in the remote repository to bind
+# any action to the push (e.g. sending an email or CIA notification
+# or even verifying if the commits are well-formed before letting
+# them in). See `git receive-pack`(1) documentation for details.
+#
+# Takes the branch names as arguments, defaulting to "origin".
+#
+# OPTIONS
+# -------
+# -r BRANCH:: Push the given branch
+#	Pushes the given branch instead of the current one. Note that
+#	we lie a little here and you can actually specify a particular
+#	commit here, but you probably will not want to do that.
+#
+# -t TAG:: Push the given TAG
+#	Tells cg-push to also push the given tag. Note that in the
+#	future, cg-push should push tags automatically. Also note
+#	that even if you pass `cg-push` the '-t' arguments, your
+#	HEAD is still pushed as well in addition to the tags.
+
+# Testsuite: TODO
+
+USAGE="cg-push [-r LOCAL_BRANCH] [-t TAG]... [REMOTE_BRANCH]..."
+_git_wc_unneeded=1
+
+. "${COGITO_LIB:-/usr/lib/cogito/}"cg-Xlib || exit 1
+
+
+send_pack_update()
+{
+	name="$1"; shift
+	commit="$(cg-object-id -c "$locbranch")"; old="$(cat "$_git/refs/heads/$name" 2>/dev/null)"
+	git send-pack "$@" && git update-ref refs/heads/"$name" "$commit" $old
+}
+
+
+locbranch="$_git_head"
+tags=()
+while optparse; do
+	if optparse -r=; then
+		locbranch="$OPTARG"
+		[ "$(cg-object-id -c "$locbranch")" ] || exit 1
+	elif optparse -t=; then
+		tags[${#tags[@]}]="refs/tags/$OPTARG"
+	else
+		optfail
+	fi
+done
+
+push_branch()
+{
+	name="$1"
+	uri="$(cat "$_git/branches/$name" 2>/dev/null)" || die "unknown branch: $name"
+
+	rembranch=master
+	if echo "$uri" | grep -q '#'; then
+		rembranch="$(echo "$uri" | cut -d '#' -f 2)"
+		uri="$(echo "$uri" | cut -d '#' -f 1)"
+	fi
+	sprembranch=":refs/heads/$rembranch"
+
+	if [ "${uri#http://}" != "$uri" -o "${uri#https://}" != "$uri" ]; then
+		git http-push "$uri/" "$locbranch$sprembranch" "${tags[@]}"
+
+	elif [ "${uri#git+ssh://}" != "$uri" ]; then
+		send_pack_update "$name" "$(echo "$uri" | sed 's#^git+ssh://\([^/]*\)\(/.*\)$#\1:\2#')" "$locbranch$sprembranch" "${tags[@]}"
+
+	elif [ "${uri#rsync://}" != "$uri" ]; then
+		die "pushing over rsync not supported"
+
+	elif [ "${uri#*:}" != "$uri" ]; then
+		echo "WARNING: I guessed the host:path syntax was used and fell back to the git+ssh protocol."
+		echo "WARNING: The host:path syntax is evil because it is implicit. Please just use a URI."
+		send_pack_update "$name" "$uri" "$locbranch$sprembranch" "${tags[@]}"
+
+	else
+		remgit="$uri"; [ -d "$remgit/.git" ] && remgit="$remgit/.git"
+		if is_same_repo "$_git_objects" "$remgit/objects"; then
+			commit="$(cg-object-id -c "$locbranch")"
+			remid="$(cat "$remgit"/refs/heads/$rembranch)" || die "$remgit: no branch $master"
+			if [ "$remid" = "$commit" ] && [ ! "${tags[*]}" ]; then
+				echo "$remgit#$rembranch: Already up-to-date." >&2
+				exit 0
+			fi
+			if [ "$remid" != "$(git merge-base "$remid" "$commit")" ]; then
+				echo "ERROR: Remote '$rembranch' has some changes you don't have in your '$locbranch'" >&2
+				echo "Try to cg-update from it first, then push." >&2
+				exit 1
+			fi
+
+			echo "Pushing $commit to $remgit#$rembranch" >&2
+			[ -x "$remgit/hooks/update" ] && "$remgit/hooks/update" "$rembranch" "$remid" "$commit"
+			GIT_DIR="$remgit" git update-ref refs/heads/"$rembranch" "$commit" "$remid" || die "push failed"
+			git update-ref refs/heads/"$name" "$commit"
+			for tag in "${tags[@]}"; do
+				GIT_DIR="$remgit" git update-ref refs/tags/"$tag" "$(cat "$_git/refs/tags/$tag")"
+			done
+			[ -x "$remgit/hooks/post-update" ] && "$remgit/hooks/post-update" "$rembranch"
+		else
+			send_pack_update "$name" "$uri" "$locbranch$sprembranch" "${tags[@]}"
+		fi
+	fi
+}
+
+if [ "${#ARGS[@]}" == 0 ]; then
+	name="$(choose_origin branches "where to push to?")" || exit 1
+	push_branch "$name"
+
+else
+	for name in "${ARGS[@]}"; do
+		push_branch "$name"
+	done
+fi

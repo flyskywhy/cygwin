@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-dbhash.html" />
+<link rel="prev" href="module-dbm.html" />
+<link rel="parent" href="persistence.html" />
+<link rel="next" href="module-dbhash.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.9 gdbm -- GNU's reinterpretation of dbm</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.8 dbm  "
+  href="module-dbm.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.10 dbhash  "
+  href="module-dbhash.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-dbm.html">13.8 dbm  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-dbhash.html">13.10 dbhash  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0015900000000000000000">
+13.9 <tt class="module">gdbm</tt> --
+         GNU's reinterpretation of dbm</a>
+</h1>
+
+<p>
+<a name="module-gdbm"></a>  
+<p class="availability">Availability: <span
+ class="platform">Unix</span>.</p>
+
+<p>
+This module is quite similar to the <tt class="module"><a href="module-dbm.html">dbm</a></tt><a id='l2h-2523' xml:id='l2h-2523'></a>
+module, but uses <code>gdbm</code> instead to provide some additional
+functionality.  Please note that the file formats created by
+<code>gdbm</code> and <code>dbm</code> are incompatible.
+
+<p>
+The <tt class="module">gdbm</tt> module provides an interface to the GNU DBM
+library.  <code>gdbm</code> objects behave like mappings
+(dictionaries), except that keys and values are always strings.
+Printing a <code>gdbm</code> object doesn't print the keys and values, and
+the <tt class="method">items()</tt> and <tt class="method">values()</tt> methods are not supported.
+
+<p>
+The module defines the following constant and functions:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-2517' xml:id='l2h-2517' class="exception">error</tt></b></dt>
+<dd>
+Raised on <code>gdbm</code>-specific errors, such as I/O errors.
+<tt class="exception">KeyError</tt> is raised for general mapping errors like
+specifying an incorrect key.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2518' xml:id='l2h-2518' class="function">open</tt></b>(</nobr></td>
+  <td><var>filename, </var><big>[</big><var>flag, </var><big>[</big><var>mode</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open a <code>gdbm</code> database and return a <code>gdbm</code> object.  The
+<var>filename</var> argument is the name of the database file.
+
+<p>
+The optional <var>flag</var> argument can be
+<code>'r'</code> (to open an existing database for reading only -- default),
+<code>'w'</code> (to open an existing database for reading and writing),
+<code>'c'</code> (which creates the database if it doesn't exist), or
+<code>'n'</code> (which always creates a new empty database).
+
+<p>
+The following additional characters may be appended to the flag to
+control how the database is opened:
+
+<p>
+
+<ul>
+<li><code>'f'</code> -- Open the database in fast mode.  Writes to the database
+                     will not be synchronized.
+</li>
+<li><code>'s'</code> -- Synchronized mode. This will cause changes to the database
+                     will be immediately written to the file.
+</li>
+<li><code>'u'</code> -- Do not lock database. 
+</li>
+</ul>
+
+<p>
+Not all flags are valid for all versions of <code>gdbm</code>.  The
+module constant <code>open_flags</code> is a string of supported flag
+characters.  The exception <tt class="exception">error</tt> is raised if an invalid
+flag is specified.
+
+<p>
+The optional <var>mode</var> argument is the <span class="Unix">Unix</span> mode of the file, used
+only when the database has to be created.  It defaults to octal
+<code>0666</code>.
+</dl>
+
+<p>
+In addition to the dictionary-like methods, <code>gdbm</code> objects have the
+following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2519' xml:id='l2h-2519' class="function">firstkey</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+It's possible to loop over every key in the database using this method 
+and the <tt class="method">nextkey()</tt> method.  The traversal is ordered by
+<code>gdbm</code>'s internal hash values, and won't be sorted by the key
+values.  This method returns the starting key.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2520' xml:id='l2h-2520' class="function">nextkey</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+Returns the key that follows <var>key</var> in the traversal.  The
+following code prints every key in the database <code>db</code>, without
+having to create a list in memory that contains them all:
+
+<p>
+<div class="verbatim"><pre>
+k = db.firstkey()
+while k != None:
+    print k
+    k = db.nextkey(k)
+</pre></div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2521' xml:id='l2h-2521' class="function">reorganize</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+If you have carried out a lot of deletions and would like to shrink
+the space used by the <code>gdbm</code> file, this routine will reorganize
+the database.  <code>gdbm</code> will not shorten the length of a database
+file except by using this reorganization; otherwise, deleted file
+space will be kept and reused as new (key, value) pairs are added.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2522' xml:id='l2h-2522' class="function">sync</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+When the database has been opened in fast mode, this method forces any 
+unwritten data to be written to the disk.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-anydbm.html">anydbm</a></tt>:</b>
+    <dd>Generic interface to <code>dbm</code>-style databases.
+  </dl>
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-whichdb.html">whichdb</a></tt>:</b>
+    <dd>Utility module used to determine the type of an
+                      existing database.
+  </dl>
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.8 dbm  "
+  href="module-dbm.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.10 dbhash  "
+  href="module-dbhash.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-dbm.html">13.8 dbm  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-dbhash.html">13.10 dbhash  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

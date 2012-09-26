@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="debugger-hooks.html" />
+<link rel="prev" href="module-pdb.html" />
+<link rel="parent" href="module-pdb.html" />
+<link rel="next" href="debugger-hooks.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>24.1 Debugger Commands </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="24. the Python Debugger"
+  href="module-pdb.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="24. the Python Debugger"
+  href="module-pdb.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="24.2 how It Works"
+  href="debugger-hooks.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-pdb.html">24. The Python Debugger</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pdb.html">24. The Python Debugger</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="debugger-hooks.html">24.2 How It Works</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0026100000000000000000"></a><a name="debugger-commands"></a>
+<br>
+24.1 Debugger Commands 
+</h1>
+
+<p>
+The debugger recognizes the following commands.  Most commands can be
+abbreviated to one or two letters; e.g. "<tt class="samp">h(elp)</tt>" means that
+either "<tt class="samp">h</tt>" or "<tt class="samp">help</tt>" can be used to enter the help
+command (but not "<tt class="samp">he</tt>" or "<tt class="samp">hel</tt>", nor "<tt class="samp">H</tt>" or
+"<tt class="samp">Help</tt>" or "<tt class="samp">HELP</tt>").  Arguments to commands must be
+separated by whitespace (spaces or tabs).  Optional arguments are
+enclosed in square brackets ("<tt class="samp">[]</tt>") in the command syntax; the
+square brackets must not be typed.  Alternatives in the command syntax
+are separated by a vertical bar ("<tt class="samp">|</tt>").
+
+<p>
+Entering a blank line repeats the last command entered.  Exception: if
+the last command was a "<tt class="samp">list</tt>" command, the next 11 lines are
+listed.
+
+<p>
+Commands that the debugger doesn't recognize are assumed to be Python
+statements and are executed in the context of the program being
+debugged.  Python statements can also be prefixed with an exclamation
+point ("<tt class="samp">!</tt>").  This is a powerful way to inspect the program
+being debugged; it is even possible to change a variable or call a
+function.  When an
+exception occurs in such a statement, the exception name is printed
+but the debugger's state is not changed.
+
+<p>
+Multiple commands may be entered on a single line, separated by
+"<tt class="samp">;;</tt>".  (A single "<tt class="samp">;</tt>" is not used as it is
+the separator for multiple commands in a line that is passed to
+the Python parser.)
+No intelligence is applied to separating the commands;
+the input is split at the first "<tt class="samp">;;</tt>" pair, even if it is in
+the middle of a quoted string.
+
+<p>
+The debugger supports aliases.  Aliases can have parameters which
+allows one a certain level of adaptability to the context under
+examination.
+
+<p>
+If a file <span class="file">.pdbrc</span>
+<a id='l2h-5086' xml:id='l2h-5086'></a><a id='l2h-5087' xml:id='l2h-5087'></a>exists in the user's home directory or in the current directory, it is
+read in and executed as if it had been typed at the debugger prompt.
+This is particularly useful for aliases.  If both files exist, the one
+in the home directory is read first and aliases defined there can be
+overridden by the local file.
+
+<p>
+<dl>
+<dt><strong>h(elp) <big>[</big><var>command</var><big>]</big></strong></dt>
+<dd><p>
+Without argument, print the list of available commands.  With a
+<var>command</var> as argument, print help about that command.  "<tt class="samp">help
+pdb</tt>" displays the full documentation file; if the environment variable
+<a class="envvar" id='l2h-5088' xml:id='l2h-5088'>PAGER</a> is defined, the file is piped through that command
+instead.  Since the <var>command</var> argument must be an identifier,
+"<tt class="samp">help exec</tt>" must be entered to get help on the "<tt class="samp">!</tt>" command.
+
+<p>
+</dd>
+<dt><strong>w(here)</strong></dt>
+<dd><p>
+Print a stack trace, with the most recent frame at the bottom.  An
+arrow indicates the current frame, which determines the context of
+most commands.
+
+<p>
+</dd>
+<dt><strong>d(own)</strong></dt>
+<dd><p>
+Move the current frame one level down in the stack trace
+(to a newer frame).
+
+<p>
+</dd>
+<dt><strong>u(p)</strong></dt>
+<dd><p>
+Move the current frame one level up in the stack trace
+(to an older frame).
+
+<p>
+</dd>
+<dt><strong>b(reak) <big>[</big><big>[</big><var>filename</var>:<big>]</big><var>lineno</var><code><big class="XLARGE">|</big></code><var>function</var><big>[</big>, <var>condition</var><big>]</big><big>]</big></strong></dt>
+<dd><p>
+With a <var>lineno</var> argument, set a break there in the current
+file.  With a <var>function</var> argument, set a break at the first
+executable statement within that function.
+The line number may be prefixed with a filename and a colon,
+to specify a breakpoint in another file (probably one that
+hasn't been loaded yet).  The file is searched on <code>sys.path</code>.
+Note that each breakpoint is assigned a number to which all the other
+breakpoint commands refer.
+
+<p>
+If a second argument is present, it is an expression which must
+evaluate to true before the breakpoint is honored.
+
+<p>
+Without argument, list all breaks, including for each breakpoint,
+the number of times that breakpoint has been hit, the current
+ignore count, and the associated condition if any.
+
+<p>
+</dd>
+<dt><strong>tbreak <big>[</big><big>[</big><var>filename</var>:<big>]</big><var>lineno</var><code><big class="XLARGE">|</big></code><var>function</var><big>[</big>, <var>condition</var><big>]</big><big>]</big></strong></dt>
+<dd><p>
+Temporary breakpoint, which is removed automatically when it is
+first hit.  The arguments are the same as break.
+
+<p>
+</dd>
+<dt><strong>cl(ear) <big>[</big><var>bpnumber</var> <big>[</big><var>bpnumber ...</var><big>]</big><big>]</big></strong></dt>
+<dd><p>
+With a space separated list of breakpoint numbers, clear those
+breakpoints.  Without argument, clear all breaks (but first
+ask confirmation).
+
+<p>
+</dd>
+<dt><strong>disable <big>[</big><var>bpnumber</var> <big>[</big><var>bpnumber ...</var><big>]</big><big>]</big></strong></dt>
+<dd><p>
+Disables the breakpoints given as a space separated list of
+breakpoint numbers.  Disabling a breakpoint means it cannot cause
+the program to stop execution, but unlike clearing a breakpoint, it
+remains in the list of breakpoints and can be (re-)enabled.
+
+<p>
+</dd>
+<dt><strong>enable <big>[</big><var>bpnumber</var> <big>[</big><var>bpnumber ...</var><big>]</big><big>]</big></strong></dt>
+<dd><p>
+Enables the breakpoints specified.
+
+<p>
+</dd>
+<dt><strong>ignore <var>bpnumber</var> <big>[</big><var>count</var><big>]</big></strong></dt>
+<dd><p>
+Sets the ignore count for the given breakpoint number.  If
+count is omitted, the ignore count is set to 0.  A breakpoint
+becomes active when the ignore count is zero.  When non-zero,
+the count is decremented each time the breakpoint is reached
+and the breakpoint is not disabled and any associated condition
+evaluates to true.
+
+<p>
+</dd>
+<dt><strong>condition <var>bpnumber</var> <big>[</big><var>condition</var><big>]</big></strong></dt>
+<dd><p>
+Condition is an expression which must evaluate to true before
+the breakpoint is honored.  If condition is absent, any existing
+condition is removed; i.e., the breakpoint is made unconditional.
+
+<p>
+</dd>
+<dt><strong>commands <big>[</big><var>bpnumber</var><big>]</big></strong></dt>
+<dd><p>
+Specify a list of commands for breakpoint number <var>bpnumber</var>.  The
+commands themselves appear on the following lines.  Type a line
+containing just 'end' to terminate the commands. An example:
+
+<p>
+<div class="verbatim"><pre>
+(Pdb) commands 1
+(com) print some_variable
+(com) end
+(Pdb)
+</pre></div>
+
+<p>
+To remove all commands from a breakpoint, type commands and
+follow it immediately with  end; that is, give no commands.
+
+<p>
+With no <var>bpnumber</var> argument, commands refers to the last
+breakpoint set.
+
+<p>
+You can use breakpoint commands to start your program up again.
+Simply use the continue command, or step, or any other
+command that resumes execution.
+
+<p>
+Specifying any command resuming execution (currently continue,
+step, next, return, jump, quit and their abbreviations) terminates
+the command list (as if that command was immediately followed by end).
+This is because any time you resume execution
+(even with a simple next or step), you may encounterÂ·
+another breakpoint-which could have its own command list, leading to
+ambiguities about which list to execute.
+
+<p>
+If you use the 'silent' command in the command list, the
+usual message about stopping at a breakpoint is not printed.  This may
+be desirable for breakpoints that are to print a specific message and
+then continue.  If none of the other commands print anything, you
+see no sign that the breakpoint was reached.
+
+<p>
+
+<span class="versionnote">New in version 2.5.</span>
+
+<p>
+</dd>
+<dt><strong>s(tep)</strong></dt>
+<dd><p>
+Execute the current line, stop at the first possible occasion
+(either in a function that is called or on the next line in the
+current function).
+
+<p>
+</dd>
+<dt><strong>n(ext)</strong></dt>
+<dd><p>
+Continue execution until the next line in the current function
+is reached or it returns.  (The difference between "<tt class="samp">next</tt>" and
+"<tt class="samp">step</tt>" is that "<tt class="samp">step</tt>" stops inside a called function, while
+"<tt class="samp">next</tt>" executes called functions at (nearly) full speed, only
+stopping at the next line in the current function.)
+
+<p>
+</dd>
+<dt><strong>r(eturn)</strong></dt>
+<dd><p>
+Continue execution until the current function returns.
+
+<p>
+</dd>
+<dt><strong>c(ont(inue))</strong></dt>
+<dd><p>
+Continue execution, only stop when a breakpoint is encountered.
+
+<p>
+</dd>
+<dt><strong>j(ump) <var>lineno</var></strong></dt>
+<dd><p>
+Set the next line that will be executed.  Only available in the
+bottom-most frame.  This lets you jump back and execute code
+again, or jump forward to skip code that you don't want to run.
+
+<p>
+It should be noted that not all jumps are allowed -- for instance it
+is not possible to jump into the middle of a <tt class="keyword">for</tt> loop or out
+of a <tt class="keyword">finally</tt> clause.
+
+<p>
+</dd>
+<dt><strong>l(ist) <big>[</big><var>first</var><big>[</big>, <var>last</var><big>]</big><big>]</big></strong></dt>
+<dd><p>
+List source code for the current file.  Without arguments, list 11
+lines around the current line or continue the previous listing.  With
+one argument, list 11 lines around at that line.  With two arguments,
+list the given range; if the second argument is less than the first,
+it is interpreted as a count.
+
+<p>
+</dd>
+<dt><strong>a(rgs)</strong></dt>
+<dd><p>
+Print the argument list of the current function.
+
+<p>
+</dd>
+<dt><strong>p <var>expression</var></strong></dt>
+<dd><p>
+Evaluate the <var>expression</var> in the current context and print its
+value.  <span class="note"><b class="label">Note:</b>
+"<tt class="samp">print</tt>" can also be used, but is not a debugger
+command -- this executes the Python <tt class="keyword">print</tt> statement.</span>
+
+<p>
+</dd>
+<dt><strong>pp <var>expression</var></strong></dt>
+<dd><p>
+Like the "<tt class="samp">p</tt>" command, except the value of the expression is
+pretty-printed using the <tt class="module">pprint</tt> module.
+
+<p>
+</dd>
+<dt><strong>alias <big>[</big><var>name</var> <big>[</big>command<big>]</big><big>]</big></strong></dt>
+<dd><p>
+Creates an alias called <var>name</var> that executes <var>command</var>.  The
+command must <em>not</em> be enclosed in quotes.  Replaceable parameters
+can be indicated by "<tt class="samp">%1</tt>", "<tt class="samp">%2</tt>", and so on, while "<tt class="samp">%*</tt>" is
+replaced by all the parameters.  If no command is given, the current
+alias for <var>name</var> is shown. If no arguments are given, all
+aliases are listed.
+
+<p>
+Aliases may be nested and can contain anything that can be
+legally typed at the pdb prompt.  Note that internal pdb commands
+<em>can</em> be overridden by aliases.  Such a command is
+then hidden until the alias is removed.  Aliasing is recursively
+applied to the first word of the command line; all other words
+in the line are left alone.
+
+<p>
+As an example, here are two useful aliases (especially when placed
+in the <span class="file">.pdbrc</span> file):
+
+<p>
+<div class="verbatim"><pre>
+#Print instance variables (usage "pi classInst")
+alias pi for k in %1.__dict__.keys(): print "%1.",k,"=",%1.__dict__[k]
+#Print instance variables in self
+alias ps pi self
+</pre></div>
+
+<p>
+</dd>
+<dt><strong>unalias <var>name</var></strong></dt>
+<dd><p>
+Deletes the specified alias.
+
+<p>
+</dd>
+<dt><strong><big>[</big>!<big>]</big><var>statement</var></strong></dt>
+<dd><p>
+Execute the (one-line) <var>statement</var> in the context of
+the current stack frame.
+The exclamation point can be omitted unless the first word
+of the statement resembles a debugger command.
+To set a global variable, you can prefix the assignment
+command with a "<tt class="samp">global</tt>" command on the same line, e.g.:
+
+<p>
+<div class="verbatim"><pre>
+(Pdb) global list_options; list_options = ['-l']
+(Pdb)
+</pre></div>
+
+<p>
+</dd>
+<dt><strong>q(uit)</strong></dt>
+<dd><p>
+Quit from the debugger.
+The program being executed is aborted.
+
+<p>
+</dd>
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="24. the Python Debugger"
+  href="module-pdb.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="24. the Python Debugger"
+  href="module-pdb.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="24.2 how It Works"
+  href="debugger-hooks.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-pdb.html">24. The Python Debugger</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-pdb.html">24. The Python Debugger</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="debugger-hooks.html">24.2 How It Works</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

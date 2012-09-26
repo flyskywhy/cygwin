@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-tty.html" />
+<link rel="prev" href="module-dl.html" />
+<link rel="parent" href="unix.html" />
+<link rel="next" href="node513.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>16.7 termios -- POSIX style tty control</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="16.6.1 dl Objects"
+  href="dl-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="16. unix Specific Services"
+  href="unix.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16.7.1 Example"
+  href="node513.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dl-objects.html">16.6.1 Dl Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="unix.html">16. Unix Specific Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node513.html">16.7.1 Example</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0018700000000000000000">
+16.7 <tt class="module">termios</tt> --
+         POSIX style tty control</a>
+</h1>
+
+<p>
+<a name="module-termios"></a>  
+<p class="availability">Availability: <span
+ class="platform">Unix</span>.</p>
+
+<p>
+<a id='l2h-3543' xml:id='l2h-3543'></a><a id='l2h-3544' xml:id='l2h-3544'></a>
+<p>
+This module provides an interface to the POSIX calls for tty I/O
+control.  For a complete description of these calls, see the POSIX or
+<span class="Unix">Unix</span> manual pages.  It is only available for those <span class="Unix">Unix</span> versions
+that support POSIX <em>termios</em> style tty I/O control (and then
+only if configured at installation time).
+
+<p>
+All functions in this module take a file descriptor <var>fd</var> as their
+first argument.  This can be an integer file descriptor, such as
+returned by <code>sys.stdin.fileno()</code>, or a file object, such as
+<code>sys.stdin</code> itself.
+
+<p>
+This module also defines all the constants needed to work with the
+functions provided here; these have the same name as their
+counterparts in C.  Please refer to your system documentation for more
+information on using these terminal control interfaces.
+
+<p>
+The module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3545' xml:id='l2h-3545' class="function">tcgetattr</tt></b>(</nobr></td>
+  <td><var>fd</var>)</td></tr></table></dt>
+<dd>
+Return a list containing the tty attributes for file descriptor
+<var>fd</var>, as follows: <code>[</code><var>iflag</var>, <var>oflag</var>, <var>cflag</var>,
+<var>lflag</var>, <var>ispeed</var>, <var>ospeed</var>, <var>cc</var><code>]</code> where
+<var>cc</var> is a list of the tty special characters (each a string of
+length 1, except the items with indices <tt class="constant">VMIN</tt> and
+<tt class="constant">VTIME</tt>, which are integers when these fields are
+defined).  The interpretation of the flags and the speeds as well as
+the indexing in the <var>cc</var> array must be done using the symbolic
+constants defined in the <tt class="module">termios</tt>
+module.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3546' xml:id='l2h-3546' class="function">tcsetattr</tt></b>(</nobr></td>
+  <td><var>fd, when, attributes</var>)</td></tr></table></dt>
+<dd>
+Set the tty attributes for file descriptor <var>fd</var> from the
+<var>attributes</var>, which is a list like the one returned by
+<tt class="function">tcgetattr()</tt>.  The <var>when</var> argument determines when the
+attributes are changed: <tt class="constant">TCSANOW</tt> to change immediately,
+<tt class="constant">TCSADRAIN</tt> to change after transmitting all queued output,
+or <tt class="constant">TCSAFLUSH</tt> to change after transmitting all queued
+output and discarding all queued input.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3547' xml:id='l2h-3547' class="function">tcsendbreak</tt></b>(</nobr></td>
+  <td><var>fd, duration</var>)</td></tr></table></dt>
+<dd>
+Send a break on file descriptor <var>fd</var>.  A zero <var>duration</var> sends
+a break for 0.25-0.5 seconds; a nonzero <var>duration</var> has a system
+dependent meaning.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3548' xml:id='l2h-3548' class="function">tcdrain</tt></b>(</nobr></td>
+  <td><var>fd</var>)</td></tr></table></dt>
+<dd>
+Wait until all output written to file descriptor <var>fd</var> has been
+transmitted.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3549' xml:id='l2h-3549' class="function">tcflush</tt></b>(</nobr></td>
+  <td><var>fd, queue</var>)</td></tr></table></dt>
+<dd>
+Discard queued data on file descriptor <var>fd</var>.  The <var>queue</var>
+selector specifies which queue: <tt class="constant">TCIFLUSH</tt> for the input
+queue, <tt class="constant">TCOFLUSH</tt> for the output queue, or
+<tt class="constant">TCIOFLUSH</tt> for both queues.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3550' xml:id='l2h-3550' class="function">tcflow</tt></b>(</nobr></td>
+  <td><var>fd, action</var>)</td></tr></table></dt>
+<dd>
+Suspend or resume input or output on file descriptor <var>fd</var>.  The
+<var>action</var> argument can be <tt class="constant">TCOOFF</tt> to suspend output,
+<tt class="constant">TCOON</tt> to restart output, <tt class="constant">TCIOFF</tt> to suspend
+input, or <tt class="constant">TCION</tt> to restart input.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-tty.html">tty</a></tt>:</b>
+    <dd>Convenience functions for common terminal control
+                  operations.
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node513.html">16.7.1 Example</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="16.6.1 dl Objects"
+  href="dl-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="16. unix Specific Services"
+  href="unix.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="16.7.1 Example"
+  href="node513.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dl-objects.html">16.6.1 Dl Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="unix.html">16. Unix Specific Services</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node513.html">16.7.1 Example</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

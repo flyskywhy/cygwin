@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="deque-objects.html" />
+<link rel="parent" href="deque-objects.html" />
+<link rel="next" href="defaultdict-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>5.3.1.1 Recipes </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.3.1 deque objects"
+  href="deque-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.3.1 deque objects"
+  href="deque-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.3.2 defaultdict objects"
+  href="defaultdict-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="deque-objects.html">5.3.1 deque objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="deque-objects.html">5.3.1 deque objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="defaultdict-objects.html">5.3.2 defaultdict objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION007311000000000000000"></a><a name="deque-recipes"></a>
+<br>
+5.3.1.1 Recipes 
+</h3>
+
+<p>
+This section shows various approaches to working with deques.
+
+<p>
+The <tt class="method">rotate()</tt> method provides a way to implement <tt class="class">deque</tt>
+slicing and deletion.  For example, a pure python implementation of
+<code>del d[n]</code> relies on the <tt class="method">rotate()</tt> method to position
+elements to be popped:
+
+<p>
+<div class="verbatim"><pre>
+def delete_nth(d, n):
+    d.rotate(-n)
+    d.popleft()
+    d.rotate(n)
+</pre></div>
+
+<p>
+To implement <tt class="class">deque</tt> slicing, use a similar approach applying
+<tt class="method">rotate()</tt> to bring a target element to the left side of the deque.
+Remove old entries with <tt class="method">popleft()</tt>, add new entries with
+<tt class="method">extend()</tt>, and then reverse the rotation.
+
+<p>
+With minor variations on that approach, it is easy to implement Forth style
+stack manipulations such as <code>dup</code>, <code>drop</code>, <code>swap</code>, <code>over</code>,
+<code>pick</code>, <code>rot</code>, and <code>roll</code>.
+
+<p>
+A roundrobin task server can be built from a <tt class="class">deque</tt> using
+<tt class="method">popleft()</tt> to select the current task and <tt class="method">append()</tt>
+to add it back to the tasklist if the input stream is not exhausted:
+
+<p>
+<div class="verbatim"><pre>
+def roundrobin(*iterables):
+    pending = deque(iter(i) for i in iterables)
+    while pending:
+        task = pending.popleft()
+        try:
+            yield task.next()
+        except StopIteration:
+            continue
+        pending.append(task)
+
+&gt;&gt;&gt; for value in roundrobin('abc', 'd', 'efgh'):
+...     print value
+
+a
+d
+e
+b
+f
+c
+g
+h
+</pre></div>
+
+<p>
+Multi-pass data reduction algorithms can be succinctly expressed and
+efficiently coded by extracting elements with multiple calls to
+<tt class="method">popleft()</tt>, applying the reduction function, and calling
+<tt class="method">append()</tt> to add the result back to the queue.
+
+<p>
+For example, building a balanced binary tree of nested lists entails
+reducing two adjacent nodes into one by grouping them in a list:
+
+<p>
+<div class="verbatim"><pre>
+def maketree(iterable):
+    d = deque(iterable)
+    while len(d) &gt; 1:
+        pair = [d.popleft(), d.popleft()]
+        d.append(pair)
+    return list(d)
+
+&gt;&gt;&gt; print maketree('abcdefgh')
+[[[['a', 'b'], ['c', 'd']], [['e', 'f'], ['g', 'h']]]]
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="5.3.1 deque objects"
+  href="deque-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="5.3.1 deque objects"
+  href="deque-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5.3.2 defaultdict objects"
+  href="defaultdict-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="deque-objects.html">5.3.1 deque objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="deque-objects.html">5.3.1 deque objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="defaultdict-objects.html">5.3.2 defaultdict objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,226 @@
+Version 2.1.1 (15 April 2008)
+-----------------------------
+
+ Bugs fixed:
+ * Make files that are to be sorted more text-like to fix problem on Windows.
+ * Fix comment in header of --write-symbol-info output file.
+
+ Miscellaneous
+ * Adjust test suite for upstream changes in the svntest code.
+
+
+Version 2.1.0 (19 February 2008)
+--------------------------------
+
+ New features:
+ * Allow conversion of a CVS repository to git (experimental).
+   - Support mapping from cvs author names to git "Author <email>" form.
+ * Enhance symbol transform capabilities:
+   - Add SymbolMapper, for transforming specific symbols in specific files.
+   - Allow SymbolTransforms to cause a symbol to be discarded.
+ * Enhance symbol strategy capabilities:
+   - Write each CVS branch/tag to be written to an arbitrary SVN path.
+   - Choose which trunk/branch should serve as the parent of each branch/tag.
+   - --symbol-hints: manually specify how symbols should be converted.
+   - Make symbol strategy rules project-specific.
+ * --write-symbol-info: output info about CVS symbols.
+ * Add option ctx.decode_apple_single for handling AppleSingle-encoded files.
+ * Add a new, restartable pass that converts author and log_msg to unicode.
+ * Allow properties to be left unset via auto-props using a leading '!'.
+
+ Bugs fixed:
+ * Fix issue #80: Empty CVS,v file not accepted.
+ * Fix issue #108: Create project TTB directories "just-in-time".
+ * Fix issue #112: Random test failures with Python 2.5.
+ * Fix issue #115: crash - Bad file descriptor.
+ * Fix the translation of line-end characters for eol-styles CR and CRLF.
+
+ Improvements and output changes:
+ * Create trunk/tags/branches directories for project when project is created.
+ * Improved conversion speed significantly, especially for large repositories.
+ * Ignore (with a warning) symbols defined to malformed revision numbers.
+ * Tolerate multiple definitions of a symbol to the same revision number.
+ * Handle RCS files that superfluously set the default branch to trunk.
+ * Allow '/' characters in CVS symbol names (creating multilevel SVN paths).
+ * Allow symbols to be transformed to contain '/' (allowing multilevel paths).
+ * Convert '\' characters to '/' (rather than '--') in symbol names.
+ * Make encoding problems fatal; to resolve, restart at CleanMetadataPass.
+
+ Miscellaneous:
+ * Change the default symbol handling option to --symbol-default=heuristic.
+
+
+Version 2.0.1 (04 October 2007)
+-------------------------------
+
+ Bugs fixed:
+ * Fix problem with keyword expansion when using --use-internal-co.
+
+
+Version 2.0.0 (15 August 2007)
+------------------------------
+
+ New features:
+ * Add --use-internal-co to speed conversions, and make it the default.
+ * Add --retain-conflicting-attic-files option.
+ * Add --no-cross-branch-commits option.
+ * Add --default-eol option and deprecate --no-default-eol.
+ * RevisionRecorder hook allows file text/deltas to be recorded in pass 1.
+ * RevisionReader hook allow file text to be retrieved from RevisionRecorder.
+ * Slightly changed the order that properties are set, for more flexibility.
+ * Don't set svn:keywords on files for which svn:eol-style is not set.
+ * Implement issue #53: Allow --trunk='' for --trunk-only conversions.
+
+ Bugs fixed:
+ * Fix issue #97: Follow symlinks within CVS repository.
+ * Fix issue #99: cvs2svn tries to create a file twice.
+ * Fix issue #100: cvs2svn doesn't retrieve the right version.
+ * Fix issue #105: Conflict between directory and Attic file causes crash.
+ * Fix issue #106: SVNRepositoryMirrorParentMissingError.
+ * Fix missing command-line handling of --fallback-encoding option.
+ * Fix issue #85: Disable symbol sanity checks when in --trunk-only mode.
+
+ Improvements and output changes:
+ * Analyze CVS revision dependency graph, giving a more robust conversion.
+ * Improve choice of symbol parents when CVS history is ambiguous.
+ * In the case of clock skew to the past, resync forwards, not backwards.
+ * Treat timestamps that lie in the future as bogus, and adjust backwards.
+ * Gracefully handle tags that refer to nonexistent revisions.
+ * Check and fail if revision header appears multiple times.
+ * Gracefully handle multiple deltatext blocks for same revision.
+ * Be more careful about only processing reasonable *,v files.
+ * Improve checks for illegal filenames.
+ * Check if a directory name conflicts with a filename.
+ * When file is imported, omit the empty revision 1.1.
+ * If a non-trunk default branch is excluded, graft its contents to trunk.
+ * Omit the initial 'dead' revision when a file is added on a branch.
+ * Require --symbol-transform pattern to match entire symbol name.
+ * Treat files as binary by default instead of as text, because it is safer.
+ * Treat auto-props case-insensitively; deprecate --auto-props-ignore-case.
+
+ Miscellaneous:
+ * Add a simple (nonportable) script to log cvs2svn memory usage.
+ * Allow contrib/shrink_test_case.py script to try deleting tags and branches.
+ * Add --skip-initial-test option to contrib/shrink_test_case.py script.
+
+
+Version 1.5.1 (28 January 2007)
+-------------------------------
+
+ Bugs fixed:
+ * Add missing import in cvs2svn_lib/process.py.
+ * Fix omission of parsing of the --fallback-encoding option.
+
+
+Version 1.5.0 (03 October 2006)
+-------------------------------
+
+ New features:
+ * Support multiproject conversions (each gets its own trunk, tags, branches).
+ * New --options option to allow run-time options to be defined via a file.
+ * --co, --cvs, and --sort options to specify the paths to executables.
+ * Add new --fallback-encoding option.
+
+ Bugs fixed:
+ * Fix issue #86: Support multiple project roots per repository.
+ * Fix issue #104: Allow path to "sort" executable to be specified.
+ * Fix issue #8: Allow multiple --encoding options.
+ * Fix issue #109: Improve handling of fallback encodings.
+
+ Improvements and output changes:
+ * Further reduce conversion time and temporary space requirements.
+
+ Miscellaneous:
+ * Deprecate the --dump-only option (it is now implied by --dumpfile).
+ * Add scripts to help isolate conversion problems and shrink test cases.
+ * Add a script to search for illegal filenames in a CVS repository.
+
+
+Version 1.4.0 (27 August 2006)
+------------------------------
+
+ New features:
+ * Support multicomponent --trunk, --tags, and --branches paths (issue #7).
+ * New --auto-props option allows file properties to be set via file.
+ * --force-branch and --force-tag options now accept regular expressions.
+ * Add --symbol-default option.
+ * Support multiple, ordered --encoding options.
+
+ Bugs fixed:
+ * Fix issue #93: Tags with forbidden characters converted to branches.
+ * Fix issue #102: Branch file, deleted in CVS, is present in SVN.
+
+ Improvements and output changes:
+ * Print informative warning message if a required program is missing.
+ * Output an error if any CVS filenames contain control characters.
+ * Clean up temporary files even for pass-by-pass conversions.
+ * Improve handling of commit dependencies and multibranch commits.
+ * Implemented issue #50 (performance change).
+ * Reduced the amount of temporary disk space needed during the conversion.
+
+ Miscellaneous:
+ * cvs2svn now requires Python version 2.2 or later.
+ * cvs2svn has been broken up into many smaller python modules for clarity.
+
+
+Version 1.3.1 (24 May 2006)
+---------------------------
+
+ Bugs fixed:
+ * Fix issue #67: malfunction caused by RCS branches rooted at revision 1.0.
+
+
+Version 1.3.0 (18 August 2005)
+------------------------------
+
+ Bugs fixed:
+ * Fix cvs2svn's dumpfile output to work after Subversion's r12645.
+ * Fix issue #71: Avoid resyncing two consecutive CVS revs to same time.
+ * Fix issue #88: Don't allow resyncing to throw off CVS revision order.
+ * Fix issue #89: Handle initially dead branch revisions acceptably.
+ * Fix some branch-filling bugs (r1429, r1444).
+
+ Improvements and output changes:
+ * Better --encoding support when iconv_codec module is available.
+ * Speedups to pass8 (r1421)
+ * Use standard "rNNN" syntax when printing Subversion revisions.
+
+
+Version 1.2.1 (14 February 2005)
+--------------------------------
+
+ Bugs fixed:
+ * Fix cvs2svn's dumpfile output to work after Subversion's r12645.
+
+
+Version 1.2.0 (11 January 2005)
+-------------------------------
+
+ New features:
+ * --fs-type=TYPE: make it possible to specify the filesystem type.
+
+ Bugs fixed:
+ * Convert files with svn:eol-style to have LF end of lines only.
+ * Fix hang in pass 8 for files that ended with a CR.
+ * Import unexpanded keywords into the repository.
+ * Fix the handling of the $Revision$ keyword.
+ * Fix bug in branch/tag creation edge case.
+
+
+Version 1.1.0 (15 September 2004)
+---------------------------------
+
+ New features:
+ * --symbol-transform: change tag and branch names using regular expressions.
+ * Flush log after writing, for better feedback when using 'tee'.
+
+ Bugs fixed:
+ * Issue 74: No longer attempt to change non-existent files.
+ * Allow the Subversion repository created to have spaces in its name.
+ * Avoid erroring when using a svnadmin that uses FSFS by default.
+
+
+Version 1.0.0 (25 August 2004)
+------------------------------
+
+ * The cvs2svn project comes of age.

@@ -1,0 +1,1632 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="mapping-structs.html" />
+<link rel="prev" href="common-structs.html" />
+<link rel="parent" href="newTypes.html" />
+<link rel="next" href="mapping-structs.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>10.3 Type Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10.2 common Object Structures"
+  href="common-structs.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.4 mapping Object Structures"
+  href="mapping-structs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="common-structs.html">10.2 Common Object Structures</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mapping-structs.html">10.4 Mapping Object Structures</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0012300000000000000000"></a><a name="type-structs"></a>
+<br>
+10.3 Type Objects 
+</h1>
+
+<p>
+Perhaps one of the most important structures of the Python object
+system is the structure that defines a new type: the
+<tt class="ctype">PyTypeObject</tt> structure.  Type objects can be handled using any
+of the <tt class="cfunction">PyObject_*()</tt> or <tt class="cfunction">PyType_*()</tt> functions,
+but do not offer much that's interesting to most Python applications.
+These objects are fundamental to how objects behave, so they are very
+important to the interpreter itself and to any extension module that
+implements new types.
+
+<p>
+Type objects are fairly large compared to most of the standard types.
+The reason for the size is that each type object stores a large number
+of values, mostly C function pointers, each of which implements a
+small part of the type's functionality.  The fields of the type object
+are examined in detail in this section.  The fields will be described
+in the order in which they occur in the structure.
+
+<p>
+Typedefs:
+unaryfunc, binaryfunc, ternaryfunc, inquiry, coercion, intargfunc,
+intintargfunc, intobjargproc, intintobjargproc, objobjargproc,
+destructor, freefunc, printfunc, getattrfunc, getattrofunc, setattrfunc,
+setattrofunc, cmpfunc, reprfunc, hashfunc
+
+<p>
+The structure definition for <tt class="ctype">PyTypeObject</tt> can be found in
+<span class="file">Include/object.h</span>.  For convenience of reference, this repeats
+the definition found there:
+
+<p>
+<div class="verbatim">
+<pre>typedef struct _typeobject {
+    PyObject_VAR_HEAD
+    char *tp_name; /* For printing, in format "&lt;module&gt;.&lt;name&gt;" */
+    int tp_basicsize, tp_itemsize; /* For allocation */
+
+    /* Methods to implement standard operations */
+
+    destructor tp_dealloc;
+    printfunc tp_print;
+    getattrfunc tp_getattr;
+    setattrfunc tp_setattr;
+    cmpfunc tp_compare;
+    reprfunc tp_repr;
+
+    /* Method suites for standard classes */
+
+    PyNumberMethods *tp_as_number;
+    PySequenceMethods *tp_as_sequence;
+    PyMappingMethods *tp_as_mapping;
+
+    /* More standard operations (here for binary compatibility) */
+
+    hashfunc tp_hash;
+    ternaryfunc tp_call;
+    reprfunc tp_str;
+    getattrofunc tp_getattro;
+    setattrofunc tp_setattro;
+
+    /* Functions to access object as input/output buffer */
+    PyBufferProcs *tp_as_buffer;
+
+    /* Flags to define presence of optional/expanded features */
+    long tp_flags;
+
+    char *tp_doc; /* Documentation string */
+
+    /* Assigned meaning in release 2.0 */
+    /* call function for all accessible objects */
+    traverseproc tp_traverse;
+
+    /* delete references to contained objects */
+    inquiry tp_clear;
+
+    /* Assigned meaning in release 2.1 */
+    /* rich comparisons */
+    richcmpfunc tp_richcompare;
+
+    /* weak reference enabler */
+    long tp_weaklistoffset;
+
+    /* Added in release 2.2 */
+    /* Iterators */
+    getiterfunc tp_iter;
+    iternextfunc tp_iternext;
+
+    /* Attribute descriptor and subclassing stuff */
+    struct PyMethodDef *tp_methods;
+    struct PyMemberDef *tp_members;
+    struct PyGetSetDef *tp_getset;
+    struct _typeobject *tp_base;
+    PyObject *tp_dict;
+    descrgetfunc tp_descr_get;
+    descrsetfunc tp_descr_set;
+    long tp_dictoffset;
+    initproc tp_init;
+    allocfunc tp_alloc;
+    newfunc tp_new;
+    freefunc tp_free; /* Low-level free-memory routine */
+    inquiry tp_is_gc; /* For PyObject_IS_GC */
+    PyObject *tp_bases;
+    PyObject *tp_mro; /* method resolution order */
+    PyObject *tp_cache;
+    PyObject *tp_subclasses;
+    PyObject *tp_weaklist;
+
+} PyTypeObject;
+</pre>
+<div class="footer">
+<a href="typestruct.txt" type="text/plain">Download as text (original file name: <span class="file">typestruct.h</span>).</a>
+</div></div>
+
+<p>
+The type object structure extends the <tt class="ctype">PyVarObject</tt> structure.
+The <tt class="member">ob_size</tt> field is used for dynamic types (created
+by  <tt class="function">type_new()</tt>, usually called from a class statement).
+Note that <tt class="cdata">PyType_Type</tt> (the metatype) initializes
+<tt class="member">tp_itemsize</tt>, which means that its instances (i.e. type
+objects) <em>must</em> have the <tt class="member">ob_size</tt> field.
+
+<p>
+<dl><dt>PyObject* <b><tt id='l2h-980' xml:id='l2h-980' class="cmember">_ob_next</tt></b></dt>
+<dd>
+<dt>PyObject* <b><tt id='l2h-1045' xml:id='l2h-1045' class="cmember">_ob_prev</tt></b></dt>
+<dd>
+  These fields are only present when the macro <code>Py_TRACE_REFS</code> is
+  defined.  Their initialization to <tt class="constant">NULL</tt> is taken care of by the
+  <code>PyObject_HEAD_INIT</code> macro.  For statically allocated objects,
+  these fields always remain <tt class="constant">NULL</tt>.  For dynamically allocated
+  objects, these two fields are used to link the object into a
+  doubly-linked list of <em>all</em> live objects on the heap.  This
+  could be used for various debugging purposes; currently the only use
+  is to print the objects that are still alive at the end of a run
+  when the environment variable <a class="envvar" id='l2h-1046' xml:id='l2h-1046'>PYTHONDUMPREFS</a> is set.
+
+<p>
+These fields are not inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>Py_ssize_t <b><tt id='l2h-981' xml:id='l2h-981' class="cmember">ob_refcnt</tt></b></dt>
+<dd>
+  This is the type object's reference count, initialized to <code>1</code>
+  by the <code>PyObject_HEAD_INIT</code> macro.  Note that for statically
+  allocated type objects, the type's instances (objects whose
+  <tt class="member">ob_type</tt> points back to the type) do <em>not</em> count as
+  references.  But for dynamically allocated type objects, the
+  instances <em>do</em> count as references.
+
+<p>
+This field is not inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>PyTypeObject* <b><tt id='l2h-982' xml:id='l2h-982' class="cmember">ob_type</tt></b></dt>
+<dd>
+  This is the type's type, in other words its metatype.  It is
+  initialized by the argument to the <code>PyObject_HEAD_INIT</code> macro,
+  and its value should normally be <code>&amp;PyType_Type</code>.  However, for
+  dynamically loadable extension modules that must be usable on
+  Windows (at least), the compiler complains that this is not a valid
+  initializer.  Therefore, the convention is to pass <tt class="constant">NULL</tt> to the
+  <code>PyObject_HEAD_INIT</code> macro and to initialize this field
+  explicitly at the start of the module's initialization function,
+  before doing anything else.  This is typically done like this:
+
+<p>
+<div class="verbatim"><pre>
+Foo_Type.ob_type = &amp;PyType_Type;
+</pre></div>
+
+<p>
+This should be done before any instances of the type are created.
+  <tt class="cfunction">PyType_Ready()</tt> checks if <tt class="member">ob_type</tt> is <tt class="constant">NULL</tt>, and
+  if so, initializes it: in Python 2.2, it is set to
+  <code>&amp;PyType_Type</code>; in Python 2.2.1 and later it is
+  initialized to the <tt class="member">ob_type</tt> field of the base class.
+  <tt class="cfunction">PyType_Ready()</tt> will not change this field if it is
+  non-zero.
+
+<p>
+In Python 2.2, this field is not inherited by subtypes.  In 2.2.1,
+  and in 2.3 and beyond, it is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>Py_ssize_t <b><tt id='l2h-983' xml:id='l2h-983' class="cmember">ob_size</tt></b></dt>
+<dd>
+  For statically allocated type objects, this should be initialized
+  to zero.  For dynamically allocated type objects, this field has a
+  special internal meaning.
+
+<p>
+This field is not inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>char* <b><tt id='l2h-984' xml:id='l2h-984' class="cmember">tp_name</tt></b></dt>
+<dd>
+  Pointer to a NUL-terminated string containing the name of the type.
+  For types that are accessible as module globals, the string should
+  be the full module name, followed by a dot, followed by the type
+  name; for built-in types, it should be just the type name.  If the
+  module is a submodule of a package, the full package name is part of
+  the full module name.  For example, a type named <tt class="class">T</tt> defined
+  in module <tt class="module">M</tt> in subpackage <tt class="module">Q</tt> in package <tt class="module">P</tt>
+  should have the <tt class="member">tp_name</tt> initializer <code>"P.Q.M.T"</code>.
+
+<p>
+For dynamically allocated type objects, this should just be the type
+  name, and the module name explicitly stored in the type dict as the
+  value for key <code>'__module__'</code>.
+
+<p>
+For statically allocated type objects, the tp_name field should
+  contain a dot.  Everything before the last dot is made accessible as
+  the <tt class="member">__module__</tt> attribute, and everything after the last dot
+  is made accessible as the <tt class="member">__name__</tt> attribute.
+
+<p>
+If no dot is present, the entire <tt class="member">tp_name</tt> field is made
+  accessible as the <tt class="member">__name__</tt> attribute, and the
+  <tt class="member">__module__</tt> attribute is undefined (unless explicitly set in
+  the dictionary, as explained above).  This means your type will be
+  impossible to pickle.
+
+<p>
+This field is not inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>Py_ssize_t <b><tt id='l2h-985' xml:id='l2h-985' class="cmember">tp_basicsize</tt></b></dt>
+<dd>
+<dt>Py_ssize_t <b><tt id='l2h-1047' xml:id='l2h-1047' class="cmember">tp_itemsize</tt></b></dt>
+<dd>
+  These fields allow calculating the size in bytes of instances of
+  the type.
+
+<p>
+There are two kinds of types: types with fixed-length instances have
+  a zero <tt class="member">tp_itemsize</tt> field, types with variable-length
+  instances have a non-zero <tt class="member">tp_itemsize</tt> field.  For a type
+  with fixed-length instances, all instances have the same size,
+  given in <tt class="member">tp_basicsize</tt>.
+
+<p>
+For a type with variable-length instances, the instances must have
+  an <tt class="member">ob_size</tt> field, and the instance size is
+  <tt class="member">tp_basicsize</tt> plus N times <tt class="member">tp_itemsize</tt>, where N is
+  the ``length'' of the object.  The value of N is typically stored in
+  the instance's <tt class="member">ob_size</tt> field.  There are exceptions:  for
+  example, long ints use a negative <tt class="member">ob_size</tt> to indicate a
+  negative number, and N is <code>abs(<tt class="member">ob_size</tt>)</code> there.  Also,
+  the presence of an <tt class="member">ob_size</tt> field in the instance layout
+  doesn't mean that the instance structure is variable-length (for
+  example, the structure for the list type has fixed-length instances,
+  yet those instances have a meaningful <tt class="member">ob_size</tt> field).
+
+<p>
+The basic size includes the fields in the instance declared by the
+  macro PyObject_HEAD or
+  PyObject_VAR_HEAD (whichever is used to declare the
+  instance struct) and this in turn includes the <tt class="member">_ob_prev</tt> and
+  <tt class="member">_ob_next</tt> fields if they are present.  This means that the
+  only correct way to get an initializer for the <tt class="member">tp_basicsize</tt>
+  is to use the <tt class="keyword">sizeof</tt> operator on the struct used to
+  declare the instance layout.  The basic size does not include the GC
+  header size (this is new in Python 2.2; in 2.1 and 2.0, the GC
+  header size was included in <tt class="member">tp_basicsize</tt>).
+
+<p>
+These fields are inherited separately by subtypes.  If the base type
+  has a non-zero <tt class="member">tp_itemsize</tt>, it is generally not safe to set
+  <tt class="member">tp_itemsize</tt> to a different non-zero value in a subtype
+  (though this depends on the implementation of the base type).
+
+<p>
+A note about alignment: if the variable items require a particular
+  alignment, this should be taken care of by the value of
+  <tt class="member">tp_basicsize</tt>.  Example: suppose a type implements an array
+  of <code>double</code>. <tt class="member">tp_itemsize</tt> is <code>sizeof(double)</code>.
+  It is the programmer's responsibility that <tt class="member">tp_basicsize</tt> is
+  a multiple of <code>sizeof(double)</code> (assuming this is the alignment
+  requirement for <code>double</code>).
+</dl>
+
+<p>
+<dl><dt>destructor <b><tt id='l2h-986' xml:id='l2h-986' class="cmember">tp_dealloc</tt></b></dt>
+<dd>
+  A pointer to the instance destructor function.  This function must
+  be defined unless the type guarantees that its instances will never
+  be deallocated (as is the case for the singletons <code>None</code> and
+  <code>Ellipsis</code>).
+
+<p>
+The destructor function is called by the <tt class="cfunction">Py_DECREF()</tt> and
+  <tt class="cfunction">Py_XDECREF()</tt> macros when the new reference count is
+  zero.  At this point, the instance is still in existence, but there
+  are no references to it.  The destructor function should free all
+  references which the instance owns, free all memory buffers owned by
+  the instance (using the freeing function corresponding to the
+  allocation function used to allocate the buffer), and finally (as
+  its last action) call the type's <tt class="member">tp_free</tt> function.  If the
+  type is not subtypable (doesn't have the
+  <tt class="constant">Py_TPFLAGS_BASETYPE</tt> flag bit set), it is permissible to
+  call the object deallocator directly instead of via
+  <tt class="member">tp_free</tt>.  The object deallocator should be the one used to
+  allocate the instance; this is normally <tt class="cfunction">PyObject_Del()</tt>
+  if the instance was allocated using <tt class="cfunction">PyObject_New()</tt> or
+  <tt class="cfunction">PyObject_VarNew()</tt>, or <tt class="cfunction">PyObject_GC_Del()</tt> if
+  the instance was allocated using <tt class="cfunction">PyObject_GC_New()</tt> or
+  <tt class="cfunction">PyObject_GC_VarNew()</tt>.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>printfunc <b><tt id='l2h-987' xml:id='l2h-987' class="cmember">tp_print</tt></b></dt>
+<dd>
+  An optional pointer to the instance print function.
+
+<p>
+The print function is only called when the instance is printed to a
+  <em>real</em> file; when it is printed to a pseudo-file (like a
+  <tt class="class">StringIO</tt> instance), the instance's <tt class="member">tp_repr</tt> or
+  <tt class="member">tp_str</tt> function is called to convert it to a string.  These
+  are also called when the type's <tt class="member">tp_print</tt> field is <tt class="constant">NULL</tt>.  A
+  type should never implement <tt class="member">tp_print</tt> in a way that produces
+  different output than <tt class="member">tp_repr</tt> or <tt class="member">tp_str</tt> would.
+
+<p>
+The print function is called with the same signature as
+  <tt class="cfunction">PyObject_Print()</tt>: <code>int tp_print(PyObject *self, FILE
+  *file, int flags)</code>.  The <var>self</var> argument is the instance to be
+  printed.  The <var>file</var> argument is the stdio file to which it is
+  to be printed.  The <var>flags</var> argument is composed of flag bits.
+  The only flag bit currently defined is <tt class="constant">Py_PRINT_RAW</tt>.
+  When the <tt class="constant">Py_PRINT_RAW</tt> flag bit is set, the instance
+  should be printed the same way as <tt class="member">tp_str</tt> would format it;
+  when the <tt class="constant">Py_PRINT_RAW</tt> flag bit is clear, the instance
+  should be printed the same was as <tt class="member">tp_repr</tt> would format it.
+  It should return <code>-1</code> and set an exception condition when an
+  error occurred during the comparison.
+
+<p>
+It is possible that the <tt class="member">tp_print</tt> field will be deprecated.
+  In any case, it is recommended not to define <tt class="member">tp_print</tt>, but
+  instead to rely on <tt class="member">tp_repr</tt> and <tt class="member">tp_str</tt> for
+  printing.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>getattrfunc <b><tt id='l2h-988' xml:id='l2h-988' class="cmember">tp_getattr</tt></b></dt>
+<dd>
+  An optional pointer to the get-attribute-string function.
+
+<p>
+This field is deprecated.  When it is defined, it should point to a
+  function that acts the same as the <tt class="member">tp_getattro</tt> function,
+  but taking a C string instead of a Python string object to give the
+  attribute name.  The signature is the same as for
+  <tt class="cfunction">PyObject_GetAttrString()</tt>.
+
+<p>
+This field is inherited by subtypes together with
+  <tt class="member">tp_getattro</tt>: a subtype inherits both <tt class="member">tp_getattr</tt>
+  and <tt class="member">tp_getattro</tt> from its base type when the subtype's
+  <tt class="member">tp_getattr</tt> and <tt class="member">tp_getattro</tt> are both <tt class="constant">NULL</tt>.
+</dl>
+
+<p>
+<dl><dt>setattrfunc <b><tt id='l2h-989' xml:id='l2h-989' class="cmember">tp_setattr</tt></b></dt>
+<dd>
+  An optional pointer to the set-attribute-string function.
+
+<p>
+This field is deprecated.  When it is defined, it should point to a
+  function that acts the same as the <tt class="member">tp_setattro</tt> function,
+  but taking a C string instead of a Python string object to give the
+  attribute name.  The signature is the same as for
+  <tt class="cfunction">PyObject_SetAttrString()</tt>.
+
+<p>
+This field is inherited by subtypes together with
+  <tt class="member">tp_setattro</tt>: a subtype inherits both <tt class="member">tp_setattr</tt>
+  and <tt class="member">tp_setattro</tt> from its base type when the subtype's
+  <tt class="member">tp_setattr</tt> and <tt class="member">tp_setattro</tt> are both <tt class="constant">NULL</tt>.
+</dl>
+
+<p>
+<dl><dt>cmpfunc <b><tt id='l2h-990' xml:id='l2h-990' class="cmember">tp_compare</tt></b></dt>
+<dd>
+  An optional pointer to the three-way comparison function.
+
+<p>
+The signature is the same as for <tt class="cfunction">PyObject_Compare()</tt>.
+  The function should return <code>1</code> if <var>self</var> greater than
+  <var>other</var>, <code>0</code> if <var>self</var> is equal to <var>other</var>, and
+  <code>-1</code> if <var>self</var> less than <var>other</var>.  It should return
+  <code>-1</code> and set an exception condition when an error occurred
+  during the comparison.
+
+<p>
+This field is inherited by subtypes together with
+  <tt class="member">tp_richcompare</tt> and <tt class="member">tp_hash</tt>: a subtypes inherits
+  all three of <tt class="member">tp_compare</tt>, <tt class="member">tp_richcompare</tt>, and
+  <tt class="member">tp_hash</tt> when the subtype's <tt class="member">tp_compare</tt>,
+  <tt class="member">tp_richcompare</tt>, and <tt class="member">tp_hash</tt> are all <tt class="constant">NULL</tt>.
+</dl>
+
+<p>
+<dl><dt>reprfunc <b><tt id='l2h-991' xml:id='l2h-991' class="cmember">tp_repr</tt></b></dt>
+<dd>
+  An optional pointer to a function that implements the built-in
+  function <tt class="function">repr()</tt>.<a id='l2h-992' xml:id='l2h-992'></a>
+<p>
+The signature is the same as for <tt class="cfunction">PyObject_Repr()</tt>; it
+  must return a string or a Unicode object.  Ideally, this function
+  should return a string that, when passed to <tt class="function">eval()</tt>, given
+  a suitable environment, returns an object with the same value.  If
+  this is not feasible, it should return a string starting with
+  "<tt class="character">&lt;</tt>" and ending with "<tt class="character">&gt;</tt>" from
+  which both the type and the value of the object can be deduced.
+
+<p>
+When this field is not set, a string of the form "<tt class="samp">&lt;%s object
+  at %p&gt;</tt>" is returned, where <code>%s</code> is replaced by the type name,
+  and <code>%p</code> by the object's memory address.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+PyNumberMethods *tp_as_number;
+
+<p>
+XXX
+
+<p>
+PySequenceMethods *tp_as_sequence;
+
+<p>
+XXX
+
+<p>
+PyMappingMethods *tp_as_mapping;
+
+<p>
+XXX
+
+<p>
+<dl><dt>hashfunc <b><tt id='l2h-993' xml:id='l2h-993' class="cmember">tp_hash</tt></b></dt>
+<dd>
+  An optional pointer to a function that implements the built-in
+  function <tt class="function">hash()</tt>.<a id='l2h-994' xml:id='l2h-994'></a>
+<p>
+The signature is the same as for <tt class="cfunction">PyObject_Hash()</tt>; it
+  must return a C long.  The value <code>-1</code> should not be returned as
+  a normal return value; when an error occurs during the computation
+  of the hash value, the function should set an exception and return
+  <code>-1</code>.
+
+<p>
+When this field is not set, two possibilities exist: if the
+  <tt class="member">tp_compare</tt> and <tt class="member">tp_richcompare</tt> fields are both
+  <tt class="constant">NULL</tt>, a default hash value based on the object's address is
+  returned; otherwise, a <tt class="exception">TypeError</tt> is raised.
+
+<p>
+This field is inherited by subtypes together with
+  <tt class="member">tp_richcompare</tt> and <tt class="member">tp_compare</tt>: a subtypes inherits
+  all three of <tt class="member">tp_compare</tt>, <tt class="member">tp_richcompare</tt>, and
+  <tt class="member">tp_hash</tt>, when the subtype's <tt class="member">tp_compare</tt>,
+  <tt class="member">tp_richcompare</tt> and <tt class="member">tp_hash</tt> are all <tt class="constant">NULL</tt>.
+</dl>
+
+<p>
+<dl><dt>ternaryfunc <b><tt id='l2h-995' xml:id='l2h-995' class="cmember">tp_call</tt></b></dt>
+<dd>
+  An optional pointer to a function that implements calling the
+  object.  This should be <tt class="constant">NULL</tt> if the object is not callable.  The
+  signature is the same as for <tt class="cfunction">PyObject_Call()</tt>.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>reprfunc <b><tt id='l2h-996' xml:id='l2h-996' class="cmember">tp_str</tt></b></dt>
+<dd>
+  An optional pointer to a function that implements the built-in
+  operation <tt class="function">str()</tt>.  (Note that <tt class="class">str</tt> is a type now,
+  and <tt class="function">str()</tt> calls the constructor for that type.  This
+  constructor calls <tt class="cfunction">PyObject_Str()</tt> to do the actual work,
+  and <tt class="cfunction">PyObject_Str()</tt> will call this handler.)
+
+<p>
+The signature is the same as for <tt class="cfunction">PyObject_Str()</tt>; it must
+  return a string or a Unicode object.  This function should return a
+  ``friendly'' string representation of the object, as this is the
+  representation that will be used by the print statement.
+
+<p>
+When this field is not set, <tt class="cfunction">PyObject_Repr()</tt> is called to
+  return a string representation.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>getattrofunc <b><tt id='l2h-997' xml:id='l2h-997' class="cmember">tp_getattro</tt></b></dt>
+<dd>
+  An optional pointer to the get-attribute function.
+
+<p>
+The signature is the same as for <tt class="cfunction">PyObject_GetAttr()</tt>.  It
+  is usually convenient to set this field to
+  <tt class="cfunction">PyObject_GenericGetAttr()</tt>, which implements the normal
+  way of looking for object attributes.
+
+<p>
+This field is inherited by subtypes together with
+  <tt class="member">tp_getattr</tt>: a subtype inherits both <tt class="member">tp_getattr</tt> and
+  <tt class="member">tp_getattro</tt> from its base type when the subtype's
+  <tt class="member">tp_getattr</tt> and <tt class="member">tp_getattro</tt> are both <tt class="constant">NULL</tt>.
+</dl>
+
+<p>
+<dl><dt>setattrofunc <b><tt id='l2h-998' xml:id='l2h-998' class="cmember">tp_setattro</tt></b></dt>
+<dd>
+  An optional pointer to the set-attribute function.
+
+<p>
+The signature is the same as for <tt class="cfunction">PyObject_SetAttr()</tt>.  It
+  is usually convenient to set this field to
+  <tt class="cfunction">PyObject_GenericSetAttr()</tt>, which implements the normal
+  way of setting object attributes.
+
+<p>
+This field is inherited by subtypes together with
+  <tt class="member">tp_setattr</tt>: a subtype inherits both <tt class="member">tp_setattr</tt> and
+  <tt class="member">tp_setattro</tt> from its base type when the subtype's
+  <tt class="member">tp_setattr</tt> and <tt class="member">tp_setattro</tt> are both <tt class="constant">NULL</tt>.
+</dl>
+
+<p>
+<dl><dt>PyBufferProcs* <b><tt id='l2h-999' xml:id='l2h-999' class="cmember">tp_as_buffer</tt></b></dt>
+<dd>
+  Pointer to an additional structure that contains fields relevant only to
+  objects which implement the buffer interface.  These fields are
+  documented in ``Buffer Object Structures'' (section
+  <a href="buffer-structs.html#buffer-structs">10.7</a>).
+
+<p>
+The <tt class="member">tp_as_buffer</tt> field is not inherited, but the contained
+  fields are inherited individually.
+</dl>
+
+<p>
+<dl><dt>long <b><tt id='l2h-1000' xml:id='l2h-1000' class="cmember">tp_flags</tt></b></dt>
+<dd>
+  This field is a bit mask of various flags.  Some flags indicate
+  variant semantics for certain situations; others are used to
+  indicate that certain fields in the type object (or in the extension
+  structures referenced via <tt class="member">tp_as_number</tt>,
+  <tt class="member">tp_as_sequence</tt>, <tt class="member">tp_as_mapping</tt>, and
+  <tt class="member">tp_as_buffer</tt>) that were historically not always present are
+  valid; if such a flag bit is clear, the type fields it guards must
+  not be accessed and must be considered to have a zero or <tt class="constant">NULL</tt>
+  value instead.
+
+<p>
+Inheritance of this field is complicated.  Most flag bits are
+  inherited individually, i.e. if the base type has a flag bit set,
+  the subtype inherits this flag bit.  The flag bits that pertain to
+  extension structures are strictly inherited if the extension
+  structure is inherited, i.e. the base type's value of the flag bit
+  is copied into the subtype together with a pointer to the extension
+  structure.  The <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> flag bit is inherited
+  together with the <tt class="member">tp_traverse</tt> and <tt class="member">tp_clear</tt> fields,
+  i.e. if the <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> flag bit is clear in the
+  subtype and the <tt class="member">tp_traverse</tt> and <tt class="member">tp_clear</tt> fields in
+  the subtype exist (as indicated by the
+  <tt class="constant">Py_TPFLAGS_HAVE_RICHCOMPARE</tt> flag bit) and have <tt class="constant">NULL</tt>
+  values.
+
+<p>
+The following bit masks are currently defined; these can be or-ed
+  together using the <code>|</code> operator to form the value of the
+  <tt class="member">tp_flags</tt> field.  The macro <tt class="cfunction">PyType_HasFeature()</tt>
+  takes a type and a flags value, <var>tp</var> and <var>f</var>, and checks
+  whether <code><var>tp</var>-&gt;tp_flags &amp; <var>f</var></code> is non-zero.
+
+<p>
+<dl><dt><b><tt id='l2h-1001' xml:id='l2h-1001'>Py_TPFLAGS_HAVE_GETCHARBUFFER</tt></b></dt>
+<dd>
+    If this bit is set, the <tt class="ctype">PyBufferProcs</tt> struct referenced by
+    <tt class="member">tp_as_buffer</tt> has the <tt class="member">bf_getcharbuffer</tt> field.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1002' xml:id='l2h-1002'>Py_TPFLAGS_HAVE_SEQUENCE_IN</tt></b></dt>
+<dd>
+    If this bit is set, the <tt class="ctype">PySequenceMethods</tt> struct
+    referenced by <tt class="member">tp_as_sequence</tt> has the <tt class="member">sq_contains</tt>
+    field.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1003' xml:id='l2h-1003'>Py_TPFLAGS_GC</tt></b></dt>
+<dd>
+    This bit is obsolete.  The bit it used to name is no longer in
+    use.  The symbol is now defined as zero.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1004' xml:id='l2h-1004'>Py_TPFLAGS_HAVE_INPLACEOPS</tt></b></dt>
+<dd>
+    If this bit is set, the <tt class="ctype">PySequenceMethods</tt> struct
+    referenced by <tt class="member">tp_as_sequence</tt> and the
+    <tt class="ctype">PyNumberMethods</tt> structure referenced by
+    <tt class="member">tp_as_number</tt> contain the fields for in-place operators.
+    In particular, this means that the <tt class="ctype">PyNumberMethods</tt>
+    structure has the fields <tt class="member">nb_inplace_add</tt>,
+    <tt class="member">nb_inplace_subtract</tt>, <tt class="member">nb_inplace_multiply</tt>,
+    <tt class="member">nb_inplace_divide</tt>, <tt class="member">nb_inplace_remainder</tt>,
+    <tt class="member">nb_inplace_power</tt>, <tt class="member">nb_inplace_lshift</tt>,
+    <tt class="member">nb_inplace_rshift</tt>, <tt class="member">nb_inplace_and</tt>,
+    <tt class="member">nb_inplace_xor</tt>, and <tt class="member">nb_inplace_or</tt>; and the
+    <tt class="ctype">PySequenceMethods</tt> struct has the fields
+    <tt class="member">sq_inplace_concat</tt> and <tt class="member">sq_inplace_repeat</tt>.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1005' xml:id='l2h-1005'>Py_TPFLAGS_CHECKTYPES</tt></b></dt>
+<dd>
+    If this bit is set, the binary and ternary operations in the
+    <tt class="ctype">PyNumberMethods</tt> structure referenced by
+    <tt class="member">tp_as_number</tt> accept arguments of arbitrary object types,
+    and do their own type conversions if needed.  If this bit is
+    clear, those operations require that all arguments have the
+    current type as their type, and the caller is supposed to perform
+    a coercion operation first.  This applies to <tt class="member">nb_add</tt>,
+    <tt class="member">nb_subtract</tt>, <tt class="member">nb_multiply</tt>, <tt class="member">nb_divide</tt>,
+    <tt class="member">nb_remainder</tt>, <tt class="member">nb_divmod</tt>, <tt class="member">nb_power</tt>,
+    <tt class="member">nb_lshift</tt>, <tt class="member">nb_rshift</tt>, <tt class="member">nb_and</tt>,
+    <tt class="member">nb_xor</tt>, and <tt class="member">nb_or</tt>.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1006' xml:id='l2h-1006'>Py_TPFLAGS_HAVE_RICHCOMPARE</tt></b></dt>
+<dd>
+    If this bit is set, the type object has the
+    <tt class="member">tp_richcompare</tt> field, as well as the <tt class="member">tp_traverse</tt>
+    and the <tt class="member">tp_clear</tt> fields.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1007' xml:id='l2h-1007'>Py_TPFLAGS_HAVE_WEAKREFS</tt></b></dt>
+<dd>
+    If this bit is set, the <tt class="member">tp_weaklistoffset</tt> field is
+    defined.  Instances of a type are weakly referenceable if the
+    type's <tt class="member">tp_weaklistoffset</tt> field has a value greater than
+    zero.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1008' xml:id='l2h-1008'>Py_TPFLAGS_HAVE_ITER</tt></b></dt>
+<dd>
+    If this bit is set, the type object has the <tt class="member">tp_iter</tt> and
+    <tt class="member">tp_iternext</tt> fields.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1009' xml:id='l2h-1009'>Py_TPFLAGS_HAVE_CLASS</tt></b></dt>
+<dd>
+    If this bit is set, the type object has several new fields defined
+    starting in Python 2.2: <tt class="member">tp_methods</tt>, <tt class="member">tp_members</tt>,
+    <tt class="member">tp_getset</tt>, <tt class="member">tp_base</tt>, <tt class="member">tp_dict</tt>,
+    <tt class="member">tp_descr_get</tt>, <tt class="member">tp_descr_set</tt>,
+    <tt class="member">tp_dictoffset</tt>, <tt class="member">tp_init</tt>, <tt class="member">tp_alloc</tt>,
+    <tt class="member">tp_new</tt>, <tt class="member">tp_free</tt>, <tt class="member">tp_is_gc</tt>,
+    <tt class="member">tp_bases</tt>, <tt class="member">tp_mro</tt>, <tt class="member">tp_cache</tt>,
+    <tt class="member">tp_subclasses</tt>, and <tt class="member">tp_weaklist</tt>.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1010' xml:id='l2h-1010'>Py_TPFLAGS_HEAPTYPE</tt></b></dt>
+<dd>
+    This bit is set when the type object itself is allocated on the
+    heap.  In this case, the <tt class="member">ob_type</tt> field of its instances
+    is considered a reference to the type, and the type object is
+    INCREF'ed when a new instance is created, and DECREF'ed when an
+    instance is destroyed (this does not apply to instances of
+    subtypes; only the type referenced by the instance's ob_type gets
+    INCREF'ed or DECREF'ed).
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1011' xml:id='l2h-1011'>Py_TPFLAGS_BASETYPE</tt></b></dt>
+<dd>
+    This bit is set when the type can be used as the base type of
+    another type.  If this bit is clear, the type cannot be subtyped
+    (similar to a "final" class in Java).
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1012' xml:id='l2h-1012'>Py_TPFLAGS_READY</tt></b></dt>
+<dd>
+    This bit is set when the type object has been fully initialized by
+    <tt class="cfunction">PyType_Ready()</tt>.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1013' xml:id='l2h-1013'>Py_TPFLAGS_READYING</tt></b></dt>
+<dd>
+    This bit is set while <tt class="cfunction">PyType_Ready()</tt> is in the process
+    of initializing the type object.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1014' xml:id='l2h-1014'>Py_TPFLAGS_HAVE_GC</tt></b></dt>
+<dd>
+    This bit is set when the object supports garbage collection.  If
+    this bit is set, instances must be created using
+    <tt class="cfunction">PyObject_GC_New()</tt> and destroyed using
+    <tt class="cfunction">PyObject_GC_Del()</tt>.  More information in section XXX
+    about garbage collection.  This bit also implies that the
+    GC-related fields <tt class="member">tp_traverse</tt> and <tt class="member">tp_clear</tt> are
+    present in the type object; but those fields also exist when
+    <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> is clear but
+    <tt class="constant">Py_TPFLAGS_HAVE_RICHCOMPARE</tt> is set.
+  </dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-1015' xml:id='l2h-1015'>Py_TPFLAGS_DEFAULT</tt></b></dt>
+<dd>
+    This is a bitmask of all the bits that pertain to the existence of
+    certain fields in the type object and its extension structures.
+    Currently, it includes the following bits:
+    <tt class="constant">Py_TPFLAGS_HAVE_GETCHARBUFFER</tt>,
+    <tt class="constant">Py_TPFLAGS_HAVE_SEQUENCE_IN</tt>,
+    <tt class="constant">Py_TPFLAGS_HAVE_INPLACEOPS</tt>,
+    <tt class="constant">Py_TPFLAGS_HAVE_RICHCOMPARE</tt>,
+    <tt class="constant">Py_TPFLAGS_HAVE_WEAKREFS</tt>,
+    <tt class="constant">Py_TPFLAGS_HAVE_ITER</tt>, and
+    <tt class="constant">Py_TPFLAGS_HAVE_CLASS</tt>.
+  </dd></dl>
+</dl>
+
+<p>
+<dl><dt>char* <b><tt id='l2h-1016' xml:id='l2h-1016' class="cmember">tp_doc</tt></b></dt>
+<dd>
+  An optional pointer to a NUL-terminated C string giving the
+  docstring for this type object.  This is exposed as the
+  <tt class="member">__doc__</tt> attribute on the type and instances of the type.
+
+<p>
+This field is <em>not</em> inherited by subtypes.
+</dl>
+
+<p>
+The following three fields only exist if the
+<tt class="constant">Py_TPFLAGS_HAVE_RICHCOMPARE</tt> flag bit is set.
+
+<p>
+<dl><dt>traverseproc <b><tt id='l2h-1017' xml:id='l2h-1017' class="cmember">tp_traverse</tt></b></dt>
+<dd>
+  An optional pointer to a traversal function for the garbage
+  collector.  This is only used if the <tt class="constant">Py_TPFLAGS_HAVE_GC</tt>
+  flag bit is set.  More information about Python's garbage collection
+  scheme can be found in section <a href="supporting-cycle-detection.html#supporting-cycle-detection">10.9</a>.
+
+<p>
+The <tt class="member">tp_traverse</tt> pointer is used by the garbage collector
+  to detect reference cycles. A typical implementation of a
+  <tt class="member">tp_traverse</tt> function simply calls <tt class="cfunction">Py_VISIT()</tt> on
+  each of the instance's members that are Python objects.  For exampe, this
+  is function <tt class="cfunction">local_traverse</tt> from the <tt class="module">thread</tt> extension
+  module:
+
+<p>
+<div class="verbatim"><pre>
+  static int
+  local_traverse(localobject *self, visitproc visit, void *arg)
+  {
+      Py_VISIT(self-&gt;args);
+      Py_VISIT(self-&gt;kw);
+      Py_VISIT(self-&gt;dict);
+      return 0;
+  }
+</pre></div>
+
+<p>
+Note that <tt class="cfunction">Py_VISIT()</tt> is called only on those members that can
+  participate in reference cycles.  Although there is also a
+  "<tt class="samp">self-&gt;key</tt>" member, it can only be <tt class="constant">NULL</tt> or a Python string and
+  therefore cannot be part of a reference cycle.
+
+<p>
+On the other hand, even if you know a member can never be part of a cycle,
+  as a debugging aid you may want to visit it anyway just so the
+  <tt class="module">gc</tt> module's <tt class="function">get_referents()</tt> function will include it.
+
+<p>
+Note that <tt class="cfunction">Py_VISIT()</tt> requires the <var>visit</var> and <var>arg</var>
+  parameters to <tt class="cfunction">local_traverse</tt> to have these specific names;
+  don't name them just anything.
+
+<p>
+This field is inherited by subtypes together with <tt class="member">tp_clear</tt>
+  and the <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> flag bit: the flag bit,
+  <tt class="member">tp_traverse</tt>, and <tt class="member">tp_clear</tt> are all inherited from
+  the base type if they are all zero in the subtype <em>and</em> the
+  subtype has the <tt class="constant">Py_TPFLAGS_HAVE_RICHCOMPARE</tt> flag bit set.
+</dl>
+
+<p>
+<dl><dt>inquiry <b><tt id='l2h-1018' xml:id='l2h-1018' class="cmember">tp_clear</tt></b></dt>
+<dd>
+  An optional pointer to a clear function for the garbage collector.
+  This is only used if the <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> flag bit is
+  set.
+
+<p>
+The <tt class="member">tp_clear</tt> member function is used to break reference
+  cycles in cyclic garbage detected by the garbage collector.  Taken
+  together, all <tt class="member">tp_clear</tt> functions in the system must combine to
+  break all reference cycles.  This is subtle, and if in any doubt supply a
+  <tt class="member">tp_clear</tt> function.  For example, the tuple type does not
+  implement a <tt class="member">tp_clear</tt> function, because it's possible to prove
+  that no reference cycle can be composed entirely of tuples.  Therefore
+  the <tt class="member">tp_clear</tt> functions of other types must be sufficient to
+  break any cycle containing a tuple.  This isn't immediately obvious, and
+  there's rarely a good reason to avoid implementing <tt class="member">tp_clear</tt>.
+
+<p>
+Implementations of <tt class="member">tp_clear</tt> should drop the instance's
+  references to those of its members that may be Python objects, and set
+  its pointers to those members to <tt class="constant">NULL</tt>, as in the following example:
+
+<p>
+<div class="verbatim"><pre>
+  static int
+  local_clear(localobject *self)
+  {
+      Py_CLEAR(self-&gt;key);
+      Py_CLEAR(self-&gt;args);
+      Py_CLEAR(self-&gt;kw);
+      Py_CLEAR(self-&gt;dict);
+      return 0;
+  }
+</pre></div>
+
+<p>
+The <tt class="cfunction">Py_CLEAR()</tt> macro should be used, because clearing
+  references is delicate:  the reference to the contained object must not be
+  decremented until after the pointer to the contained object is set to
+  <tt class="constant">NULL</tt>.  This is because decrementing the reference count may cause
+  the contained object to become trash, triggering a chain of reclamation
+  activity that may include invoking arbitrary Python code (due to
+  finalizers, or weakref callbacks, associated with the contained object).
+  If it's possible for such code to reference <var>self</var> again, it's
+  important that the pointer to the contained object be <tt class="constant">NULL</tt> at that
+  time, so that <var>self</var> knows the contained object can no longer be
+  used.  The <tt class="cfunction">Py_CLEAR()</tt> macro performs the operations in a
+  safe order.
+
+<p>
+Because the goal of <tt class="member">tp_clear</tt> functions is to break reference
+  cycles, it's not necessary to clear contained objects like Python strings
+  or Python integers, which can't participate in reference cycles.
+  On the other hand, it may be convenient to clear all contained Python
+  objects, and write the type's <tt class="member">tp_dealloc</tt> function to
+  invoke <tt class="member">tp_clear</tt>.
+
+<p>
+More information about Python's garbage collection
+  scheme can be found in section <a href="supporting-cycle-detection.html#supporting-cycle-detection">10.9</a>.
+
+<p>
+This field is inherited by subtypes together with <tt class="member">tp_traverse</tt>
+  and the <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> flag bit: the flag bit,
+  <tt class="member">tp_traverse</tt>, and <tt class="member">tp_clear</tt> are all inherited from
+  the base type if they are all zero in the subtype <em>and</em> the
+  subtype has the <tt class="constant">Py_TPFLAGS_HAVE_RICHCOMPARE</tt> flag bit set.
+</dl>
+
+<p>
+<dl><dt>richcmpfunc <b><tt id='l2h-1019' xml:id='l2h-1019' class="cmember">tp_richcompare</tt></b></dt>
+<dd>
+  An optional pointer to the rich comparison function.
+
+<p>
+The signature is the same as for <tt class="cfunction">PyObject_RichCompare()</tt>.
+  The function should return the result of the comparison (usually
+  <code>Py_True</code> or <code>Py_False</code>).  If the comparison is undefined,
+  it must return <code>Py_NotImplemented</code>, if another error occurred
+  it must return <code>NULL</code> and set an exception condition.
+
+<p>
+This field is inherited by subtypes together with
+  <tt class="member">tp_compare</tt> and <tt class="member">tp_hash</tt>: a subtype inherits all
+  three of <tt class="member">tp_compare</tt>, <tt class="member">tp_richcompare</tt>, and
+  <tt class="member">tp_hash</tt>, when the subtype's <tt class="member">tp_compare</tt>,
+  <tt class="member">tp_richcompare</tt>, and <tt class="member">tp_hash</tt> are all <tt class="constant">NULL</tt>.
+
+<p>
+The following constants are defined to be used as the third argument
+  for <tt class="member">tp_richcompare</tt> and for <tt class="cfunction">PyObject_RichCompare()</tt>:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Constant</th>
+      <th class="center">Comparison</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><tt class="constant">Py_LT</tt></td>
+        <td class="center"><code>&lt;</code></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">Py_LE</tt></td>
+        <td class="center"><code>&lt;=</code></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">Py_EQ</tt></td>
+        <td class="center"><code>==</code></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">Py_NE</tt></td>
+        <td class="center"><code>!=</code></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">Py_GT</tt></td>
+        <td class="center"><code>&gt;</code></td></tr>
+    <tr><td class="left"   valign="baseline"><tt class="constant">Py_GE</tt></td>
+        <td class="center"><code>&gt;=</code></td></tr></tbody>
+</table></div>
+</dl>
+
+<p>
+The next field only exists if the <tt class="constant">Py_TPFLAGS_HAVE_WEAKREFS</tt>
+flag bit is set.
+
+<p>
+<dl><dt>long <b><tt id='l2h-1020' xml:id='l2h-1020' class="cmember">tp_weaklistoffset</tt></b></dt>
+<dd>
+  If the instances of this type are weakly referenceable, this field
+  is greater than zero and contains the offset in the instance
+  structure of the weak reference list head (ignoring the GC header,
+  if present); this offset is used by
+  <tt class="cfunction">PyObject_ClearWeakRefs()</tt> and the
+  <tt class="cfunction">PyWeakref_*()</tt> functions.  The instance structure needs
+  to include a field of type <tt class="ctype">PyObject*</tt> which is initialized to
+  <tt class="constant">NULL</tt>.
+
+<p>
+Do not confuse this field with <tt class="member">tp_weaklist</tt>; that is the
+  list head for weak references to the type object itself.
+
+<p>
+This field is inherited by subtypes, but see the rules listed below.
+  A subtype may override this offset; this means that the subtype uses
+  a different weak reference list head than the base type.  Since the
+  list head is always found via <tt class="member">tp_weaklistoffset</tt>, this
+  should not be a problem.
+
+<p>
+When a type defined by a class statement has no <tt class="member">__slots__</tt>
+  declaration, and none of its base types are weakly referenceable,
+  the type is made weakly referenceable by adding a weak reference
+  list head slot to the instance layout and setting the
+  <tt class="member">tp_weaklistoffset</tt> of that slot's offset.
+
+<p>
+When a type's <tt class="member">__slots__</tt> declaration contains a slot named
+  <tt class="member">__weakref__</tt>, that slot becomes the weak reference list head
+  for instances of the type, and the slot's offset is stored in the
+  type's <tt class="member">tp_weaklistoffset</tt>.
+
+<p>
+When a type's <tt class="member">__slots__</tt> declaration does not contain a slot
+  named <tt class="member">__weakref__</tt>, the type inherits its
+  <tt class="member">tp_weaklistoffset</tt> from its base type.
+</dl>
+
+<p>
+The next two fields only exist if the
+<tt class="constant">Py_TPFLAGS_HAVE_CLASS</tt> flag bit is set.
+
+<p>
+<dl><dt>getiterfunc <b><tt id='l2h-1021' xml:id='l2h-1021' class="cmember">tp_iter</tt></b></dt>
+<dd>
+  An optional pointer to a function that returns an iterator for the
+  object.  Its presence normally signals that the instances of this
+  type are iterable (although sequences may be iterable without this
+  function, and classic instances always have this function, even if
+  they don't define an <tt class="method">__iter__()</tt> method).
+
+<p>
+This function has the same signature as
+  <tt class="cfunction">PyObject_GetIter()</tt>.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>iternextfunc <b><tt id='l2h-1022' xml:id='l2h-1022' class="cmember">tp_iternext</tt></b></dt>
+<dd>
+  An optional pointer to a function that returns the next item in an
+  iterator, or raises <tt class="exception">StopIteration</tt> when the iterator is
+  exhausted.  Its presence normally signals that the instances of this
+  type are iterators (although classic instances always have this
+  function, even if they don't define a <tt class="method">next()</tt> method).
+
+<p>
+Iterator types should also define the <tt class="member">tp_iter</tt> function, and
+  that function should return the iterator instance itself (not a new
+  iterator instance).
+
+<p>
+This function has the same signature as <tt class="cfunction">PyIter_Next()</tt>.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+The next fields, up to and including <tt class="member">tp_weaklist</tt>, only exist
+if the <tt class="constant">Py_TPFLAGS_HAVE_CLASS</tt> flag bit is set.
+
+<p>
+<dl><dt>struct PyMethodDef* <b><tt id='l2h-1023' xml:id='l2h-1023' class="cmember">tp_methods</tt></b></dt>
+<dd>
+  An optional pointer to a static <tt class="constant">NULL</tt>-terminated array of
+  <tt class="ctype">PyMethodDef</tt> structures, declaring regular methods of this
+  type.
+
+<p>
+For each entry in the array, an entry is added to the type's
+  dictionary (see <tt class="member">tp_dict</tt> below) containing a method
+  descriptor.
+
+<p>
+This field is not inherited by subtypes (methods are
+  inherited through a different mechanism).
+</dl>
+
+<p>
+<dl><dt>struct PyMemberDef* <b><tt id='l2h-1024' xml:id='l2h-1024' class="cmember">tp_members</tt></b></dt>
+<dd>
+  An optional pointer to a static <tt class="constant">NULL</tt>-terminated array of
+  <tt class="ctype">PyMemberDef</tt> structures, declaring regular data members
+  (fields or slots) of instances of this type.
+
+<p>
+For each entry in the array, an entry is added to the type's
+  dictionary (see <tt class="member">tp_dict</tt> below) containing a member
+  descriptor.
+
+<p>
+This field is not inherited by subtypes (members are inherited
+  through a different mechanism).
+</dl>
+
+<p>
+<dl><dt>struct PyGetSetDef* <b><tt id='l2h-1025' xml:id='l2h-1025' class="cmember">tp_getset</tt></b></dt>
+<dd>
+  An optional pointer to a static <tt class="constant">NULL</tt>-terminated array of
+  <tt class="ctype">PyGetSetDef</tt> structures, declaring computed attributes of
+  instances of this type.
+
+<p>
+For each entry in the array, an entry is added to the type's
+  dictionary (see <tt class="member">tp_dict</tt> below) containing a getset
+  descriptor.
+
+<p>
+This field is not inherited by subtypes (computed attributes are
+  inherited through a different mechanism).
+
+<p>
+Docs for PyGetSetDef (XXX belong elsewhere):
+
+<p>
+<div class="verbatim"><pre>
+typedef PyObject *(*getter)(PyObject *, void *);
+typedef int (*setter)(PyObject *, PyObject *, void *);
+
+typedef struct PyGetSetDef {
+    char *name;    /* attribute name */
+    getter get;    /* C function to get the attribute */
+    setter set;    /* C function to set the attribute */
+    char *doc;     /* optional doc string */
+    void *closure; /* optional additional data for getter and setter */
+} PyGetSetDef;
+</pre></div>
+</dl>
+
+<p>
+<dl><dt>PyTypeObject* <b><tt id='l2h-1026' xml:id='l2h-1026' class="cmember">tp_base</tt></b></dt>
+<dd>
+  An optional pointer to a base type from which type properties are
+  inherited.  At this level, only single inheritance is supported;
+  multiple inheritance require dynamically creating a type object by
+  calling the metatype.
+
+<p>
+This field is not inherited by subtypes (obviously), but it defaults
+  to <code>&amp;PyBaseObject_Type</code> (which to Python programmers is known
+  as the type <tt class="class">object</tt>).
+</dl>
+
+<p>
+<dl><dt>PyObject* <b><tt id='l2h-1027' xml:id='l2h-1027' class="cmember">tp_dict</tt></b></dt>
+<dd>
+  The type's dictionary is stored here by <tt class="cfunction">PyType_Ready()</tt>.
+
+<p>
+This field should normally be initialized to <tt class="constant">NULL</tt> before
+  PyType_Ready is called; it may also be initialized to a dictionary
+  containing initial attributes for the type.  Once
+  <tt class="cfunction">PyType_Ready()</tt> has initialized the type, extra
+  attributes for the type may be added to this dictionary only if they
+  don't correspond to overloaded operations (like <tt class="method">__add__()</tt>).
+
+<p>
+This field is not inherited by subtypes (though the attributes
+  defined in here are inherited through a different mechanism).
+</dl>
+
+<p>
+<dl><dt>descrgetfunc <b><tt id='l2h-1028' xml:id='l2h-1028' class="cmember">tp_descr_get</tt></b></dt>
+<dd>
+  An optional pointer to a "descriptor get" function.
+
+<p>
+The function signature is
+
+<p>
+<div class="verbatim"><pre>
+PyObject * tp_descr_get(PyObject *self, PyObject *obj, PyObject *type);
+</pre></div>
+
+<p>
+XXX blah, blah.
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>descrsetfunc <b><tt id='l2h-1029' xml:id='l2h-1029' class="cmember">tp_descr_set</tt></b></dt>
+<dd>
+  An optional pointer to a "descriptor set" function.
+
+<p>
+The function signature is
+
+<p>
+<div class="verbatim"><pre>
+int tp_descr_set(PyObject *self, PyObject *obj, PyObject *value);
+</pre></div>
+
+<p>
+This field is inherited by subtypes.
+
+<p>
+XXX blah, blah.
+
+<p>
+</dl>
+
+<p>
+<dl><dt>long <b><tt id='l2h-1030' xml:id='l2h-1030' class="cmember">tp_dictoffset</tt></b></dt>
+<dd>
+  If the instances of this type have a dictionary containing instance
+  variables, this field is non-zero and contains the offset in the
+  instances of the type of the instance variable dictionary; this
+  offset is used by <tt class="cfunction">PyObject_GenericGetAttr()</tt>.
+
+<p>
+Do not confuse this field with <tt class="member">tp_dict</tt>; that is the
+  dictionary for attributes of the type object itself.
+
+<p>
+If the value of this field is greater than zero, it specifies the
+  offset from the start of the instance structure.  If the value is
+  less than zero, it specifies the offset from the <em>end</em> of the
+  instance structure.  A negative offset is more expensive to use, and
+  should only be used when the instance structure contains a
+  variable-length part.  This is used for example to add an instance
+  variable dictionary to subtypes of <tt class="class">str</tt> or <tt class="class">tuple</tt>.
+  Note that the <tt class="member">tp_basicsize</tt> field should account for the
+  dictionary added to the end in that case, even though the dictionary
+  is not included in the basic object layout.  On a system with a
+  pointer size of 4 bytes, <tt class="member">tp_dictoffset</tt> should be set to
+  <code>-4</code> to indicate that the dictionary is at the very end of the
+  structure.
+
+<p>
+The real dictionary offset in an instance can be computed from a
+  negative <tt class="member">tp_dictoffset</tt> as follows:
+
+<p>
+<div class="verbatim"><pre>
+dictoffset = tp_basicsize + abs(ob_size)*tp_itemsize + tp_dictoffset
+if dictoffset is not aligned on sizeof(void*):
+    round up to sizeof(void*)
+</pre></div>
+
+<p>
+where <tt class="member">tp_basicsize</tt>, <tt class="member">tp_itemsize</tt> and
+  <tt class="member">tp_dictoffset</tt> are taken from the type object, and
+  <tt class="member">ob_size</tt> is taken from the instance.  The absolute value is
+  taken because long ints use the sign of <tt class="member">ob_size</tt> to store
+  the sign of the number.  (There's never a need to do this
+  calculation yourself; it is done for you by
+  <tt class="cfunction">_PyObject_GetDictPtr()</tt>.)
+
+<p>
+This field is inherited by subtypes, but see the rules listed below.
+  A subtype may override this offset; this means that the subtype
+  instances store the dictionary at a difference offset than the base
+  type.  Since the dictionary is always found via
+  <tt class="member">tp_dictoffset</tt>, this should not be a problem.
+
+<p>
+When a type defined by a class statement has no <tt class="member">__slots__</tt>
+  declaration, and none of its base types has an instance variable
+  dictionary, a dictionary slot is added to the instance layout and
+  the <tt class="member">tp_dictoffset</tt> is set to that slot's offset.
+
+<p>
+When a type defined by a class statement has a <tt class="member">__slots__</tt>
+  declaration, the type inherits its <tt class="member">tp_dictoffset</tt> from its
+  base type.
+
+<p>
+(Adding a slot named <tt class="member">__dict__</tt> to the <tt class="member">__slots__</tt>
+  declaration does not have the expected effect, it just causes
+  confusion.  Maybe this should be added as a feature just like
+  <tt class="member">__weakref__</tt> though.)
+</dl>
+
+<p>
+<dl><dt>initproc <b><tt id='l2h-1031' xml:id='l2h-1031' class="cmember">tp_init</tt></b></dt>
+<dd>
+  An optional pointer to an instance initialization function.
+
+<p>
+This function corresponds to the <tt class="method">__init__()</tt> method of
+  classes.  Like <tt class="method">__init__()</tt>, it is possible to create an
+  instance without calling <tt class="method">__init__()</tt>, and it is possible to
+  reinitialize an instance by calling its <tt class="method">__init__()</tt> method
+  again.
+
+<p>
+The function signature is
+
+<p>
+<div class="verbatim"><pre>
+int tp_init(PyObject *self, PyObject *args, PyObject *kwds)
+</pre></div>
+
+<p>
+The self argument is the instance to be initialized; the <var>args</var>
+  and <var>kwds</var> arguments represent positional and keyword arguments
+  of the call to <tt class="method">__init__()</tt>.
+
+<p>
+The <tt class="member">tp_init</tt> function, if not <tt class="constant">NULL</tt>, is called when an
+  instance is created normally by calling its type, after the type's
+  <tt class="member">tp_new</tt> function has returned an instance of the type.  If
+  the <tt class="member">tp_new</tt> function returns an instance of some other type
+  that is not a subtype of the original type, no <tt class="member">tp_init</tt>
+  function is called; if <tt class="member">tp_new</tt> returns an instance of a
+  subtype of the original type, the subtype's <tt class="member">tp_init</tt> is
+  called.  (VERSION NOTE: described here is what is implemented in
+  Python 2.2.1 and later.  In Python 2.2, the <tt class="member">tp_init</tt> of the
+  type of the object returned by <tt class="member">tp_new</tt> was always called, if
+  not <tt class="constant">NULL</tt>.)
+
+<p>
+This field is inherited by subtypes.
+</dl>
+
+<p>
+<dl><dt>allocfunc <b><tt id='l2h-1032' xml:id='l2h-1032' class="cmember">tp_alloc</tt></b></dt>
+<dd>
+  An optional pointer to an instance allocation function.
+
+<p>
+The function signature is
+
+<p>
+<div class="verbatim"><pre>
+PyObject *tp_alloc(PyTypeObject *self, Py_ssize_t nitems)
+</pre></div>
+
+<p>
+The purpose of this function is to separate memory allocation from
+  memory initialization.  It should return a pointer to a block of
+  memory of adequate length for the instance, suitably aligned, and
+  initialized to zeros, but with <tt class="member">ob_refcnt</tt> set to <code>1</code>
+  and <tt class="member">ob_type</tt> set to the type argument.  If the type's
+  <tt class="member">tp_itemsize</tt> is non-zero, the object's <tt class="member">ob_size</tt> field
+  should be initialized to <var>nitems</var> and the length of the
+  allocated memory block should be <code>tp_basicsize +
+  <var>nitems</var>*tp_itemsize</code>, rounded up to a multiple of
+  <code>sizeof(void*)</code>; otherwise, <var>nitems</var> is not used and the
+  length of the block should be <tt class="member">tp_basicsize</tt>.
+
+<p>
+Do not use this function to do any other instance initialization,
+  not even to allocate additional memory; that should be done by
+  <tt class="member">tp_new</tt>.
+
+<p>
+This field is inherited by static subtypes, but not by dynamic
+  subtypes (subtypes created by a class statement); in the latter,
+  this field is always set to <tt class="cfunction">PyType_GenericAlloc()</tt>, to
+  force a standard heap allocation strategy.  That is also the
+  recommended value for statically defined types.
+</dl>
+
+<p>
+<dl><dt>newfunc <b><tt id='l2h-1033' xml:id='l2h-1033' class="cmember">tp_new</tt></b></dt>
+<dd>
+  An optional pointer to an instance creation function.
+
+<p>
+If this function is <tt class="constant">NULL</tt> for a particular type, that type cannot
+  be called to create new instances; presumably there is some other
+  way to create instances, like a factory function.
+
+<p>
+The function signature is
+
+<p>
+<div class="verbatim"><pre>
+PyObject *tp_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds)
+</pre></div>
+
+<p>
+The subtype argument is the type of the object being created; the
+  <var>args</var> and <var>kwds</var> arguments represent positional and keyword
+  arguments of the call to the type.  Note that subtype doesn't have
+  to equal the type whose <tt class="member">tp_new</tt> function is called; it may
+  be a subtype of that type (but not an unrelated type).
+
+<p>
+The <tt class="member">tp_new</tt> function should call
+  <code><var>subtype</var>-&gt;tp_alloc(<var>subtype</var>, <var>nitems</var>)</code> to
+  allocate space for the object, and then do only as much further
+  initialization as is absolutely necessary.  Initialization that can
+  safely be ignored or repeated should be placed in the
+  <tt class="member">tp_init</tt> handler.  A good rule of thumb is that for
+  immutable types, all initialization should take place in
+  <tt class="member">tp_new</tt>, while for mutable types, most initialization should
+  be deferred to <tt class="member">tp_init</tt>.
+
+<p>
+This field is inherited by subtypes, except it is not inherited by
+  static types whose <tt class="member">tp_base</tt> is <tt class="constant">NULL</tt> or
+  <code>&amp;PyBaseObject_Type</code>.  The latter exception is a precaution so
+  that old extension types don't become callable simply by being
+  linked with Python 2.2.
+</dl>
+
+<p>
+<dl><dt>destructor <b><tt id='l2h-1034' xml:id='l2h-1034' class="cmember">tp_free</tt></b></dt>
+<dd>
+  An optional pointer to an instance deallocation function.
+
+<p>
+The signature of this function has changed slightly: in Python
+  2.2 and 2.2.1, its signature is <tt class="ctype">destructor</tt>:
+
+<p>
+<div class="verbatim"><pre>
+void tp_free(PyObject *)
+</pre></div>
+
+<p>
+In Python 2.3 and beyond, its signature is <tt class="ctype">freefunc</tt>:
+
+<p>
+<div class="verbatim"><pre>
+void tp_free(void *)
+</pre></div>
+
+<p>
+The only initializer that is compatible with both versions is
+  <code>_PyObject_Del</code>, whose definition has suitably adapted in
+  Python 2.3.
+
+<p>
+This field is inherited by static subtypes, but not by dynamic
+  subtypes (subtypes created by a class statement); in the latter,
+  this field is set to a deallocator suitable to match
+  <tt class="cfunction">PyType_GenericAlloc()</tt> and the value of the
+  <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> flag bit.
+</dl>
+
+<p>
+<dl><dt>inquiry <b><tt id='l2h-1035' xml:id='l2h-1035' class="cmember">tp_is_gc</tt></b></dt>
+<dd>
+  An optional pointer to a function called by the garbage collector.
+
+<p>
+The garbage collector needs to know whether a particular object is
+  collectible or not.  Normally, it is sufficient to look at the
+  object's type's <tt class="member">tp_flags</tt> field, and check the
+  <tt class="constant">Py_TPFLAGS_HAVE_GC</tt> flag bit.  But some types have a
+  mixture of statically and dynamically allocated instances, and the
+  statically allocated instances are not collectible.  Such types
+  should define this function; it should return <code>1</code> for a
+  collectible instance, and <code>0</code> for a non-collectible instance.
+  The signature is
+
+<p>
+<div class="verbatim"><pre>
+int tp_is_gc(PyObject *self)
+</pre></div>
+
+<p>
+(The only example of this are types themselves.  The metatype,
+  <tt class="cdata">PyType_Type</tt>, defines this function to distinguish between
+  statically and dynamically allocated types.)
+
+<p>
+This field is inherited by subtypes.  (VERSION NOTE: in Python
+  2.2, it was not inherited.  It is inherited in 2.2.1 and later
+  versions.)
+</dl>
+
+<p>
+<dl><dt>PyObject* <b><tt id='l2h-1036' xml:id='l2h-1036' class="cmember">tp_bases</tt></b></dt>
+<dd>
+  Tuple of base types.
+
+<p>
+This is set for types created by a class statement.  It should be
+  <tt class="constant">NULL</tt> for statically defined types.
+
+<p>
+This field is not inherited.
+</dl>
+
+<p>
+<dl><dt>PyObject* <b><tt id='l2h-1037' xml:id='l2h-1037' class="cmember">tp_mro</tt></b></dt>
+<dd>
+  Tuple containing the expanded set of base types, starting with the
+  type itself and ending with <tt class="class">object</tt>, in Method Resolution
+  Order.
+
+<p>
+This field is not inherited; it is calculated fresh by
+  <tt class="cfunction">PyType_Ready()</tt>.
+</dl>
+
+<p>
+<dl><dt>PyObject* <b><tt id='l2h-1038' xml:id='l2h-1038' class="cmember">tp_cache</tt></b></dt>
+<dd>
+  Unused.  Not inherited.  Internal use only.
+</dl>
+
+<p>
+<dl><dt>PyObject* <b><tt id='l2h-1039' xml:id='l2h-1039' class="cmember">tp_subclasses</tt></b></dt>
+<dd>
+  List of weak references to subclasses.  Not inherited.  Internal
+  use only.
+</dl>
+
+<p>
+<dl><dt>PyObject* <b><tt id='l2h-1040' xml:id='l2h-1040' class="cmember">tp_weaklist</tt></b></dt>
+<dd>
+  Weak reference list head, for weak references to this type
+  object.  Not inherited.  Internal use only.
+</dl>
+
+<p>
+The remaining fields are only defined if the feature test macro
+<tt class="constant">COUNT_ALLOCS</tt> is defined, and are for internal use only.
+They are documented here for completeness.  None of these fields are
+inherited by subtypes.
+
+<p>
+<dl><dt>Py_ssize_t <b><tt id='l2h-1041' xml:id='l2h-1041' class="cmember">tp_allocs</tt></b></dt>
+<dd>
+  Number of allocations.
+</dl>
+
+<p>
+<dl><dt>Py_ssize_t <b><tt id='l2h-1042' xml:id='l2h-1042' class="cmember">tp_frees</tt></b></dt>
+<dd>
+  Number of frees.
+</dl>
+
+<p>
+<dl><dt>Py_ssize_t <b><tt id='l2h-1043' xml:id='l2h-1043' class="cmember">tp_maxalloc</tt></b></dt>
+<dd>
+  Maximum simultaneously allocated objects.
+</dl>
+
+<p>
+<dl><dt>PyTypeObject* <b><tt id='l2h-1044' xml:id='l2h-1044' class="cmember">tp_next</tt></b></dt>
+<dd>
+  Pointer to the next type object with a non-zero <tt class="member">tp_allocs</tt>
+  field.
+</dl>
+
+<p>
+Also, note that, in a garbage collected Python, tp_dealloc may be
+called from any Python thread, not just the thread which created the
+object (if the object becomes part of a refcount cycle, that cycle
+might be collected by a garbage collection on any thread).  This is
+not a problem for Python API calls, since the thread on which
+tp_dealloc is called will own the Global Interpreter Lock (GIL).
+However, if the object being destroyed in turn destroys objects from
+some other C or C++ library, care should be taken to ensure that
+destroying those objects on the thread which called tp_dealloc will
+not violate any assumptions of the library.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="10.2 common Object Structures"
+  href="common-structs.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="10. object Implementation Support"
+  href="newTypes.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="10.4 mapping Object Structures"
+  href="mapping-structs.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="common-structs.html">10.2 Common Object Structures</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="newTypes.html">10. Object Implementation Support</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mapping-structs.html">10.4 Mapping Object Structures</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

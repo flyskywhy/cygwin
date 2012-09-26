@@ -1,0 +1,378 @@
+minires 1.00
+
+Pierre A. Humblet
+October 2004
+
+Copyright (c) 2001 - 2004 Pierre A. Humblet
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option)
+any later version
+
+The file minires.c contains a simple implementation of resolver functions
+(found e.g. in the bind package) commonly used in clients, adapted to the
+Cygwin environment. The initial version was written from scratch as a
+weekend project, starting from man page API definitions.
+
+On versions of Windows that support it (Windows 2000 and above), the
+function res_query are implemented by calling DnsQuery and translating
+the result to wire format IF THE FILE /etc/resolv.conf IS NOT READABLE 
+or if it contains an "options" line with token "osquery". 
+
+If this is not the case, the system works as a simple synchronous non 
+caching stub resolver.
+Instead of querying a local bind daemon, the routines try to reach
+predefined name servers. Their addresses are obtained directly from Windows
+(except on Win95 with DHCP) or from /etc/resolv.conf or from the LOCALDOMAIN
+environment variable.
+
+The API conforms to the following resolver(3) and resolv.conf man pages, 
+with some variations noted below. See also resolver(5) and hostname(7).
+
+Recent versions of bind include many functions not implemented here.
+
+The resolv.h, arpa/nameser.h and arpa/nameser_compat.h files are included 
+as they are not in the current standard Cygwin. They were taken from 
+bind 9.2.1.
+
+THESE INCLUDE FILES MUST BE INSTALLED MANUALLY (not done by make install)
+under /usr/local/include (or /usr/include).  
+Verify that you do not already have such files under /usr/include from 
+some other source.
+
+Note that resolv.h redefines the function names to have a "__" prefix.
+This can lead to problems with some configure scripts, see
+http://www.openldap.org/lists/openldap-bugs/199907/msg00021.html
+To partially resolve the issue, the dll (but not the static library) 
+also exports the functions without extra underscores.
+
+The package creates the library libminires.dll.a libminires.a). 
+Standard makefiles expect libresolv.dll.a 
+MAKE A SYMBOLIC LINK FROM ONE TO THE OTHER:
+ln -s /usr/local/lib/libminires.dll.a /usr/local/lib/libresolv.dll.a
+
+resolv.h changed with release 0.94. Applications compiled with
+the old (new) version WILL NOT RUN with newer (older) dll's.
+
+*********************************************************
+resolver(3)
+
+#include <sys/types.h> 
+#include <netinet/in.h> 
+#include <arpa/nameser.h> 
+#include <resolv.h> 
+
+res_query(dname, class, type, answer, anslen) 
+const char *dname; 
+int class, type; 
+u_char *answer; 
+int anslen; 
+
+res_search(dname, class, type, answer, anslen) 
+const char *dname; 
+int class, type; 
+u_char *answer;
+int anslen; 
+
+res_mkquery(op, dname, class, type, data, datalen, newrr, buf, buflen) 
+int op; 
+const char *dname; 
+int class, type; 
+const char *data; 
+int datalen; 
+struct rrec *newrr; 
+u_char *buf; 
+int buflen; 
+
+int res_querydomain( const char * Name, const char * DomName, int Class,
+		     int Type, unsigned char * AnsPtr, int AnsLength)
+
+res_send(msg, msglen, answer, anslen) 
+const u_char *msg; 
+int msglen; 
+u_char *answer; 
+int anslen; 
+
+res_init() 
+
+res_close()
+
+dn_comp(exp_dn, comp_dn, length, dnptrs, lastdnptr) 
+const char *exp_dn; 
+u_char *comp_dn; 
+int length; 
+u_char **dnptrs, **lastdnptr; 
+
+dn_expand(msg, eomorig, comp_dn, exp_dn, length) 
+const u_char *msg, *eomorig, *comp_dn; 
+char *exp_dn; 
+int length; 
+
+int dn_skipname(const unsigned char *comp_dn, const unsigned char *eom)
+
+The res_xx functions listed above are not thread safe as they access 
+a common structure, struct __res_state _res (see below) and set the
+global variable h_errno.
+
+The functions res_nquery, res_nsearch, res_nmkquery, res_nsend, 
+res_ninit and res_nclose are thread safe. They all have an extra 
+initial argument of type res_state and set the element res_h_errno.
+
+DESCRIPTION
+
+These routines are used for making, sending and interpreting query and reply
+messages with Internet domain name servers.
+
+Global configuration and state information that is used by the resolver
+routines is kept in the structure _res. Most of the values have reasonable
+defaults and can be ignored. Options stored in _res.options are defined in
+resolv.h and are as follows. Options are stored as a simple bit mask
+containing the bitwise ``or'' of the options enabled.
+
+RES_INIT 
+True if the initial name server address and default domain name are
+initialized (i.e., res_init has been called).
+
+RES_DEBUG 
+Print debugging messages. 
+
+RES_AAONLY 
+Accept authoritative answers only. With this option, res_send should
+continue until it finds an authoritative answer or finds an error. Currently
+this is not implemented.
+
+RES_USEVC 
+Use TCP connections for queries instead of UDP datagrams. 
+
+RES_STAYOPEN 
+Used with RES_USEVC to keep the TCP connection open between queries. This is
+useful only in programs that regularly do many queries. UDP should be the
+normal mode used.
+
+RES_IGNTC 
+Ignore truncation errors, i.e., don't retry with TCP. 
+
+RES_RECURSE 
+Set the recursion-desired bit in queries. This is the default. ( res_send
+does not do iterative queries and expects the name server to handle
+recursion.)
+
+RES_DEFNAMES 
+If set, res_search will append the default domain name to single-component
+names (those that do not contain a dot). This option is enabled by default.
+
+RES_DNSRCH
+If this option is set, res_search will search for host names in the current
+domain and in parent domains; see hostname(7). This is used by the standard
+host lookup routine gethostbyname(3). This option is enabled by default.
+
+RES_NOALIASES
+This option turns off the user level aliasing feature controlled by the
+HOSTALIASES environment variable. Network daemons should set this option.
+
+The options are initialized by placing the following line in /etc/resolv.conf:
+options debug use_os retry:n retrans:n
+ 
+The res_init routine reads the configuration file (if any; see resolver(5))
+to get the default domain name, search list and the Internet address of the
+local name server(s). If no server is configured, the host running the
+resolver is tried. The current domain name is defined by the hostname if not
+specified in the configuration file; it can be overridden by the environment
+variable LOCALDOMAIN. This environment variable may contain several
+blank-separated tokens if you wish to override the search list on a
+per-process basis. This is similar to the search command in the
+configuration file. Another environment variable (``RES_OPTIONS'') can be
+set to override certain internal resolver options which are otherwise set by
+changing fields in the _res structure or are inherited from the
+configuration file's options command. The syntax of the ``RES_OPTIONS''
+environment variable is explained in resolver(5). Initialization normally
+occurs on the first call to one of the other resolver routines.  
+
+The res_query function provides an interface to the server query
+mechanism. It constructs a query, sends it to the local server, awaits a
+response, and makes preliminary checks on the reply. The query requests
+information of the specified type and class for the specified
+fully-qualified domain name dname . The reply message is left in the answer
+buffer with length anslen supplied by the caller.
+
+The res_querydomain queries the concatenation of Name and DomName.
+
+The res_search routine makes a query and awaits a response like res_query,
+but in addition, it implements the default and search rules controlled by
+the RES_DEFNAMES and RES_DNSRCH options. It returns the first successful
+reply.
+
+The remaining routines are lower-level routines used by res_query. The
+res_mkquery function constructs a standard query message and places it in
+buf. It returns the size of the query, or -1 if the query is larger than
+buflen. The query type op is usually QUERY, but can be any of the query
+types defined in <arpa/nameser.h>. The domain name for the query is given by
+dname. Newrr is currently unused but is intended for making update messages.
+
+The res_send routine sends a pre-formatted query and returns an answer. It
+will call res_init if RES_INIT is not set, send the query to the local name
+server, and handle timeouts and retries. The length of the reply message is
+returned, or -1 if there were errors.
+
+The res_close routine closes all sockets opened by res_send.
+ 
+The dn_comp function compresses the domain name exp_dn and stores it in
+comp_dn. The size of the compressed name is returned or -1 if there were
+errors. The size of the array pointed to by comp_dn is given by length. The
+compression uses an array of pointers dnptrs to previously-compressed names
+in the current message. The first pointer points to to the beginning of the
+message and the list ends with NULL. The limit to the array is specified by
+lastdnptr. A side effect of dn_comp is to update the list of pointers for
+labels inserted into the message as the name is compressed. If dnptr is
+NULL, names are not compressed. If lastdnptr is NULL, the list of labels is
+not updated.
+
+The dn_expand entry expands the compressed domain name comp_dn to a full
+domain name. The compressed name is contained in a query or reply message;
+msg is a pointer to the beginning of the message. The uncompressed name is
+placed in the buffer indicated by exp_dn which is of size length. The size
+of compressed name is returned or -1 if there was an error.
+
+The dn_skipname entry returns the size of the compressed name, as does 
+dn_expand, or -1 if there was an error.
+
+***********************************************************************************
+
+resolv.conf - configuration file for name server routines
+
+DESCRIPTION
+This file helps initialize routines from the resolver(3N) C library.
+It is not needed for normal minires operations, it is only useful
+if one doesn't want to use the configuration provided by Windows.
+The resolver routines provide access to the Internet Domain Name System.
+The resolver configuration file contains information that is read by the
+resolver routines the first time a process calls them. The file is designed
+to be human readable and contains a list of keyword-value pairs that provide
+various types of resolver information. Keyword-value pairs are of the form:
+
+keyword value
+
+The keyword-value pair must appear on a single line, and the keyword
+(for instance, nameserver) must start the line. 
+The value or value list follows the keyword, separated from it by white space characters. 
+
+
+The different configuration options are:
+
+nameserver address [] 
+Specifies the Internet address in dotnotation format of one or more name
+servers to which the resolver should direct any queries. Up to MAXNS
+(currently three) name servers may be listed.  If multiple servers are
+specified, the resolver routines query them cyclically starting at a random
+point, until the maximum number of attemps (retry) has been made. Retries
+are separated by the retrans interval.
+
+domain name
+Specifies a local domain name for use as the default domain.
+
+Most searches for names within a domain can use short names relative to the
+local domain. If a domain line is missing from the configuration file, the
+domain is determined from the environment variable, LOCALDOMAIN, if it is
+defined, from the domain name (see domainname(1M)) by omitting the first
+level, or from the host name (gethostname(3C)) by using everything after the
+first dot. Finally, if the host name does not contain a domain part, the
+root domain is assumed.
+
+search searchlist 
+Specifies a search list for host-name lookup. The search list is normally
+determined from the local domain name; by default, it contains only the
+local domain name. This may be changed by listing the desired domains for
+searches in searchlist. Spaces or tabs must separate domain names.
+
+Most resolver queries are attempted using each component of the search path
+in turn until a match is found. Note that this process may be slow and will
+generate a lot of network traffic if the servers for the listed domains are
+not local. Also queries will time out if no server is available for one of
+the domains.
+
+The search list is currently limited to six domains.
+
+options optionlist 
+Specifies optional behaviors for various resolver routines in accordance
+with optionlist values, each of which is equivalent to an internal resolver
+variable.
+
+The values that may be included as individual optionlist values are:
+
+debug 
+Sets RES_DEBUG in the _res.options field.
+
+osquery 
+Uses a os specific routine for res_query, if available
+
+ndots:n [ NOT IMPLEMENTED. THE DEFAULT is 0 ]
+Sets a floor threshold for the number of dots which must appear in a name
+given to res_query() (see resolver(3N)) before an initial absolute (as-is)
+query is performed. The default for n is 1. Thus, if there are any dots in a
+name, the name is tried first as an absolute name before any search-list
+domain names are appended to it.
+
+retry:n 
+Sets the number of attempts made to connect to each name server.
+While retry:0 is allowed, it is equivalent to retry:1. The default is 4.
+
+retrans:n 
+Sets the basic retransmit timeout, in seconds. 
+While retrans:0 is allowed, it is equivalent to retrans:1. The default is 5.
+
+The domain and search keywords are mutually exclusive. If more than one instance 
+of these keywords is present, the last instance takes precedence.
+
+The options established through any search lines in the local resolv.conf file
+can be overridden on a per-process basis by setting the environment variable, 
+LOCALDOMAIN, to a space-separated list of search domains.
+
+The options established through any options lines in the local resolv.conf
+file can be amended on a per-process basis by setting the environment
+variable, RES_OPTIONS, to a space-separated list of resolver options, These
+options are listed above under the options keyword.
+
+
+***********************************************************************************
+
+Non conformance
+
+Functions
+--------
+res_mkquery(): implemented only for op == QUERY
+res_search():  always looks up first, even with RES_DNSRCH and RES_DEFNAMES,
+               no matter the number of dots in the domain.
+
+Options:
+-------
+RES_USEVC:     not implemented
+RES_STAYOPEN:  not implemented
+RES_RECURSE:   always applied
+RES_NOALIASES: not implemented
+Options other than RES_DEBUG are set by res_init(). They
+can be modified after calling that function.
+
+Environment
+----------
+RES_OPTIONS:   not implemented
+
+Windows extensions 
+------------------
+The domain name or search list are obtained as follows, 
+in order of increasing priorities:
+1) From Windows
+2) From /etc/resolv.conf 
+3) From the environment variable LOCALDOMAIN
+
+The DNS servers are obtained as follows, 
+in order of increasing priorities:
+1) From Windows [except on Win95 with DHCP]
+2) From /etc/resolv.conf [mandatory on Win95 with DHCP]
+
+Build instructions
+------------------
+1) Download the source package
+2) make 
+3) make install
+   (see remark above about the include files)

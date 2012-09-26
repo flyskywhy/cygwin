@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="dist.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="dist.html" title='Distributing python Modules' />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node11.html" />
+<link rel="prev" href="describing-extensions.html" />
+<link rel="parent" href="setup-script.html" />
+<link rel="next" href="node11.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.4 Relationships between Distributions and Packages</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.3 describing extension modules"
+  href="describing-extensions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.5 installing Scripts"
+  href="node11.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="describing-extensions.html">2.3 Describing extension modules</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node11.html">2.5 Installing Scripts</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION002400000000000000000">
+2.4 Relationships between Distributions and Packages</a>
+</h1>
+
+<p>
+A distribution may relate to packages in three specific ways:
+
+<p>
+
+<ol>
+<li>It can require packages or modules.
+
+<p>
+</li>
+<li>It can provide packages or modules.
+
+<p>
+</li>
+<li>It can obsolete packages or modules.
+</li>
+</ol>
+
+<p>
+These relationships can be specified using keyword arguments to the
+<tt class="function">distutils.core.setup()</tt> function.
+
+<p>
+Dependencies on other Python modules and packages can be specified by
+supplying the <var>requires</var> keyword argument to <tt class="function">setup()</tt>.
+The value must be a list of strings.  Each string specifies a package
+that is required, and optionally what versions are sufficient.
+
+<p>
+To specify that any version of a module or package is required, the
+string should consist entirely of the module or package name.
+Examples include <code>'mymodule'</code> and <code>'xml.parsers.expat'</code>.
+
+<p>
+If specific versions are required, a sequence of qualifiers can be
+supplied in parentheses.  Each qualifier may consist of a comparison
+operator and a version number.  The accepted comparison operators are:
+
+<p>
+<div class="verbatim"><pre>
+&lt;    &gt;    ==
+&lt;=   &gt;=   !=
+</pre></div>
+
+<p>
+These can be combined by using multiple qualifiers separated by commas
+(and optional whitespace).  In this case, all of the qualifiers must
+be matched; a logical AND is used to combine the evaluations.
+
+<p>
+Let's look at a bunch of examples:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Requires Expression</th>
+      <th class="left"  >Explanation</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><code>==1.0</code></td>
+        <td class="left"  >Only version <code>1.0</code> is compatible</td></tr>
+    <tr><td class="left"   valign="baseline"><code>&gt;1.0, !=1.5.1, &lt;2.0</code></td>
+        <td class="left"  >Any version after <code>1.0</code> and before
+                                <code>2.0</code> is compatible, except
+                                <code>1.5.1</code></td></tr></tbody>
+</table></div>
+
+<p>
+Now that we can specify dependencies, we also need to be able to
+specify what we provide that other distributions can require.  This is
+done using the <var>provides</var> keyword argument to <tt class="function">setup()</tt>.
+The value for this keyword is a list of strings, each of which names a
+Python module or package, and optionally identifies the version.  If
+the version is not specified, it is assumed to match that of the
+distribution.
+
+<p>
+Some examples:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Provides Expression</th>
+      <th class="left"  >Explanation</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><code>mypkg</code></td>
+        <td class="left"  >Provide <code>mypkg</code>, using the distribution version</td></tr>
+    <tr><td class="left"   valign="baseline"><code>mypkg (1.1)</code></td>
+        <td class="left"  >Provide <code>mypkg</code> version 1.1, regardless of the
+                       distribution version</td></tr></tbody>
+</table></div>
+
+<p>
+A package can declare that it obsoletes other packages using the
+<var>obsoletes</var> keyword argument.  The value for this is similar to
+that of the <var>requires</var> keyword: a list of strings giving module or
+package specifiers.  Each specifier consists of a module or package
+name optionally followed by one or more version qualifiers.  Version
+qualifiers are given in parentheses after the module or package name.
+
+<p>
+The versions identified by the qualifiers are those that are obsoleted
+by the distribution being described.  If no qualifiers are given, all
+versions of the named module or package are understood to be
+obsoleted.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.3 describing extension modules"
+  href="describing-extensions.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2. writing the Setup"
+  href="setup-script.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.5 installing Scripts"
+  href="node11.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Distributing Python Modules</td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="describing-extensions.html">2.3 Describing extension modules</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="setup-script.html">2. Writing the Setup</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node11.html">2.5 Installing Scripts</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

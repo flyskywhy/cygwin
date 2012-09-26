@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="dynamic-linking.html" />
+<link rel="parent" href="building-on-windows.html" />
+<link rel="next" href="embedding.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>4.3 Using DLLs in Practice </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.2 differences Between Unix"
+  href="dynamic-linking.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. building C and"
+  href="building-on-windows.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5. embedding Python in"
+  href="embedding.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dynamic-linking.html">4.2 Differences Between Unix</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="building-on-windows.html">4. Building C and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="embedding.html">5. Embedding Python in</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION006300000000000000000"></a><a name="win-dlls"></a>
+<br>
+4.3 Using DLLs in Practice 
+</h1>
+
+<p>
+Windows Python is built in Microsoft Visual C++; using other
+compilers may or may not work (though Borland seems to).  The rest of
+this section is MSVC++ specific.
+
+<p>
+When creating DLLs in Windows, you must pass <span class="file">pythonXY.lib</span> to
+the linker.  To build two DLLs, spam and ni (which uses C functions
+found in spam), you could use these commands:
+
+<p>
+<div class="verbatim"><pre>
+cl /LD /I/python/include spam.c ../libs/pythonXY.lib
+cl /LD /I/python/include ni.c spam.lib ../libs/pythonXY.lib
+</pre></div>
+
+<p>
+The first command created three files: <span class="file">spam.obj</span>,
+<span class="file">spam.dll</span> and <span class="file">spam.lib</span>.  <span class="file">Spam.dll</span> does not contain
+any Python functions (such as <tt class="cfunction">PyArg_ParseTuple()</tt>), but it
+does know how to find the Python code thanks to <span class="file">pythonXY.lib</span>.
+
+<p>
+The second command created <span class="file">ni.dll</span> (and <span class="file">.obj</span> and
+<span class="file">.lib</span>), which knows how to find the necessary functions from
+spam, and also from the Python executable.
+
+<p>
+Not every identifier is exported to the lookup table.  If you want any
+other modules (including Python) to be able to see your identifiers,
+you have to say "<tt class="samp">_declspec(dllexport)</tt>", as in "<tt class="samp">void
+_declspec(dllexport) initspam(void)</tt>" or "<tt class="samp">PyObject
+_declspec(dllexport) *NiGetSpamData(void)</tt>".
+
+<p>
+Developer Studio will throw in a lot of import libraries that you do
+not really need, adding about 100K to your executable.  To get rid of
+them, use the Project Settings dialog, Link tab, to specify
+<em>ignore default libraries</em>.  Add the correct
+<span class="file">msvcrt<var>xx</var>.lib</span> to the list of libraries.
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="4.2 differences Between Unix"
+  href="dynamic-linking.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="4. building C and"
+  href="building-on-windows.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="5. embedding Python in"
+  href="embedding.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dynamic-linking.html">4.2 Differences Between Unix</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="building-on-windows.html">4. Building C and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="embedding.html">5. Embedding Python in</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

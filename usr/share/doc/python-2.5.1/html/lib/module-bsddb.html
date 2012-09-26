@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-dumbdbm.html" />
+<link rel="prev" href="module-dbhash.html" />
+<link rel="parent" href="persistence.html" />
+<link rel="next" href="bsddb-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.11 bsddb -- Interface to Berkeley DB library</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.10.1 database Objects"
+  href="dbhash-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.11.1 Hash, btree and"
+  href="bsddb-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dbhash-objects.html">13.10.1 Database Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="bsddb-objects.html">13.11.1 Hash, BTree and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00151100000000000000000">
+13.11 <tt class="module">bsddb</tt> --
+         Interface to Berkeley DB library</a>
+</h1>
+
+<p>
+<a name="module-bsddb"></a>
+
+<p>
+The <tt class="module">bsddb</tt> module provides an interface to the Berkeley DB
+library.  Users can create hash, btree or record based library files
+using the appropriate open call. Bsddb objects behave generally like
+dictionaries.  Keys and values must be strings, however, so to use
+other objects as keys or to store other kinds of objects the user must
+serialize them somehow, typically using <tt class="function">marshal.dumps()</tt> or 
+<tt class="function">pickle.dumps()</tt>.
+
+<p>
+The <tt class="module">bsddb</tt> module requires a Berkeley DB library version from
+3.3 thru 4.5.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seeurl">
+    <dt><a href="http://pybsddb.sourceforge.net/"
+        class="url">http://pybsddb.sourceforge.net/</a></dt>
+    <dd>The website with documentation for the <tt class="module">bsddb.db</tt>
+          Python Berkeley DB interface that closely mirrors the object
+          oriented interface provided in Berkeley DB 3 and 4.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.oracle.com/database/berkeley-db/"
+        class="url">http://www.oracle.com/database/berkeley-db/</a></dt>
+    <dd>The Berkeley DB library.</dd>
+  </dl>
+</div>
+
+<p>
+A more modern DB, DBEnv and DBSequence object interface is available in the
+<tt class="module">bsddb.db</tt> module which closely matches the Berkeley DB C API
+documented at the above URLs.  Additional features provided by the
+<tt class="module">bsddb.db</tt> API include fine tuning, transactions, logging, and
+multiprocess concurrent database access.
+
+<p>
+The following is a description of the legacy <tt class="module">bsddb</tt> interface
+compatible with the old Python bsddb module.  Starting in Python 2.5 this
+interface should be safe for multithreaded access.  The <tt class="module">bsddb.db</tt>
+API is recommended for threading users as it provides better control.
+
+<p>
+The <tt class="module">bsddb</tt> module defines the following functions that create
+objects that access the appropriate type of Berkeley DB file.  The
+first two arguments of each function are the same.  For ease of
+portability, only the first two arguments should be used in most
+instances.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2534' xml:id='l2h-2534' class="function">hashopen</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, flag</var><big>[</big><var>,
+                           mode</var><big>[</big><var>, pgsize</var><big>[</big><var>,
+                           ffactor</var><big>[</big><var>, nelem</var><big>[</big><var>,
+                           cachesize</var><big>[</big><var>, lorder</var><big>[</big><var>,
+                           hflags</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open the hash format file named <var>filename</var>.  Files never intended
+to be preserved on disk may be created by passing <code>None</code> as the 
+<var>filename</var>.  The optional
+<var>flag</var> identifies the mode used to open the file.  It may be
+"<tt class="character">r</tt>" (read only), "<tt class="character">w</tt>" (read-write) ,
+"<tt class="character">c</tt>" (read-write - create if necessary; the default) or
+"<tt class="character">n</tt>" (read-write - truncate to zero length).  The other
+arguments are rarely used and are just passed to the low-level
+<tt class="cfunction">dbopen()</tt> function.  Consult the Berkeley DB documentation
+for their use and interpretation.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2535' xml:id='l2h-2535' class="function">btopen</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, flag</var><big>[</big><var>,
+mode</var><big>[</big><var>, btflags</var><big>[</big><var>, cachesize</var><big>[</big><var>, maxkeypage</var><big>[</big><var>,
+minkeypage</var><big>[</big><var>, pgsize</var><big>[</big><var>, lorder</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Open the btree format file named <var>filename</var>.  Files never intended 
+to be preserved on disk may be created by passing <code>None</code> as the 
+<var>filename</var>.  The optional
+<var>flag</var> identifies the mode used to open the file.  It may be
+"<tt class="character">r</tt>" (read only), "<tt class="character">w</tt>" (read-write),
+"<tt class="character">c</tt>" (read-write - create if necessary; the default) or
+"<tt class="character">n</tt>" (read-write - truncate to zero length).  The other
+arguments are rarely used and are just passed to the low-level dbopen
+function.  Consult the Berkeley DB documentation for their use and
+interpretation.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2536' xml:id='l2h-2536' class="function">rnopen</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, flag</var><big>[</big><var>, mode</var><big>[</big><var>,
+rnflags</var><big>[</big><var>, cachesize</var><big>[</big><var>, pgsize</var><big>[</big><var>, lorder</var><big>[</big><var>,
+rlen</var><big>[</big><var>, delim</var><big>[</big><var>, source</var><big>[</big><var>, pad</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Open a DB record format file named <var>filename</var>.  Files never intended 
+to be preserved on disk may be created by passing <code>None</code> as the 
+<var>filename</var>.  The optional
+<var>flag</var> identifies the mode used to open the file.  It may be
+"<tt class="character">r</tt>" (read only), "<tt class="character">w</tt>" (read-write),
+"<tt class="character">c</tt>" (read-write - create if necessary; the default) or
+"<tt class="character">n</tt>" (read-write - truncate to zero length).  The other
+arguments are rarely used and are just passed to the low-level dbopen
+function.  Consult the Berkeley DB documentation for their use and
+interpretation.
+</dl>
+
+<p>
+<div class="note"><b class="label">Note:</b>
+Beginning in 2.3 some <span class="Unix">Unix</span> versions of Python may have a <tt class="module">bsddb185</tt>
+module.  This is present <em>only</em> to allow backwards compatibility with
+systems which ship with the old Berkeley DB 1.85 database library.  The
+<tt class="module">bsddb185</tt> module should never be used directly in new code.
+</div>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+  <dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-dbhash.html">dbhash</a></tt>:</b>
+    <dd>DBM-style interface to the <tt class="module">bsddb</tt>.
+  </dl>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="bsddb-objects.html">13.11.1 Hash, BTree and Record Objects</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.10.1 database Objects"
+  href="dbhash-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13. data Persistence"
+  href="persistence.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.11.1 Hash, btree and"
+  href="bsddb-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="dbhash-objects.html">13.10.1 Database Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="persistence.html">13. Data Persistence</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="bsddb-objects.html">13.11.1 Hash, BTree and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="file-cookie-jar-classes.html" />
+<link rel="prev" href="module-cookielib.html" />
+<link rel="parent" href="module-cookielib.html" />
+<link rel="next" href="file-cookie-jar-classes.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.22.1 CookieJar and FileCookieJar Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.2 filecookiejar subclasses and"
+  href="file-cookie-jar-classes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="file-cookie-jar-classes.html">18.22.2 FileCookieJar subclasses and</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00202210000000000000000"></a><a name="cookie-jar-objects"></a>
+<br>
+18.22.1 CookieJar and FileCookieJar Objects 
+</h2>
+
+<p>
+<tt class="class">CookieJar</tt> objects support the iterator protocol for iterating
+over contained <tt class="class">Cookie</tt> objects.
+
+<p>
+<tt class="class">CookieJar</tt> has the following methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4365' xml:id='l2h-4365' class="method">add_cookie_header</tt></b>(</nobr></td>
+  <td><var>request</var>)</td></tr></table></dt>
+<dd>
+Add correct <span class="mailheader">Cookie:</span> header to <var>request</var>.
+
+<p>
+If policy allows (ie. the <tt class="member">rfc2965</tt> and <tt class="member">hide_cookie2</tt>
+attributes of the <tt class="class">CookieJar</tt>'s <tt class="class">CookiePolicy</tt> instance
+are true and false respectively), the <span class="mailheader">Cookie2:</span> header is
+also added when appropriate.
+
+<p>
+The <var>request</var> object (usually a <tt class="class">urllib2.Request</tt> instance)
+must support the methods <tt class="method">get_full_url()</tt>, <tt class="method">get_host()</tt>,
+<tt class="method">get_type()</tt>, <tt class="method">unverifiable()</tt>,
+<tt class="method">get_origin_req_host()</tt>, <tt class="method">has_header()</tt>,
+<tt class="method">get_header()</tt>, <tt class="method">header_items()</tt>, and
+<tt class="method">add_unredirected_header()</tt>,as documented by <tt class="module">urllib2</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4366' xml:id='l2h-4366' class="method">extract_cookies</tt></b>(</nobr></td>
+  <td><var>response, request</var>)</td></tr></table></dt>
+<dd>
+Extract cookies from HTTP <var>response</var> and store them in the
+<tt class="class">CookieJar</tt>, where allowed by policy.
+
+<p>
+The <tt class="class">CookieJar</tt> will look for allowable <span class="mailheader">Set-Cookie:</span>
+and <span class="mailheader">Set-Cookie2:</span> headers in the <var>response</var> argument,
+and store cookies as appropriate (subject to the
+<tt class="method">CookiePolicy.set_ok()</tt> method's approval).
+
+<p>
+The <var>response</var> object (usually the result of a call to
+<tt class="method">urllib2.urlopen()</tt>, or similar) should support an
+<tt class="method">info()</tt> method, which returns an object with a
+<tt class="method">getallmatchingheaders()</tt> method (usually a
+<tt class="class">mimetools.Message</tt> instance).
+
+<p>
+The <var>request</var> object (usually a <tt class="class">urllib2.Request</tt> instance)
+must support the methods <tt class="method">get_full_url()</tt>, <tt class="method">get_host()</tt>,
+<tt class="method">unverifiable()</tt>, and <tt class="method">get_origin_req_host()</tt>, as
+documented by <tt class="module">urllib2</tt>.  The request is used to set default
+values for cookie-attributes as well as for checking that the cookie
+is allowed to be set.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4367' xml:id='l2h-4367' class="method">set_policy</tt></b>(</nobr></td>
+  <td><var>policy</var>)</td></tr></table></dt>
+<dd>
+Set the <tt class="class">CookiePolicy</tt> instance to be used.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4368' xml:id='l2h-4368' class="method">make_cookies</tt></b>(</nobr></td>
+  <td><var>response, request</var>)</td></tr></table></dt>
+<dd>
+Return sequence of <tt class="class">Cookie</tt> objects extracted from
+<var>response</var> object.
+
+<p>
+See the documentation for <tt class="method">extract_cookies</tt> for the interfaces
+required of the <var>response</var> and <var>request</var> arguments.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4369' xml:id='l2h-4369' class="method">set_cookie_if_ok</tt></b>(</nobr></td>
+  <td><var>cookie, request</var>)</td></tr></table></dt>
+<dd>
+Set a <tt class="class">Cookie</tt> if policy says it's OK to do so.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4370' xml:id='l2h-4370' class="method">set_cookie</tt></b>(</nobr></td>
+  <td><var>cookie</var>)</td></tr></table></dt>
+<dd>
+Set a <tt class="class">Cookie</tt>, without checking with policy to see whether or
+not it should be set.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4371' xml:id='l2h-4371' class="method">clear</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>domain</var><big>[</big><var>,
+      path</var><big>[</big><var>, name</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Clear some cookies.
+
+<p>
+If invoked without arguments, clear all cookies.  If given a single
+argument, only cookies belonging to that <var>domain</var> will be removed.
+If given two arguments, cookies belonging to the specified
+<var>domain</var> and URL <var>path</var> are removed.  If given three
+arguments, then the cookie with the specified <var>domain</var>, <var>path</var>
+and <var>name</var> is removed.
+
+<p>
+Raises <tt class="exception">KeyError</tt> if no matching cookie exists.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4372' xml:id='l2h-4372' class="method">clear_session_cookies</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Discard all session cookies.
+
+<p>
+Discards all contained cookies that have a true <tt class="member">discard</tt>
+attribute (usually because they had either no <code>max-age</code> or
+<code>expires</code> cookie-attribute, or an explicit <code>discard</code>
+cookie-attribute).  For interactive browsers, the end of a session
+usually corresponds to closing the browser window.
+
+<p>
+Note that the <tt class="method">save()</tt> method won't save session cookies
+anyway, unless you ask otherwise by passing a true
+<var>ignore_discard</var> argument.
+</dl>
+
+<p>
+<tt class="class">FileCookieJar</tt> implements the following additional methods:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4373' xml:id='l2h-4373' class="method">save</tt></b>(</nobr></td>
+  <td><var>filename=<tt class="constant">None</tt>,
+    ignore_discard=<tt class="constant">False</tt>, ignore_expires=<tt class="constant">False</tt></var>)</td></tr></table></dt>
+<dd>
+Save cookies to a file.
+
+<p>
+This base class raises <tt class="exception">NotImplementedError</tt>.  Subclasses may
+leave this method unimplemented.
+
+<p>
+<var>filename</var> is the name of file in which to save cookies.  If
+<var>filename</var> is not specified, <tt class="member">self.filename</tt> is used (whose
+default is the value passed to the constructor, if any); if
+<tt class="member">self.filename</tt> is <tt class="constant">None</tt>, <tt class="exception">ValueError</tt> is
+raised.
+
+<p>
+<var>ignore_discard</var>: save even cookies set to be discarded.
+<var>ignore_expires</var>: save even cookies that have expired
+
+<p>
+The file is overwritten if it already exists, thus wiping all the
+cookies it contains.  Saved cookies can be restored later using the
+<tt class="method">load()</tt> or <tt class="method">revert()</tt> methods.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4374' xml:id='l2h-4374' class="method">load</tt></b>(</nobr></td>
+  <td><var>filename=<tt class="constant">None</tt>,
+    ignore_discard=<tt class="constant">False</tt>, ignore_expires=<tt class="constant">False</tt></var>)</td></tr></table></dt>
+<dd>
+Load cookies from a file.
+
+<p>
+Old cookies are kept unless overwritten by newly loaded ones.
+
+<p>
+Arguments are as for <tt class="method">save()</tt>.
+
+<p>
+The named file must be in the format understood by the class, or
+<tt class="exception">LoadError</tt> will be raised.  Also, <tt class="exception">IOError</tt> may
+be raised, for example if the file does not exist.  <span class="note"><b class="label">Note:</b>
+For
+backwards-compatibility with Python 2.4 (which raised
+an <tt class="exception">IOError</tt>), <tt class="exception">LoadError</tt> is a subclass
+of <tt class="exception">IOError</tt>.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4375' xml:id='l2h-4375' class="method">revert</tt></b>(</nobr></td>
+  <td><var>filename=<tt class="constant">None</tt>,
+    ignore_discard=<tt class="constant">False</tt>, ignore_expires=<tt class="constant">False</tt></var>)</td></tr></table></dt>
+<dd>
+Clear all cookies and reload cookies from a saved file.
+
+<p>
+<tt class="method">revert()</tt> can raise the same exceptions as <tt class="method">load()</tt>.
+If there is a failure, the object's state will not be altered.
+</dl>
+
+<p>
+<tt class="class">FileCookieJar</tt> instances have the following public attributes:
+
+<p>
+<dl><dt><b><tt id='l2h-4376' xml:id='l2h-4376' class="member">filename</tt></b></dt>
+<dd>
+Filename of default file in which to keep cookies.  This attribute may
+be assigned to.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4377' xml:id='l2h-4377' class="member">delayload</tt></b></dt>
+<dd>
+If true, load cookies lazily from disk.  This attribute should not be
+assigned to.  This is only a hint, since this only affects
+performance, not behaviour (unless the cookies on disk are changing).
+A <tt class="class">CookieJar</tt> object may ignore it.  None of the
+<tt class="class">FileCookieJar</tt> classes included in the standard library lazily
+loads cookies.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.22 cookielib  "
+  href="module-cookielib.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.2 filecookiejar subclasses and"
+  href="file-cookie-jar-classes.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-cookielib.html">18.22 cookielib  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="file-cookie-jar-classes.html">18.22.2 FileCookieJar subclasses and</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

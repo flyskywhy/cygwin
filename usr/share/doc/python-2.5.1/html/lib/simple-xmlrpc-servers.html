@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node661.html" />
+<link rel="prev" href="module-SimpleXMLRPCServer.html" />
+<link rel="parent" href="module-SimpleXMLRPCServer.html" />
+<link rel="next" href="node661.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.25.1 SimpleXMLRPCServer Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.25 simplexmlrpcserver  "
+  href="module-SimpleXMLRPCServer.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.25 simplexmlrpcserver  "
+  href="module-SimpleXMLRPCServer.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.25.2 CGIXMLRPCRequestHandler"
+  href="node661.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-SimpleXMLRPCServer.html">18.25 SimpleXMLRPCServer  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-SimpleXMLRPCServer.html">18.25 SimpleXMLRPCServer  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node661.html">18.25.2 CGIXMLRPCRequestHandler</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION00202510000000000000000"></a><a name="simple-xmlrpc-servers"></a>
+<br>
+18.25.1 SimpleXMLRPCServer Objects 
+</h2>
+
+<p>
+The <tt class="class">SimpleXMLRPCServer</tt> class is based on
+<tt class="class">SocketServer.TCPServer</tt> and provides a means of creating
+simple, stand alone XML-RPC servers.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4468' xml:id='l2h-4468' class="method">register_function</tt></b>(</nobr></td>
+  <td><var>function</var><big>[</big><var>,
+                                                          name</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Register a function that can respond to XML-RPC requests.  If
+  <var>name</var> is given, it will be the method name associated with
+  <var>function</var>, otherwise <code><var>function</var>.__name__</code> will be
+  used.  <var>name</var> can be either a normal or Unicode string, and may
+  contain characters not legal in Python identifiers, including the
+  period character.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4469' xml:id='l2h-4469' class="method">register_instance</tt></b>(</nobr></td>
+  <td><var>instance</var><big>[</big><var>,
+                                       allow_dotted_names</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Register an object which is used to expose method names which have
+  not been registered using <tt class="method">register_function()</tt>.  If
+  <var>instance</var> contains a <tt class="method">_dispatch()</tt> method, it is called
+  with the requested method name and the parameters from the request.  Its
+  API is <code>def <tt class="method">_dispatch</tt>(self, method, params)</code> (note that
+  <var>params</var> does not represent a variable argument list).  If it calls an
+  underlying function to perform its task, that function is called as
+  <code>func(*params)</code>, expanding the parameter list.
+  The return value from <tt class="method">_dispatch()</tt> is returned to the client as
+  the result.  If
+  <var>instance</var> does not have a <tt class="method">_dispatch()</tt> method, it is
+  searched for an attribute matching the name of the requested method.
+
+<p>
+If the optional <var>allow_dotted_names</var> argument is true and the
+  instance does not have a <tt class="method">_dispatch()</tt> method, then
+  if the requested method name contains periods, each component of the
+  method name is searched for individually, with the effect that a
+  simple hierarchical search is performed.  The value found from this
+  search is then called with the parameters from the request, and the
+  return value is passed back to the client.
+
+<p>
+<div class="warning"><b class="label">Warning:</b>
+
+  Enabling the <var>allow_dotted_names</var> option allows intruders to access
+  your module's global variables and may allow intruders to execute
+  arbitrary code on your machine.  Only use this option on a secure,
+  closed network.
+  </div>
+
+<p>
+
+<span class="versionnote">Changed in version 2.3.5, 2.4.1:
+<var>allow_dotted_names</var> was added to plug a security hole;
+  prior versions are insecure.</span>
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4470' xml:id='l2h-4470' class="method">register_introspection_functions</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Registers the XML-RPC introspection functions <code>system.listMethods</code>,
+  <code>system.methodHelp</code> and <code>system.methodSignature</code>. 
+  
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4471' xml:id='l2h-4471' class="method">register_multicall_functions</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Registers the XML-RPC multicall function system.multicall.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-4472' xml:id='l2h-4472' class="member">rpc_paths</tt></b></dt>
+<dd>
+An attribute value that must be a tuple listing valid path portions of
+the URL for receiving XML-RPC requests.  Requests posted to other
+paths will result in a 404 ``no such page'' HTTP error.  If this
+tuple is empty, all paths will be considered valid.
+The default value is <code>('/', '/RPC2')</code>.
+  
+<span class="versionnote">New in version 2.5.</span>
+
+</dl>
+
+<p>
+Example:
+
+<p>
+<div class="verbatim"><pre>
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+
+# Create server
+server = SimpleXMLRPCServer(("localhost", 8000))
+server.register_introspection_functions()
+
+# Register pow() function; this will use the value of 
+# pow.__name__ as the name, which is just 'pow'.
+server.register_function(pow)
+
+# Register a function under a different name
+def adder_function(x,y):
+    return x + y
+server.register_function(adder_function, 'add')
+
+# Register an instance; all the methods of the instance are 
+# published as XML-RPC methods (in this case, just 'div').
+class MyFuncs:
+    def div(self, x, y): 
+        return x // y
+    
+server.register_instance(MyFuncs())
+
+# Run the server's main loop
+server.serve_forever()
+</pre></div>
+
+<p>
+The following client code will call the methods made available by 
+the preceding server:
+
+<p>
+<div class="verbatim"><pre>
+import xmlrpclib
+
+s = xmlrpclib.Server('http://localhost:8000')
+print s.pow(2,3)  # Returns 2**3 = 8
+print s.add(2,3)  # Returns 5
+print s.div(5,2)  # Returns 5//2 = 2
+
+# Print list of available methods
+print s.system.listMethods()
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.25 simplexmlrpcserver  "
+  href="module-SimpleXMLRPCServer.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18.25 simplexmlrpcserver  "
+  href="module-SimpleXMLRPCServer.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.25.2 CGIXMLRPCRequestHandler"
+  href="node661.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-SimpleXMLRPCServer.html">18.25 SimpleXMLRPCServer  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-SimpleXMLRPCServer.html">18.25 SimpleXMLRPCServer  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node661.html">18.25.2 CGIXMLRPCRequestHandler</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

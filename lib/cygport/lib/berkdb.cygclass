@@ -1,0 +1,255 @@
+################################################################################
+#
+# berkdb.cygclass - functions for building the Berkeley DB
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: berkdb.cygclass 4304 2008-08-26 08:20:25Z yselkowitz $
+#
+################################################################################
+
+case ${PV_MAJ_MIN} in
+	3.*|4.*)	SLOT="${PV_MAJ_MIN}" ;;
+	*)			error "berkdb: accepts only versions 3.x or 4.x" ;;
+esac
+
+tarpv=${PVP[0]}.${PVP[1]}.${PVP[2]}
+
+DESCRIPTION="Berkeley DB version ${SLOT}"
+HOMEPAGE="http://www.oracle.com/technology/products/berkeley-db/db/index.html"
+SRC_URI="http://download.oracle.com/berkeley-db/db-${tarpv}.tar.gz"
+SRC_DIR="db-${tarpv}"
+
+if defined PVP[3]
+then
+	for ((p = 1; p <= PVP[3]; p++))
+	do
+		PATCH_URI+=" ${HOMEPAGE%/*}/update/${tarpv}/patch.${tarpv}.${p}"
+	done
+fi
+
+n=0
+
+PKG_NAMES="${PN} lib${PN} lib${PN}-devel ${PN}-doc"
+PKG_HINTS="setup lib devel doc"
+PKG_CONTENTS[((n++))]="--exclude=html usr/bin/db${SLOT}_*.exe usr/share/doc/"
+PKG_CONTENTS[((n++))]="usr/bin/cygdb-${SLOT}.dll usr/bin/cygdb_cxx-${SLOT}.dll"
+PKG_CONTENTS[((n++))]="etc/p*/lib${PN}-devel.sh usr/include/ usr/lib/lib*"
+PKG_CONTENTS[((n++))]="usr/share/doc/${P}/html/"
+
+if inherited java
+then
+	PKG_NAMES+=" java-${PN}"
+	PKG_HINTS+=" java"
+	PKG_CONTENTS[((n++))]="usr/bin/cygdb_java-${SLOT}.dll ${JAVA_DIR#/}"
+fi
+
+if inherited tcl
+then
+	PKG_NAMES+=" tcl-${PN}"
+	PKG_HINTS+=" tcl"
+	PKG_CONTENTS[((n++))]="${TCL_LIBDIR#/}"
+fi
+
+unset n
+
+DIFF_EXCLUDES="aclocal.m4 configure config.hin db.jar libtool.ac lt*.ac"
+
+# At a minimum, the following must be changed:
+# * chmod +w dist/Makefile.in dist/aclocal/tcl.ac dist/configure.ac
+# * sed -i -e 's/test -f/test -e/g' dist/aclocal/tcl.ac
+# * sed -i -e 's/aix\*/aix*|cygwin*/g' dist/aclocal/tcl.ac
+# * Modify/define MAKEFILE_TSOLINK (before 4.5)
+# * Undef __lock_* macros in lock/lock_region.c (before 4.3)
+
+berkdb_autoreconf() {
+	check_prog_req libtoolize libtool
+
+	local errormsg="berkdb: libtoolize failed"
+	local lt_v=$(libtoolize --version | head -n 1 | cut -d ' ' -f 4)
+
+	[ -f s_config ] && [ -d aclocal ] || error "not in dist/ directory"
+
+	case ${lt_v} in
+	1.5.*)
+		cp -f /usr/share/aclocal/libtool.m4 aclocal/ || error "${errormsg}"
+		libtoolize --copy --force || error "${errormsg}"
+		;;
+	1.*|2.[01].*)
+		error "berkdb: unsupported libtool version: ${lt_v}"
+		;;
+	2.*)
+		ac_macrodir=aclocal libtoolize --copy --force --install || error "${errormsg}"
+		;;
+	*)
+		error "berkdb: unsupported libtool version: ${lt_v}"
+		;;
+	esac
+
+	# some versions require .ac extension, others use .m4
+	if [ -f aclocal/libtool.ac ]
+	then
+		rename .m4 .ac aclocal/*.m4
+	fi
+
+	./s_config || error "s_config failed"
+}
+
+berkdb_compile() {
+	local use_java use_tcl
+
+	if inherited java
+	then
+		use_java="--enable-java"
+	else
+		use_java="--disable-java"
+	fi
+
+	if inherited tcl
+	then
+		use_tcl="--enable-tcl --with-tcl=/usr/lib --enable-test"
+	else
+		use_tcl="--disable-tcl --disable-test"
+	fi
+
+	CYGCONF_SOURCE=${S}/dist \
+	cygconf \
+		--includedir=/usr/include/db${SLOT} \
+		--with-mutex=x86/gcc-assembly \
+		--enable-compat185 \
+		--enable-cxx \
+		--enable-dynamic \
+		${use_java} ${use_tcl}
+
+	cygmake libdb-${SLOT}.la
+
+	case ${SLOT} in
+		3.[0-2]) objvar=OBJS ;;
+		3.*|4.*) objvar=C_OBJS ;;
+	esac
+
+	cygmake ${objvar}="libdb-${SLOT}.la"
+}
+
+berkdb_install() {
+	case ${SLOT} in
+		4.[3-9])
+			USE_DESTDIR=1 cyginstall \
+				docdir=/usr/share/doc/${P}/html \
+				emode=755 fmode=644
+			;;
+		4.[012])
+			USE_DESTDIR=0 cyginstall \
+				includedir=${D}/usr/include/db${SLOT} \
+				docdir=${D}/usr/share/doc/${P}/html \
+				emode=755 fmode=644
+			;;
+		3.*)
+			USE_DESTDIR=0 cyginstall \
+				includedir=${D}/usr/include/db${SLOT} \
+				docdir=${D}/usr/share/doc/${P}/html \
+				emode=755 fmode=644 \
+				chmod=true ln=true strip=true
+			;;
+	esac
+
+	# remove unslotted static libs
+	rm -f ${D}/usr/lib/libdb{_cxx,}.a
+
+	# slot executables
+	(
+	 cd ${D}/usr/bin
+	 rename db_ db${SLOT}_ *.exe
+	)
+
+	if inherited java
+	then
+		rm -f ${D}/usr/lib/libdb_java-${SLOT}.*
+		# relocate and slot Java jar
+		dodir ${JAVA_DIR}
+		mv ${D}/usr/lib/db.jar ${D}${JAVA_DIR}/db-${SLOT}.jar
+	fi
+
+	if inherited tcl
+	then
+		rm -f ${D}/usr/lib/libdb_tcl-${SLOT}.*
+		# relocate and install Tcl module
+		dodir ${TCL_LIBDIR}/db${SLOT}
+		mv ${D}/usr/lib/cygdb_tcl-${SLOT}.dll ${D}${TCL_LIBDIR}/db${SLOT}/
+		echo pkg_mkIndex ${D}${TCL_LIBDIR}/db${SLOT} cygdb_tcl-${SLOT}.dll | ${TCLSH}
+		sed -i -e "s#${D}##g" ${D}${TCL_LIBDIR}/db${SLOT}/pkgIndex.tcl
+	fi
+}
+
+berkdb_postinst() {
+	local h l lx prog
+
+	dodir /etc/postinstall
+
+	# headers and link libraries
+	cat >> ${D}/etc/postinstall/lib${PN}-devel.sh <<-_EOF
+		incdir=/usr/include
+		libdir=/usr/lib
+		slot=${SLOT}
+		rank=$(( PVP[0] * 100 + PVP[1] ))
+
+		/usr/sbin/update-alternatives \\
+		  --install \${incdir}/db.h      db.h       \${incdir}/db\${slot}/db.h \${rank} \\
+		  --slave   \${incdir}/db_185.h  db_185.h   \${incdir}/db\${slot}/db_185.h \\
+		  --slave   \${incdir}/db_cxx.h  db_cxx.h   \${incdir}/db\${slot}/db_cxx.h \\
+		  --slave   \${incdir}/db        db         \${incdir}/db\${slot} \\
+		  --slave   \${libdir}/libdb.a      libdb.a      \${libdir}/libdb-\${slot}.a \\
+		  --slave   \${libdir}/libdb.dll.a  libdb.dll.a  \${libdir}/libdb-\${slot}.dll.a \\
+		  --slave   \${libdir}/libdb.la     libdb.la     \${libdir}/libdb-\${slot}.la \\
+		  --slave   \${libdir}/libdb_cxx.a      libdb_cxx.a      \${libdir}/libdb_cxx-\${slot}.a \\
+		  --slave   \${libdir}/libdb_cxx.dll.a  libdb_cxx.dll.a  \${libdir}/libdb_cxx-\${slot}.dll.a \\
+		  --slave   \${libdir}/libdb_cxx.la     libdb_cxx.la     \${libdir}/libdb_cxx-\${slot}.la
+
+		/usr/sbin/update-alternatives \\
+		  --install \${incdir}/db${PVP[0]}  db${PVP[0]}  \${incdir}/db\${slot} \${rank} \\
+		  --slave   \${libdir}/libdb${PVP[0]}.a      libdb${PVP[0]}.a      \${libdir}/libdb-\${slot}.a \\
+		  --slave   \${libdir}/libdb${PVP[0]}.dll.a  libdb${PVP[0]}.dll.a  \${libdir}/libdb-\${slot}.dll.a \\
+		  --slave   \${libdir}/libdb${PVP[0]}.la     libdb${PVP[0]}.la     \${libdir}/libdb-\${slot}.la \\
+		  --slave   \${libdir}/libdb${PVP[0]}_cxx.a      libdb${PVP[0]}_cxx.a      \${libdir}/libdb_cxx-\${slot}.a \\
+		  --slave   \${libdir}/libdb${PVP[0]}_cxx.dll.a  libdb${PVP[0]}_cxx.dll.a  \${libdir}/libdb_cxx-\${slot}.dll.a \\
+		  --slave   \${libdir}/libdb${PVP[0]}_cxx.la     libdb${PVP[0]}_cxx.la     \${libdir}/libdb_cxx-\${slot}.la
+		_EOF
+
+	dodir /etc/preremove
+
+	cat >> ${D}/etc/preremove/lib${PN}-devel.sh <<-_EOF
+		incdir=/usr/include
+		slot=${SLOT}
+
+		/usr/sbin/update-alternatives --remove db.h \${incdir}/db\${slot}/db.h
+		/usr/sbin/update-alternatives --remove db${PVP[0]} \${incdir}/db\${slot}
+		_EOF
+}
+
+src_compile() {
+	cd ${S}/dist
+	berkdb_autoreconf
+	cd ${B}
+	berkdb_compile
+}
+
+src_install() {
+	cd ${B}
+	berkdb_install
+	berkdb_postinst
+}

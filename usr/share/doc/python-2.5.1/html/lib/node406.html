@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="multiple-destinations.html" />
+<link rel="prev" href="node405.html" />
+<link rel="parent" href="module-logging.html" />
+<link rel="next" href="multiple-destinations.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.5.2 Basic example </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.1 logger Objects"
+  href="node405.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.3 logging to multiple"
+  href="multiple-destinations.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node405.html">14.5.1 Logger Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="multiple-destinations.html">14.5.3 Logging to multiple</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0016520000000000000000"></a><a name="minimal-example"></a>
+<br>
+14.5.2 Basic example 
+</h2>
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+formerly <tt class="function">basicConfig</tt> did not take any keyword
+arguments.</span>
+
+<p>
+The <tt class="module">logging</tt> package provides a lot of flexibility, and its
+configuration can appear daunting.  This section demonstrates that simple
+use of the logging package is possible.
+
+<p>
+The simplest example shows logging to the console:
+
+<p>
+<div class="verbatim"><pre>
+import logging
+
+logging.debug('A debug message')
+logging.info('Some information')
+logging.warning('A shot across the bows')
+</pre></div>
+
+<p>
+If you run the above script, you'll see this:
+<div class="verbatim"><pre>
+WARNING:root:A shot across the bows
+</pre></div>
+
+<p>
+Because no particular logger was specified, the system used the root logger.
+The debug and info messages didn't appear because by default, the root
+logger is configured to only handle messages with a severity of WARNING
+or above. The message format is also a configuration default, as is the output
+destination of the messages - <code>sys.stderr</code>. The severity level,
+the message format and destination can be easily changed, as shown in
+the example below:
+
+<p>
+<div class="verbatim"><pre>
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(message)s',
+                    filename='/tmp/myapp.log',
+                    filemode='w')
+logging.debug('A debug message')
+logging.info('Some information')
+logging.warning('A shot across the bows')
+</pre></div>
+
+<p>
+The <tt class="method">basicConfig()</tt> method is used to change the configuration
+defaults, which results in output (written to <code>/tmp/myapp.log</code>)
+which should look something like the following:
+
+<p>
+<div class="verbatim"><pre>
+2004-07-02 13:00:08,743 DEBUG A debug message
+2004-07-02 13:00:08,743 INFO Some information
+2004-07-02 13:00:08,743 WARNING A shot across the bows
+</pre></div>
+
+<p>
+This time, all messages with a severity of DEBUG or above were handled,
+and the format of the messages was also changed, and output went to the
+specified file rather than the console.
+
+<p>
+Formatting uses standard Python string formatting - see section
+<a href="typesseq-strings.html#typesseq-strings">3.6.2</a>. The format string takes the following
+common specifiers. For a complete list of specifiers, consult the
+<tt class="class">Formatter</tt> documentation.
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="left"  >Format</th>
+      <th class="left"  >Description</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="left"   valign="baseline"><code>%(name)s</code></td>
+        <td class="left"  >Name of the logger (logging channel).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(levelname)s</code></td>
+        <td class="left"  >Text logging level for the message
+                        (<code>'DEBUG'</code>, <code>'INFO'</code>,
+                        <code>'WARNING'</code>, <code>'ERROR'</code>,
+                        <code>'CRITICAL'</code>).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(asctime)s</code></td>
+        <td class="left"  >Human-readable time when the <tt class="class">LogRecord</tt>
+                        was created.  By default this is of the form
+                        ``2003-07-08 16:49:45,896'' (the numbers after the
+                        comma are millisecond portion of the time).</td></tr>
+    <tr><td class="left"   valign="baseline"><code>%(message)s</code></td>
+        <td class="left"  >The logged message.</td></tr></tbody>
+</table></div>
+
+<p>
+To change the date/time format, you can pass an additional keyword parameter,
+<var>datefmt</var>, as in the following:
+
+<p>
+<div class="verbatim"><pre>
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)-8s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename='/temp/myapp.log',
+                    filemode='w')
+logging.debug('A debug message')
+logging.info('Some information')
+logging.warning('A shot across the bows')
+</pre></div>
+
+<p>
+which would result in output like
+
+<p>
+<div class="verbatim"><pre>
+Fri, 02 Jul 2004 13:06:18 DEBUG    A debug message
+Fri, 02 Jul 2004 13:06:18 INFO     Some information
+Fri, 02 Jul 2004 13:06:18 WARNING  A shot across the bows
+</pre></div>
+
+<p>
+The date format string follows the requirements of <tt class="function">strftime()</tt> -
+see the documentation for the <tt class="module"><a href="module-time.html">time</a></tt> module.
+
+<p>
+If, instead of sending logging output to the console or a file, you'd rather
+use a file-like object which you have created separately, you can pass it
+to <tt class="function">basicConfig()</tt> using the <var>stream</var> keyword argument. Note
+that if both <var>stream</var> and <var>filename</var> keyword arguments are passed,
+the <var>stream</var> argument is ignored.
+
+<p>
+Of course, you can put variable information in your output. To do this,
+simply have the message be a format string and pass in additional arguments
+containing the variable information, as in the following example:
+
+<p>
+<div class="verbatim"><pre>
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)-8s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename='/temp/myapp.log',
+                    filemode='w')
+logging.error('Pack my box with %d dozen %s', 5, 'liquor jugs')
+</pre></div>
+
+<p>
+which would result in
+
+<p>
+<div class="verbatim"><pre>
+Wed, 21 Jul 2004 15:35:16 ERROR    Pack my box with 5 dozen liquor jugs
+</pre></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.1 logger Objects"
+  href="node405.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5 logging  "
+  href="module-logging.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.5.3 logging to multiple"
+  href="multiple-destinations.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node405.html">14.5.1 Logger Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-logging.html">14.5 logging  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="multiple-destinations.html">14.5.3 Logging to multiple</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

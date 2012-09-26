@@ -1,0 +1,961 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="os-process.html" />
+<link rel="prev" href="os-fd-ops.html" />
+<link rel="parent" href="module-os.html" />
+<link rel="next" href="os-process.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.1.4 Files and Directories </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.1.3 file Descriptor Operations"
+  href="os-fd-ops.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.1 os  "
+  href="module-os.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.1.5 process Management"
+  href="os-process.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="os-fd-ops.html">14.1.3 File Descriptor Operations</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-os.html">14.1 os  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="os-process.html">14.1.5 Process Management</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0016140000000000000000"></a><a name="os-file-dir"></a>
+<br>
+14.1.4 Files and Directories 
+</h2>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2676' xml:id='l2h-2676' class="function">access</tt></b>(</nobr></td>
+  <td><var>path, mode</var>)</td></tr></table></dt>
+<dd>
+Use the real uid/gid to test for access to <var>path</var>.  Note that most
+operations will use the effective uid/gid, therefore this routine can
+be used in a suid/sgid environment to test if the invoking user has the
+specified access to <var>path</var>.  <var>mode</var> should be <tt class="constant">F_OK</tt>
+to test the existence of <var>path</var>, or it can be the inclusive OR of
+one or more of <tt class="constant">R_OK</tt>, <tt class="constant">W_OK</tt>, and <tt class="constant">X_OK</tt> to
+test permissions.  Return <tt class="constant">True</tt> if access is allowed,
+<tt class="constant">False</tt> if not.
+See the <span class="Unix">Unix</span> man page <span class="manpage"><i>access</i>(2)</span> for more information.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+Using <tt class="function">access()</tt> to check if a user is authorized to e.g.
+open a file before actually doing so using <tt class="function">open()</tt> creates a 
+security hole, because the user might exploit the short time interval 
+between checking and opening the file to manipulate it.</span>
+
+<p>
+<span class="note"><b class="label">Note:</b>
+I/O operations may fail even when <tt class="function">access()</tt>
+indicates that they would succeed, particularly for operations
+on network filesystems which may have permissions semantics
+beyond the usual POSIX permission-bit model.</span>
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2677' xml:id='l2h-2677'>F_OK</tt></b></dt>
+<dd>
+  Value to pass as the <var>mode</var> parameter of <tt class="function">access()</tt> to
+  test the existence of <var>path</var>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2678' xml:id='l2h-2678'>R_OK</tt></b></dt>
+<dd>
+  Value to include in the <var>mode</var> parameter of <tt class="function">access()</tt>
+  to test the readability of <var>path</var>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2679' xml:id='l2h-2679'>W_OK</tt></b></dt>
+<dd>
+  Value to include in the <var>mode</var> parameter of <tt class="function">access()</tt>
+  to test the writability of <var>path</var>.
+</dd></dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2680' xml:id='l2h-2680'>X_OK</tt></b></dt>
+<dd>
+  Value to include in the <var>mode</var> parameter of <tt class="function">access()</tt>
+  to determine if <var>path</var> can be executed.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2681' xml:id='l2h-2681' class="function">chdir</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+<a id='l2h-2717' xml:id='l2h-2717'></a>
+Change the current working directory to <var>path</var>.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2682' xml:id='l2h-2682' class="function">fchdir</tt></b>(</nobr></td>
+  <td><var>fd</var>)</td></tr></table></dt>
+<dd>
+Change the current working directory to the directory represented by
+the file descriptor <var>fd</var>.  The descriptor must refer to an opened
+directory, not an open file.
+Availability: <span class="Unix">Unix</span>.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2683' xml:id='l2h-2683' class="function">getcwd</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a string representing the current working directory.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2684' xml:id='l2h-2684' class="function">getcwdu</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a Unicode object representing the current working directory.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2685' xml:id='l2h-2685' class="function">chroot</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Change the root directory of the current process to <var>path</var>.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+
+<span class="versionnote">New in version 2.2.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2686' xml:id='l2h-2686' class="function">chmod</tt></b>(</nobr></td>
+  <td><var>path, mode</var>)</td></tr></table></dt>
+<dd>
+Change the mode of <var>path</var> to the numeric <var>mode</var>.
+<var>mode</var> may take one of the following values
+(as defined in the <tt class="module">stat</tt> module) or bitwise or-ed
+combinations of them:
+
+<ul>
+<li><code>S_ISUID</code>
+</li>
+<li><code>S_ISGID</code>
+</li>
+<li><code>S_ENFMT</code>
+</li>
+<li><code>S_ISVTX</code>
+</li>
+<li><code>S_IREAD</code>
+</li>
+<li><code>S_IWRITE</code>
+</li>
+<li><code>S_IEXEC</code>
+</li>
+<li><code>S_IRWXU</code>
+</li>
+<li><code>S_IRUSR</code>
+</li>
+<li><code>S_IWUSR</code>
+</li>
+<li><code>S_IXUSR</code>
+</li>
+<li><code>S_IRWXG</code>
+</li>
+<li><code>S_IRGRP</code>
+</li>
+<li><code>S_IWGRP</code>
+</li>
+<li><code>S_IXGRP</code>
+</li>
+<li><code>S_IRWXO</code>
+</li>
+<li><code>S_IROTH</code>
+</li>
+<li><code>S_IWOTH</code>
+</li>
+<li><code>S_IXOTH</code>
+</li>
+</ul>
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+
+<p>
+<span class="note"><b class="label">Note:</b>
+Although Windows supports <tt class="function">chmod()</tt>, you can only 
+set the file's read-only flag with it (via the <code>S_IWRITE</code> 
+and <code>S_IREAD</code> constants or a corresponding integer value). 
+All other bits are ignored.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2687' xml:id='l2h-2687' class="function">chown</tt></b>(</nobr></td>
+  <td><var>path, uid, gid</var>)</td></tr></table></dt>
+<dd>
+Change the owner and group id of <var>path</var> to the numeric <var>uid</var>
+and <var>gid</var>. To leave one of the ids unchanged, set it to -1.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2688' xml:id='l2h-2688' class="function">lchown</tt></b>(</nobr></td>
+  <td><var>path, uid, gid</var>)</td></tr></table></dt>
+<dd>
+Change the owner and group id of <var>path</var> to the numeric <var>uid</var>
+and gid. This function will not follow symbolic links.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2689' xml:id='l2h-2689' class="function">link</tt></b>(</nobr></td>
+  <td><var>src, dst</var>)</td></tr></table></dt>
+<dd>
+Create a hard link pointing to <var>src</var> named <var>dst</var>.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2690' xml:id='l2h-2690' class="function">listdir</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Return a list containing the names of the entries in the directory.
+The list is in arbitrary order.  It does not include the special
+entries <code>'.'</code> and <code>'..'</code> even if they are present in the
+directory.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+
+<p>
+
+<span class="versionnote">Changed in version 2.3:
+On Windows NT/2k/XP and <span class="Unix">Unix</span>, if <var>path</var> is a Unicode
+object, the result will be a list of Unicode objects.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2691' xml:id='l2h-2691' class="function">lstat</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Like <tt class="function">stat()</tt>, but do not follow symbolic links.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2692' xml:id='l2h-2692' class="function">mkfifo</tt></b>(</nobr></td>
+  <td><var>path</var><big>[</big><var>, mode</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Create a FIFO (a named pipe) named <var>path</var> with numeric mode
+<var>mode</var>.  The default <var>mode</var> is <code>0666</code> (octal).  The current
+umask value is first masked out from the mode.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+
+<p>
+FIFOs are pipes that can be accessed like regular files.  FIFOs exist
+until they are deleted (for example with <tt class="function">os.unlink()</tt>).
+Generally, FIFOs are used as rendezvous between ``client'' and
+``server'' type processes: the server opens the FIFO for reading, and
+the client opens it for writing.  Note that <tt class="function">mkfifo()</tt>
+doesn't open the FIFO -- it just creates the rendezvous point.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2693' xml:id='l2h-2693' class="function">mknod</tt></b>(</nobr></td>
+  <td><var>filename</var><big>[</big><var>, mode=0600, device</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Create a filesystem node (file, device special file or named pipe)
+named <var>filename</var>. <var>mode</var> specifies both the permissions to use and
+the type of node to be created, being combined (bitwise OR) with one
+of S_IFREG, S_IFCHR, S_IFBLK, and S_IFIFO (those constants are
+available in <tt class="module">stat</tt>). For S_IFCHR and S_IFBLK, <var>device</var>
+defines the newly created device special file (probably using
+<tt class="function">os.makedev()</tt>), otherwise it is ignored.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2694' xml:id='l2h-2694' class="function">major</tt></b>(</nobr></td>
+  <td><var>device</var>)</td></tr></table></dt>
+<dd>
+Extracts the device major number from a raw device number (usually
+the <tt class="member">st_dev</tt> or <tt class="member">st_rdev</tt> field from <tt class="ctype">stat</tt>).
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2695' xml:id='l2h-2695' class="function">minor</tt></b>(</nobr></td>
+  <td><var>device</var>)</td></tr></table></dt>
+<dd>
+Extracts the device minor number from a raw device number (usually
+the <tt class="member">st_dev</tt> or <tt class="member">st_rdev</tt> field from <tt class="ctype">stat</tt>).
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2696' xml:id='l2h-2696' class="function">makedev</tt></b>(</nobr></td>
+  <td><var>major, minor</var>)</td></tr></table></dt>
+<dd>
+Composes a raw device number from the major and minor device numbers.
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2697' xml:id='l2h-2697' class="function">mkdir</tt></b>(</nobr></td>
+  <td><var>path</var><big>[</big><var>, mode</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Create a directory named <var>path</var> with numeric mode <var>mode</var>.
+The default <var>mode</var> is <code>0777</code> (octal).  On some systems,
+<var>mode</var> is ignored.  Where it is used, the current umask value is
+first masked out.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2698' xml:id='l2h-2698' class="function">makedirs</tt></b>(</nobr></td>
+  <td><var>path</var><big>[</big><var>, mode</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Recursive directory creation function.<a id='l2h-2718' xml:id='l2h-2718'></a>
+Like <tt class="function">mkdir()</tt>,
+but makes all intermediate-level directories needed to contain the
+leaf directory.  Throws an <tt class="exception">error</tt> exception if the leaf
+directory already exists or cannot be created.  The default <var>mode</var>
+is <code>0777</code> (octal).  On some systems, <var>mode</var> is ignored.
+Where it is used, the current umask value is first masked out.
+<span class="note"><b class="label">Note:</b>
+<tt class="function">makedirs()</tt> will become confused if the path elements
+to create include <var>os.pardir</var>.</span>
+
+<span class="versionnote">New in version 1.5.2.</span>
+
+<span class="versionnote">Changed in version 2.3:
+This function now handles UNC paths correctly.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2699' xml:id='l2h-2699' class="function">pathconf</tt></b>(</nobr></td>
+  <td><var>path, name</var>)</td></tr></table></dt>
+<dd>
+Return system configuration information relevant to a named file.
+<var>name</var> specifies the configuration value to retrieve; it may be a
+string which is the name of a defined system value; these names are
+specified in a number of standards (POSIX.1, <span class="Unix">Unix</span> 95, <span class="Unix">Unix</span> 98, and
+others).  Some platforms define additional names as well.  The names
+known to the host operating system are given in the
+<code>pathconf_names</code> dictionary.  For configuration variables not
+included in that mapping, passing an integer for <var>name</var> is also
+accepted.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+
+<p>
+If <var>name</var> is a string and is not known, <tt class="exception">ValueError</tt> is
+raised.  If a specific value for <var>name</var> is not supported by the
+host system, even if it is included in <code>pathconf_names</code>, an
+<tt class="exception">OSError</tt> is raised with <tt class="constant">errno.EINVAL</tt> for the
+error number.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2700' xml:id='l2h-2700'>pathconf_names</tt></b></dt>
+<dd>
+Dictionary mapping names accepted by <tt class="function">pathconf()</tt> and
+<tt class="function">fpathconf()</tt> to the integer values defined for those names
+by the host operating system.  This can be used to determine the set
+of names known to the system.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2701' xml:id='l2h-2701' class="function">readlink</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Return a string representing the path to which the symbolic link
+points.  The result may be either an absolute or relative pathname; if
+it is relative, it may be converted to an absolute pathname using
+<code>os.path.join(os.path.dirname(<var>path</var>), <var>result</var>)</code>.
+Availability: Macintosh, <span class="Unix">Unix</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2702' xml:id='l2h-2702' class="function">remove</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Remove the file <var>path</var>.  If <var>path</var> is a directory,
+<tt class="exception">OSError</tt> is raised; see <tt class="function">rmdir()</tt> below to remove
+a directory.  This is identical to the <tt class="function">unlink()</tt> function
+documented below.  On Windows, attempting to remove a file that is in
+use causes an exception to be raised; on <span class="Unix">Unix</span>, the directory entry is
+removed but the storage allocated to the file is not made available
+until the original file is no longer in use.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2703' xml:id='l2h-2703' class="function">removedirs</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+<a id='l2h-2719' xml:id='l2h-2719'></a>
+Removes directories recursively.  Works like
+<tt class="function">rmdir()</tt> except that, if the leaf directory is
+successfully removed, <tt class="function">removedirs()</tt> 
+tries to successively remove every parent directory mentioned in 
+<var>path</var> until an error is raised (which is ignored, because
+it generally means that a parent directory is not empty).
+For example, "<tt class="samp">os.removedirs('foo/bar/baz')</tt>" will first remove
+the directory "<tt class="samp">'foo/bar/baz'</tt>", and then remove "<tt class="samp">'foo/bar'</tt>"and "<tt class="samp">'foo'</tt>" if they are empty.
+Raises <tt class="exception">OSError</tt> if the leaf directory could not be 
+successfully removed.
+
+<span class="versionnote">New in version 1.5.2.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2704' xml:id='l2h-2704' class="function">rename</tt></b>(</nobr></td>
+  <td><var>src, dst</var>)</td></tr></table></dt>
+<dd>
+Rename the file or directory <var>src</var> to <var>dst</var>.  If <var>dst</var> is
+a directory, <tt class="exception">OSError</tt> will be raised.  On <span class="Unix">Unix</span>, if
+<var>dst</var> exists and is a file, it will be removed silently if the
+user has permission.  The operation may fail on some <span class="Unix">Unix</span> flavors
+if <var>src</var> and <var>dst</var> are on different filesystems.  If
+successful, the renaming will be an atomic operation (this is a
+POSIX requirement).  On Windows, if <var>dst</var> already exists,
+<tt class="exception">OSError</tt> will be raised even if it is a file; there may be
+no way to implement an atomic rename when <var>dst</var> names an existing
+file.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2705' xml:id='l2h-2705' class="function">renames</tt></b>(</nobr></td>
+  <td><var>old, new</var>)</td></tr></table></dt>
+<dd>
+Recursive directory or file renaming function.
+Works like <tt class="function">rename()</tt>, except creation of any intermediate
+directories needed to make the new pathname good is attempted first.
+After the rename, directories corresponding to rightmost path segments
+of the old name will be pruned away using <tt class="function">removedirs()</tt>.
+
+<span class="versionnote">New in version 1.5.2.</span>
+
+<p>
+<div class="note"><b class="label">Note:</b>
+This function can fail with the new directory structure made if
+you lack permissions needed to remove the leaf directory or file.
+</div>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2706' xml:id='l2h-2706' class="function">rmdir</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Remove the directory <var>path</var>.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2707' xml:id='l2h-2707' class="function">stat</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Perform a <tt class="cfunction">stat()</tt> system call on the given path.  The
+return value is an object whose attributes correspond to the members of
+the <tt class="ctype">stat</tt> structure, namely:
+<tt class="member">st_mode</tt> (protection bits),
+<tt class="member">st_ino</tt> (inode number),
+<tt class="member">st_dev</tt> (device),
+<tt class="member">st_nlink</tt> (number of hard links),
+<tt class="member">st_uid</tt> (user ID of owner),
+<tt class="member">st_gid</tt> (group ID of owner),
+<tt class="member">st_size</tt> (size of file, in bytes),
+<tt class="member">st_atime</tt> (time of most recent access),
+<tt class="member">st_mtime</tt> (time of most recent content modification),
+<tt class="member">st_ctime</tt>
+(platform dependent; time of most recent metadata change on <span class="Unix">Unix</span>, or
+the time of creation on Windows):
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import os
+&gt;&gt;&gt; statinfo = os.stat('somefile.txt')
+&gt;&gt;&gt; statinfo
+(33188, 422511L, 769L, 1, 1032, 100, 926L, 1105022698,1105022732, 1105022732)
+&gt;&gt;&gt; statinfo.st_size
+926L
+&gt;&gt;&gt;
+</pre></div>
+
+<p>
+
+<span class="versionnote">Changed in version 2.3:
+If <tt class="function">stat_float_times</tt> returns true, the time
+values are floats, measuring seconds. Fractions of a second may be
+reported if the system supports that. On Mac OS, the times are always
+floats. See <tt class="function">stat_float_times</tt> for further discussion.</span>
+
+<p>
+On some <span class="Unix">Unix</span> systems (such as Linux), the following attributes may
+also be available:
+<tt class="member">st_blocks</tt> (number of blocks allocated for file),
+<tt class="member">st_blksize</tt> (filesystem blocksize),
+<tt class="member">st_rdev</tt> (type of device if an inode device).
+<tt class="member">st_flags</tt> (user defined flags for file).
+
+<p>
+On other <span class="Unix">Unix</span> systems (such as FreeBSD), the following attributes
+may be available (but may be only filled out if root tries to
+use them):
+<tt class="member">st_gen</tt> (file generation number),
+<tt class="member">st_birthtime</tt> (time of file creation).
+
+<p>
+On Mac OS systems, the following attributes may also be available:
+<tt class="member">st_rsize</tt>,
+<tt class="member">st_creator</tt>,
+<tt class="member">st_type</tt>.
+
+<p>
+On RISCOS systems, the following attributes are also available:
+<tt class="member">st_ftype</tt> (file type),
+<tt class="member">st_attrs</tt> (attributes),
+<tt class="member">st_obtype</tt> (object type).
+
+<p>
+For backward compatibility, the return value of <tt class="function">stat()</tt> is
+also accessible as a tuple of at least 10 integers giving the most
+important (and portable) members of the <tt class="ctype">stat</tt> structure, in the
+order
+<tt class="member">st_mode</tt>,
+<tt class="member">st_ino</tt>,
+<tt class="member">st_dev</tt>,
+<tt class="member">st_nlink</tt>,
+<tt class="member">st_uid</tt>,
+<tt class="member">st_gid</tt>,
+<tt class="member">st_size</tt>,
+<tt class="member">st_atime</tt>,
+<tt class="member">st_mtime</tt>,
+<tt class="member">st_ctime</tt>.
+More items may be added at the end by some implementations.
+The standard module <tt class="module"><a href="module-stat.html">stat</a></tt><a id='l2h-2720' xml:id='l2h-2720'></a> defines
+functions and constants that are useful for extracting information
+from a <tt class="ctype">stat</tt> structure.
+(On Windows, some items are filled with dummy values.)
+
+<p>
+<span class="note"><b class="label">Note:</b>
+The exact meaning and resolution of the <tt class="member">st_atime</tt>,
+ <tt class="member">st_mtime</tt>, and <tt class="member">st_ctime</tt> members depends on the
+ operating system and the file system.  For example, on Windows systems
+ using the FAT or FAT32 file systems, <tt class="member">st_mtime</tt> has 2-second
+ resolution, and <tt class="member">st_atime</tt> has only 1-day resolution.  See
+ your operating system documentation for details.</span>
+
+<p>
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+
+<p>
+
+<span class="versionnote">Changed in version 2.2:
+Added access to values as attributes of the returned object.</span>
+
+<span class="versionnote">Changed in version 2.5:
+Added st_gen, st_birthtime.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2708' xml:id='l2h-2708' class="function">stat_float_times</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>newvalue</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Determine whether <tt class="class">stat_result</tt> represents time stamps as float
+objects.  If <var>newvalue</var> is <code>True</code>, future calls to <tt class="function">stat()</tt>
+return floats, if it is <code>False</code>, future calls return ints.
+If <var>newvalue</var> is omitted, return the current setting.
+
+<p>
+For compatibility with older Python versions, accessing
+<tt class="class">stat_result</tt> as a tuple always returns integers.
+
+<p>
+
+<span class="versionnote">Changed in version 2.5:
+Python now returns float values by default. Applications
+which do not work correctly with floating point time stamps can use
+this function to restore the old behaviour.</span>
+
+<p>
+The resolution of the timestamps (that is the smallest possible fraction)
+depends on the system. Some systems only support second resolution;
+on these systems, the fraction will always be zero.
+
+<p>
+It is recommended that this setting is only changed at program startup
+time in the <var>__main__</var> module; libraries should never change this
+setting. If an application uses a library that works incorrectly if
+floating point time stamps are processed, this application should turn
+the feature off until the library has been corrected.
+
+<p>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2709' xml:id='l2h-2709' class="function">statvfs</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Perform a <tt class="cfunction">statvfs()</tt> system call on the given path.  The
+return value is an object whose attributes describe the filesystem on
+the given path, and correspond to the members of the
+<tt class="ctype">statvfs</tt> structure, namely:
+<tt class="member">f_bsize</tt>,
+<tt class="member">f_frsize</tt>,
+<tt class="member">f_blocks</tt>,
+<tt class="member">f_bfree</tt>,
+<tt class="member">f_bavail</tt>,
+<tt class="member">f_files</tt>,
+<tt class="member">f_ffree</tt>,
+<tt class="member">f_favail</tt>,
+<tt class="member">f_flag</tt>,
+<tt class="member">f_namemax</tt>.
+Availability: <span class="Unix">Unix</span>.
+
+<p>
+For backward compatibility, the return value is also accessible as a
+tuple whose values correspond to the attributes, in the order given above.
+The standard module <tt class="module"><a href="module-statvfs.html">statvfs</a></tt><a id='l2h-2721' xml:id='l2h-2721'></a>
+defines constants that are useful for extracting information
+from a <tt class="ctype">statvfs</tt> structure when accessing it as a sequence; this
+remains useful when writing code that needs to work with versions of
+Python that don't support accessing the fields as attributes.
+
+<p>
+
+<span class="versionnote">Changed in version 2.2:
+Added access to values as attributes of the returned object.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2710' xml:id='l2h-2710' class="function">symlink</tt></b>(</nobr></td>
+  <td><var>src, dst</var>)</td></tr></table></dt>
+<dd>
+Create a symbolic link pointing to <var>src</var> named <var>dst</var>.
+Availability: <span class="Unix">Unix</span>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2711' xml:id='l2h-2711' class="function">tempnam</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>dir</var><big>[</big><var>, prefix</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a unique path name that is reasonable for creating a temporary
+file.  This will be an absolute path that names a potential directory
+entry in the directory <var>dir</var> or a common location for temporary
+files if <var>dir</var> is omitted or <code>None</code>.  If given and not
+<code>None</code>, <var>prefix</var> is used to provide a short prefix to the
+filename.  Applications are responsible for properly creating and
+managing files created using paths returned by <tt class="function">tempnam()</tt>;
+no automatic cleanup is provided.
+On <span class="Unix">Unix</span>, the environment variable <a class="envvar" id='l2h-2722' xml:id='l2h-2722'>TMPDIR</a> overrides
+<var>dir</var>, while on Windows the <a class="envvar" id='l2h-2723' xml:id='l2h-2723'>TMP</a> is used.  The specific
+behavior of this function depends on the C library implementation;
+some aspects are underspecified in system documentation.
+<span class="warning"><b class="label">Warning:</b>
+Use of <tt class="function">tempnam()</tt> is vulnerable to symlink attacks;
+consider using <tt class="function">tmpfile()</tt> (section <a href="os-newstreams.html#os-newstreams">14.1.2</a>)
+instead.</span>  Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2712' xml:id='l2h-2712' class="function">tmpnam</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a unique path name that is reasonable for creating a temporary
+file.  This will be an absolute path that names a potential directory
+entry in a common location for temporary files.  Applications are
+responsible for properly creating and managing files created using
+paths returned by <tt class="function">tmpnam()</tt>; no automatic cleanup is
+provided.
+<span class="warning"><b class="label">Warning:</b>
+Use of <tt class="function">tmpnam()</tt> is vulnerable to symlink attacks;
+consider using <tt class="function">tmpfile()</tt> (section <a href="os-newstreams.html#os-newstreams">14.1.2</a>)
+instead.</span>  Availability: <span class="Unix">Unix</span>, Windows.  This function probably
+shouldn't be used on Windows, though: Microsoft's implementation of
+<tt class="function">tmpnam()</tt> always creates a name in the root directory of the
+current drive, and that's generally a poor location for a temp file
+(depending on privileges, you may not even be able to open a file
+using this name).
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-2713' xml:id='l2h-2713'>TMP_MAX</tt></b></dt>
+<dd>
+The maximum number of unique names that <tt class="function">tmpnam()</tt> will
+generate before reusing names.
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2714' xml:id='l2h-2714' class="function">unlink</tt></b>(</nobr></td>
+  <td><var>path</var>)</td></tr></table></dt>
+<dd>
+Remove the file <var>path</var>.  This is the same function as
+<tt class="function">remove()</tt>; the <tt class="function">unlink()</tt> name is its traditional
+<span class="Unix">Unix</span> name.
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2715' xml:id='l2h-2715' class="function">utime</tt></b>(</nobr></td>
+  <td><var>path, times</var>)</td></tr></table></dt>
+<dd>
+Set the access and modified times of the file specified by <var>path</var>.
+If <var>times</var> is <code>None</code>, then the file's access and modified
+times are set to the current time.  Otherwise, <var>times</var> must be a
+2-tuple of numbers, of the form <code>(<var>atime</var>, <var>mtime</var>)</code>
+which is used to set the access and modified times, respectively.
+Whether a directory can be given for <var>path</var> depends on whether the
+operating system implements directories as files (for example, Windows
+does not).  Note that the exact times you set here may not be returned
+by a subsequent <tt class="function">stat()</tt> call, depending on the resolution
+with which your operating system records access and modification times;
+see <tt class="function">stat()</tt>.
+
+<span class="versionnote">Changed in version 2.0:
+Added support for <code>None</code> for <var>times</var>.</span>
+
+Availability: Macintosh, <span class="Unix">Unix</span>, Windows.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-2716' xml:id='l2h-2716' class="function">walk</tt></b>(</nobr></td>
+  <td><var>top</var><big>[</big><var>, topdown<code>=True</code>
+                       </var><big>[</big><var>, onerror<code>=None</code></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<a id='l2h-2724' xml:id='l2h-2724'></a>
+<tt class="function">walk()</tt> generates the file names in a directory tree, by
+walking the tree either top down or bottom up.
+For each directory in the tree rooted at directory <var>top</var> (including
+<var>top</var> itself), it yields a 3-tuple
+<code>(<var>dirpath</var>, <var>dirnames</var>, <var>filenames</var>)</code>.
+
+<p>
+<var>dirpath</var> is a string, the path to the directory.  <var>dirnames</var> is
+a list of the names of the subdirectories in <var>dirpath</var>
+(excluding <code>'.'</code> and <code>'..'</code>).  <var>filenames</var> is a list of
+the names of the non-directory files in <var>dirpath</var>.  Note that the
+names in the lists contain no path components.  To get a full
+path (which begins with <var>top</var>) to a file or directory in
+<var>dirpath</var>, do <code>os.path.join(<var>dirpath</var>, <var>name</var>)</code>.
+
+<p>
+If optional argument <var>topdown</var> is true or not specified, the triple
+for a directory is generated before the triples for any of its
+subdirectories (directories are generated top down).  If <var>topdown</var> is
+false, the triple for a directory is generated after the triples for all
+of its subdirectories (directories are generated bottom up).
+
+<p>
+When <var>topdown</var> is true, the caller can modify the <var>dirnames</var> list
+in-place (perhaps using <tt class="keyword">del</tt> or slice assignment), and
+<tt class="function">walk()</tt> will only recurse into the subdirectories whose names
+remain in <var>dirnames</var>; this can be used to prune the search,
+impose a specific order of visiting, or even to inform <tt class="function">walk()</tt>
+about directories the caller creates or renames before it resumes
+<tt class="function">walk()</tt> again.  Modifying <var>dirnames</var> when <var>topdown</var> is
+false is ineffective, because in bottom-up mode the directories in
+<var>dirnames</var> are generated before <var>dirpath</var> itself is generated.
+
+<p>
+By default errors from the <code>os.listdir()</code> call are ignored.  If
+optional argument <var>onerror</var> is specified, it should be a function;
+it will be called with one argument, an <tt class="exception">OSError</tt> instance.  It can
+report the error to continue with the walk, or raise the exception
+to abort the walk.  Note that the filename is available as the
+<code>filename</code> attribute of the exception object.
+
+<p>
+<div class="note"><b class="label">Note:</b>
+If you pass a relative pathname, don't change the current working
+directory between resumptions of <tt class="function">walk()</tt>.  <tt class="function">walk()</tt>
+never changes the current directory, and assumes that its caller
+doesn't either.
+</div>
+
+<p>
+<div class="note"><b class="label">Note:</b>
+On systems that support symbolic links, links to subdirectories appear
+in <var>dirnames</var> lists, but <tt class="function">walk()</tt> will not visit them
+(infinite loops are hard to avoid when following symbolic links).
+To visit linked directories, you can identify them with
+<code>os.path.islink(<var>path</var>)</code>, and invoke <code>walk(<var>path</var>)</code>
+on each directly.
+</div>
+
+<p>
+This example displays the number of bytes taken by non-directory files
+in each directory under the starting directory, except that it doesn't
+look under any CVS subdirectory:
+
+<p>
+<div class="verbatim"><pre>
+import os
+from os.path import join, getsize
+for root, dirs, files in os.walk('python/Lib/email'):
+    print root, "consumes",
+    print sum(getsize(join(root, name)) for name in files),
+    print "bytes in", len(files), "non-directory files"
+    if 'CVS' in dirs:
+        dirs.remove('CVS')  # don't visit CVS directories
+</pre></div>
+
+<p>
+In the next example, walking the tree bottom up is essential:
+<tt class="function">rmdir()</tt> doesn't allow deleting a directory before the
+directory is empty:
+
+<p>
+<div class="verbatim"><pre>
+# Delete everything reachable from the directory named in 'top',
+# assuming there are no symbolic links.
+# CAUTION:  This is dangerous!  For example, if top == '/', it
+# could delete all your disk files.
+import os
+for root, dirs, files in os.walk(top, topdown=False):
+    for name in files:
+        os.remove(os.path.join(root, name))
+    for name in dirs:
+        os.rmdir(os.path.join(root, name))
+</pre></div>
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.1.3 file Descriptor Operations"
+  href="os-fd-ops.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.1 os  "
+  href="module-os.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.1.5 process Management"
+  href="os-process.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="os-fd-ops.html">14.1.3 File Descriptor Operations</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-os.html">14.1 os  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="os-process.html">14.1.5 Process Management</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

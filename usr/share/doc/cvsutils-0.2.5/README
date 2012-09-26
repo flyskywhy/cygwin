@@ -1,0 +1,175 @@
+CVSU - CVS Utilities
+====================
+
+PLEASE NOTE, THAT ALTHOUGH THIS SOFTWARE WORKS FOR ITS AUTHOR, IT MAY OR
+MAY NOT WORK FOR YOU. PLEASE BE CAREFUL.  SOME OF THE INCLUDED FILES MAY
+REMOVE RESULTS OF YOUR WORK.  PLEASE MAKE SURE THAT YOU UNDERSTAND HOW
+THEY WORK BEFORE USING THEM.
+
+CVSU is licensed under the terms of the GNU Public License, version 2.
+See file COPYING and http://www.gnu.org/copyleft/gpl.html for details.
+
+The homepage of CVSU is http://www.red-bean.com/cvsutils/
+
+The original author of CVSU is
+ Tom Tromey <tromey@cygnus.com>
+
+Later it was maintained by
+ Pavel Roskin <proski@gnu.org>
+
+The project is currently discouninued.  No further development is
+expected.
+
+
+Introduction
+============
+
+CVS Utilities is a set of scripts that operate on working directories of
+CVS (Concurrent Versions System).
+
+Unlike some other version control systems, it's common for CVS
+repository to reside on a remote system.  Unfortunately, the standard
+CVS client requires connection to the repository for almost all
+operations.  This means that some operations are impossible when the
+repository is unreachable over the network, or when the network
+connection is slow compared to the size of the project.
+
+In fact, CVS keeps some data in the working directory that allows for
+some disconnected operations.  In particular, no connection to the
+repository is required to identify locally modified files.  But the CVS
+client cannot do it.  This is the gap CVS Utilities aim to close.
+
+Admittedly, the insistence of the CVS client on repository connection
+can be justified in most cases.  That's why CVS Utilities are not aiming
+to be a "better client".  It's an extension to CVS client with limited
+capabilities but higher speed.  (If someone was to write a better CVS
+client, it would probably keep base versions or their checksums
+somewhere, like Subversion does, but CVS Utilities use the same format
+of the working directory as the standard CVS client.)
+
+More specifically, these are the reasons behind CVS Utilities:
+
+- There is enough information in the CVS working directory to identify
+  local modifications and removals of the files under version control
+  and to find files unknown to the version control.
+
+- In particular, the unknown files can be removed to recreate the
+  working directory in its pristine state.  It can be done really fast,
+  whereas another checkout can take several minutes.
+
+- CVS poses certain unnecessary restrictions on read-only users, e.g.
+  "cvs add" command doesn't work for them, although this command is
+  essential for "cvs diff" showing new files.
+
+
+Included scripts
+================
+
+cvsu
+----
+
+Offline "cvs update" simulator.
+
+It lists the files found in the current directory (or in the directories
+which you specify).  The script takes following into account:
+
+- Attributes of the file (i.e. whatever lstat() returns)
+- Information about the file in CVS/Entries and CVS/Entries.Log
+
+Timestamp of the file is compared to the timestamp stored in CVS/Entries.
+
+Run "cvsu --help" to see supported command line options.  The options
+can be abbreviated.  This functionality is provided by Perl, and may
+vary from one machine to another.
+
+
+cvsco
+-----
+
+When you want to remove the working directory and check it out anew,
+use cvsco instead.
+
+Essentially, cvsco removes results of compilation and discards local
+changes.  It deletes all the files except the listed unmodified ones and
+updates everything which seems to be missing.
+
+Note that the existing unmodified files are not updated, but those
+missing or modified are!  (Consider it a bug it you want.)  It's a good
+idea to run "cvs update" after cvsco if you suspect somebody could have
+committed new changes since your last update.
+
+Another bug-feature - files removed by "cvs remove" (or "cvsdo remove")
+are not resurrected.
+
+
+cvsdiscard
+----------
+
+The easiest way to discard local changes.
+
+cvsdiscard discards local changes but keeps results of compilation.  It
+works like "cvsco", but it only deletes files which are likely to cause
+merge conflicts.
+
+
+cvspurge
+--------
+
+cvspurge leaves all files and directories known to CVS, but removes the
+rest.  Unlike cvsco, it doesn't remove local changes.  It is useful to
+test local changes in the otherwise clean source tree.
+
+
+cvstrim
+-------
+
+cvstrim removes files and directories unknown to CVS.
+
+Unlike cvspurge, files listed in .cvsignore are not removed.  The idea
+is to remove only the files that are "not supposed" to be in the working
+directory, i.e. those that the CVS client would flag with the question
+mark.  If you make sure that .cvsignore files include results of normal
+build process, those files will be kept.
+
+
+cvschroot
+---------
+
+cvschroot makes it possible to change CVS/Root in all subdirectories to
+the given value.
+
+The only argument accepted is the new CVSROOT value.  Old-style
+CVS/Repository files that contain the full path to the repository are
+updated to reflect the change.  New-style CVS/Repository don't need to
+be changed.  If the environment variable CVSROOT is defined, it
+overrides the contents of CVS/Root.  In other words, it is treated as
+the _old_ CVS root.
+
+
+cvsdo
+-----
+
+cvsdo simulates some of the CVS commands (currently add, remove and diff)
+without any access to the CVS server.
+
+Using "cvsdo add" and "cvsdo remove" allows you to create diffs with
+"cvs diff -N", in which all removed and added files will appear in the
+diff correctly, as is you had used "cvs add" and "cvs remove"
+respectively.
+
+"cvsdo diff" tries to locate the backup copies of the modified files. If
+they can be found, they are compared with the current version using
+"diff".  Only those backup copies are used that have the modification
+date equal to the date listed in CVS/Entries for the modified file.
+
+"cvsdo diff" patches the diff output to make it easier to read and safer
+to use with patch (especially GNU patch).  In particular, newly added
+files are handled better by "cvsdo diff" than by "cvs diff".  The header
+of the "diff" output is patched in such way that GNU patch will create a
+new file when the resulting patch is applied and remove that file when
+the patch is reverted.
+
+Files named "ChangeLog" receive special treatment.  "cvsdo diff" will
+try to omit as much context as possible, so that the patch can be
+applied even if other changes have been made to the ChangeLog.
+

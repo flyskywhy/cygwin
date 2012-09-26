@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="legacy-unit-tests.html" />
+<link rel="prev" href="minimal-example.html" />
+<link rel="parent" href="module-unittest.html" />
+<link rel="next" href="legacy-unit-tests.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.3.2 Organizing test code </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.3.1 basic example"
+  href="minimal-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.3 unittest  "
+  href="module-unittest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.3.3 re-using old test"
+  href="legacy-unit-tests.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="minimal-example.html">23.3.1 Basic example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-unittest.html">23.3 unittest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="legacy-unit-tests.html">23.3.3 Re-using old test</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0025320000000000000000"></a><a name="organizing-tests"></a>
+<br>
+23.3.2 Organizing test code
+            
+</h2>
+
+<p>
+The basic building blocks of unit testing are <i class="dfn">test cases</i> --
+single scenarios that must be set up and checked for correctness.  In
+<tt class="module">unittest</tt>, test cases are represented by instances of
+<tt class="module">unittest</tt>'s <tt class="class">TestCase</tt> class. To make
+your own test cases you must write subclasses of <tt class="class">TestCase</tt>, or
+use <tt class="class">FunctionTestCase</tt>.
+
+<p>
+An instance of a <tt class="class">TestCase</tt>-derived class is an object that can
+completely run a single test method, together with optional set-up
+and tidy-up code.
+
+<p>
+The testing code of a <tt class="class">TestCase</tt> instance should be entirely
+self contained, such that it can be run either in isolation or in
+arbitrary combination with any number of other test cases.
+
+<p>
+The simplest <tt class="class">TestCase</tt> subclass will simply override the
+<tt class="method">runTest()</tt> method in order to perform specific testing code:
+
+<p>
+<div class="verbatim"><pre>
+import unittest
+
+class DefaultWidgetSizeTestCase(unittest.TestCase):
+    def runTest(self):
+        widget = Widget('The widget')
+        self.assertEqual(widget.size(), (50, 50), 'incorrect default size')
+</pre></div>
+
+<p>
+Note that in order to test something, we use the one of the
+<tt class="method">assert*()</tt> or <tt class="method">fail*()</tt> methods provided by the
+<tt class="class">TestCase</tt> base class.  If the test fails, an exception will be
+raised, and <tt class="module">unittest</tt> will identify the test case as a
+<i class="dfn">failure</i>.  Any other exceptions will be treated as <i class="dfn">errors</i>.
+This helps you identify where the problem is: <i class="dfn">failures</i> are caused by
+incorrect results - a 5 where you expected a 6. <i class="dfn">Errors</i> are caused by
+incorrect code - e.g., a <tt class="exception">TypeError</tt> caused by an incorrect
+function call.
+
+<p>
+The way to run a test case will be described later.  For now, note
+that to construct an instance of such a test case, we call its
+constructor without arguments:
+
+<p>
+<div class="verbatim"><pre>
+testCase = DefaultWidgetSizeTestCase()
+</pre></div>
+
+<p>
+Now, such test cases can be numerous, and their set-up can be
+repetitive.  In the above case, constructing a <tt class="class">Widget</tt> in each of
+100 Widget test case subclasses would mean unsightly duplication.
+
+<p>
+Luckily, we can factor out such set-up code by implementing a method
+called <tt class="method">setUp()</tt>, which the testing framework will
+automatically call for us when we run the test:
+
+<p>
+<div class="verbatim"><pre>
+import unittest
+
+class SimpleWidgetTestCase(unittest.TestCase):
+    def setUp(self):
+        self.widget = Widget('The widget')
+
+class DefaultWidgetSizeTestCase(SimpleWidgetTestCase):
+    def runTest(self):
+        self.failUnless(self.widget.size() == (50,50),
+                        'incorrect default size')
+
+class WidgetResizeTestCase(SimpleWidgetTestCase):
+    def runTest(self):
+        self.widget.resize(100,150)
+        self.failUnless(self.widget.size() == (100,150),
+                        'wrong size after resize')
+</pre></div>
+
+<p>
+If the <tt class="method">setUp()</tt> method raises an exception while the test is
+running, the framework will consider the test to have suffered an
+error, and the <tt class="method">runTest()</tt> method will not be executed.
+
+<p>
+Similarly, we can provide a <tt class="method">tearDown()</tt> method that tidies up
+after the <tt class="method">runTest()</tt> method has been run:
+
+<p>
+<div class="verbatim"><pre>
+import unittest
+
+class SimpleWidgetTestCase(unittest.TestCase):
+    def setUp(self):
+        self.widget = Widget('The widget')
+
+    def tearDown(self):
+        self.widget.dispose()
+        self.widget = None
+</pre></div>
+
+<p>
+If <tt class="method">setUp()</tt> succeeded, the <tt class="method">tearDown()</tt> method will be
+run whether <tt class="method">runTest()</tt> succeeded or not.
+
+<p>
+Such a working environment for the testing code is called a
+<i class="dfn">fixture</i>.
+
+<p>
+Often, many small test cases will use the same fixture.  In this case,
+we would end up subclassing <tt class="class">SimpleWidgetTestCase</tt> into many
+small one-method classes such as
+<tt class="class">DefaultWidgetSizeTestCase</tt>.  This is time-consuming and
+discouraging, so in the same vein as JUnit, <tt class="module">unittest</tt> provides
+a simpler mechanism:
+
+<p>
+<div class="verbatim"><pre>
+import unittest
+
+class WidgetTestCase(unittest.TestCase):
+    def setUp(self):
+        self.widget = Widget('The widget')
+
+    def tearDown(self):
+        self.widget.dispose()
+        self.widget = None
+
+    def testDefaultSize(self):
+        self.failUnless(self.widget.size() == (50,50),
+                        'incorrect default size')
+
+    def testResize(self):
+        self.widget.resize(100,150)
+        self.failUnless(self.widget.size() == (100,150),
+                        'wrong size after resize')
+</pre></div>
+
+<p>
+Here we have not provided a <tt class="method">runTest()</tt> method, but have
+instead provided two different test methods.  Class instances will now
+each run one of the <tt class="method">test*()</tt>  methods, with <code>self.widget</code>
+created and destroyed separately for each instance.  When creating an
+instance we must specify the test method it is to run.  We do this by
+passing the method name in the constructor:
+
+<p>
+<div class="verbatim"><pre>
+defaultSizeTestCase = WidgetTestCase('testDefaultSize')
+resizeTestCase = WidgetTestCase('testResize')
+</pre></div>
+
+<p>
+Test case instances are grouped together according to the features
+they test.  <tt class="module">unittest</tt> provides a mechanism for this: the
+<i class="dfn">test suite</i>, represented by <tt class="module">unittest</tt>'s <tt class="class">TestSuite</tt>
+class:
+
+<p>
+<div class="verbatim"><pre>
+widgetTestSuite = unittest.TestSuite()
+widgetTestSuite.addTest(WidgetTestCase('testDefaultSize'))
+widgetTestSuite.addTest(WidgetTestCase('testResize'))
+</pre></div>
+
+<p>
+For the ease of running tests, as we will see later, it is a good
+idea to provide in each test module a callable object that returns a
+pre-built test suite:
+
+<p>
+<div class="verbatim"><pre>
+def suite():
+    suite = unittest.TestSuite()
+    suite.addTest(WidgetTestCase('testDefaultSize'))
+    suite.addTest(WidgetTestCase('testResize'))
+    return suite
+</pre></div>
+
+<p>
+or even:
+
+<p>
+<div class="verbatim"><pre>
+def suite():
+    tests = ['testDefaultSize', 'testResize']
+
+    return unittest.TestSuite(map(WidgetTestCase, tests))
+</pre></div>
+
+<p>
+Since it is a common pattern to create a <tt class="class">TestCase</tt> subclass
+with many similarly named test functions, <tt class="module">unittest</tt> provides a
+<tt class="class">TestLoader</tt> class that can be used to automate the process of
+creating a test suite and populating it with individual tests.
+For example,
+
+<p>
+<div class="verbatim"><pre>
+suite = unittest.TestLoader().loadTestsFromTestCase(WidgetTestCase)
+</pre></div>
+
+<p>
+will create a test suite that will run
+<code>WidgetTestCase.testDefaultSize()</code> and <code>WidgetTestCase.testResize</code>.
+<tt class="class">TestLoader</tt> uses the <code>'test'</code> method name prefix to identify
+test methods automatically.
+
+<p>
+Note that the order in which the various test cases will be run is
+determined by sorting the test function names with the built-in
+<tt class="function">cmp()</tt> function.
+
+<p>
+Often it is desirable to group suites of test cases together, so as to
+run tests for the whole system at once.  This is easy, since
+<tt class="class">TestSuite</tt> instances can be added to a <tt class="class">TestSuite</tt> just
+as <tt class="class">TestCase</tt> instances can be added to a <tt class="class">TestSuite</tt>:
+
+<p>
+<div class="verbatim"><pre>
+suite1 = module1.TheTestSuite()
+suite2 = module2.TheTestSuite()
+alltests = unittest.TestSuite([suite1, suite2])
+</pre></div>
+
+<p>
+You can place the definitions of test cases and test suites in the
+same modules as the code they are to test (such as <span class="file">widget.py</span>),
+but there are several advantages to placing the test code in a
+separate module, such as <span class="file">test_widget.py</span>:
+
+<p>
+
+<ul>
+<li>The test module can be run standalone from the command line.
+</li>
+<li>The test code can more easily be separated from shipped code.
+</li>
+<li>There is less temptation to change test code to fit the code
+        it tests without a good reason.
+</li>
+<li>Test code should be modified much less frequently than the
+        code it tests.
+</li>
+<li>Tested code can be refactored more easily.
+</li>
+<li>Tests for modules written in C must be in separate modules
+        anyway, so why not be consistent?
+</li>
+<li>If the testing strategy changes, there is no need to change
+        the source code.
+</li>
+</ul>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.3.1 basic example"
+  href="minimal-example.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.3 unittest  "
+  href="module-unittest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.3.3 re-using old test"
+  href="legacy-unit-tests.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="minimal-example.html">23.3.1 Basic example</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-unittest.html">23.3 unittest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="legacy-unit-tests.html">23.3.3 Re-using old test</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

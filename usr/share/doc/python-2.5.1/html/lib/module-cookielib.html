@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-Cookie.html" />
+<link rel="prev" href="module-CGIHTTPServer.html" />
+<link rel="parent" href="internet.html" />
+<link rel="next" href="cookie-jar-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.22 cookielib -- Cookie handling for HTTP clients</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.21 cgihttpserver  "
+  href="module-CGIHTTPServer.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.1 cookiejar and FileCookieJar"
+  href="cookie-jar-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-CGIHTTPServer.html">18.21 CGIHTTPServer  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="cookie-jar-objects.html">18.22.1 CookieJar and FileCookieJar</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION00202200000000000000000">
+18.22 <tt class="module">cookielib</tt> --
+         Cookie handling for HTTP clients</a>
+</h1>
+
+<p>
+<a name="module-cookielib"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.4.</span>
+
+<p>
+
+<p>
+The <tt class="module">cookielib</tt> module defines classes for automatic handling
+of HTTP cookies.  It is useful for accessing web sites that require
+small pieces of data - <i class="dfn">cookies</i> - to be set on the client
+machine by an HTTP response from a web server, and then returned to
+the server in later HTTP requests.
+
+<p>
+Both the regular Netscape cookie protocol and the protocol defined by
+<a class="rfc" id='rfcref-103367' xml:id='rfcref-103367'
+href="http://www.faqs.org/rfcs/rfc2965.html">RFC 2965</a> are handled.  RFC 2965 handling is switched off by default.
+<a class="rfc" id='rfcref-103369' xml:id='rfcref-103369'
+href="http://www.faqs.org/rfcs/rfc2109.html">RFC 2109</a> cookies are parsed as Netscape cookies and subsequently
+treated either as Netscape or RFC 2965 cookies according to the
+'policy' in effect.  Note that the great majority of cookies on the
+Internet are Netscape cookies.  <tt class="module">cookielib</tt> attempts to follow
+the de-facto Netscape cookie protocol (which differs substantially
+from that set out in the original Netscape specification), including
+taking note of the <code>max-age</code> and <code>port</code> cookie-attributes
+introduced with RFC 2965.  <span class="note"><b class="label">Note:</b>
+The various named parameters found in
+<span class="mailheader">Set-Cookie:</span> and <span class="mailheader">Set-Cookie2:</span> headers
+(eg. <code>domain</code> and <code>expires</code>) are conventionally referred to
+as <i class="dfn">attributes</i>.  To distinguish them from Python attributes, the
+documentation for this module uses the term <i class="dfn">cookie-attribute</i>
+instead</span>.
+
+<p>
+The module defines the following exception:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-4359' xml:id='l2h-4359' class="exception">LoadError</tt></b></dt>
+<dd>
+Instances of <tt class="class">FileCookieJar</tt> raise this exception on failure to
+load cookies from a file.  <span class="note"><b class="label">Note:</b>
+For backwards-compatibility
+with Python 2.4 (which raised an <tt class="exception">IOError</tt>),
+<tt class="exception">LoadError</tt> is a subclass of <tt class="exception">IOError</tt></span>.
+</dd></dl>
+
+<p>
+The following classes are provided:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4360' xml:id='l2h-4360' class="class">CookieJar</tt></b>(</nobr></td>
+  <td><var>policy=<tt class="constant">None</tt></var>)</td></tr></table></dt>
+<dd>
+<var>policy</var> is an object implementing the <tt class="class">CookiePolicy</tt>
+interface.
+
+<p>
+The <tt class="class">CookieJar</tt> class stores HTTP cookies.  It extracts cookies
+from HTTP requests, and returns them in HTTP responses.
+<tt class="class">CookieJar</tt> instances automatically expire contained cookies
+when necessary.  Subclasses are also responsible for storing and
+retrieving cookies from a file or database.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4361' xml:id='l2h-4361' class="class">FileCookieJar</tt></b>(</nobr></td>
+  <td><var>filename, delayload=<tt class="constant">None</tt>,
+ policy=<tt class="constant">None</tt></var>)</td></tr></table></dt>
+<dd>
+<var>policy</var> is an object implementing the <tt class="class">CookiePolicy</tt>
+interface.  For the other arguments, see the documentation for the
+corresponding attributes.
+
+<p>
+A <tt class="class">CookieJar</tt> which can load cookies from, and perhaps save
+cookies to, a file on disk.  Cookies are <strong>NOT</strong> loaded from the
+named file until either the <tt class="method">load()</tt> or <tt class="method">revert()</tt>
+method is called.  Subclasses of this class are documented in section
+<a href="file-cookie-jar-classes.html#file-cookie-jar-classes">18.22.2</a>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4362' xml:id='l2h-4362' class="class">CookiePolicy</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This class is responsible for deciding whether each cookie should be
+accepted from / returned to the server.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4363' xml:id='l2h-4363' class="class">DefaultCookiePolicy</tt></b>(</nobr></td>
+  <td><var>
+    blocked_domains=<tt class="constant">None</tt>,
+    allowed_domains=<tt class="constant">None</tt>,
+    netscape=<tt class="constant">True</tt>, rfc2965=<tt class="constant">False</tt>,
+    rfc2109_as_netscape=<tt class="constant">None</tt>,
+    hide_cookie2=<tt class="constant">False</tt>,
+    strict_domain=<tt class="constant">False</tt>,
+    strict_rfc2965_unverifiable=<tt class="constant">True</tt>,
+    strict_ns_unverifiable=<tt class="constant">False</tt>,
+    strict_ns_domain=<tt class="constant">DefaultCookiePolicy.DomainLiberal</tt>,
+    strict_ns_set_initial_dollar=<tt class="constant">False</tt>,
+    strict_ns_set_path=<tt class="constant">False</tt>
+  </var>)</td></tr></table></dt>
+<dd>
+
+<p>
+Constructor arguments should be passed as keyword arguments only.
+<var>blocked_domains</var> is a sequence of domain names that we never
+accept cookies from, nor return cookies to. <var>allowed_domains</var> if
+not <tt class="constant">None</tt>, this is a sequence of the only domains for which
+we accept and return cookies.  For all other arguments, see the
+documentation for <tt class="class">CookiePolicy</tt> and <tt class="class">DefaultCookiePolicy</tt>
+objects.
+
+<p>
+<tt class="class">DefaultCookiePolicy</tt> implements the standard accept / reject
+rules for Netscape and RFC 2965 cookies.  By default, RFC 2109 cookies
+(ie. cookies received in a <span class="mailheader">Set-Cookie:</span> header with a
+version cookie-attribute of 1) are treated according to the RFC 2965
+rules.  However, if RFC 2965 handling is turned off or
+<tt class="member">rfc2109_as_netscape</tt> is True, RFC 2109 cookies are
+'downgraded' by the <tt class="class">CookieJar</tt> instance to Netscape cookies, by
+setting the <tt class="member">version</tt> attribute of the <tt class="class">Cookie</tt> instance
+to 0.  <tt class="class">DefaultCookiePolicy</tt> also provides some parameters to
+allow some fine-tuning of policy.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-4364' xml:id='l2h-4364' class="class">Cookie</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This class represents Netscape, RFC 2109 and RFC 2965 cookies.  It is
+not expected that users of <tt class="module">cookielib</tt> construct their own
+<tt class="class">Cookie</tt> instances.  Instead, if necessary, call
+<tt class="method">make_cookies()</tt> on a <tt class="class">CookieJar</tt> instance.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-urllib2.html">urllib2</a></tt>:</b>
+    <dd>URL opening with automatic cookie handling.
+  </dl>
+
+<p>
+<dl compact="compact" class="seemodule">
+    <dt>Module <b><tt class="module"><a href="module-Cookie.html">Cookie</a></tt>:</b>
+    <dd>HTTP cookie classes, principally useful for
+server-side code.  The <tt class="module">cookielib</tt> and <tt class="module">Cookie</tt> modules
+do not depend on each other.
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://wwwsearch.sf.net/ClientCookie/"
+        class="url">http://wwwsearch.sf.net/ClientCookie/</a></dt>
+    <dd>Extensions to this
+module, including a class for reading Microsoft Internet Explorer
+cookies on Windows.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.netscape.com/newsref/std/cookie_spec.html"
+        class="url">http://www.netscape.com/newsref/std/cookie_spec.html</a></dt>
+    <dd>The
+specification of the original Netscape cookie protocol.  Though this
+is still the dominant protocol, the 'Netscape cookie protocol'
+implemented by all the major browsers (and <tt class="module">cookielib</tt>) only
+bears a passing resemblance to the one sketched out in
+<code>cookie_spec.html</code>.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.faqs.org/rfcs/rfc2109.html"
+        title="HTTP state Management Mechanism"
+        >RFC 2109, <em>HTTP State Management Mechanism</em></a>
+    <dd>Obsoleted by RFC 2965.
+Uses <span class="mailheader">Set-Cookie:</span> with version=1.
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.faqs.org/rfcs/rfc2965.html"
+        title="HTTP state Management Mechanism"
+        >RFC 2965, <em>HTTP State Management Mechanism</em></a>
+    <dd>The Netscape protocol
+with the bugs fixed.  Uses <span class="mailheader">Set-Cookie2:</span> in place of
+<span class="mailheader">Set-Cookie:</span>.  Not widely used.
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://kristol.org/cookie/errata.html"
+        class="url">http://kristol.org/cookie/errata.html</a></dt>
+    <dd>Unfinished errata to
+RFC 2965.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.faqs.org/rfcs/rfc2964.html"
+        title="Use of HTTP state Management"
+        >RFC 2964, <em>Use of HTTP State Management</em></a>
+    <dd>
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="cookie-jar-objects.html">18.22.1 CookieJar and FileCookieJar Objects</a>
+<li><a href="file-cookie-jar-classes.html">18.22.2 FileCookieJar subclasses and co-operation with web browsers</a>
+<li><a href="cookie-policy-objects.html">18.22.3 CookiePolicy Objects</a>
+<li><a href="default-cookie-policy-objects.html">18.22.4 DefaultCookiePolicy Objects</a>
+<li><a href="node643.html">18.22.5 Cookie Objects</a>
+<li><a href="cookielib-examples.html">18.22.6 Examples</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.21 cgihttpserver  "
+  href="module-CGIHTTPServer.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.22.1 cookiejar and FileCookieJar"
+  href="cookie-jar-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-CGIHTTPServer.html">18.21 CGIHTTPServer  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="cookie-jar-objects.html">18.22.1 CookieJar and FileCookieJar</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

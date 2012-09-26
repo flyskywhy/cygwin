@@ -1,0 +1,510 @@
+The Cogito Version Control System
+=================================
+
+Cogito is a version control system layered on top of the git tree history
+storage system. It aims at seamless user interface and ease of use, providing
+generally smoother user experience than the "raw" Core GIT itself and indeed
+many other version control systems.
+
+We shall first describe some quick ways to get started using Cogito, then go
+over each available command one by one.
+
+Please note that this document (meant to serve as a kind of Cogito tutorial
+in the future) is quite sketchy so far; a much better starting tutorial might
+be one of the Git Crash Courses featured at the Git homepage
+(http://git.or.cz/). The reference documentation should be of pretty good
+quality (see the 'Getting help' section at the bottom of this file).
+
+You can find the Cogito homepage at http://git.or.cz/cogito/[].
+
+
+Cogito is quite easy and intuitive to use. If you want to dive right in,
+see cg-ref(7) for a quick commands/concepts reference and cg-help(1)
+or cogito(7) for a reference manual.
+
+
+
+Installing
+----------
+
+If your distribution does not offer Cogito by itself, Cogito can be obtained as
+a tarball from
+
+ - http://www.kernel.org/pub/software/scm/cogito/[]
+
+Download and unpack the latest version, build with make, put the executables
+somewhere in your `$PATH` (or add your Cogito directory itself to your `$PATH`),
+and you're ready to go!
+
+The following tools are vitally required by Cogito to do anything useful:
+
+`-------------------------------`----------------------------------------------
+Tool				Description
+-------------------------------------------------------------------------------
+git-core			Cogito is just a frontend for git.
+bash				All Cogito executables are scripted in bash.
+sed, grep, textutils, etc.	The basic shell environment.
+diff, patch			The basic utilities for tracking file changes.
+-------------------------------------------------------------------------------
+
+The following tools are very recommended for regular Cogito operation:
+
+`-------------------------------`----------------------------------------------
+Tool				Description
+-------------------------------------------------------------------------------
+curl				For fetching files with the HTTP backend.
+ssh				For fetching files with the git+ssh backend.
+-------------------------------------------------------------------------------
+
+The following tools are optional but recommended:
+
+`-------------------------------`----------------------------------------------
+Tool				Description
+-------------------------------------------------------------------------------
+rsync				For fetching files with the rsync backend.
+GNU coreutils			The GNU versions of stat, date and cp \
+				are preferred over the BSD variants.
+asciidoc (>= 7.0), xmlto	For building documentation.
+-------------------------------------------------------------------------------
+
+
+
+Getting started
+---------------
+
+Starting a Fresh GIT Repository
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to start your own project using Cogito, there are two basic ways
+to do this. You may start a fresh repository with no files in it, or you may
+take an existing directory tree and turn it into a GIT repository.
+
+Starting an Empty Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To create a new repository with no files in it, `cd` into an empty directory,
+and give the following command:
+
+	$ cg-init
+
+Your editor will start up, and you will be asked to type in the initial
+commit description. Type something cute, and exit your editor.
+
+That's it! You're now in your own GIT repository. Notice there is now a `.git`
+directory. Go into it and look around, but don't change anything in there.
+That's what Cogito commands are for.
+
+Turning an Existing Directory Into a Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you have a directory full of files, you can easily turn this into a
+GIT repository. In fact, it is virtually the same as starting an empty
+repository. Just `cd` into the directory you want converted into a GIT
+repository, and give the following command:
+
+	$ cg-init
+
+Your editor starts up, you type in an initial commit message, exit your
+editor, and you're good to go. All of the files and directories within that
+directory are now part of a GIT archive.
+
+
+Accessing Someone Else's GIT Repository
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cloning the Repository
+^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to get started tracking an outside GIT repository, you first
+must have Cogito's executables on your `$PATH`. Next, you need the URL (or
+local directory path) of the repository you want to track. You can't just
+use the URL of a tarball, like the one given above for the Cogito source.
+The URL must point specifically to a `.git` directory somewhere. For instance,
+the URL for Cogito's self-hosting repository is
+
+	http://www.kernel.org/pub/scm/cogito/cogito.git
+
+Notice that the final directory, `cogito.git`, is not called `.git`. That is
+fine. It still has the same content as your `.git` directory.
+
+To clone the repository to your local filesystem, use the cg-clone command.
+cg-clone can be told to create a new directory for your repository, or to
+drop the repository into the current directory.
+
+To have a new directory created, just invoke cg-clone with the URL.  You can
+also include the directory in the command to specify exactly how should the
+new directory be called, as follows:
+
+	$ cg-clone http://www.kernel.org/pub/scm/cogito/cogito.git cogitodir
+
+You will watch a progressbar for a while and when it is over there will be a
+new directory called 'cogitodir' (or whatever name you chose) in the current
+directory. `cd` into it. Because we used the Cogito URL, you will see the
+Cogito source tree, with its own `.git` directory keeping track of everything.
+
+Note that the 'cogitodir' argument is optional; if you don't specify it,
+cg-clone will automatically determine the directory name from the URL - it
+would be 'cogito' for the URL we used. (Note that it's safe as cg-clone will
+refuse to do anything if the directory already exists.)
+
+If, instead, you want to clone the repository to the current directory,
+first make sure you are in an empty directory. Then give the following
+command:
+
+	$ cg-clone -s http://www.kernel.org/pub/scm/cogito/cogito.git
+
+When you get your prompt back, do an ls to see the source tree and `.git`
+directory.
+
+Tracking Others' Work
+^^^^^^^^^^^^^^^^^^^^^
+
+Of course, once you have cloned a repository, you don't just want to leave
+it at that. The upstream sources are constantly being updated, and you want
+to follow these updates. To do this, `cd` into the working tree directory (not
+the `.git` directory, but the directory that contains the `.git` directory), and
+give the following command:
+
+	$ cg-update
+
+You don't use a URL anymore - Cogito knows which tree you're tracking, because
+this information is stored in the `.git` directory. The above command will track
+the 'origin' branch, which represents the repository you originally cloned.
+But cg-update can be also used to track specific branches. See below for more
+discussion of branches and how to track them.
+
+When you give the above `cg-update` command, this performed two actions.
+First, it fetched all new changes from the upstream repository into your
+local repository. At that point, the changes exist in your local repository
+as part of the project history. The changes themselves are not actually
+visible in the files you see, but reside in the `.git` directory's awareness,
+just downloaded and ready to be merged somewhere.  The second thing `cg-update`
+does is to merge these changes into the files you see and work with. The end
+result is that when the `cg-update` has finished, you will see all the
+upstream changes reflected in your local files, and the `.git` directory will
+be aware of the history of those changes as well.
+
+It may be that you want to be aware of the history of the upstream work, but
+you don't yet want those changes merged with your own local files. To do
+this, give the following command:
+
+	$ cg-fetch
+
+This does the first part of cg-update's job, but skips the second part.
+Now your local files have not been changed, but your `.git` directory has been
+updated with the history of all the changes that have occurred in the
+upstream sources.
+
+Using `cg-fetch` is useful for a variety of purposes, for instance if you want
+to construct a diff against the latest version of the upstream sources, but
+don't want those changes to disturb your ongoing work. `cg-fetch` will update
+your `.git` directory with the history you need to construct your diff,
+without merging that history into your tree, potentially breaking your
+changes.
+
+Typically, if you are not making changes to the project yourself, but just
+want the latest version of a given project for your own use, you would use
+`cg-update`. `cg-fetch` is strictly for development work.
+
+Once you've done a `cg-fetch`, you may decide you want to merge after all. In
+this case a `cg-update` command will do the trick, however you will also
+update your local files with any further upstream changes that have occurred
+since your `cg-fetch`. The alternative and more powerful way is using
+the `cg-merge` command, which we shall describe later.
+
+
+
+Using Cogito
+------------
+
+If there are any changes, two IDs will be printed during `cg-fetch` or
+`cg-update` run (I mean the line saying "Tree change"). Pass those as
+parameters to cg-diff and you will get a diff describing changes from
+the last time you fetched. You can also
+
+	$ cg-diff -r origin..HEAD
+
+which will show changes between the cloned branch and your current branch
+(shall you do any modifications).
+
+Note that you can also access other branches than the one you clones from,
+by adding it with the command
+
+	$ cg-branch-add name repourl
+
+(the repourl can have a fragment part identifying a branch inside of the
+repository). Then you can pass the 'name' to `cg-update` and `cg-fetch`
+or use it anywhere where you could use the 'origin' name.
+
+When you do some local changes, you can do
+
+	$ cg-diff
+
+to display them.  Of course you will want to commit. If you added any new
+files, do
+
+	$ cg-add newfile1 newfile2 ...
+
+first. Then examine your changes by `cg-diff` or just list what files did you
+change by
+
+	$ cg-status
+
+and feel free to commit by the
+
+	$ cg-commit
+
+command, which will present you with the editor of your choice for composing
+the commit message. (`cg-commit` also has a very convenient command-line
+usage.)
+
+It is nice to be able to examine the commit history. We have tool for that too:
+
+	$ cg-log -r origin
+
+will get you the history of the branch you cloned from. `cg-log` with no
+arguments will default to the history of the current branch. Try also
+prepending the `-c` and `-f` options. To only get a brief overview of the
+changes, do
+
+	$ cg-log -s
+
+
+Note that we gave only a glimpse to the basic usage, but there is a lot more
+- merging (`cg-merge`), moving your tree to an older commit (`cg-seek`),
+pushing (`cg-push`), etc.
+
+
+Understanding Cogito branching and merging
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cogito's (partially inherited from GIT) concept of branching and merging may be
+a little confusing at first, since it can be different from what you knew so far.
+First, "branch" is too abstract word for us, so we will abandon it for now.
+We will present two other key concepts instead:
+
+	- Repository - when you did `cg-clone` or `cg-init`, you created
+	  a repository. That is a kind of container holding (usually) all your
+	  history and data.
+
+	- Head - each repository has some heads available. Those are kind of
+	  handles for various sequences of commit. A head contains simply a
+	  pointer to the last commit in the sequence, and if you commit 'onto'
+	  a head, the pointer will be advanced to the new commit. Your
+	  "current" head is the one you are currently working on. It is
+	  normally called 'master'.
+
+Now let's take an hypothetical repository:
+
+	repository
+	+--------+
+	|  master<  heads (denoted by the '<')
+	|   unoji<
+	+--------+
+
+Let's suppose that we want to fork off master's development. We have two
+possibilities, either make new repository for it, or a new head.
+
+Let's say that we want to fork it off for our work offline on a notebook,
+so we will make it through cloning the repository to our notebook. What
+will `cg-clone` do?
+
+	+--------+
+	+--------+
+
+First it creates an empty repository
+
+	+--------+
+	$  origin<
+	+--------+
+
+Then it creates an 'origin' head, and will copy all the history from the
+remote repository's 'master' head there. So this head exists to reflect
+the state of the remote repository. The important point is that it is
+called 'origin' in our new repository, even through it corresponds to
+a 'master' head in the old repository. This is normal - you can name your
+local heads whatever you want.
+
+The dollar sign denotes that this head is associated with a "remote branch"
+- a source location of the head is saved somewhere and you can fetch the
+head and possibly push to it.
+
+	+--------+
+	|  master<
+	$  origin<
+	+--------+
+
+Finally it copied over the 'origin' head to the 'master' head, which will
+from now as your current head represent your local development in the
+repository.
+
+So you do some local development, do few commits on the 'master' head and
+want to catch up with the upstream repository. You use 'cg-update', but what
+will it do?
+
+	+--------+
+	|  master<
+	$  origin<-F--- - - ... remote repository ...
+	+--------+
+
+First, it will fetch: populate your 'origin' head with the new commits from
+the remote's 'master' head.
+
+	+--------+
+	|  master<-M-.
+	$  origin>---'
+	+--------+
+
+Then, it will merge those new commits to your 'master' head.
+
+Now let's imagine that there is also another head 'unoji' on the other side
+besides 'master', containing some cool commits not in 'master' (it has such an
+exotic name, after all...). You want to merge its commits to your head too?
+
+	$ cg-branch-add r-unoji 'http://remote/repository#unoji'
+	$ cg-fetch r-unoji
+
+will make your repository look like
+
+	+--------+
+	|  master<
+	$  origin<
+	$ r-unoji<
+	+--------+
+
+with 'r-unoji' containing stuff from the remote's 'unoji' branch.
+
+Ok, you did some development, but you decided not to merge it into upstream's
+'master' yet since it is not yet stable enough. However, you want to upload it
+into the upstream repository since it is public and you want people to be able
+to try out your stuff. Easy, let's push it to a new head on the server.
+
+	$ cg-branch-add upmirror 'git+ssh://remote/repository#nislu'
+
+will make your repository look like:
+
+	+--------+
+	|  master<
+	$  origin<
+	$ r-unoji<
+	$upmirror|
+	+--------+
+
+Note that 'upmirror' has no head associated, it has just the "remote branch"
+info. That is because it needs no head since it's solely for pushing. It is
+however normal to have a head (frequently it's the 'origin') both for pulling
+and pushing.
+
+	$ cg-push upmirror
+
+will then make the remote repository look like:
+
+	+--------+
+	|  master<
+	|   unoji<
+	|   nislu<
+	+--------+
+
+with 'nislu' on the remote side corresponding to the 'master' in your local
+repository.
+
+Ok, so this is how it goes for multiple repositories, where the cloned
+repositories are essentially single branches. Note that if you clone the
+repository locally, it can be actually very cheap, basically for free with
+`cg-clone -l` (but please read its documentation).
+
+But what if you still do not want multiple repositories? The key here is to
+change your "current head" from 'master' to some new head, and then to be
+able to switch back and forth:
+
+	$ cg-switch -c aspyk
+
+to create a new 'aspyk' head (based on your current commit) and switch
+to it, and
+
+	$ cg-switch master
+
+to switch back to 'master' later, etc.
+
+You can get the list of available heads by
+
+	$ cg-status -g
+
+where the current head is marked by '>' and remote heads are marked by 'R'.
+You can also get the list of source locations for remote heads by
+
+	$ cg-branch-ls
+
+
+Using Cogito for team work
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A small team with SSH access to a shared server can use Cogito in a way
+similar to traditional CVS over SSH.
+
+If you are bootstrapping the project, and you have a local Cogito working
+copy, you must set up the shared repository and push a local head to it.
+
+To set up the shared repository, for example in
+
+	remoteserver:/srv/git/projectname.git
+
+login to the remote server and do:
+
+	$ mkdir /srv/git
+	$ cg-admin-setuprepo -g gitcommit /srv/git/projectname.git
+
+Note: All the developers with "push" access must then obviously belong
+to the 'gitcommit' group on the remote server.
+
+Going back to your Cogito working copy, run:
+
+	$ cg-branch-add origin git+ssh://remoteserver/srv/git/project.git
+	$ cg-push
+
+Now your other team members can start working with you, doing
+
+         $ cg-clone git+ssh://remoteserver/var/git/project.git
+
+and when they are ready to push their work onto the shared repository,
+they just do:
+
+         $ cg-update
+         $ cg-push
+
+
+Cogito vs. other GIT tools
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can *MOSTLY* use Cogito in parallel with other GIT frontends (e.g. StGIT),
+as well as the GIT plumbing and core GIT tools - the tools only need to keep
+HEAD in place and follow the standardized `refs/` hierarchy. The only notable
+exception is that you should stick with a single toolkit during a merge. Also,
+you can't use `cg-update` and `cg-fetch` out of the box on repositories produced
+by `git clone` since it uses incompatible branches representation.
+
+
+
+Getting Help
+------------
+
+Cogito commands come with their own documentation. To get quick usage help on
+cg-fetch, for example, give this command:
+
+	$ cg-fetch --help
+
+or, for a command's full reference manual, you can use either of these:
+
+	$ cg-fetch --long-help
+	$ cg-help cg-fetch
+
+Alternatively, the man pages for the individual commands can be used as a
+reference (their content is equivalent to the cg-help output).
+cogito(7) is a good starting point.
+
+You can ask thoughtful questions and make suggestions on the GIT mailing list:
+
+	git@vger.kernel.org
+
+or (less preferably) contact the maintainer Petr Baudis <pasky@suse.cz>
+directly.

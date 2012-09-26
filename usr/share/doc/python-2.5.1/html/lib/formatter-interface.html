@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="formatter-impls.html" />
+<link rel="prev" href="module-formatter.html" />
+<link rel="parent" href="module-formatter.html" />
+<link rel="next" href="formatter-impls.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>33.1.1 The Formatter Interface </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="33.1 formatter  "
+  href="module-formatter.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="33.1 formatter  "
+  href="module-formatter.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="33.1.2 formatter Implementations"
+  href="formatter-impls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-formatter.html">33.1 formatter  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-formatter.html">33.1 formatter  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="formatter-impls.html">33.1.2 Formatter Implementations</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0035110000000000000000"></a><a name="formatter-interface"></a>
+<br>
+33.1.1 The Formatter Interface 
+</h2>
+
+<p>
+Interfaces to create formatters are dependent on the specific
+formatter class being instantiated.  The interfaces described below
+are the required interfaces which all formatters must support once
+initialized.
+
+<p>
+One data element is defined at the module level:
+
+<p>
+<dl><dt><b><tt id='l2h-5512' xml:id='l2h-5512'>AS_IS</tt></b></dt>
+<dd>
+Value which can be used in the font specification passed to the
+<code>push_font()</code> method described below, or as the new value to any
+other <code>push_<var>property</var>()</code> method.  Pushing the <code>AS_IS</code>
+value allows the corresponding <code>pop_<var>property</var>()</code> method to
+be called without having to track whether the property was changed.
+</dd></dl>
+
+<p>
+The following attributes are defined for formatter instance objects:
+
+<p>
+<dl><dt><b><tt id='l2h-5513' xml:id='l2h-5513' class="member">writer</tt></b></dt>
+<dd>
+The writer instance with which the formatter interacts.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5514' xml:id='l2h-5514' class="method">end_paragraph</tt></b>(</nobr></td>
+  <td><var>blanklines</var>)</td></tr></table></dt>
+<dd>
+Close any open paragraphs and insert at least <var>blanklines</var>
+before the next paragraph.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5515' xml:id='l2h-5515' class="method">add_line_break</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Add a hard line break if one does not already exist.  This does not
+break the logical paragraph.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5516' xml:id='l2h-5516' class="method">add_hor_rule</tt></b>(</nobr></td>
+  <td><var>*args, **kw</var>)</td></tr></table></dt>
+<dd>
+Insert a horizontal rule in the output.  A hard break is inserted if
+there is data in the current paragraph, but the logical paragraph is
+not broken.  The arguments and keywords are passed on to the writer's
+<tt class="method">send_line_break()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5517' xml:id='l2h-5517' class="method">add_flowing_data</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Provide data which should be formatted with collapsed whitespace.
+Whitespace from preceding and successive calls to
+<tt class="method">add_flowing_data()</tt> is considered as well when the whitespace
+collapse is performed.  The data which is passed to this method is
+expected to be word-wrapped by the output device.  Note that any
+word-wrapping still must be performed by the writer object due to the
+need to rely on device and font information.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5518' xml:id='l2h-5518' class="method">add_literal_data</tt></b>(</nobr></td>
+  <td><var>data</var>)</td></tr></table></dt>
+<dd>
+Provide data which should be passed to the writer unchanged.
+Whitespace, including newline and tab characters, are considered legal
+in the value of <var>data</var>.  
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5519' xml:id='l2h-5519' class="method">add_label_data</tt></b>(</nobr></td>
+  <td><var>format, counter</var>)</td></tr></table></dt>
+<dd>
+Insert a label which should be placed to the left of the current left
+margin.  This should be used for constructing bulleted or numbered
+lists.  If the <var>format</var> value is a string, it is interpreted as a
+format specification for <var>counter</var>, which should be an integer.
+The result of this formatting becomes the value of the label; if
+<var>format</var> is not a string it is used as the label value directly.
+The label value is passed as the only argument to the writer's
+<tt class="method">send_label_data()</tt> method.  Interpretation of non-string label
+values is dependent on the associated writer.
+
+<p>
+Format specifications are strings which, in combination with a counter
+value, are used to compute label values.  Each character in the format
+string is copied to the label value, with some characters recognized
+to indicate a transform on the counter value.  Specifically, the
+character "<tt class="character">1</tt>" represents the counter value formatter as an
+Arabic number, the characters "<tt class="character">A</tt>" and "<tt class="character">a</tt>"
+represent alphabetic representations of the counter value in upper and
+lower case, respectively, and "<tt class="character">I</tt>" and "<tt class="character">i</tt>"
+represent the counter value in Roman numerals, in upper and lower
+case.  Note that the alphabetic and roman transforms require that the
+counter value be greater than zero.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5520' xml:id='l2h-5520' class="method">flush_softspace</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Send any pending whitespace buffered from a previous call to
+<tt class="method">add_flowing_data()</tt> to the associated writer object.  This
+should be called before any direct manipulation of the writer object.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5521' xml:id='l2h-5521' class="method">push_alignment</tt></b>(</nobr></td>
+  <td><var>align</var>)</td></tr></table></dt>
+<dd>
+Push a new alignment setting onto the alignment stack.  This may be
+<tt class="constant">AS_IS</tt> if no change is desired.  If the alignment value is
+changed from the previous setting, the writer's <tt class="method">new_alignment()</tt>
+method is called with the <var>align</var> value.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5522' xml:id='l2h-5522' class="method">pop_alignment</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Restore the previous alignment.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5523' xml:id='l2h-5523' class="method">push_font</tt></b>(</nobr></td>
+  <td><var><code>(</code>size, italic, bold, teletype<code>)</code></var>)</td></tr></table></dt>
+<dd>
+Change some or all font properties of the writer object.  Properties
+which are not set to <tt class="constant">AS_IS</tt> are set to the values passed in
+while others are maintained at their current settings.  The writer's
+<tt class="method">new_font()</tt> method is called with the fully resolved font
+specification.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5524' xml:id='l2h-5524' class="method">pop_font</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Restore the previous font.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5525' xml:id='l2h-5525' class="method">push_margin</tt></b>(</nobr></td>
+  <td><var>margin</var>)</td></tr></table></dt>
+<dd>
+Increase the number of left margin indentations by one, associating
+the logical tag <var>margin</var> with the new indentation.  The initial
+margin level is <code>0</code>.  Changed values of the logical tag must be
+true values; false values other than <tt class="constant">AS_IS</tt> are not
+sufficient to change the margin.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5526' xml:id='l2h-5526' class="method">pop_margin</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Restore the previous margin.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5527' xml:id='l2h-5527' class="method">push_style</tt></b>(</nobr></td>
+  <td><var>*styles</var>)</td></tr></table></dt>
+<dd>
+Push any number of arbitrary style specifications.  All styles are
+pushed onto the styles stack in order.  A tuple representing the
+entire stack, including <tt class="constant">AS_IS</tt> values, is passed to the
+writer's <tt class="method">new_styles()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5528' xml:id='l2h-5528' class="method">pop_style</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>n<code> = 1</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Pop the last <var>n</var> style specifications passed to
+<tt class="method">push_style()</tt>.  A tuple representing the revised stack,
+including <tt class="constant">AS_IS</tt> values, is passed to the writer's
+<tt class="method">new_styles()</tt> method.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5529' xml:id='l2h-5529' class="method">set_spacing</tt></b>(</nobr></td>
+  <td><var>spacing</var>)</td></tr></table></dt>
+<dd>
+Set the spacing style for the writer.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5530' xml:id='l2h-5530' class="method">assert_line_data</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>flag<code> = 1</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Inform the formatter that data has been added to the current paragraph
+out-of-band.  This should be used when the writer has been manipulated
+directly.  The optional <var>flag</var> argument can be set to false if
+the writer manipulations produced a hard line break at the end of the
+output.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="33.1 formatter  "
+  href="module-formatter.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="33.1 formatter  "
+  href="module-formatter.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="33.1.2 formatter Implementations"
+  href="formatter-impls.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="module-formatter.html">33.1 formatter  </a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-formatter.html">33.1 formatter  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="formatter-impls.html">33.1.2 Formatter Implementations</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

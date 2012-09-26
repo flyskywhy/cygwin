@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# Copyright (c) Josef "Jeff" Sipek, 2006, 2007
+#
+
+USAGE="[-v | -g | -e]"
+. `dirname $0`/guilt
+
+while case "$#" in 0) break ;; esac
+do
+	case "$1" in
+	-v)
+		verbose=t ;;
+	-g)
+		gui=t ;;
+	-e)
+		edit=t ;;
+	*)
+		usage ;;
+	esac
+	shift
+done
+
+if [ ! -z "$edit" ]; then 
+	$editor "$series"
+elif [ ! -z "$gui" ]; then
+	[ -z "`get_top`" ] && die "No patches applied."
+	bottom=`head -1 $applied | cut -d: -f1`
+	top=`tail -1 $applied | cut -d: -f1`
+	range="$bottom..$top"
+
+	# FIXME, this doesn't quite work - it's perfectly fine with
+	# git-rev-list, but gitk for whatever reason likes to include the
+	# parent
+	[ "$bottom" = "$top" ] && range="$bottom^..$bottom"
+
+	gitk $range
+elif [ -z "$verbose" ]; then
+	get_series
+else
+	prefix="+"
+	top=`get_top`
+
+	get_series |
+	while read patch; do
+		if [ -z "$top" ]; then
+			echo "  $patch"
+		else
+			if [ "$patch" = "$top" ]; then
+				echo "= $patch"
+				prefix=" "
+			else
+				echo "$prefix $patch"
+			fi
+		fi
+	done
+fi

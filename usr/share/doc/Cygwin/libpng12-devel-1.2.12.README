@@ -1,0 +1,282 @@
+libpng12-devel
+------------------------------------------
+libpng is the official reference library for the PNG
+format. PNG, or Portable Network Graphics, is a 
+turbo-studly image format with lossless compression.
+
+Runtime requirements:
+  cygwin-1.5.21-2
+  zlib-1.2.3-2
+
+Build requirements:
+  cygwin-1.5.21-2
+  gcc-3.4.4-1
+  binutils-20060817-1
+  zlib-1.2.3-2
+
+Canonical homepage:
+  http://www.libpng.org/pub/png/libpng.html
+
+Canonical download:
+  http://prdownloads.sourceforge.net/libpng/
+
+License:
+  custom zlib/libpng license (sinilar to BSD-no-advert-clause)
+  OSI Certified Open Source Software 
+
+Language:
+  C
+
+===========================================================
+
+Build instructions:
+  unpack libpng-1.2.12-X-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./libpng-1.2.12-X.cygport all
+
+This will create:
+  /usr/src/libpng-1.2.12-X.tar.bz2
+  /usr/src/libpng-1.2.12-X-src.tar.bz2
+  /usr/src/libpng12-1.2.12-X.tar.bz2
+  /usr/src/libpng12-devel-1.2.12-X.tar.bz2
+
+Also, 'cygport libpng-1.0.20-X.cygport check' will test the package
+
+===========================================================
+
+To link this library with your projects:
+  #1) include png.h and pngconf.h
+  #2) to link with the static library, use '-static' on the link line
+  #3) to link with the dll, no unusual link-time flags are needed
+In either case, there are NO special compile time flags needed
+
+NOTE!!!!  To insure that you link against the 1.2.x version of libpng,
+you must use -I/usr/include/libpng12 and -Lpng12.  You can hardcode this,
+or use the automated 'pkg-config' tool:
+  'pkg-config libpng12 --cflags'
+  'pkg-config libpng12 --libs'
+or you can use the libpng12-config script:
+  'libpng12-config --cppflags'
+  'libpng12-config --ldflags'
+  'libpng12-config --libs'
+
+===========================================================
+
+The libpng family of cygwin packages have been structured so that 
+generic, unversioned filenames are symlinked to a specific, selected
+set of versioned names using the 'altenratives' program.
+For instance,
+
+  libpng-config, 'pkgconfig libpng', /usr/lib/libpng.a, 
+  /usr/lib/libpng.dll.a, /usr/include/libpng/, /usr/include/png.h,
+  /usr/include/pngconf.h
+
+will point to the corresponding versioned files and directories.
+Therefore, if you use -lpng, and -I/usr/include/libpng/, you will 
+build against the 'alternatives'-selected version of those files.
+
+To modify the 'alternatives' choice (which defaults to the most recent
+version), use the following command:
+
+   '/usr/sbin/update-alternatives --set libpng /usr/include/libpngXX'
+
+where XX is '12' or '10' -- and all of the other links will automatically
+be updated to match.  Currently, the most recent implementation is
+libpng12.  If left to its 'auto' setting, update-alternatives will
+ensure that the generic names always track the "most recent" even if
+"most recent" becomes "libpng27" down the road.  If you use the --set
+command above, and want to revert back to 'always most recent' behavior 
+for the unversioned files, use 
+
+  '/usr/sbin/update-alternatives --auto libpng'
+
+See 'man alternatives' for more information.
+
+If you always want the most recent, use the unversioned files.  If 
+you want to "freeze" at libpng12, use the version-12 files.  
+
+See the makefile and inspect how pngtest.exe (dll) and 
+pngtest-stat.exe (static) are compiled and linked.
+
+===========================================================
+
+Files included in libpng12:
+
+  /usr/bin/cygpng12.dll
+
+Files included in libpng12-devel:
+  see 'cygcheck -l libpng12-devel' output or browse the listing 
+  for the appropriate version at http://cygwin.com/packages/.
+
+Files included in libpng (main):
+  see 'cygcheck -l libpng' output or browse the listing 
+  for the appropriate version at http://cygwin.com/packages/.
+
+===========================================================
+
+Port Notes:
+----------  libpng-1.2.12-1 -- 04 Nov 2006 -----------
+* update to latest official release of libpng-1.2.x
+* switch to cygport build
+* Although upstream is now providing an autotools-driven
+  build, the use of libtool results in a DLL with a different
+  name (cygpng12-0.dll rather than cygpng12.dll).  To maintain
+  compatibility, cygwin's distribution of libpng-1.2.x (and
+  libpng-1.0.x) will continue to use the custom-makefile build
+  system.  However, when libpng-1.4.x is released, cygwin will then
+  begin to use the autotool-driven buildsystem (via cygport) for 
+  the 1.4.x series and beyond.
+
+---------- 1.2.8-2 ---------
+* brown paper bag fix -- corrected postinstall script
+
+---------- 1.2.8-1 ---------
+* routine version upgrade
+* use 'alternatives' system to manage conflicts between 1.2.x and 1.0.y
+
+---------- 1.2.5-4 ---------
+cygwin-1.5.2 FLAG DAY release.
+
+---------- 1.2.5-3 ---------
+cygwin-1.5.1 FLAG DAY release.
+Documentation moved to /usr/share/*
+
+---------- 1.2.5-2 ---------
+cygwin-1.5.0 FLAG DAY release.  This library will not work 
+with kernels older than 1.5.0.  However, if you have cygwin-1.5.0
+installed, then you should also update to this version of libpng12.
+Ditto zlib-1.1.4-2+, libpng10-1.0.15-2
+
+---------- 1.2.5-1 ---------
+Update to official 1.2.5 release.  Includes two
+post-release fixes for 16bit samples.  Also, since gcc3 with
+-fomit-frame-pointer requires -maccumulate-outgoing-args, 
+IF gcc3 was compiled with dwarf2 exceptions -- but not otherwise.
+Because cygwin's gcc3 currently uses dwarf2, but AFAIK the next
+version will not, I took the safe road and just dropped 
+-fomit-frame-pointer.
+
+---------- 1.2.4-1 ---------
+Update to official 1.2.4 release.  Fixes a security hole.
+
+---------- 1.2.3-1 ---------
+
+Update to official 1.2.3 release.  Actually PUBLISHED this
+one to the cygwin community (the release candidates were
+private releases)
+
+---------- 1.2.3rc6-1 ---------
+
+Update to 1.2.3rc6 release.  Keeping up...
+
+---------- 1.2.3rc5-1 ---------
+
+Update to 1.2.3rc5 release. Major changes in the makefile 
+and build procedure...sigh.  They're really keeping me busy...
+
+---------- 1.2.3rc4-1 ---------
+
+Update to 1.2.3rc4 release; symlinks and postinstall
+script now part of the -devel package, instead of the main
+package.  1.2.3r4 also adds libpng-config scripts.
+
+---------- 1.2.2-1 ------------
+
+Correct a bug in pngconf.h (_cdecl), update to 1.2.2 release
+
+In order to facilitate peaceful coexistence, the upstream libpng
+folks made the following changes:
+  dynamic lib: cygpng12.dll
+  import lib:  libpng12.dll.a
+  static lib:  libpng12.a
+  include files:  /usr/include/libpng12/*
+
+Also, they recommend removing the /usr/include/png[conf].h files.
+Then, they create the following symlinks:
+
+  in /usr/lib:     libpng.dll.a --> libpng12.dll.a
+  in /usr/lib:     libpng.a     --> libpng12.a
+  in /usr/include: libpng       --> libpng12/
+
+I've implemented this symlink creation as part of the postinstall
+script.
+
+AND, to enable the import/devel libs from multiple major versions
+to coexist, I've FURTHER split the distribution into:
+  libpng12-devel
+  libpng12
+  libpng    (just those files which conflict between versions.
+             right now, just the man pages, and the postinstall
+             script)
+
+---------- 1.2.1-1 ------------
+
+Mega changes.  Update to the 1.2.1 release, which is incompatible.
+Therefore, the DLL is now named cygpng3.dll and is in the 'libpng3'
+package (instead of cygpng2.dll / libpng2).
+
+---------- 1.0.12-1 ------------
+
+No additional cygwin-specific changes, except updating to .12 release
+
+---------- 1.0.11-2 ------------
+
+Not released.
+
+Changed cygwin build to use the auto-import functionality of newer 
+binutils.  Also, split into two packages -- one contains only the 
+DLL -- in preparation for the imminent release of the incompatible
+libpng-2.x series.
+
+---------- 1.0.11 --------------
+
+No additional cygwin-specific changes, except updating to .11 release
+
+---------- 1.0.9 ---------------
+
+Version 1.0.9-3: as always, the dll is named cygpng2.dll.  See notes 
+  below.  Also, the -DALL_STATIC synonym for -DPNG_STATIC (and
+  -DZLIB_STATIC) was added.  Although the binary package does 
+  not contain assembler routines, asm acceleration DOES work
+  with both DLL and static builds and with -mwin32 or without.
+
+---------- 1.0.8 ---------------
+
+Version 1.0.8-2 contains the 1.0.9pre3 patches.  However, I kept the 
+  1.0.8 number since the 9pre3 patches ONLY affect the assembler
+  routines, and the cygwin precompiled packages do NOT use the
+  assember stuff.  Thus, the only change from 1.0.8-1 to 1.0.8-2
+  is the dll name change (see below).
+
+As of 1.0.8-2, the dll is named "cygpng2.dll" NOT "libpng.dll".  This 
+  helps to avoid dll naming conflicts between cygwin dll's and 
+  dlls from other platforms (native, pw, etc).  If you have an
+  executable that depends on "libpng.dll" you may either recompile 
+  your app so that it links with libpng.dll.a/cygpng2.dll, or install
+  *just* the dll from libpng-1.0.8-1.tar.gz into your /usr/bin 
+  directory.
+
+The dll is VERSIONED. (i.e. "cygpng2.dll" NOT "cygpng.dll") because
+  the png developers will soon release libpng-2.x.y, which has an
+  entirely different ABI/API.  To enable the upcoming version and 
+  this one to coexist, the dll's are versioned (versioning is not
+  necessary for static libs until AFTER the release of 2.x.y; 
+  but you've got to think ahead for the dynamic libs).
+
+The png-developers specify that the interface version number (IVN) 
+  of the current 1.x.y series is "2" and the IVN of the upcoming
+  2.x.y series will be "3".  I suppose IVN = 1 was for the 0.x.y
+  pre-releases. 
+
+All #ifdef (WIN32) statements are guarded with '&& !(__CYGWIN__)' or 
+  expanded with '|| (__CYGWIN__)' as appropriate. So, the cygwin 
+  version should work whether 'WIN32' is defined or not (e.g.
+  whether '-mno-win32' is used or not)
+
+Binary package does NOT include the 586 or 686 optimized assembler
+  code in pnggccrd.c. See Makefile for instructions on how to enable 
+  assembler optimizations.
+
+Cygwin port maintained by: Charles Wilson cygwin@cygwin.com

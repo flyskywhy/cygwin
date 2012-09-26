@@ -1,0 +1,106 @@
+################################################################################
+#
+# gnome2.cygclass - functions for building GNOME 2.x packages
+#
+# Part of cygport - Cygwin packaging application
+# Copyright (C) 2006, 2007, 2008 Yaakov Selkowitz
+# Provided by the Cygwin Ports project <http://cygwinports.dotsrc.org/>
+#
+# cygport is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# cygport is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with cygport.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $Id: gnome2.cygclass 4155 2008-08-07 04:58:41Z yselkowitz $
+#
+################################################################################
+
+inherit gnome.org
+
+gnome2_autoreconf() {
+	local configure_ac
+	local skip_d
+
+	if [ -e configure.ac ]
+	then
+		configure_ac="configure.ac"
+	elif [ -e configure.in ]
+	then
+		configure_ac="configure.in"
+	else
+		error "gnome2: configure.ac or configure.in not found"
+	fi
+
+	check_prog_req gnome-autogen.sh gnome-common
+
+	if [ -f omf-install/Makefile.am -o -f omf.make -o -f xmldocs.make ]
+	then
+		USE_COMMON_DOC_BUILD=yes
+	fi
+
+	export WANT_AUTOMAKE
+
+	export ACLOCAL_FLAGS
+	export NOCONFIGURE=1
+	export PKG_NAME=${ORIG_PN:-${PN}}
+	export REQUIRED_AUTOMAKE_VERSION=$(automake --version | head -n 1 | sed 's/^.*[  ]\([0-9.]*[a-z]*\).*$/\1/')
+	export REQUIRED_LIBTOOL_VERSION=1.5.18	# new autotools layout
+	export USE_COMMON_DOC_BUILD
+
+	for skip_d in ${GNOME2_NO_AUTOGEN}
+	do
+		if [ -d ${skip_d} ]
+		then
+			touch ${skip_d}/NO-AUTO-GEN
+		else
+			warning "GNOME2_NO_AUTOGEN: directory not found: ${skip_d}"
+		fi
+	done
+
+	# FIXME: does not detect sublevel configures
+	if $(grep -Eq 'AM_(GNU_GETTEXT|ICONV)' ${configure_ac})
+	then
+		cp -f /usr/share/gettext/config.rpath .
+	fi
+
+	# Automake will exit if these are not present
+	# dodoc won't install these, however, if they are empty
+	touch AUTHORS COPYING ChangeLog INSTALL NEWS README
+
+	gnome-autogen.sh || error "gnome2: autoreconf failed"
+}
+
+gnome2_compile() {
+	# GNOME packages require /var/lib for compatibility with scrollkeeper
+	cygconf \
+		--localstatedir=/var/lib \
+		--enable-gtk-doc \
+		--disable-schemas-install \
+		--disable-scrollkeeper \
+		--disable-static \
+		"${@}"
+	cygmake
+}
+
+src_compile() {
+	case ${PN} in
+		gnome-backgrounds|gnome-common|gnome-icon-theme|gnome-themes|gnome-themes-extras|gnome-games-extra-data)
+			# These are just data and don't benefit from autoreconf
+			;;
+		*)
+			cd ${S}
+			gnome2_autoreconf
+			;;
+	esac
+
+	cd ${B}
+	gnome2_compile
+}

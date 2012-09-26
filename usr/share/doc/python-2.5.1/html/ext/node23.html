@@ -1,0 +1,517 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node24.html" />
+<link rel="prev" href="node22.html" />
+<link rel="parent" href="dnt-basics.html" />
+<link rel="next" href="node24.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>2.1.2 Providing finer control over data attributes</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1.1 adding data and"
+  href="node22.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1.3 supporting cyclic garbage"
+  href="node24.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node22.html">2.1.1 Adding data and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node24.html">2.1.3 Supporting cyclic garbage</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION004120000000000000000">
+2.1.2 Providing finer control over data attributes</a>
+</h2>
+
+<p>
+In this section, we'll provide finer control over how the
+<tt class="member">first</tt> and <tt class="member">last</tt> attributes are set in the
+<tt class="class">Noddy</tt> example. In the previous version of our module, the
+instance variables <tt class="member">first</tt> and <tt class="member">last</tt> could be set to
+non-string values or even deleted. We want to make sure that these
+attributes always contain strings.
+
+<p>
+<div class="verbatim">
+<pre>#include &lt;Python.h&gt;
+#include "structmember.h"
+
+typedef struct {
+    PyObject_HEAD
+    PyObject *first;
+    PyObject *last;
+    int number;
+} Noddy;
+
+static void
+Noddy_dealloc(Noddy* self)
+{
+    Py_XDECREF(self-&gt;first);
+    Py_XDECREF(self-&gt;last);
+    self-&gt;ob_type-&gt;tp_free((PyObject*)self);
+}
+
+static PyObject *
+Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    Noddy *self;
+
+    self = (Noddy *)type-&gt;tp_alloc(type, 0);
+    if (self != NULL) {
+        self-&gt;first = PyString_FromString("");
+        if (self-&gt;first == NULL)
+          {
+            Py_DECREF(self);
+            return NULL;
+          }
+        
+        self-&gt;last = PyString_FromString("");
+        if (self-&gt;last == NULL)
+          {
+            Py_DECREF(self);
+            return NULL;
+          }
+
+        self-&gt;number = 0;
+    }
+
+    return (PyObject *)self;
+}
+
+static int
+Noddy_init(Noddy *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *first=NULL, *last=NULL, *tmp;
+
+    static char *kwlist[] = {"first", "last", "number", NULL};
+
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|SSi", kwlist, 
+                                      &amp;first, &amp;last, 
+                                      &amp;self-&gt;number))
+        return -1; 
+
+    if (first) {
+        tmp = self-&gt;first;
+        Py_INCREF(first);
+        self-&gt;first = first;
+        Py_DECREF(tmp);
+    }
+
+    if (last) {
+        tmp = self-&gt;last;
+        Py_INCREF(last);
+        self-&gt;last = last;
+        Py_DECREF(tmp);
+    }
+
+    return 0;
+}
+
+static PyMemberDef Noddy_members[] = {
+    {"number", T_INT, offsetof(Noddy, number), 0,
+     "noddy number"},
+    {NULL}  /* Sentinel */
+};
+
+static PyObject *
+Noddy_getfirst(Noddy *self, void *closure)
+{
+    Py_INCREF(self-&gt;first);
+    return self-&gt;first;
+}
+
+static int
+Noddy_setfirst(Noddy *self, PyObject *value, void *closure)
+{
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete the first attribute");
+    return -1;
+  }
+  
+  if (! PyString_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, 
+                    "The first attribute value must be a string");
+    return -1;
+  }
+      
+  Py_DECREF(self-&gt;first);
+  Py_INCREF(value);
+  self-&gt;first = value;    
+
+  return 0;
+}
+
+static PyObject *
+Noddy_getlast(Noddy *self, void *closure)
+{
+    Py_INCREF(self-&gt;last);
+    return self-&gt;last;
+}
+
+static int
+Noddy_setlast(Noddy *self, PyObject *value, void *closure)
+{
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete the last attribute");
+    return -1;
+  }
+  
+  if (! PyString_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, 
+                    "The last attribute value must be a string");
+    return -1;
+  }
+      
+  Py_DECREF(self-&gt;last);
+  Py_INCREF(value);
+  self-&gt;last = value;    
+
+  return 0;
+}
+
+static PyGetSetDef Noddy_getseters[] = {
+    {"first", 
+     (getter)Noddy_getfirst, (setter)Noddy_setfirst,
+     "first name",
+     NULL},
+    {"last", 
+     (getter)Noddy_getlast, (setter)Noddy_setlast,
+     "last name",
+     NULL},
+    {NULL}  /* Sentinel */
+};
+
+static PyObject *
+Noddy_name(Noddy* self)
+{
+    static PyObject *format = NULL;
+    PyObject *args, *result;
+
+    if (format == NULL) {
+        format = PyString_FromString("%s %s");
+        if (format == NULL)
+            return NULL;
+    }
+
+    args = Py_BuildValue("OO", self-&gt;first, self-&gt;last);
+    if (args == NULL)
+        return NULL;
+
+    result = PyString_Format(format, args);
+    Py_DECREF(args);
+    
+    return result;
+}
+
+static PyMethodDef Noddy_methods[] = {
+    {"name", (PyCFunction)Noddy_name, METH_NOARGS,
+     "Return the name, combining the first and last name"
+    },
+    {NULL}  /* Sentinel */
+};
+
+static PyTypeObject NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(Noddy),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Noddy_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Noddy objects",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    0,		               /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    Noddy_methods,             /* tp_methods */
+    Noddy_members,             /* tp_members */
+    Noddy_getseters,           /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)Noddy_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Noddy_new,                 /* tp_new */
+};
+
+static PyMethodDef module_methods[] = {
+    {NULL}  /* Sentinel */
+};
+
+#ifndef PyMODINIT_FUNC	/* declarations for DLL import/export */
+#define PyMODINIT_FUNC void
+#endif
+PyMODINIT_FUNC
+initnoddy3(void) 
+{
+    PyObject* m;
+
+    if (PyType_Ready(&amp;NoddyType) &lt; 0)
+        return;
+
+    m = Py_InitModule3("noddy3", module_methods,
+                       "Example module that creates an extension type.");
+
+    if (m == NULL)
+      return;
+
+    Py_INCREF(&amp;NoddyType);
+    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;NoddyType);
+}
+</pre>
+<div class="footer">
+<a href="noddy3.txt" type="text/plain">Download as text (original file name: <span class="file">noddy3.c</span>).</a>
+</div></div>
+
+<p>
+To provide greater control, over the <tt class="member">first</tt> and <tt class="member">last</tt>
+attributes, we'll use custom getter and setter functions.  Here are
+the functions for getting and setting the <tt class="member">first</tt> attribute:
+
+<p>
+<div class="verbatim"><pre>
+Noddy_getfirst(Noddy *self, void *closure)
+{
+    Py_INCREF(self-&gt;first);
+    return self-&gt;first;
+}
+
+static int
+Noddy_setfirst(Noddy *self, PyObject *value, void *closure)
+{
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete the first attribute");
+    return -1;
+  }
+
+  if (! PyString_Check(value)) {
+    PyErr_SetString(PyExc_TypeError,
+                    "The first attribute value must be a string");
+    return -1;
+  }
+
+  Py_DECREF(self-&gt;first);
+  Py_INCREF(value);
+  self-&gt;first = value;
+
+  return 0;
+}
+</pre></div>
+
+<p>
+The getter function is passed a <tt class="class">Noddy</tt> object and a
+``closure'', which is void pointer. In this case, the closure is
+ignored. (The closure supports an advanced usage in which definition
+data is passed to the getter and setter. This could, for example, be
+used to allow a single set of getter and setter functions that decide
+the attribute to get or set based on data in the closure.)
+
+<p>
+The setter function is passed the <tt class="class">Noddy</tt> object, the new value,
+and the closure. The new value may be <tt class="constant">NULL</tt>, in which case the
+attribute is being deleted.  In our setter, we raise an error if the
+attribute is deleted or if the attribute value is not a string.
+
+<p>
+We create an array of <tt class="ctype">PyGetSetDef</tt> structures:
+
+<p>
+<div class="verbatim"><pre>
+static PyGetSetDef Noddy_getseters[] = {
+    {"first",
+     (getter)Noddy_getfirst, (setter)Noddy_setfirst,
+     "first name",
+     NULL},
+    {"last",
+     (getter)Noddy_getlast, (setter)Noddy_setlast,
+     "last name",
+     NULL},
+    {NULL}  /* Sentinel */
+};
+</pre></div>
+
+<p>
+and register it in the <tt class="member">tp_getset</tt> slot:
+
+<p>
+<div class="verbatim"><pre>
+    Noddy_getseters,           /* tp_getset */
+</pre></div>
+
+<p>
+to register out attribute getters and setters.
+
+<p>
+The last item in a <tt class="ctype">PyGetSetDef</tt> structure is the closure
+mentioned above. In this case, we aren't using the closure, so we just
+pass <tt class="constant">NULL</tt>.
+
+<p>
+We also remove the member definitions for these attributes:
+
+<p>
+<div class="verbatim"><pre>
+static PyMemberDef Noddy_members[] = {
+    {"number", T_INT, offsetof(Noddy, number), 0,
+     "noddy number"},
+    {NULL}  /* Sentinel */
+};
+</pre></div>
+
+<p>
+We also need to update the <tt class="member">tp_init</tt> handler to only allow
+strings<a name="tex2html7"
+  href="#foot1160"><sup>2.3</sup></a> to be passed:
+
+<p>
+<div class="verbatim"><pre>
+static int
+Noddy_init(Noddy *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *first=NULL, *last=NULL, *tmp;
+
+    static char *kwlist[] = {"first", "last", "number", NULL};
+
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|SSi", kwlist,
+                                      &amp;first, &amp;last,
+                                      &amp;self-&gt;number))
+        return -1;
+
+    if (first) {
+        tmp = self-&gt;first;
+        Py_INCREF(first);
+        self-&gt;first = first;
+        Py_DECREF(tmp);
+    }
+
+    if (last) {
+        tmp = self-&gt;last;
+        Py_INCREF(last);
+        self-&gt;last = last;
+        Py_DECREF(tmp);
+    }
+
+    return 0;
+}
+</pre></div>
+
+<p>
+With these changes, we can assure that the <tt class="member">first</tt> and
+<tt class="member">last</tt> members are never <tt class="constant">NULL</tt> so we can remove checks for <tt class="constant">NULL</tt>
+values in almost all cases. This means that most of the
+<tt class="cfunction">Py_XDECREF()</tt> calls can be converted to <tt class="cfunction">Py_DECREF()</tt>
+calls. The only place we can't change these calls is in the
+deallocator, where there is the possibility that the initialization of
+these members failed in the constructor.
+
+<p>
+We also rename the module initialization function and module name in
+the initialization function, as we did before, and we add an extra
+definition to the <span class="file">setup.py</span> file.
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot1160">...
+strings</a><A
+ HREF="node23.html#tex2html7"><sup>2.3</sup></a></dt>
+<dd>We now know that the first and last members are strings,
+so perhaps we could be less careful about decrementing their
+reference counts, however, we accept instances of string subclasses.
+Even though deallocating normal strings won't call back into our
+objects, we can't guarantee that deallocating an instance of a string
+subclass won't. call back into out objects.
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="2.1.1 adding data and"
+  href="node22.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="2.1 the Basics"
+  href="dnt-basics.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="2.1.3 supporting cyclic garbage"
+  href="node24.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node22.html">2.1.1 Adding data and</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="dnt-basics.html">2.1 The Basics</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node24.html">2.1.3 Supporting cyclic garbage</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

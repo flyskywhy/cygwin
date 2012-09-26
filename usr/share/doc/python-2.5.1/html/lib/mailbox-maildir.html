@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="mailbox-mbox.html" />
+<link rel="prev" href="mailbox-objects.html" />
+<link rel="parent" href="mailbox-objects.html" />
+<link rel="next" href="mailbox-mbox.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.3.1.1 Maildir</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.1.2 mbox"
+  href="mailbox-mbox.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-mbox.html">7.3.1.2 mbox</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION009311000000000000000"></a>
+<a name="mailbox-maildir"></a>
+<br>
+7.3.1.1 <tt class="class">Maildir</tt>
+</h3>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-1365' xml:id='l2h-1365' class="class">Maildir</tt></b>(</nobr></td>
+  <td><var>dirname</var><big>[</big><var>, factory=rfc822.Message</var><big>[</big><var>,
+create=True</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+A subclass of <tt class="class">Mailbox</tt> for mailboxes in Maildir format. Parameter
+<var>factory</var> is a callable object that accepts a file-like message
+representation (which behaves as if opened in binary mode) and returns a custom
+representation. If <var>factory</var> is <code>None</code>, <tt class="class">MaildirMessage</tt> is used
+as the default message representation. If <var>create</var> is <code>True</code>, the
+mailbox is created if it does not exist.
+
+<p>
+It is for historical reasons that <var>factory</var> defaults to
+<tt class="class">rfc822.Message</tt> and that <var>dirname</var> is named as such rather than
+<var>path</var>. For a <tt class="class">Maildir</tt> instance that behaves like instances of other
+<tt class="class">Mailbox</tt> subclasses, set <var>factory</var> to <code>None</code>.
+</dl>
+
+<p>
+Maildir is a directory-based mailbox format invented for the qmail mail
+transfer agent and now widely supported by other programs. Messages in a
+Maildir mailbox are stored in separate files within a common directory
+structure. This design allows Maildir mailboxes to be accessed and modified by
+multiple unrelated programs without data corruption, so file locking is
+unnecessary.
+
+<p>
+Maildir mailboxes contain three subdirectories, namely: <span class="file">tmp</span>, <span class="file">new</span>,
+and <span class="file">cur</span>. Messages are created momentarily in the <span class="file">tmp</span> subdirectory
+and then moved to the <span class="file">new</span> subdirectory to finalize delivery. A mail user
+agent may subsequently move the message to the <span class="file">cur</span> subdirectory and
+store information about the state of the message in a special "info" section
+appended to its file name.
+
+<p>
+Folders of the style introduced by the Courier mail transfer agent are also
+supported. Any subdirectory of the main mailbox is considered a folder if
+"<tt class="character">.</tt>" is the first character in its name. Folder names are represented
+by <tt class="class">Maildir</tt> without the leading "<tt class="character">.</tt>". Each folder is itself a
+Maildir mailbox but should not contain other folders. Instead, a logical
+nesting is indicated using "<tt class="character">.</tt>" to delimit levels, e.g.,
+"Archived.2005.07".
+
+<p>
+<div class="note"><b class="label">Note:</b>
+The Maildir specification requires the use of a colon ("<tt class="character">:</tt>") in
+certain message file names. However, some operating systems do not permit this
+character in file names, If you wish to use a Maildir-like format on such an
+operating system, you should specify another character to use instead. The
+exclamation point ("<tt class="character">!</tt>") is a popular choice. For example:
+<div class="verbatim"><pre>
+import mailbox
+mailbox.Maildir.colon = '!'
+</pre></div>
+The <tt class="member">colon</tt> attribute may also be set on a per-instance basis.
+</div>
+
+<p>
+<tt class="class">Maildir</tt> instances have all of the methods of <tt class="class">Mailbox</tt> in
+addition to the following:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1366' xml:id='l2h-1366' class="method">list_folders</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Return a list of the names of all folders.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1367' xml:id='l2h-1367' class="method">get_folder</tt></b>(</nobr></td>
+  <td><var>folder</var>)</td></tr></table></dt>
+<dd>
+Return a <tt class="class">Maildir</tt> instance representing the folder whose name is
+<var>folder</var>. A <tt class="exception">NoSuchMailboxError</tt> exception is raised if the
+folder does not exist.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1368' xml:id='l2h-1368' class="method">add_folder</tt></b>(</nobr></td>
+  <td><var>folder</var>)</td></tr></table></dt>
+<dd>
+Create a folder whose name is <var>folder</var> and return a <tt class="class">Maildir</tt>
+instance representing it.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1369' xml:id='l2h-1369' class="method">remove_folder</tt></b>(</nobr></td>
+  <td><var>folder</var>)</td></tr></table></dt>
+<dd>
+Delete the folder whose name is <var>folder</var>. If the folder contains any
+messages, a <tt class="exception">NotEmptyError</tt> exception will be raised and the folder
+will not be deleted.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1370' xml:id='l2h-1370' class="method">clean</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Delete temporary files from the mailbox that have not been accessed in the
+last 36 hours. The Maildir specification says that mail-reading programs
+should do this occasionally.
+</dl>
+
+<p>
+Some <tt class="class">Mailbox</tt> methods implemented by <tt class="class">Maildir</tt> deserve special
+remarks:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1371' xml:id='l2h-1371' class="method">add</tt></b>(</nobr></td>
+  <td><var>message</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1372' xml:id='l2h-1372' class="method">__setitem__</tt></b>(</nobr></td>
+  <td><var>key, message</var>)</td></tr></table></dt>
+<dd><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1373' xml:id='l2h-1373' class="method">update</tt></b>(</nobr></td>
+  <td><var>arg</var>)</td></tr></table></dt>
+<dd><span class="warning"><b class="label">Warning:</b>
+These methods generate unique file names based upon the current
+process ID. When using multiple threads, undetected name clashes may occur and
+cause corruption of the mailbox unless threads are coordinated to avoid using
+these methods to manipulate the same mailbox simultaneously.</span>
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1374' xml:id='l2h-1374' class="method">flush</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+All changes to Maildir mailboxes are immediately applied, so this method does
+nothing.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1375' xml:id='l2h-1375' class="method">lock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1376' xml:id='l2h-1376' class="method">unlock</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>Maildir mailboxes do not support (or require) locking, so these methods do
+nothing. 
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1377' xml:id='l2h-1377' class="method">close</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+<tt class="class">Maildir</tt> instances do not keep any open files and the underlying
+mailboxes do not support locking, so this method does nothing.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1378' xml:id='l2h-1378' class="method">get_file</tt></b>(</nobr></td>
+  <td><var>key</var>)</td></tr></table></dt>
+<dd>
+Depending upon the host platform, it may not be possible to modify or remove
+the underlying message while the returned file remains open.
+</dl>
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+    <dl compact="compact" class="seeurl">
+    <dt><a href='http://www.qmail.org/man/man5/maildir.html'
+        >maildir man page from
+    qmail</a></dt>
+    <dd>The original specification of the format.</dd>
+  </dl>
+    <dl compact="compact" class="seeurl">
+    <dt><a href='http://cr.yp.to/proto/maildir.html'
+        >Using maildir format</a></dt>
+    <dd>Notes
+    on Maildir by its inventor. Includes an updated name-creation scheme and
+    details on "info" semantics.</dd>
+  </dl>
+    <dl compact="compact" class="seeurl">
+    <dt><a href='http://www.courier-mta.org/?maildir.html'
+        >maildir man page from
+    Courier</a></dt>
+    <dd>Another specification of the format. Describes a common extension
+    for supporting folders.</dd>
+  </dl>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.3.1 mailbox objects"
+  href="mailbox-objects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3.1.2 mbox"
+  href="mailbox-mbox.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="mailbox-objects.html">7.3.1 Mailbox objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="mailbox-mbox.html">7.3.1.2 mbox</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

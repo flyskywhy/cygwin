@@ -1,0 +1,172 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Special filenames</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.61.2"><link rel="home" href="index.html" title="Cygwin User's Guide"><link rel="up" href="using.html" title="Chapter 3. Using Cygwin"><link rel="previous" href="using-filemodes.html" title="File permissions"><link rel="next" href="using-cygwinenv.html" title="The CYGWIN environment
+variable"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Special filenames</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="using-filemodes.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Using Cygwin</th><td width="20%" align="right"> <a accesskey="n" href="using-cygwinenv.html">Next</a></td></tr></table><hr></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="using-specialnames"></a>Special filenames</h2></div></div><div></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4729460"></a>DOS devices</h3></div></div><div></div></div><p>Windows filenames invalid under Windows are also invalid under
+Cygwin.  This means that base filenames such as 
+<tt class="filename">AUX</tt>, <tt class="filename">COM1</tt>,
+<tt class="filename">LPT1</tt> or <tt class="filename">PRN</tt> (to name a few)
+cannot be used in a regular Cygwin Windows or POSIX path, even with an
+extension (<tt class="filename">prn.txt</tt>). However the special names can be
+used as filename extensions (<tt class="filename">file.aux</tt>). You can use
+the special names as you would under DOS, for example you can print on your
+default printer with the command <b class="command">cat filename &gt; PRN</b>
+(make sure to end with a Form Feed).
+</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4729518"></a>POSIX devices</h3></div></div><div></div></div><p>There is no need to create a POSIX <tt class="filename">/dev</tt> 
+directory as Cygwin automatically simulates it internally. 
+These devices cannot be seen with the command <b class="command">ls /dev/</b>
+although commands such as <b class="command">ls /dev/tty</b> work fine.
+If you want to be able to see all devices in
+<tt class="filename">/dev/</tt>, you can use Igor Pechtchanski's
+<a href="http://cygwin.com/ml/cygwin/2004-03/txt00028.txt" target="_top">create_devices.sh</a>
+script.
+</p><p>
+Cygwin supports the following devices commonly found on POSIX systems:
+<tt class="filename">/dev/dsp</tt>, <tt class="filename">/dev/null</tt>, 
+<tt class="filename">/dev/zero</tt>, <tt class="filename">/dev/console</tt>,
+<tt class="filename">/dev/tty</tt>, <tt class="filename">/dev/ttym</tt>, 
+<tt class="filename">/dev/ttyX</tt>, <tt class="filename">/dev/ttySX</tt>, 
+<tt class="filename">/dev/pipe</tt>, <tt class="filename">/dev/port</tt>, 
+<tt class="filename">/dev/ptmx</tt>, <tt class="filename">/dev/mem</tt>,
+<tt class="filename">/dev/random</tt>, and <tt class="filename">/dev/urandom</tt>.
+Some other POSIX devices, such as 
+<tt class="filename">/dev/kmem</tt>, are planned for development.
+Cygwin also has several Windows-specific devices:
+<tt class="filename">/dev/comX</tt> (the serial ports, starting with 
+<tt class="filename">COM1</tt> which is the same as <tt class="filename">ttyS0</tt>),
+<tt class="filename">/dev/conin</tt> (Windows <tt class="filename">CONIN$</tt>),
+<tt class="filename">/dev/conout</tt> (Windows <tt class="filename">CONOUT$</tt>),
+<tt class="filename">/dev/clipboard</tt> (the Windows clipboard, currently
+text only), and <tt class="filename">/dev/windows</tt> (the Windows message
+queue).
+</p><p>Windows NT/W2K/XP additionally support raw devices like floppies,
+disks, partitions and tapes.  These are accessed from Cygwin applications
+using POSIX device names which are supported in two different ways.
+</p><p>Up to Cygwin 1.3.3 the only way to access those devices was
+to mount the Win32 device names to a POSIX device name but this usage
+is discouraged since Cygwin 1.3.4 and only kept for backward compatibility.
+</p><p>
+Beginning with Cygwin 1.3.4, raw devices are accessible by Cygwin processes
+using fixed POSIX device names.  These fixed POSIX device names are generated
+using a direct conversion from the POSIX namespace to the internal NT namespace.
+E.g. the first harddisk is the NT internal device \device\harddisk0\partition0
+or the first partition on the third harddisk is \device\harddisk2\partition1.
+The first floppy in the system is \device\floppy0, the first CD-ROM is
+\device\cdrom0 and the first tape drive is \device\tape0.
+</p><p>The new fixed POSIX names are mapped to NT internal devices as
+follows:</p><pre class="screen">
+/dev/st0	\device\tape0, rewind
+/dev/nst0	\device\tape0, no-rewind
+/dev/st1	\device\tape1
+...
+
+/dev/fd0	\device\floppy0
+/dev/fd1	\device\floppy1
+...
+
+/dev/scd0	\device\cdrom0
+/dev/scd1	\device\cdrom1
+...
+
+/dev/sr0	\device\cdrom0
+/dev/sr1	\device\cdrom1
+...
+
+/dev/sda	\device\harddisk0\partition0	(whole disk)
+/dev/sda1	\device\harddisk0\partition1	(first partition)
+...
+/dev/sda15	\device\harddisk0\partition15	(fifteenth partition)
+
+/dev/sdb	\device\harddisk1\partition0
+/dev/sdb1	\device\harddisk1\partition1
+
+[up to]
+
+/dev/sdl	\device\harddisk11\partition0
+/dev/sdl1	\device\harddisk11\partition1
+...
+/dev/sdl15	\device\harddisk11\partition15
+</pre><p>
+if you don't like these device names, feel free to create symbolic
+links as they are created on Linux systems for convenience:
+</p><pre class="screen">
+ln -s /dev/scd0 /dev/cdrom
+ln -s /dev/nst0  /dev/tape
+...
+</pre><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning</h3><p>
+Note that you can't use the mount table to map from fixed device name
+to your own device name or to map from internal NT device name to
+your own device name.  Also using symbolic links to map from the internal
+NT device name to your own device name will not do what you want.
+The following three examples will not work as expected:
+</p><pre class="screen">
+mount -f -b /dev/nst0 /dev/tape     # DOES NOT WORK
+mount -f -b /device/tape0 /dev/tape # DOES NOT WORK
+ln -s /device/tape0 /dev/tape       # DOES NOT WORK
+</pre></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4729801"></a>The .exe extension</h3></div></div><div></div></div><p> Executable program filenames end with <tt class="filename">.exe</tt>
+but the <tt class="filename">.exe</tt> need not be included in the command,
+so that traditional UNIX names can be used.  However, for programs that
+end in <tt class="filename">.bat</tt> and <tt class="filename">.com</tt>, you
+cannot omit the extension.  </p><p>As a side effect, the <b class="command"> ls filename</b> gives
+information about <tt class="filename">filename.exe</tt> if
+<tt class="filename">filename.exe</tt> exists and <tt class="filename">filename</tt>
+does not.  In the same situation the function call
+<tt class="function">stat("filename",..)</tt> gives information about
+<tt class="filename">filename.exe</tt>.  The two files can be distinguished
+by examining their inodes, as demonstrated below.
+</p><pre class="screen">
+<tt class="prompt">C:\&gt;</tt> <b class="userinput"><tt>ls * </tt></b>
+a      a.exe     b.exe
+<tt class="prompt">C:\&gt;</tt> <b class="userinput"><tt>ls -i a a.exe</tt></b>
+445885548 a       435996602 a.exe
+<tt class="prompt">C:\&gt;</tt> <b class="userinput"><tt>ls -i b b.exe</tt></b>
+432961010 b       432961010 b.exe
+</pre><p>
+If a shell script <tt class="filename">myprog</tt> and a program
+<tt class="filename">myprog.exe</tt> coexist in a directory, the shell
+script has precedence and is selected for execution of
+<b class="command">myprog</b>.  Note that this was quite the reverse up to
+Cygwin 1.5.19.  It has been changed for consistency with the rest of Cygwin.
+</p><p>The <b class="command">gcc</b> compiler produces an executable named
+<tt class="filename">filename.exe</tt> when asked to produce
+<tt class="filename">filename</tt>. This allows many makefiles written
+for UNIX systems to work well under Cygwin.</p><p>Unfortunately, the <b class="command">install</b> and
+<b class="command">strip</b> commands do distinguish between
+<tt class="filename">filename</tt> and <tt class="filename">filename.exe</tt>. They
+fail when working on a non-existing <tt class="filename">filename</tt> even if
+<tt class="filename">filename.exe</tt> exists, thus breaking some makefiles.
+This problem can be solved by writing <b class="command">install</b> and
+<b class="command">strip</b> shell scripts to provide the extension ".exe"
+when needed.
+</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4730022"></a>The /proc filesystem</h3></div></div><div></div></div><p>
+Cygwin, like Linux and other similar operating systems, supports the
+<tt class="filename">/proc</tt> virtual filesystem. The files in this
+directory are representations of various aspects of your system,
+for example the command <b class="userinput"><tt>cat /proc/cpuinfo</tt></b> 
+displays information such as what model and speed processor you have.
+</p><p>
+One unique aspect of the Cygwin <tt class="filename">/proc</tt> filesystem
+is <tt class="filename">/proc/registry</tt>, which displays the Windows
+registry with each <tt class="literal">KEY</tt> as a directory and each
+<tt class="literal">VALUE</tt> as a file. As anytime you deal with the
+Windows registry, use caution since changes may result in an unstable
+or broken system.
+</p><p>
+The Cygwin <tt class="filename">/proc</tt> is not as complete as the
+one in Linux, but it provides significant capabilities. The
+<tt class="systemitem">procps</tt> package contains several utilities
+that use it.
+</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4730096"></a>The @pathnames</h3></div></div><div></div></div><p>To circumvent the limitations on shell line length in the native
+Windows command shells, Cygwin programs expand their arguments
+starting with "@" in a special way.  If a file
+<tt class="filename">pathname</tt> exists, the argument
+<tt class="filename">@pathname</tt> expands recursively to the content of
+<tt class="filename">pathname</tt>. Double quotes can be used inside the
+file to delimit strings containing blank space. 
+Embedded double quotes must be repeated.
+In the following example compare the behaviors of the bash built-in
+<b class="command">echo</b> and of the program <b class="command">/bin/echo</b>.</p><div class="example"><a name="id4730141"></a><p class="title"><b>Example 3.2.  Using @pathname</b></p><pre class="screen">
+<tt class="prompt">bash$</tt> <b class="userinput"><tt>echo  'This   is   "a     long"  line' &gt; mylist</tt></b>
+<tt class="prompt">bash$</tt> <b class="userinput"><tt>echo @mylist</tt></b>
+@mylist
+<tt class="prompt">c:\&gt;</tt> <b class="userinput"><tt>c:\cygwin\bin\echo @mylist</tt></b>
+This is a     long line
+</pre></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="using-filemodes.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="using.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="using-cygwinenv.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">File permissions </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> The CYGWIN environment
+variable</td></tr></table></div></body></html>

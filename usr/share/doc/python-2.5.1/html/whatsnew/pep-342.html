@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="whatsnew25.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="whatsnew25.html" title='What's new in python 2.5' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="pep-343.html" />
+<link rel="prev" href="pep-341.html" />
+<link rel="parent" href="whatsnew25.html" />
+<link rel="next" href="pep-343.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7 PEP 342: New Generator Features</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6 pep 341: Unified"
+  href="pep-341.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8 pep 343: The"
+  href="pep-343.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-341.html">6 PEP 341: Unified</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-343.html">8 PEP 343: The</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION000800000000000000000"></a><a name="pep-342"></a>
+<br>
+7 PEP 342: New Generator Features
+</h1>
+
+<p>
+Python 2.5 adds a simple way to pass values <em>into</em> a generator.
+As introduced in Python 2.3, generators only produce output; once a
+generator's code was invoked to create an iterator, there was no way to
+pass any new information into the function when its execution is
+resumed.  Sometimes the ability to pass in some information would be
+useful.  Hackish solutions to this include making the generator's code
+look at a global variable and then changing the global variable's
+value, or passing in some mutable object that callers then modify.
+
+<p>
+To refresh your memory of basic generators, here's a simple example:
+
+<p>
+<div class="verbatim"><pre>
+def counter (maximum):
+    i = 0
+    while i &lt; maximum:
+        yield i
+        i += 1
+</pre></div>
+
+<p>
+When you call <code>counter(10)</code>, the result is an iterator that
+returns the values from 0 up to 9.  On encountering the
+<tt class="keyword">yield</tt> statement, the iterator returns the provided value and
+suspends the function's execution, preserving the local variables.
+Execution resumes on the following call to the iterator's 
+<tt class="method">next()</tt> method, picking up after the <tt class="keyword">yield</tt> statement.
+
+<p>
+In Python 2.3, <tt class="keyword">yield</tt> was a statement; it didn't return any
+value.  In 2.5, <tt class="keyword">yield</tt> is now an expression, returning a
+value that can be assigned to a variable or otherwise operated on:
+
+<p>
+<div class="verbatim"><pre>
+val = (yield i)
+</pre></div>
+
+<p>
+I recommend that you always put parentheses around a <tt class="keyword">yield</tt>
+expression when you're doing something with the returned value, as in
+the above example.  The parentheses aren't always necessary, but it's
+easier to always add them instead of having to remember when they're
+needed.
+
+<p>
+(<a class="rfc" id='rfcref-2370' xml:id='rfcref-2370'
+href="http://www.python.org/peps/pep-0342.html">PEP 342</a> explains the exact rules, which are that a
+<tt class="keyword">yield</tt>-expression must always be parenthesized except when it
+occurs at the top-level expression on the right-hand side of an
+assignment.  This means you can write <code>val = yield i</code> but have to
+use parentheses when there's an operation, as in <code>val = (yield i)
++ 12</code>.)
+
+<p>
+Values are sent into a generator by calling its
+<tt class="method">send(<var>value</var>)</tt> method.  The generator's code is then
+resumed and the <tt class="keyword">yield</tt> expression returns the specified
+<var>value</var>.  If the regular <tt class="method">next()</tt> method is called, the
+<tt class="keyword">yield</tt> returns <tt class="constant">None</tt>.
+
+<p>
+Here's the previous example, modified to allow changing the value of
+the internal counter.
+
+<p>
+<div class="verbatim"><pre>
+def counter (maximum):
+    i = 0
+    while i &lt; maximum:
+        val = (yield i)
+        # If value provided, change counter
+        if val is not None:
+            i = val
+        else:
+            i += 1
+</pre></div>
+
+<p>
+And here's an example of changing the counter:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; it = counter(10)
+&gt;&gt;&gt; print it.next()
+0
+&gt;&gt;&gt; print it.next()
+1
+&gt;&gt;&gt; print it.send(8)
+8
+&gt;&gt;&gt; print it.next()
+9
+&gt;&gt;&gt; print it.next()
+Traceback (most recent call last):
+  File ``t.py'', line 15, in ?
+    print it.next()
+StopIteration
+</pre></div>
+
+<p>
+<tt class="keyword">yield</tt> will usually return <tt class="constant">None</tt>, so you
+should always check for this case.  Don't just use its value in
+expressions unless you're sure that the <tt class="method">send()</tt> method
+will be the only method used to resume your generator function.
+
+<p>
+In addition to <tt class="method">send()</tt>, there are two other new methods on
+generators:
+
+<p>
+
+<ul>
+<li><tt class="method">throw(<var>type</var>, <var>value</var>=None,
+  <var>traceback</var>=None)</tt> is used to raise an exception inside the
+  generator; the exception is raised by the <tt class="keyword">yield</tt> expression
+  where the generator's execution is paused.
+
+<p>
+</li>
+<li><tt class="method">close()</tt> raises a new <tt class="exception">GeneratorExit</tt>
+  exception inside the generator to terminate the iteration.  On
+  receiving this exception, the generator's code must either raise
+  <tt class="exception">GeneratorExit</tt> or <tt class="exception">StopIteration</tt>.  Catching
+  the <tt class="exception">GeneratorExit</tt> exception and returning a value is
+  illegal and will trigger a <tt class="exception">RuntimeError</tt>; if the function
+  raises some other exception, that exception is propagated to the
+  caller.  <tt class="method">close()</tt> will also be called by Python's garbage
+  collector when the generator is garbage-collected.
+
+<p>
+If you need to run cleanup code when a <tt class="exception">GeneratorExit</tt> occurs,
+  I suggest using a <code>try: ... finally:</code> suite instead of 
+  catching <tt class="exception">GeneratorExit</tt>.
+
+<p>
+</li>
+</ul>
+
+<p>
+The cumulative effect of these changes is to turn generators from
+one-way producers of information into both producers and consumers.
+
+<p>
+Generators also become <em>coroutines</em>, a more generalized form of
+subroutines.  Subroutines are entered at one point and exited at
+another point (the top of the function, and a <tt class="keyword">return</tt>
+statement), but coroutines can be entered, exited, and resumed at
+many different points (the <tt class="keyword">yield</tt> statements).  We'll have to
+figure out patterns for using coroutines effectively in Python.
+
+<p>
+The addition of the <tt class="method">close()</tt> method has one side effect that
+isn't obvious.  <tt class="method">close()</tt> is called when a generator is
+garbage-collected, so this means the generator's code gets one last
+chance to run before the generator is destroyed.  This last chance
+means that <code>try...finally</code> statements in generators can now be
+guaranteed to work; the <tt class="keyword">finally</tt> clause will now always get a
+chance to run.  The syntactic restriction that you couldn't mix
+<tt class="keyword">yield</tt> statements with a <code>try...finally</code> suite has
+therefore been removed.  This seems like a minor bit of language
+trivia, but using generators and <code>try...finally</code> is actually
+necessary in order to implement the  <tt class="keyword">with</tt> statement
+described by PEP 343.  I'll look at this new statement in the following 
+section.
+
+<p>
+Another even more esoteric effect of this change: previously, the
+<tt class="member">gi_frame</tt> attribute of a generator was always a frame object.
+It's now possible for <tt class="member">gi_frame</tt> to be <code>None</code>
+once the generator has been exhausted.
+
+<p>
+<div class="seealso">
+  <p class="heading">See Also:</p>
+
+<p>
+<dl compact="compact" class="seerfc">
+    <dt><a href="http://www.python.org/peps/pep-0342.html"
+        title="Coroutines via Enhanced Generators"
+        >PEP 342, <em>Coroutines via Enhanced Generators</em></a>
+    <dd>PEP written by 
+Guido van&nbsp;Rossum and Phillip J. Eby;
+implemented by Phillip J. Eby.  Includes examples of 
+some fancier uses of generators as coroutines.
+
+<p>
+Earlier versions of these features were proposed in 
+<a class="rfc" id='rfcref-2366' xml:id='rfcref-2366'
+href="http://www.python.org/peps/pep-0288.html">PEP 288</a> by Raymond Hettinger and <a class="rfc" id='rfcref-2368' xml:id='rfcref-2368'
+href="http://www.python.org/peps/pep-0325.html">PEP 325</a> by Samuele Pedroni.
+
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://en.wikipedia.org/wiki/Coroutine"
+        class="url">http://en.wikipedia.org/wiki/Coroutine</a></dt>
+    <dd>The Wikipedia entry for 
+coroutines.</dd>
+  </dl>
+
+<p>
+<dl compact="compact" class="seeurl">
+    <dt><a href="http://www.sidhe.org/~dan/blog/archives/000178.html"
+        class="url">http://www.sidhe.org/~dan/blog/archives/000178.html</a></dt>
+    <dd>An
+explanation of coroutines from a Perl point of view, written by Dan
+Sugalski.</dd>
+  </dl>
+
+<p>
+</div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="6 pep 341: Unified"
+  href="pep-341.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="What's new in Python"
+  href="whatsnew25.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="8 pep 343: The"
+  href="pep-343.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">What's New in Python 2.5</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="pep-341.html">6 PEP 341: Unified</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="whatsnew25.html">What's New in Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="pep-343.html">8 PEP 343: The</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 1.01.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="typesseq-xrange.html" />
+<link rel="prev" href="string-methods.html" />
+<link rel="parent" href="typesseq.html" />
+<link rel="next" href="typesseq-xrange.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>3.6.2 String Formatting Operations </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.6.1 string Methods"
+  href="string-methods.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.6 sequence Types "
+  href="typesseq.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.6.3 xrange Type"
+  href="typesseq-xrange.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="string-methods.html">3.6.1 String Methods</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="typesseq.html">3.6 Sequence Types </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="typesseq-xrange.html">3.6.3 XRange Type</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION005620000000000000000"></a><a name="typesseq-strings"></a>
+<br>
+3.6.2 String Formatting Operations 
+</h2>
+
+<p>
+<a id='l2h-271' xml:id='l2h-271'></a>
+
+<p>
+String and Unicode objects have one unique built-in operation: the
+<code>%</code> operator (modulo).  This is also known as the string
+<em>formatting</em> or <em>interpolation</em> operator.  Given
+<code><var>format</var> % <var>values</var></code> (where <var>format</var> is a string or
+Unicode object), <code>%</code> conversion specifications in <var>format</var>
+are replaced with zero or more elements of <var>values</var>.  The effect
+is similar to the using <tt class="cfunction">sprintf()</tt> in the C language.  If
+<var>format</var> is a Unicode object, or if any of the objects being
+converted using the <code>%s</code> conversion are Unicode objects, the
+result will also be a Unicode object.
+
+<p>
+If <var>format</var> requires a single argument, <var>values</var> may be a
+single non-tuple object.<a name="tex2html9"
+  href="#foot3108"><sup>3.4</sup></a>  Otherwise, <var>values</var> must be a tuple with
+exactly the number of items specified by the format string, or a
+single mapping object (for example, a dictionary).
+
+<p>
+A conversion specifier contains two or more characters and has the
+following components, which must occur in this order:
+
+<p>
+
+<ol>
+<li>The "<tt class="character">%</tt>" character, which marks the start of the
+         specifier.
+</li>
+<li>Mapping key (optional), consisting of a parenthesised sequence
+         of characters (for example, <code>(somename)</code>).
+</li>
+<li>Conversion flags (optional), which affect the result of some
+         conversion types.
+</li>
+<li>Minimum field width (optional).  If specified as an
+         "<tt class="character">*</tt>" (asterisk), the actual width is read from the
+         next element of the tuple in <var>values</var>, and the object to
+         convert comes after the minimum field width and optional
+         precision.
+</li>
+<li>Precision (optional), given as a "<tt class="character">.</tt>" (dot) followed
+         by the precision.  If specified as "<tt class="character">*</tt>" (an
+         asterisk), the actual width is read from the next element of
+         the tuple in <var>values</var>, and the value to convert comes after
+         the precision.
+</li>
+<li>Length modifier (optional).
+</li>
+<li>Conversion type.
+</li>
+</ol>
+
+<p>
+When the right argument is a dictionary (or other mapping type), then
+the formats in the string <em>must</em> include a parenthesised mapping key into
+that dictionary inserted immediately after the "<tt class="character">%</tt>"
+character. The mapping key selects the value to be formatted from the
+mapping.  For example:
+
+<p>
+<div class="verbatim"><pre>
+&gt;&gt;&gt; print '%(language)s has %(#)03d quote types.' % \
+          {'language': "Python", "#": 2}
+Python has 002 quote types.
+</pre></div>
+
+<p>
+In this case no <code>*</code> specifiers may occur in a format (since they
+require a sequential parameter list).
+
+<p>
+The conversion flag characters are:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Flag</th>
+      <th class="left"  >Meaning</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><tt class="character">#</tt></td>
+        <td class="left"  >The value conversion will use the ``alternate form''
+              (where defined below).</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">0</tt></td>
+        <td class="left"  >The conversion will be zero padded for numeric values.</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">-</tt></td>
+        <td class="left"  >The converted value is left adjusted (overrides
+             the "<tt class="character">0</tt>" conversion if both are given).</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">&nbsp;</tt></td>
+        <td class="left"  >(a space) A blank should be left before a positive number
+             (or empty string) produced by a signed conversion.</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">+</tt></td>
+        <td class="left"  >A sign character ("<tt class="character">+</tt>" or "<tt class="character">-</tt>") will
+             precede the conversion (overrides a "space" flag).</td></tr></tbody>
+</table></div>
+
+<p>
+A length modifier (<code>h</code>, <code>l</code>, or <code>L</code>) may be
+present, but is ignored as it is not necessary for Python.
+
+<p>
+The conversion types are:
+
+<p>
+<div class="center"><table class="realtable">
+  <thead>
+    <tr>
+      <th class="center">Conversion</th>
+      <th class="left"  >Meaning</th>
+      <th class="center">Notes</th>
+      </tr>
+    </thead>
+  <tbody>
+    <tr><td class="center" valign="baseline"><tt class="character">d</tt></td>
+        <td class="left"  >Signed integer decimal.</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">i</tt></td>
+        <td class="left"  >Signed integer decimal.</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">o</tt></td>
+        <td class="left"  >Unsigned octal.</td>
+        <td class="center">(1)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">u</tt></td>
+        <td class="left"  >Unsigned decimal.</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">x</tt></td>
+        <td class="left"  >Unsigned hexadecimal (lowercase).</td>
+        <td class="center">(2)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">X</tt></td>
+        <td class="left"  >Unsigned hexadecimal (uppercase).</td>
+        <td class="center">(2)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">e</tt></td>
+        <td class="left"  >Floating point exponential format (lowercase).</td>
+        <td class="center">(3)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">E</tt></td>
+        <td class="left"  >Floating point exponential format (uppercase).</td>
+        <td class="center">(3)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">f</tt></td>
+        <td class="left"  >Floating point decimal format.</td>
+        <td class="center">(3)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">F</tt></td>
+        <td class="left"  >Floating point decimal format.</td>
+        <td class="center">(3)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">g</tt></td>
+        <td class="left"  >Floating point format. Uses exponential format
+              if exponent is greater than -4 or less than precision,
+              decimal format otherwise.</td>
+        <td class="center">(4)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">G</tt></td>
+        <td class="left"  >Floating point format. Uses exponential format
+              if exponent is greater than -4 or less than precision,
+              decimal format otherwise.</td>
+        <td class="center">(4)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">c</tt></td>
+        <td class="left"  >Single character (accepts integer or single character
+              string).</td>
+        <td class="center"></td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">r</tt></td>
+        <td class="left"  >String (converts any python object using
+              <tt class="function">repr()</tt>).</td>
+        <td class="center">(5)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">s</tt></td>
+        <td class="left"  >String (converts any python object using
+              <tt class="function">str()</tt>).</td>
+        <td class="center">(6)</td></tr>
+    <tr><td class="center" valign="baseline"><tt class="character">%</tt></td>
+        <td class="left"  >No argument is converted, results in a "<tt class="character">%</tt>"
+               character in the result.</td>
+        <td class="center"></td></tr></tbody>
+</table></div>
+
+<p>
+Notes:
+<dl>
+<dt><strong>(1)</strong></dt>
+<dd>The alternate form causes a leading zero ("<tt class="character">0</tt>") to be
+    inserted between left-hand padding and the formatting of the
+    number if the leading character of the result is not already a
+    zero.
+  
+</dd>
+<dt><strong>(2)</strong></dt>
+<dd>The alternate form causes a leading <code>'0x'</code> or <code>'0X'</code>
+    (depending on whether the "<tt class="character">x</tt>" or "<tt class="character">X</tt>" format
+    was used) to be inserted between left-hand padding and the
+    formatting of the number if the leading character of the result is
+    not already a zero.
+  
+</dd>
+<dt><strong>(3)</strong></dt>
+<dd>The alternate form causes the result to always contain a decimal
+    point, even if no digits follow it.
+
+<p>
+The precision determines the number of digits after the decimal
+    point and defaults to 6.
+  
+</dd>
+<dt><strong>(4)</strong></dt>
+<dd>The alternate form causes the result to always contain a decimal
+    point, and trailing zeroes are not removed as they would
+    otherwise be.
+
+<p>
+The precision determines the number of significant digits before
+    and after the decimal point and defaults to 6.
+  
+</dd>
+<dt><strong>(5)</strong></dt>
+<dd>The <code>%r</code> conversion was added in Python 2.0.
+
+<p>
+The precision determines the maximal number of characters used.
+  
+</dd>
+<dt><strong>(6)</strong></dt>
+<dd>If the object or format provided is a <tt class="class">unicode</tt> string,
+    the resulting string will also be <tt class="class">unicode</tt>.
+
+<p>
+The precision determines the maximal number of characters used.
+</dd>
+</dl>
+
+<p>
+Since Python strings have an explicit length, <code>%s</code> conversions
+do not assume that <code>'\0'</code> is the end of the string.
+
+<p>
+For safety reasons, floating point precisions are clipped to 50;
+<code>%f</code> conversions for numbers whose absolute value is over 1e25
+are replaced by <code>%g</code> conversions.<a name="tex2html10"
+  href="#foot3213"><sup>3.5</sup></a>  All other errors raise exceptions.
+
+<p>
+Additional string operations are defined in standard modules
+<tt class="module"><a href="module-string.html">string</a></tt><a id='l2h-272' xml:id='l2h-272'></a> and
+<tt class="module"><a href="module-re.html">re</a></tt>.<a id='l2h-273' xml:id='l2h-273'></a>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot3108">... object.</a><A
+ href="typesseq-strings.html#tex2html9"><sup>3.4</sup></a></dt>
+<dd>To format only a tuple you
+should therefore provide a singleton tuple whose only element
+is the tuple to be formatted.
+
+</dd>
+<dt><a name="foot3213">... conversions.</a><A
+ href="typesseq-strings.html#tex2html10"><sup>3.5</sup></a></dt>
+<dd>
+  These numbers are fairly arbitrary.  They are intended to
+  avoid printing endless strings of meaningless digits without hampering
+  correct use and without having to know the exact precision of floating
+  point values on a particular machine.
+
+
+</dd>
+</dl>
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="3.6.1 string Methods"
+  href="string-methods.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="3.6 sequence Types "
+  href="typesseq.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="3.6.3 xrange Type"
+  href="typesseq-xrange.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="string-methods.html">3.6.1 String Methods</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="typesseq.html">3.6 Sequence Types </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="typesseq-xrange.html">3.6.3 XRange Type</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

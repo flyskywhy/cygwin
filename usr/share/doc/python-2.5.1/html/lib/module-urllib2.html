@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-httplib.html" />
+<link rel="prev" href="module-urllib.html" />
+<link rel="parent" href="internet.html" />
+<link rel="next" href="request-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>18.6 urllib2 -- extensible library for opening URLs</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.5.2 Examples"
+  href="node577.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.6.1 request Objects"
+  href="request-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node577.html">18.5.2 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="request-objects.html">18.6.1 Request Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0020600000000000000000">
+18.6 <tt class="module">urllib2</tt> --
+         extensible library for opening URLs</a>
+</h1>
+
+<p>
+<a name="module-urllib2"></a>
+
+<p>
+
+<p>
+The <tt class="module">urllib2</tt> module defines functions and classes which help
+in opening URLs (mostly HTTP) in a complex world -- basic and digest
+authentication, redirections, cookies and more.
+
+<p>
+The <tt class="module">urllib2</tt> module defines the following functions:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3927' xml:id='l2h-3927' class="function">urlopen</tt></b>(</nobr></td>
+  <td><var>url</var><big>[</big><var>, data</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Open the URL <var>url</var>, which can be either a string or a <tt class="class">Request</tt>
+object.
+
+<p>
+<var>data</var> may be a string specifying additional data to send to the
+server, or <code>None</code> if no such data is needed. 
+Currently HTTP requests are the only ones that use <var>data</var>;
+the HTTP request will be a POST instead of a GET when the <var>data</var>
+parameter is provided.  <var>data</var> should be a buffer in the standard
+<span class="mimetype">application/x-www-form-urlencoded</span> format.  The
+<tt class="function">urllib.urlencode()</tt> function takes a mapping or sequence of
+2-tuples and returns a string in this format.
+
+<p>
+This function returns a file-like object with two additional methods:
+
+<p>
+
+<ul>
+<li><tt class="method">geturl()</tt> -- return the URL of the resource retrieved
+</li>
+<li><tt class="method">info()</tt> -- return the meta-information of the page, as
+                            a dictionary-like object
+</li>
+</ul>
+
+<p>
+Raises <tt class="exception">URLError</tt> on errors.
+
+<p>
+Note that <code>None</code> may be returned if no handler handles the
+request (though the default installed global <tt class="class">OpenerDirector</tt>
+uses <tt class="class">UnknownHandler</tt> to ensure this never happens).
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3928' xml:id='l2h-3928' class="function">install_opener</tt></b>(</nobr></td>
+  <td><var>opener</var>)</td></tr></table></dt>
+<dd>
+Install an <tt class="class">OpenerDirector</tt> instance as the default global
+opener.  Installing an opener is only necessary if you want urlopen to
+use that opener; otherwise, simply call <tt class="method">OpenerDirector.open()</tt>
+instead of <tt class="function">urlopen()</tt>.  The code does not check for a real
+<tt class="class">OpenerDirector</tt>, and any class with the appropriate interface
+will work.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3929' xml:id='l2h-3929' class="function">build_opener</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>handler, ...</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return an <tt class="class">OpenerDirector</tt> instance, which chains the
+handlers in the order given. <var>handler</var>s can be either instances
+of <tt class="class">BaseHandler</tt>, or subclasses of <tt class="class">BaseHandler</tt> (in
+which case it must be possible to call the constructor without
+any parameters).  Instances of the following classes will be in
+front of the <var>handler</var>s, unless the <var>handler</var>s contain
+them, instances of them or subclasses of them:
+<tt class="class">ProxyHandler</tt>, <tt class="class">UnknownHandler</tt>, <tt class="class">HTTPHandler</tt>,
+<tt class="class">HTTPDefaultErrorHandler</tt>, <tt class="class">HTTPRedirectHandler</tt>,
+<tt class="class">FTPHandler</tt>, <tt class="class">FileHandler</tt>, <tt class="class">HTTPErrorProcessor</tt>.
+
+<p>
+If the Python installation has SSL support (<tt class="function">socket.ssl()</tt>
+exists), <tt class="class">HTTPSHandler</tt> will also be added.
+
+<p>
+Beginning in Python 2.3, a <tt class="class">BaseHandler</tt> subclass may also
+change its <tt class="member">handler_order</tt> member variable to modify its
+position in the handlers list.
+</dl>
+
+<p>
+The following exceptions are raised as appropriate:
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-3930' xml:id='l2h-3930' class="exception">URLError</tt></b></dt>
+<dd>
+The handlers raise this exception (or derived exceptions) when they
+run into a problem.  It is a subclass of <tt class="exception">IOError</tt>.
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-3931' xml:id='l2h-3931' class="exception">HTTPError</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">URLError</tt>, it can also function as a 
+non-exceptional file-like return value (the same thing that
+<tt class="function">urlopen()</tt> returns).  This is useful when handling exotic
+HTTP errors, such as requests for authentication.
+</dd></dl>
+
+<p>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<tt id='l2h-3932' xml:id='l2h-3932' class="exception">GopherError</tt></b></dt>
+<dd>
+A subclass of <tt class="exception">URLError</tt>, this is the error raised by the
+Gopher handler.
+</dd></dl>
+
+<p>
+The following classes are provided:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3933' xml:id='l2h-3933' class="class">Request</tt></b>(</nobr></td>
+  <td><var>url</var><big>[</big><var>, data</var><big>]</big><var></var><big>[</big><var>, headers</var><big>]</big><var>
+    </var><big>[</big><var>, origin_req_host</var><big>]</big><var></var><big>[</big><var>, unverifiable</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This class is an abstraction of a URL request.
+
+<p>
+<var>url</var> should be a string containing a valid URL.  
+
+<p>
+<var>data</var> may be a string specifying additional data to send to the
+server, or <code>None</code> if no such data is needed. 
+Currently HTTP requests are the only ones that use <var>data</var>;
+the HTTP request will be a POST instead of a GET when the <var>data</var>
+parameter is provided.  <var>data</var> should be a buffer in the standard
+<span class="mimetype">application/x-www-form-urlencoded</span> format.  The
+<tt class="function">urllib.urlencode()</tt> function takes a mapping or sequence of
+2-tuples and returns a string in this format.
+
+<p>
+<var>headers</var> should be a dictionary, and will be treated as if
+<tt class="method">add_header()</tt> was called with each key and value as arguments.
+
+<p>
+The final two arguments are only of interest for correct handling of
+third-party HTTP cookies:
+
+<p>
+<var>origin_req_host</var> should be the request-host of the origin
+transaction, as defined by <a class="rfc" id='rfcref-102823' xml:id='rfcref-102823'
+href="http://www.faqs.org/rfcs/rfc2965.html">RFC 2965</a>.  It defaults to
+<code>cookielib.request_host(self)</code>.  This is the host name or IP
+address of the original request that was initiated by the user.  For
+example, if the request is for an image in an HTML document, this
+should be the request-host of the request for the page containing the
+image.
+
+<p>
+<var>unverifiable</var> should indicate whether the request is
+unverifiable, as defined by RFC 2965.  It defaults to False.  An
+unverifiable request is one whose URL the user did not have the option
+to approve.  For example, if the request is for an image in an HTML
+document, and the user had no option to approve the automatic fetching
+of the image, this should be true.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3934' xml:id='l2h-3934' class="class">OpenerDirector</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+The <tt class="class">OpenerDirector</tt> class opens URLs via <tt class="class">BaseHandler</tt>s
+chained together. It manages the chaining of handlers, and recovery
+from errors.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3935' xml:id='l2h-3935' class="class">BaseHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+This is the base class for all registered handlers -- and handles only
+the simple mechanics of registration.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3936' xml:id='l2h-3936' class="class">HTTPDefaultErrorHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A class which defines a default handler for HTTP error responses; all
+responses are turned into <tt class="exception">HTTPError</tt> exceptions.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3937' xml:id='l2h-3937' class="class">HTTPRedirectHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A class to handle redirections.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3938' xml:id='l2h-3938' class="class">HTTPCookieProcessor</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>cookiejar</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+A class to handle HTTP Cookies.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3939' xml:id='l2h-3939' class="class">ProxyHandler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>proxies</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Cause requests to go through a proxy.
+If <var>proxies</var> is given, it must be a dictionary mapping
+protocol names to URLs of proxies.
+The default is to read the list of proxies from the environment
+variables <a class="envvar" id='l2h-3955' xml:id='l2h-3955'>&lt;protocol&gt;_proxy</a>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3940' xml:id='l2h-3940' class="class">HTTPPasswordMgr</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Keep a database of 
+<code>(<var>realm</var>, <var>uri</var>) -&gt; (<var>user</var>, <var>password</var>)</code>
+mappings.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3941' xml:id='l2h-3941' class="class">HTTPPasswordMgrWithDefaultRealm</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Keep a database of 
+<code>(<var>realm</var>, <var>uri</var>) -&gt; (<var>user</var>, <var>password</var>)</code> mappings.
+A realm of <code>None</code> is considered a catch-all realm, which is searched
+if no other realm fits.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3942' xml:id='l2h-3942' class="class">AbstractBasicAuthHandler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>password_mgr</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a mixin class that helps with HTTP authentication, both
+to the remote host and to a proxy.
+<var>password_mgr</var>, if given, should be something that is compatible
+with <tt class="class">HTTPPasswordMgr</tt>; refer to section&nbsp;<a href="http-password-mgr.html#http-password-mgr">18.6.7</a>
+for information on the interface that must be supported.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3943' xml:id='l2h-3943' class="class">HTTPBasicAuthHandler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>password_mgr</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Handle authentication with the remote host.
+<var>password_mgr</var>, if given, should be something that is compatible
+with <tt class="class">HTTPPasswordMgr</tt>; refer to section&nbsp;<a href="http-password-mgr.html#http-password-mgr">18.6.7</a>
+for information on the interface that must be supported.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3944' xml:id='l2h-3944' class="class">ProxyBasicAuthHandler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>password_mgr</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Handle authentication with the proxy.
+<var>password_mgr</var>, if given, should be something that is compatible
+with <tt class="class">HTTPPasswordMgr</tt>; refer to section&nbsp;<a href="http-password-mgr.html#http-password-mgr">18.6.7</a>
+for information on the interface that must be supported.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3945' xml:id='l2h-3945' class="class">AbstractDigestAuthHandler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>password_mgr</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This is a mixin class that helps with HTTP authentication, both
+to the remote host and to a proxy.
+<var>password_mgr</var>, if given, should be something that is compatible
+with <tt class="class">HTTPPasswordMgr</tt>; refer to section&nbsp;<a href="http-password-mgr.html#http-password-mgr">18.6.7</a>
+for information on the interface that must be supported.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3946' xml:id='l2h-3946' class="class">HTTPDigestAuthHandler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>password_mgr</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Handle authentication with the remote host.
+<var>password_mgr</var>, if given, should be something that is compatible
+with <tt class="class">HTTPPasswordMgr</tt>; refer to section&nbsp;<a href="http-password-mgr.html#http-password-mgr">18.6.7</a>
+for information on the interface that must be supported.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3947' xml:id='l2h-3947' class="class">ProxyDigestAuthHandler</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>password_mgr</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Handle authentication with the proxy.
+<var>password_mgr</var>, if given, should be something that is compatible
+with <tt class="class">HTTPPasswordMgr</tt>; refer to section&nbsp;<a href="http-password-mgr.html#http-password-mgr">18.6.7</a>
+for information on the interface that must be supported.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3948' xml:id='l2h-3948' class="class">HTTPHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A class to handle opening of HTTP URLs.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3949' xml:id='l2h-3949' class="class">HTTPSHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A class to handle opening of HTTPS URLs.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3950' xml:id='l2h-3950' class="class">FileHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Open local files.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3951' xml:id='l2h-3951' class="class">FTPHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Open FTP URLs.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3952' xml:id='l2h-3952' class="class">CacheFTPHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Open FTP URLs, keeping a cache of open FTP connections to minimize
+delays.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3953' xml:id='l2h-3953' class="class">GopherHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Open gopher URLs.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<tt id='l2h-3954' xml:id='l2h-3954' class="class">UnknownHandler</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+A catch-all class to handle unknown URLs.
+</dl>
+
+<p>
+
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="request-objects.html">18.6.1 Request Objects</a>
+<li><a href="opener-director-objects.html">18.6.2 OpenerDirector Objects</a>
+<li><a href="base-handler-objects.html">18.6.3 BaseHandler Objects</a>
+<li><a href="http-redirect-handler.html">18.6.4 HTTPRedirectHandler Objects</a>
+<li><a href="http-cookie-processor.html">18.6.5 HTTPCookieProcessor Objects</a>
+<li><a href="proxy-handler.html">18.6.6 ProxyHandler Objects</a>
+<li><a href="http-password-mgr.html">18.6.7 HTTPPasswordMgr Objects</a>
+<li><a href="abstract-basic-auth-handler.html">18.6.8 AbstractBasicAuthHandler Objects</a>
+<li><a href="http-basic-auth-handler.html">18.6.9 HTTPBasicAuthHandler Objects</a>
+<li><a href="proxy-basic-auth-handler.html">18.6.10 ProxyBasicAuthHandler Objects</a>
+<li><a href="abstract-digest-auth-handler.html">18.6.11 AbstractDigestAuthHandler Objects</a>
+<li><a href="http-digest-auth-handler.html">18.6.12 HTTPDigestAuthHandler Objects</a>
+<li><a href="proxy-digest-auth-handler.html">18.6.13 ProxyDigestAuthHandler Objects</a>
+<li><a href="http-handler-objects.html">18.6.14 HTTPHandler Objects</a>
+<li><a href="https-handler-objects.html">18.6.15 HTTPSHandler Objects</a>
+<li><a href="file-handler-objects.html">18.6.16 FileHandler Objects</a>
+<li><a href="ftp-handler-objects.html">18.6.17 FTPHandler Objects</a>
+<li><a href="cacheftp-handler-objects.html">18.6.18 CacheFTPHandler Objects</a>
+<li><a href="gopher-handler.html">18.6.19 GopherHandler Objects</a>
+<li><a href="unknown-handler-objects.html">18.6.20 UnknownHandler Objects</a>
+<li><a href="http-error-processor-objects.html">18.6.21 HTTPErrorProcessor Objects</a>
+<li><a href="urllib2-examples.html">18.6.22 Examples</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="18.5.2 Examples"
+  href="node577.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="18. internet Protocols and"
+  href="internet.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="18.6.1 request Objects"
+  href="request-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node577.html">18.5.2 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="internet.html">18. Internet Protocols and</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="request-objects.html">18.6.1 Request Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

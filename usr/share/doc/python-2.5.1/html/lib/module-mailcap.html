@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-mailbox.html" />
+<link rel="prev" href="module-email.html" />
+<link rel="parent" href="netdata.html" />
+<link rel="next" href="module-mailbox.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.2 mailcap -- Mailcap file handling.</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.13 Examples"
+  href="node161.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node161.html">7.1.13 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-mailbox.html">7.3 mailbox  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION009200000000000000000">
+7.2 <tt class="module">mailcap</tt> --
+         Mailcap file handling.</a>
+</h1>
+<a name="module-mailcap"></a>
+<p>
+
+<p>
+Mailcap files are used to configure how MIME-aware applications such
+as mail readers and Web browsers react to files with different MIME
+types. (The name ``mailcap'' is derived from the phrase ``mail
+capability''.)  For example, a mailcap file might contain a line like
+"<tt class="samp">video/mpeg; xmpeg %s</tt>".  Then, if the user encounters an email
+message or Web document with the MIME type <span class="mimetype">video/mpeg</span>,
+"<tt class="samp">%s</tt>" will be replaced by a filename (usually one belonging to a
+temporary file) and the <b class="program">xmpeg</b> program can be automatically
+started to view the file.
+
+<p>
+The mailcap format is documented in <a class="rfc" id='rfcref-99435' xml:id='rfcref-99435'
+href="http://www.faqs.org/rfcs/rfc1524.html">RFC 1524</a>, ``A User Agent
+Configuration Mechanism For Multimedia Mail Format Information,'' but
+is not an Internet standard.  However, mailcap files are supported on
+most <span class="Unix">Unix</span> systems.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1333' xml:id='l2h-1333' class="function">findmatch</tt></b>(</nobr></td>
+  <td><var>caps, MIMEtype</var><big>[</big><var>, key</var><big>[</big><var>,
+                            filename</var><big>[</big><var>, plist</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a 2-tuple; the first element is a string containing the command
+line to be executed
+(which can be passed to <tt class="function">os.system()</tt>), and the second element is
+the mailcap entry for a given MIME type.  If no matching MIME
+type can be found, <code>(None, None)</code> is returned.
+
+<p>
+<var>key</var> is the name of the field desired, which represents the type
+of activity to be performed; the default value is 'view', since in the 
+most common case you simply want to view the body of the MIME-typed
+data.  Other possible values might be 'compose' and 'edit', if you
+wanted to create a new body of the given MIME type or alter the
+existing body data.  See <a class="rfc" id='rfcref-99437' xml:id='rfcref-99437'
+href="http://www.faqs.org/rfcs/rfc1524.html">RFC 1524</a> for a complete list of these
+fields.
+
+<p>
+<var>filename</var> is the filename to be substituted for "<tt class="samp">%s</tt>" in the
+command line; the default value is
+<code>'/dev/null'</code> which is almost certainly not what you want, so
+usually you'll override it by specifying a filename.
+
+<p>
+<var>plist</var> can be a list containing named parameters; the default
+value is simply an empty list.  Each entry in the list must be a
+string containing the parameter name, an equals sign ("<tt class="character">=</tt>"),
+and the parameter's value.  Mailcap entries can contain 
+named parameters like <code>%{foo}</code>, which will be replaced by the
+value of the parameter named 'foo'.  For example, if the command line
+"<tt class="samp">showpartial %{id} %{number} %{total}</tt>"was in a mailcap file, and <var>plist</var> was set to <code>['id=1',
+'number=2', 'total=3']</code>, the resulting command line would be 
+<code>'showpartial 1 2 3'</code>.  
+
+<p>
+In a mailcap file, the ``test'' field can optionally be specified to
+test some external condition (such as the machine architecture, or the
+window system in use) to determine whether or not the mailcap line
+applies.  <tt class="function">findmatch()</tt> will automatically check such
+conditions and skip the entry if the check fails.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-1334' xml:id='l2h-1334' class="function">getcaps</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Returns a dictionary mapping MIME types to a list of mailcap file
+entries. This dictionary must be passed to the <tt class="function">findmatch()</tt>
+function.  An entry is stored as a list of dictionaries, but it
+shouldn't be necessary to know the details of this representation.
+
+<p>
+The information is derived from all of the mailcap files found on the
+system. Settings in the user's mailcap file <span class="file">$HOME/.mailcap</span>
+will override settings in the system mailcap files
+<span class="file">/etc/mailcap</span>, <span class="file">/usr/etc/mailcap</span>, and
+<span class="file">/usr/local/etc/mailcap</span>.
+</dl>
+
+<p>
+An example usage:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import mailcap
+&gt;&gt;&gt; d=mailcap.getcaps()
+&gt;&gt;&gt; mailcap.findmatch(d, 'video/mpeg', filename='/tmp/tmp1223')
+('xmpeg /tmp/tmp1223', {'view': 'xmpeg %s'})
+</pre></div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.1.13 Examples"
+  href="node161.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7. internet Data Handling"
+  href="netdata.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.3 mailbox  "
+  href="module-mailbox.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node161.html">7.1.13 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="netdata.html">7. Internet Data Handling</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-mailbox.html">7.3 mailbox  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

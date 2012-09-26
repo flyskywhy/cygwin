@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="testsuite-objects.html" />
+<link rel="prev" href="unittest-contents.html" />
+<link rel="parent" href="module-unittest.html" />
+<link rel="next" href="testsuite-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>23.3.5 TestCase Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.3.4 classes and functions"
+  href="unittest-contents.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.3 unittest  "
+  href="module-unittest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.3.6 testsuite Objects"
+  href="testsuite-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="unittest-contents.html">23.3.4 Classes and functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-unittest.html">23.3 unittest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="testsuite-objects.html">23.3.6 TestSuite Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0025350000000000000000"></a><a name="testcase-objects"></a>
+<br>
+23.3.5 TestCase Objects
+            
+</h2>
+
+<p>
+Each <tt class="class">TestCase</tt> instance represents a single test, but each
+concrete subclass may be used to define multiple tests -- the
+concrete class represents a single test fixture.  The fixture is
+created and cleaned up for each test case.
+
+<p>
+<tt class="class">TestCase</tt> instances provide three groups of methods: one group
+used to run the test, another used by the test implementation to
+check conditions and report failures, and some inquiry methods
+allowing information about the test itself to be gathered.
+
+<p>
+Methods in the first group (running the test) are:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5013' xml:id='l2h-5013' class="method">setUp</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Method called to prepare the test fixture.  This is called
+  immediately before calling the test method; any exception raised by
+  this method will be considered an error rather than a test failure.
+  The default implementation does nothing.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5014' xml:id='l2h-5014' class="method">tearDown</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Method called immediately after the test method has been called and
+  the result recorded.  This is called even if the test method raised
+  an exception, so the implementation in subclasses may need to be
+  particularly careful about checking internal state.  Any exception
+  raised by this method will be considered an error rather than a test
+  failure.  This method will only be called if the <tt class="method">setUp()</tt>
+  succeeds, regardless of the outcome of the test method.
+  The default implementation does nothing.  
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5015' xml:id='l2h-5015' class="method">run</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>result</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Run the test, collecting the result into the test result object
+  passed as <var>result</var>.  If <var>result</var> is omitted or <tt class="constant">None</tt>,
+  a temporary result object is created (by calling the
+  <tt class="method">defaultTestCase()</tt> method) and used; this result object is not
+  returned to <tt class="method">run()</tt>'s caller.
+
+<p>
+The same effect may be had by simply calling the <tt class="class">TestCase</tt>
+  instance.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5016' xml:id='l2h-5016' class="method">debug</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Run the test without collecting the result.  This allows exceptions
+  raised by the test to be propagated to the caller, and can be used
+  to support running tests under a debugger.
+</dl>
+
+<p>
+The test code can use any of the following methods to check for and
+report failures.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5017' xml:id='l2h-5017' class="method">assert_</tt></b>(</nobr></td>
+  <td><var>expr</var><big>[</big><var>, msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5018' xml:id='l2h-5018' class="method">failUnless</tt></b>(</nobr></td>
+  <td><var>expr</var><big>[</big><var>, msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>  Signal a test failure if <var>expr</var> is false; the explanation for
+  the error will be <var>msg</var> if given, otherwise it will be
+  <tt class="constant">None</tt>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5019' xml:id='l2h-5019' class="method">assertEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>, msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5020' xml:id='l2h-5020' class="method">failUnlessEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>, msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>  Test that <var>first</var> and <var>second</var> are equal.  If the values do
+  not compare equal, the test will fail with the explanation given by
+  <var>msg</var>, or <tt class="constant">None</tt>.  Note that using <tt class="method">failUnlessEqual()</tt>
+  improves upon doing the comparison as the first parameter to
+  <tt class="method">failUnless()</tt>:  the default value for <var>msg</var> can be
+  computed to include representations of both <var>first</var> and
+  <var>second</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5021' xml:id='l2h-5021' class="method">assertNotEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>, msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5022' xml:id='l2h-5022' class="method">failIfEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>, msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>  Test that <var>first</var> and <var>second</var> are not equal.  If the values
+  do compare equal, the test will fail with the explanation given by
+  <var>msg</var>, or <tt class="constant">None</tt>.  Note that using <tt class="method">failIfEqual()</tt>
+  improves upon doing the comparison as the first parameter to
+  <tt class="method">failUnless()</tt> is that the default value for <var>msg</var> can be
+  computed to include representations of both <var>first</var> and
+  <var>second</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5023' xml:id='l2h-5023' class="method">assertAlmostEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>,
+						places</var><big>[</big><var>, msg</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5024' xml:id='l2h-5024' class="method">failUnlessAlmostEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>,
+						places</var><big>[</big><var>, msg</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>  Test that <var>first</var> and <var>second</var> are approximately equal
+  by computing the difference, rounding to the given number of <var>places</var>,
+  and comparing to zero.  Note that comparing a given number of decimal places
+  is not the same as comparing a given number of significant digits.
+  If the values do not compare equal, the test will fail with the explanation
+  given by <var>msg</var>, or <tt class="constant">None</tt>.  
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5025' xml:id='l2h-5025' class="method">assertNotAlmostEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>,
+						places</var><big>[</big><var>, msg</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5026' xml:id='l2h-5026' class="method">failIfAlmostEqual</tt></b>(</nobr></td>
+  <td><var>first, second</var><big>[</big><var>,
+						places</var><big>[</big><var>, msg</var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>  Test that <var>first</var> and <var>second</var> are not approximately equal
+  by computing the difference, rounding to the given number of <var>places</var>,
+  and comparing to zero.  Note that comparing a given number of decimal places
+  is not the same as comparing a given number of significant digits.
+  If the values do not compare equal, the test will fail with the explanation
+  given by <var>msg</var>, or <tt class="constant">None</tt>.  
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5027' xml:id='l2h-5027' class="method">assertRaises</tt></b>(</nobr></td>
+  <td><var>exception, callable, ...</var>)</td></tr></table></dt>
+<dd>
+<dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5028' xml:id='l2h-5028' class="method">failUnlessRaises</tt></b>(</nobr></td>
+  <td><var>exception, callable, ...</var>)</td></tr></table></dt>
+<dd>  Test that an exception is raised when <var>callable</var> is called with
+  any positional or keyword arguments that are also passed to
+  <tt class="method">assertRaises()</tt>.  The test passes if <var>exception</var> is
+  raised, is an error if another exception is raised, or fails if no
+  exception is raised.  To catch any of a group of exceptions, a tuple
+  containing the exception classes may be passed as <var>exception</var>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5029' xml:id='l2h-5029' class="method">failIf</tt></b>(</nobr></td>
+  <td><var>expr</var><big>[</big><var>, msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  The inverse of the <tt class="method">failUnless()</tt> method is the
+  <tt class="method">failIf()</tt> method.  This signals a test failure if <var>expr</var>
+  is true, with <var>msg</var> or <tt class="constant">None</tt> for the error message.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5030' xml:id='l2h-5030' class="method">fail</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>msg</var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+  Signals a test failure unconditionally, with <var>msg</var> or
+  <tt class="constant">None</tt> for the error message.
+</dl>
+
+<p>
+<dl><dt><b><tt id='l2h-5031' xml:id='l2h-5031' class="member">failureException</tt></b></dt>
+<dd>
+  This class attribute gives the exception raised by the
+  <tt class="method">test()</tt> method.  If a test framework needs to use a
+  specialized exception, possibly to carry additional information, it
+  must subclass this exception in order to ``play fair'' with the
+  framework.  The initial value of this attribute is
+  <tt class="exception">AssertionError</tt>.
+</dl>
+
+<p>
+Testing frameworks can use the following methods to collect
+information on the test:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5032' xml:id='l2h-5032' class="method">countTestCases</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return the number of tests represented by this test object.  For
+  <tt class="class">TestCase</tt> instances, this will always be <code>1</code>.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5033' xml:id='l2h-5033' class="method">defaultTestResult</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return an instance of the test result class that should be used
+  for this test case class (if no other result instance is provided
+  to the <tt class="method">run()</tt> method).
+
+<p>
+For <tt class="class">TestCase</tt> instances, this will always be an instance of
+  <tt class="class">TestResult</tt>;  subclasses of <tt class="class">TestCase</tt> should
+  override this as necessary.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5034' xml:id='l2h-5034' class="method">id</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Return a string identifying the specific test case.  This is usually
+  the full name of the test method, including the module and class
+  name.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5035' xml:id='l2h-5035' class="method">shortDescription</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+  Returns a one-line description of the test, or <tt class="constant">None</tt> if no
+  description has been provided.  The default implementation of this
+  method returns the first line of the test method's docstring, if
+  available, or <tt class="constant">None</tt>.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="23.3.4 classes and functions"
+  href="unittest-contents.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="23.3 unittest  "
+  href="module-unittest.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="23.3.6 testsuite Objects"
+  href="testsuite-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="unittest-contents.html">23.3.4 Classes and functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-unittest.html">23.3 unittest  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="testsuite-objects.html">23.3.6 TestSuite Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

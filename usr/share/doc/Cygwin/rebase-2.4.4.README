@@ -1,0 +1,152 @@
+$Id: README,v 1.14 2008/06/07 20:50:17 jt Exp $
+
+Abstract:
+
+The Cygwin rebase distribution contains two utilities, rebase and
+rebaseall.  The first utility is modeled after Microsoft's SDK rebase:
+
+    http://windowssdk.msdn.microsoft.com/en-us/library/ms726650.aspx
+
+However, instead of linking rebase against Microsoft's imagehlp library,
+it is linked against Ralf Habacker's imagehelper library.
+
+The following are the advantages of using Ralf's library:
+
+    1. rebase can be a Cygwin application.  If rebase is linked against
+       Microsoft's imagehlp library, then it must be a Mingw application.
+       This is because imagehlp is dependent on Microsoft's C runtime and
+       therefore cannot be used in an application that is dependent on
+       another C runtime (i.e., Cygwin).
+
+    2. rebase can be used on Windows Me.  For some reason, Microsoft's
+       imagehlp.dll does not function properly on this platform.
+
+    3. Ralf's imagehelper library also provides FixImage() which fixes
+       bad relocations in DLLs that can be caused by stripping.
+
+I would like to thank Ralf Habacker for providing the imagehelper
+library.  This library has enabled me to create a rebase utility that
+is usable by all Cygwin user (regardless of platform) on all DLLs
+(regardless of stripping).
+
+The rebaseall utility is a convenient way for users that suffer from the
+Cygwin rebase problem to rebase their entire system (i.e., all of their
+DLLs).  The following is a list of known Cygwin applications that are
+affected by the rebase problem:
+
+    Apache
+    Perl
+    Python
+
+The rebase problem is due to fork() failing when it is unable to load
+DLLs in the child at the same address as in the parent.  This is caused
+by DLLs which have conflicting base addresses.  An error message like
+the following will be displayed when the problem is triggered:
+
+    C:\cygwin\bin\python.exe: *** unable to remap C:\cygwin\bin\cygssl.dll to same address as parent(0xDF0000) != 0xE00000
+
+Note that rebaseall is only a stop-gap measure.  Eventually the rebase
+functionality will be added to Cygwin's setup.exe, so that rebasing will
+happen automatically.
+
+Requirements:
+
+The following packages or later are required to build and/or execute
+Cygwin rebase and/or rebaseall:
+
+    ash 20040127-3
+    binutils 20060709-1
+    cygwin 1.5.20-1
+    fileutils 4.1-3
+    gcc 3.4.4-1
+    grep 2.5.1a-2
+    gzip 1.3.5-2
+    sed 4.1.5-1
+
+Install:
+
+Cygwin rebase does not require any special installation procedures.
+
+Usage:
+
+Use the following procedure to rebase your entire system:
+
+    1. shutdown all Cygwin processes and services
+    2. start ash (do not use bash or rxvt)
+    3. execute /bin/rebaseall (in the ash window)
+
+If you get any errors due to DLLs being in-use or read-only, then take the
+appropriate action and rerun rebaseall.  Otherwise, you run the risk of fork()
+failing.
+
+The following is the rebaseall command line syntax:
+
+    rebaseall [-b BaseAddress] [-o Offset] [-T FileList | -] [-v]
+
+where:
+
+    -b => base address used by rebase (default: 0x70000000)
+    -o => offset between each DLL rebased (default: 0x10000)
+    -s => specify DLL suffix, use multiple if necessary (default: dll, so)
+    -T => specify filelist (or stdin) to list additional files
+    -v => verbose (default: off)
+
+The following is the rebase command line syntax:
+
+    rebase -b BaseAddress [-Vdv] [-o Offset] [-T FileList | -] Files...
+
+where:
+
+    -b => base address used by rebase
+    -d => rebase down memory (default: up)
+    -o => offset between each DLL rebased
+    -T => specify filelist (or stdin) to list additional files
+    -V => display version and exit
+    -v => verbose (default: off)
+
+Source:
+
+Cygwin rebase builds OOTB under Cygwin.  With minor Makefile tweaking,
+it builds cleanly under Mingw too.
+
+Build:
+
+See build.sh in the source archive for my exact build recipe for configuring,
+making, and packaging this distribution.
+
+Test:
+
+rebase does not contain any regression tests.
+
+Issues:
+
+The following are the known Cygwin rebase issues:
+
+1. rebase should be integrated with Cygwin's setup.exe.
+
+2. rebase does not handle in-use DLLs.
+
+3. rebase does not currently store the DLL base addresses in a database
+which would speed up and/or obviate subsequent rebases.
+
+4. rebase skips read-only DLLs.
+
+Homepage:
+
+The primary rebase web site is:
+
+    http://www.tishler.net/jason/software/rebase/
+
+Download:
+
+The primary rebase download site is:
+
+    http://www.tishler.net/jason/software/rebase/
+
+Mailing Lists:
+
+Please report problems, suggestions, etc. to <cygwin@cygwin.com>.
+
+Maintainer:
+
+    Jason Tishler <jason@tishler.net>

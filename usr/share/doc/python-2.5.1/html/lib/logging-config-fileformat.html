@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="logging-config-api.html" />
+<link rel="parent" href="node425.html" />
+<link rel="next" href="module-getpass.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>14.5.10.2 Configuration file format</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.10.1 configuration functions"
+  href="logging-config-api.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5.10 Configuration"
+  href="node425.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.6 getpass  "
+  href="module-getpass.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="logging-config-api.html">14.5.10.1 Configuration functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node425.html">14.5.10 Configuration</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-getpass.html">14.6 getpass  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00165102000000000000000"></a><a name="logging-config-fileformat"></a>
+<br>
+14.5.10.2 Configuration file format
+</h3>
+
+<p>
+The configuration file format understood by <tt class="function">fileConfig()</tt> is
+based on ConfigParser functionality. The file must contain sections
+called <code>[loggers]</code>, <code>[handlers]</code> and <code>[formatters]</code>
+which identify by name the entities of each type which are defined in
+the file. For each such entity, there is a separate section which
+identified how that entity is configured. Thus, for a logger named
+<code>log01</code> in the <code>[loggers]</code> section, the relevant
+configuration details are held in a section
+<code>[logger_log01]</code>. Similarly, a handler called <code>hand01</code> in
+the <code>[handlers]</code> section will have its configuration held in a
+section called <code>[handler_hand01]</code>, while a formatter called
+<code>form01</code> in the <code>[formatters]</code> section will have its
+configuration specified in a section called
+<code>[formatter_form01]</code>. The root logger configuration must be
+specified in a section called <code>[logger_root]</code>.
+
+<p>
+Examples of these sections in the file are given below.
+
+<p>
+<div class="verbatim"><pre>
+[loggers]
+keys=root,log02,log03,log04,log05,log06,log07
+
+[handlers]
+keys=hand01,hand02,hand03,hand04,hand05,hand06,hand07,hand08,hand09
+
+[formatters]
+keys=form01,form02,form03,form04,form05,form06,form07,form08,form09
+</pre></div>
+
+<p>
+The root logger must specify a level and a list of handlers. An
+example of a root logger section is given below.
+
+<p>
+<div class="verbatim"><pre>
+[logger_root]
+level=NOTSET
+handlers=hand01
+</pre></div>
+
+<p>
+The <code>level</code> entry can be one of <code>DEBUG, INFO, WARNING,
+ERROR, CRITICAL</code> or <code>NOTSET</code>. For the root logger only,
+<code>NOTSET</code> means that all messages will be logged. Level values are
+<tt class="function">eval()</tt>uated in the context of the <code>logging</code> package's
+namespace.
+
+<p>
+The <code>handlers</code> entry is a comma-separated list of handler names,
+which must appear in the <code>[handlers]</code> section. These names must
+appear in the <code>[handlers]</code> section and have corresponding
+sections in the configuration file.
+
+<p>
+For loggers other than the root logger, some additional information is
+required. This is illustrated by the following example.
+
+<p>
+<div class="verbatim"><pre>
+[logger_parser]
+level=DEBUG
+handlers=hand01
+propagate=1
+qualname=compiler.parser
+</pre></div>
+
+<p>
+The <code>level</code> and <code>handlers</code> entries are interpreted as for
+the root logger, except that if a non-root logger's level is specified
+as <code>NOTSET</code>, the system consults loggers higher up the hierarchy
+to determine the effective level of the logger. The <code>propagate</code>
+entry is set to 1 to indicate that messages must propagate to handlers
+higher up the logger hierarchy from this logger, or 0 to indicate that
+messages are <strong>not</strong> propagated to handlers up the hierarchy. The
+<code>qualname</code> entry is the hierarchical channel name of the logger,
+that is to say the name used by the application to get the logger.
+
+<p>
+Sections which specify handler configuration are exemplified by the
+following.
+
+<p>
+<div class="verbatim"><pre>
+[handler_hand01]
+class=StreamHandler
+level=NOTSET
+formatter=form01
+args=(sys.stdout,)
+</pre></div>
+
+<p>
+The <code>class</code> entry indicates the handler's class (as determined by
+<tt class="function">eval()</tt> in the <code>logging</code> package's namespace). The
+<code>level</code> is interpreted as for loggers, and <code>NOTSET</code> is taken
+to mean "log everything".
+
+<p>
+The <code>formatter</code> entry indicates the key name of the formatter for
+this handler. If blank, a default formatter
+(<code>logging._defaultFormatter</code>) is used. If a name is specified, it
+must appear in the <code>[formatters]</code> section and have a
+corresponding section in the configuration file.
+
+<p>
+The <code>args</code> entry, when <tt class="function">eval()</tt>uated in the context of
+the <code>logging</code> package's namespace, is the list of arguments to
+the constructor for the handler class. Refer to the constructors for
+the relevant handlers, or to the examples below, to see how typical
+entries are constructed.
+
+<p>
+<div class="verbatim"><pre>
+[handler_hand02]
+class=FileHandler
+level=DEBUG
+formatter=form02
+args=('python.log', 'w')
+
+[handler_hand03]
+class=handlers.SocketHandler
+level=INFO
+formatter=form03
+args=('localhost', handlers.DEFAULT_TCP_LOGGING_PORT)
+
+[handler_hand04]
+class=handlers.DatagramHandler
+level=WARN
+formatter=form04
+args=('localhost', handlers.DEFAULT_UDP_LOGGING_PORT)
+
+[handler_hand05]
+class=handlers.SysLogHandler
+level=ERROR
+formatter=form05
+args=(('localhost', handlers.SYSLOG_UDP_PORT), handlers.SysLogHandler.LOG_USER)
+
+[handler_hand06]
+class=handlers.NTEventLogHandler
+level=CRITICAL
+formatter=form06
+args=('Python Application', '', 'Application')
+
+[handler_hand07]
+class=handlers.SMTPHandler
+level=WARN
+formatter=form07
+args=('localhost', 'from@abc', ['user1@abc', 'user2@xyz'], 'Logger Subject')
+
+[handler_hand08]
+class=handlers.MemoryHandler
+level=NOTSET
+formatter=form08
+target=
+args=(10, ERROR)
+
+[handler_hand09]
+class=handlers.HTTPHandler
+level=NOTSET
+formatter=form09
+args=('localhost:9022', '/log', 'GET')
+</pre></div>
+
+<p>
+Sections which specify formatter configuration are typified by the following.
+
+<p>
+<div class="verbatim"><pre>
+[formatter_form01]
+format=F1 %(asctime)s %(levelname)s %(message)s
+datefmt=
+class=logging.Formatter
+</pre></div>
+
+<p>
+The <code>format</code> entry is the overall format string, and the
+<code>datefmt</code> entry is the <tt class="function">strftime()</tt>-compatible date/time format
+string. If empty, the package substitutes ISO8601 format date/times, which
+is almost equivalent to specifying the date format string "The ISO8601 format also specifies milliseconds, which are appended to the
+result of using the above format string, with a comma separator. An example
+time in ISO8601 format is <code>2003-01-23 00:29:50,411</code>.
+
+<p>
+The <code>class</code> entry is optional.  It indicates the name of the
+formatter's class (as a dotted module and class name.)  This option is
+useful for instantiating a <tt class="class">Formatter</tt> subclass.  Subclasses of
+<tt class="class">Formatter</tt> can present exception tracebacks in an expanded or
+condensed format.
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="14.5.10.1 configuration functions"
+  href="logging-config-api.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="14.5.10 Configuration"
+  href="node425.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="14.6 getpass  "
+  href="module-getpass.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="logging-config-api.html">14.5.10.1 Configuration functions</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="node425.html">14.5.10 Configuration</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-getpass.html">14.6 getpass  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

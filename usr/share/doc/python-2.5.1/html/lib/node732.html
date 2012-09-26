@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="node737.html" />
+<link rel="prev" href="node731.html" />
+<link rel="parent" href="module-gettext.html" />
+<link rel="next" href="node733.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>21.1.2 Class-based API</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="21.1.1 gnu gettext API"
+  href="node731.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="21.1 gettext  "
+  href="module-gettext.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="21.1.2.1 the NullTranslations class"
+  href="node733.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node731.html">21.1.1 GNU gettext API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-gettext.html">21.1 gettext  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node733.html">21.1.2.1 The NullTranslations class</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0023120000000000000000">
+21.1.2 Class-based API</a>
+</h2>
+
+<p>
+The class-based API of the <tt class="module">gettext</tt> module gives you more
+flexibility and greater convenience than the GNU <b class="program">gettext</b>
+API.  It is the recommended way of localizing your Python applications and
+modules.  <tt class="module">gettext</tt> defines a ``translations'' class which
+implements the parsing of GNU <span class="file">.mo</span> format files, and has methods
+for returning either standard 8-bit strings or Unicode strings.
+Instances of this ``translations'' class can also install themselves 
+in the built-in namespace as the function <tt class="function">_()</tt>.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4810' xml:id='l2h-4810' class="function">find</tt></b>(</nobr></td>
+  <td><var>domain</var><big>[</big><var>, localedir</var><big>[</big><var>, 
+                        languages</var><big>[</big><var>, all</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This function implements the standard <span class="file">.mo</span> file search
+algorithm.  It takes a <var>domain</var>, identical to what
+<tt class="function">textdomain()</tt> takes.  Optional <var>localedir</var> is as in
+<tt class="function">bindtextdomain()</tt>  Optional <var>languages</var> is a list of
+strings, where each string is a language code.
+
+<p>
+If <var>localedir</var> is not given, then the default system locale
+directory is used.<a name="tex2html180"
+  href="#foot70428"><sup>21.2</sup></a>  If <var>languages</var> is not given,
+then the following environment variables are searched: <a class="envvar" id='l2h-4813' xml:id='l2h-4813'>LANGUAGE</a>,
+<a class="envvar" id='l2h-4814' xml:id='l2h-4814'>LC_ALL</a>, <a class="envvar" id='l2h-4815' xml:id='l2h-4815'>LC_MESSAGES</a>, and <a class="envvar" id='l2h-4816' xml:id='l2h-4816'>LANG</a>.  The first one
+returning a non-empty value is used for the <var>languages</var> variable.
+The environment variables should contain a colon separated list of
+languages, which will be split on the colon to produce the expected
+list of language code strings.
+
+<p>
+<tt class="function">find()</tt> then expands and normalizes the languages, and then
+iterates through them, searching for an existing file built of these
+components:
+
+<p>
+<span class="file"><var>localedir</var>/<var>language</var>/LC_MESSAGES/<var>domain</var>.mo</span>
+
+<p>
+The first such file name that exists is returned by <tt class="function">find()</tt>.
+If no such file is found, then <code>None</code> is returned. If <var>all</var>
+is given, it returns a list of all file names, in the order in which
+they appear in the languages list or the environment variables.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4811' xml:id='l2h-4811' class="function">translation</tt></b>(</nobr></td>
+  <td><var>domain</var><big>[</big><var>, localedir</var><big>[</big><var>,
+                              languages</var><big>[</big><var>, class_</var><big>[</big><var>,
+			      fallback</var><big>[</big><var>, codeset</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Return a <tt class="class">Translations</tt> instance based on the <var>domain</var>,
+<var>localedir</var>, and <var>languages</var>, which are first passed to
+<tt class="function">find()</tt> to get a list of the
+associated <span class="file">.mo</span> file paths.  Instances with
+identical <span class="file">.mo</span> file names are cached.  The actual class instantiated
+is either <var>class_</var> if provided, otherwise
+<tt class="class">GNUTranslations</tt>.  The class's constructor must take a single
+file object argument. If provided, <var>codeset</var> will change the
+charset used to encode translated strings.
+
+<p>
+If multiple files are found, later files are used as fallbacks for
+earlier ones. To allow setting the fallback, <tt class="function">copy.copy</tt>
+is used to clone each translation object from the cache; the actual
+instance data is still shared with the cache.
+
+<p>
+If no <span class="file">.mo</span> file is found, this function raises
+<tt class="exception">IOError</tt> if <var>fallback</var> is false (which is the default),
+and returns a <tt class="class">NullTranslations</tt> instance if <var>fallback</var> is
+true.
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+Added the <var>codeset</var> parameter.</span>
+
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-4812' xml:id='l2h-4812' class="function">install</tt></b>(</nobr></td>
+  <td><var>domain</var><big>[</big><var>, localedir</var><big>[</big><var>, unicode
+			  </var><big>[</big><var>, codeset</var><big>[</big><var>, names</var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+This installs the function <tt class="function">_</tt> in Python's builtin namespace,
+based on <var>domain</var>, <var>localedir</var>, and <var>codeset</var> which are
+passed to the function <tt class="function">translation()</tt>.  The <var>unicode</var>
+flag is passed to the resulting translation object's <tt class="method">install</tt>
+method.
+
+<p>
+For the <var>names</var> parameter, please see the description of the
+translation object's <tt class="method">install</tt> method.
+
+<p>
+As seen below, you usually mark the strings in your application that are
+candidates for translation, by wrapping them in a call to the
+<tt class="function">_()</tt> function, like this:
+
+<p>
+<div class="verbatim"><pre>
+print _('This string will be translated.')
+</pre></div>
+
+<p>
+For convenience, you want the <tt class="function">_()</tt> function to be installed in
+Python's builtin namespace, so it is easily accessible in all modules
+of your application.  
+
+<p>
+
+<span class="versionnote">Changed in version 2.4:
+Added the <var>codeset</var> parameter.</span>
+
+<span class="versionnote">Changed in version 2.5:
+Added the <var>names</var> parameter.</span>
+
+</dl>
+
+<p>
+<br><hr><h4>Footnotes</h4>
+<dl>
+<dt><a name="foot70428">... used.</a><A
+ HREF="node732.html#tex2html180"><sup>21.2</sup></a></dt>
+<dd>See the footnote for
+<tt class="function">bindtextdomain()</tt> above.
+
+</dd>
+</dl>
+<p><br /></p><hr class='online-navigation' />
+<div class='online-navigation'>
+<!--Table of Child-Links-->
+<a name="CHILD_LINKS"><strong>Subsections</strong></a>
+
+<ul class="ChildLinks">
+<li><a href="node733.html">21.1.2.1 The <tt class="class">NullTranslations</tt> class</a>
+<li><a href="node734.html">21.1.2.2 The <tt class="class">GNUTranslations</tt> class</a>
+<li><a href="node735.html">21.1.2.3 Solaris message catalog support</a>
+<li><a href="node736.html">21.1.2.4 The Catalog constructor</a>
+</ul>
+<!--End of Table of Child-Links-->
+</div>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="21.1.1 gnu gettext API"
+  href="node731.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="21.1 gettext  "
+  href="module-gettext.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="21.1.2.1 the NullTranslations class"
+  href="node733.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node731.html">21.1.1 GNU gettext API</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-gettext.html">21.1 gettext  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="node733.html">21.1.2.1 The NullTranslations class</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

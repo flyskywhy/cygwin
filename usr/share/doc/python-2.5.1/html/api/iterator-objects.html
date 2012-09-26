@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="api.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="api.html" title='Python/C api Reference Manual' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="descriptor-objects.html" />
+<link rel="prev" href="moduleObjects.html" />
+<link rel="parent" href="otherObjects.html" />
+<link rel="next" href="descriptor-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>7.5.6 Iterator Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.5 module Objects"
+  href="moduleObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.7 descriptor Objects"
+  href="descriptor-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="moduleObjects.html">7.5.5 Module Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="descriptor-objects.html">7.5.7 Descriptor Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION009560000000000000000"></a><a name="iterator-objects"></a>
+<br>
+7.5.6 Iterator Objects 
+</h2>
+
+<p>
+Python provides two general-purpose iterator objects.  The first, a
+sequence iterator, works with an arbitrary sequence supporting the
+<tt class="method">__getitem__()</tt> method.  The second works with a callable
+object and a sentinel value, calling the callable for each item in the
+sequence, and ending the iteration when the sentinel value is
+returned.
+
+<p>
+<dl><dt>PyTypeObject <b><tt id='l2h-724' xml:id='l2h-724' class="cdata">PySeqIter_Type</tt></b></dt>
+<dd>
+  Type object for iterator objects returned by
+  <tt class="cfunction">PySeqIter_New()</tt> and the one-argument form of the
+  <tt class="function">iter()</tt> built-in function for built-in sequence types.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-725' xml:id='l2h-725' class="cfunction">PySeqIter_Check</tt></b>(</nobr></td><td>op)</td></tr></table></dt>
+<dd>
+  Return true if the type of <var>op</var> is <tt class="cdata">PySeqIter_Type</tt>.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-726' xml:id='l2h-726' class="cfunction">PySeqIter_New</tt></b>(</nobr></td><td>PyObject *<var>seq</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return an iterator that works with a general sequence object,
+  <var>seq</var>.  The iteration ends when the sequence raises
+  <tt class="exception">IndexError</tt> for the subscripting operation.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt>PyTypeObject <b><tt id='l2h-727' xml:id='l2h-727' class="cdata">PyCallIter_Type</tt></b></dt>
+<dd>
+  Type object for iterator objects returned by
+  <tt class="cfunction">PyCallIter_New()</tt> and the two-argument form of the
+  <tt class="function">iter()</tt> built-in function.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>int&nbsp;<b><tt id='l2h-728' xml:id='l2h-728' class="cfunction">PyCallIter_Check</tt></b>(</nobr></td><td>op)</td></tr></table></dt>
+<dd>
+  Return true if the type of <var>op</var> is <tt class="cdata">PyCallIter_Type</tt>.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline"><td><nobr>PyObject*&nbsp;<b><tt id='l2h-729' xml:id='l2h-729' class="cfunction">PyCallIter_New</tt></b>(</nobr></td><td>PyObject *<var>callable</var>,
+                                             PyObject *<var>sentinel</var>)</td></tr></table></dt>
+<dd>
+<div class="refcount-info">
+  <span class="label">Return value:</span>
+  <span class="value">New reference.</span>
+</div>
+  Return a new iterator.  The first parameter, <var>callable</var>, can be
+  any Python callable object that can be called with no parameters;
+  each call to it should return the next item in the iteration.  When
+  <var>callable</var> returns a value equal to <var>sentinel</var>, the
+  iteration will be terminated.
+  
+<span class="versionnote">New in version 2.2.</span>
+
+</dd></dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="7.5.5 module Objects"
+  href="moduleObjects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="7.5 other Objects"
+  href="otherObjects.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="7.5.7 descriptor Objects"
+  href="descriptor-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python/C API Reference Manual</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="moduleObjects.html">7.5.5 Module Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="otherObjects.html">7.5 Other Objects</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="descriptor-objects.html">7.5.7 Descriptor Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="module-modulefinder.html" />
+<link rel="prev" href="module-zipimport.html" />
+<link rel="parent" href="modules.html" />
+<link rel="next" href="module-modulefinder.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>29.3 pkgutil -- Package extension utility</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="29.2.2 Examples"
+  href="node853.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="29. importing Modules"
+  href="modules.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="29.4 modulefinder  "
+  href="module-modulefinder.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node853.html">29.2.2 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="modules.html">29. Importing Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-modulefinder.html">29.4 modulefinder  </a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h1><a name="SECTION0031300000000000000000">
+29.3 <tt class="module">pkgutil</tt> --
+         Package extension utility</a>
+</h1>
+
+<p>
+<a name="module-pkgutil"></a>
+
+<p>
+
+<span class="versionnote">New in version 2.3.</span>
+
+<p>
+This module provides a single function:
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-5397' xml:id='l2h-5397' class="function">extend_path</tt></b>(</nobr></td>
+  <td><var>path, name</var>)</td></tr></table></dt>
+<dd>
+  Extend the search path for the modules which comprise a package.
+  Intended use is to place the following code in a package's
+  <span class="file">__init__.py</span>:
+
+<p>
+<div class="verbatim"><pre>
+from pkgutil import extend_path
+__path__ = extend_path(__path__, __name__)
+</pre></div>
+
+<p>
+This will add to the package's <code>__path__</code> all subdirectories of
+  directories on <code>sys.path</code> named after the package.  This is
+  useful if one wants to distribute different parts of a single
+  logical package as multiple directories.
+
+<p>
+It also looks for <span class="file">*.pkg</span> files beginning where <code>*</code>
+  matches the <var>name</var> argument.  This feature is similar to
+  <span class="file">*.pth</span> files (see the <tt class="module"><a href="module-site.html">site</a></tt> module for more
+  information), except that it doesn't special-case lines starting
+  with <code>import</code>.  A <span class="file">*.pkg</span> file is trusted at face value:
+  apart from checking for duplicates, all entries found in a
+  <span class="file">*.pkg</span> file are added to the path, regardless of whether they
+  exist on the filesystem.  (This is a feature.)
+
+<p>
+If the input path is not a list (as is the case for frozen
+  packages) it is returned unchanged.  The input path is not
+  modified; an extended copy is returned.  Items are only appended
+  to the copy at the end.
+
+<p>
+It is assumed that <code>sys.path</code> is a sequence.  Items of
+  <code>sys.path</code> that are not (Unicode or 8-bit) strings referring to
+  existing directories are ignored.  Unicode items on <code>sys.path</code>
+  that cause errors when used as filenames may cause this function to
+  raise an exception (in line with <tt class="function">os.path.isdir()</tt> behavior).
+</dl>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="29.2.2 Examples"
+  href="node853.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="29. importing Modules"
+  href="modules.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="29.4 modulefinder  "
+  href="module-modulefinder.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node853.html">29.2.2 Examples</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="modules.html">29. Importing Modules</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="module-modulefinder.html">29.4 modulefinder  </a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

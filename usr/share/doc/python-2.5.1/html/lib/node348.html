@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="prev" href="node347.html" />
+<link rel="parent" href="sqlite3-Types.html" />
+<link rel="next" href="sqlite3-Controlling-Transactions.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>13.13.4.4 Default adapters and converters</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.4.3 converting SQLite values"
+  href="node347.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13.4 sqlite and Python"
+  href="sqlite3-Types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.5 controlling Transactions"
+  href="sqlite3-Controlling-Transactions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node347.html">13.13.4.3 Converting SQLite values</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sqlite3-Types.html">13.13.4 SQLite and Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sqlite3-Controlling-Transactions.html">13.13.5 Controlling Transactions</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h3><a name="SECTION00151344000000000000000">
+13.13.4.4 Default adapters and converters</a>
+</h3>
+
+<p>
+There are default adapters for the date and datetime types in the datetime
+module. They will be sent as ISO dates/ISO timestamps to SQLite.
+
+<p>
+The default converters are registered under the name "date" for <tt class="class">datetime.date</tt>
+and under the name "timestamp" for <tt class="class">datetime.datetime</tt>.
+
+<p>
+This way, you can use date/timestamps from Python without any additional
+fiddling in most cases. The format of the adapters is also compatible with the
+experimental SQLite date/time functions.
+
+<p>
+The following example demonstrates this.
+
+<p>
+<div class="verbatim">
+<pre>import sqlite3
+import datetime
+
+con = sqlite3.connect(":memory:", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+cur = con.cursor()
+cur.execute("create table test(d date, ts timestamp)")
+
+today = datetime.date.today()
+now = datetime.datetime.now()
+
+cur.execute("insert into test(d, ts) values (?, ?)", (today, now))
+cur.execute("select d, ts from test")
+row = cur.fetchone()
+print today, "=&gt;", row[0], type(row[0])
+print now, "=&gt;", row[1], type(row[1])
+
+cur.execute('select current_date as "d [date]", current_timestamp as "ts [timestamp]"')
+row = cur.fetchone()
+print "current_date", row[0], type(row[0])
+print "current_timestamp", row[1], type(row[1])
+</pre>
+<div class="footer">
+<a href="pysqlite_datetime.txt" type="text/plain">Download as text (original file name: <span class="file">sqlite3/pysqlite_datetime.py</span>).</a>
+</div></div>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="13.13.4.3 converting SQLite values"
+  href="node347.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="13.13.4 sqlite and Python"
+  href="sqlite3-Types.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="13.13.5 controlling Transactions"
+  href="sqlite3-Controlling-Transactions.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="node347.html">13.13.4.3 Converting SQLite values</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="sqlite3-Types.html">13.13.4 SQLite and Python</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="sqlite3-Controlling-Transactions.html">13.13.5 Controlling Transactions</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="lib.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="lib.html" title='Python library Reference' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='index' href='genindex.html' title='Index' />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="condition-objects.html" />
+<link rel="prev" href="lock-objects.html" />
+<link rel="parent" href="module-threading.html" />
+<link rel="next" href="condition-objects.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>15.3.2 RLock Objects </title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.3.1 lock Objects"
+  href="lock-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15.3 threading  "
+  href="module-threading.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.3.3 condition Objects"
+  href="condition-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="lock-objects.html">15.3.1 Lock Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-threading.html">15.3 threading  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="condition-objects.html">15.3.3 Condition Objects</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0017320000000000000000"></a><a name="rlock-objects"></a>
+<br>
+15.3.2 RLock Objects 
+</h2>
+
+<p>
+A reentrant lock is a synchronization primitive that may be
+acquired multiple times by the same thread.  Internally, it uses
+the concepts of ``owning thread'' and ``recursion level'' in
+addition to the locked/unlocked state used by primitive locks.  In
+the locked state, some thread owns the lock; in the unlocked
+state, no thread owns it.
+
+<p>
+To lock the lock, a thread calls its <tt class="method">acquire()</tt> method; this
+returns once the thread owns the lock.  To unlock the lock, a
+thread calls its <tt class="method">release()</tt> method.
+<tt class="method">acquire()</tt>/<tt class="method">release()</tt> call pairs may be nested; only
+the final <tt class="method">release()</tt> (the <tt class="method">release()</tt> of the outermost
+pair) resets the lock to unlocked and allows another thread blocked in
+<tt class="method">acquire()</tt> to proceed.
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3440' xml:id='l2h-3440' class="method">acquire</tt></b>(</nobr></td>
+  <td><var></var><big>[</big><var>blocking<code> = 1</code></var><big>]</big><var></var>)</td></tr></table></dt>
+<dd>
+Acquire a lock, blocking or non-blocking.
+
+<p>
+When invoked without arguments: if this thread already owns
+the lock, increment the recursion level by one, and return
+immediately.  Otherwise, if another thread owns the lock,
+block until the lock is unlocked.  Once the lock is unlocked
+(not owned by any thread), then grab ownership, set the
+recursion level to one, and return.  If more than one thread
+is blocked waiting until the lock is unlocked, only one at a
+time will be able to grab ownership of the lock.  There is no
+return value in this case.
+
+<p>
+When invoked with the <var>blocking</var> argument set to true, do the
+same thing as when called without arguments, and return true.
+
+<p>
+When invoked with the <var>blocking</var> argument set to false, do not
+block.  If a call without an argument would block, return false
+immediately; otherwise, do the same thing as when called
+without arguments, and return true.
+</dl>
+
+<p>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><tt id='l2h-3441' xml:id='l2h-3441' class="method">release</tt></b>(</nobr></td>
+  <td><var></var>)</td></tr></table></dt>
+<dd>
+Release a lock, decrementing the recursion level.  If after the
+decrement it is zero, reset the lock to unlocked (not owned by any
+thread), and if any other threads are blocked waiting for the lock to
+become unlocked, allow exactly one of them to proceed.  If after the
+decrement the recursion level is still nonzero, the lock remains
+locked and owned by the calling thread.
+
+<p>
+Only call this method when the calling thread owns the lock.
+Do not call this method when the lock is unlocked.
+
+<p>
+There is no return value.
+</dl>
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="15.3.1 lock Objects"
+  href="lock-objects.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="15.3 threading  "
+  href="module-threading.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="15.3.3 condition Objects"
+  href="condition-objects.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Python Library Reference</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><a href="modindex.html" title="Module Index"><img src='../icons/modules.png'
+  border='0' height='32'  alt='Module Index' width='32' /></a></td>
+<td class='online-navigation'><a rel="index" title="Index"
+  href="genindex.html"><img src='../icons/index.png'
+  border='0' height='32'  alt='Index' width='32' /></a></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="lock-objects.html">15.3.1 Lock Objects</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="module-threading.html">15.3 threading  </a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="condition-objects.html">15.3.3 Condition Objects</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="ext.css" type='text/css' />
+<link rel="SHORTCUT ICON" href="../icons/pyfav.png" type="image/png" />
+<link rel='start' href='../index.html' title='Python documentation Index' />
+<link rel="first" href="ext.html" title='Extending and Embedding the Python Interpreter' />
+<link rel='contents' href='contents.html' title="Contents" />
+<link rel='last' href='about.html' title='About this document...' />
+<link rel='help' href='about.html' title='About this document...' />
+<link rel="next" href="thinIce.html" />
+<link rel="prev" href="refcountsInPython.html" />
+<link rel="parent" href="refcounts.html" />
+<link rel="next" href="thinIce.html" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name='aesop' content='information' />
+<title>1.10.2 Ownership Rules
+</title>
+</head>
+<body>
+<div class="navigation">
+<div id='top-navigation-panel' xml:id='top-navigation-panel'>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.10.1 reference Counting in"
+  href="refcountsInPython.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1.10 reference Counts"
+  href="refcounts.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.10.3 thin Ice"
+  href="thinIce.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="refcountsInPython.html">1.10.1 Reference Counting in</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="refcounts.html">1.10 Reference Counts</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="thinIce.html">1.10.3 Thin Ice</a>
+</div>
+<hr /></div>
+</div>
+<!--End of Navigation Panel-->
+
+<h2><a name="SECTION0031020000000000000000"></a><a name="ownershipRules"></a>
+<br>
+1.10.2 Ownership Rules
+            
+</h2>
+
+<p>
+Whenever an object reference is passed into or out of a function, it
+is part of the function's interface specification whether ownership is
+transferred with the reference or not.
+
+<p>
+Most functions that return a reference to an object pass on ownership
+with the reference.  In particular, all functions whose function it is
+to create a new object, such as <tt class="cfunction">PyInt_FromLong()</tt> and
+<tt class="cfunction">Py_BuildValue()</tt>, pass ownership to the receiver.  Even if
+the object is not actually new, you still receive ownership of a new
+reference to that object.  For instance, <tt class="cfunction">PyInt_FromLong()</tt>
+maintains a cache of popular values and can return a reference to a
+cached item.
+
+<p>
+Many functions that extract objects from other objects also transfer
+ownership with the reference, for instance
+<tt class="cfunction">PyObject_GetAttrString()</tt>.  The picture is less clear, here,
+however, since a few common routines are exceptions:
+<tt class="cfunction">PyTuple_GetItem()</tt>, <tt class="cfunction">PyList_GetItem()</tt>,
+<tt class="cfunction">PyDict_GetItem()</tt>, and <tt class="cfunction">PyDict_GetItemString()</tt>
+all return references that you borrow from the tuple, list or
+dictionary.
+
+<p>
+The function <tt class="cfunction">PyImport_AddModule()</tt> also returns a borrowed
+reference, even though it may actually create the object it returns:
+this is possible because an owned reference to the object is stored in
+<code>sys.modules</code>.
+
+<p>
+When you pass an object reference into another function, in general,
+the function borrows the reference from you -- if it needs to store
+it, it will use <tt class="cfunction">Py_INCREF()</tt> to become an independent
+owner.  There are exactly two important exceptions to this rule:
+<tt class="cfunction">PyTuple_SetItem()</tt> and <tt class="cfunction">PyList_SetItem()</tt>.  These
+functions take over ownership of the item passed to them -- even if
+they fail!  (Note that <tt class="cfunction">PyDict_SetItem()</tt> and friends don't
+take over ownership -- they are ``normal.'')
+
+<p>
+When a C function is called from Python, it borrows references to its
+arguments from the caller.  The caller owns a reference to the object,
+so the borrowed reference's lifetime is guaranteed until the function
+returns.  Only when such a borrowed reference must be stored or passed
+on, it must be turned into an owned reference by calling
+<tt class="cfunction">Py_INCREF()</tt>.
+
+<p>
+The object reference returned from a C function that is called from
+Python must be an owned reference -- ownership is transferred from
+the function to its caller.
+
+<p>
+
+<div class="navigation">
+<div class='online-navigation'>
+<p></p><hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class='online-navigation'><a rel="prev" title="1.10.1 reference Counting in"
+  href="refcountsInPython.html"><img src='../icons/previous.png'
+  border='0' height='32'  alt='Previous Page' width='32' /></a></td>
+<td class='online-navigation'><a rel="parent" title="1.10 reference Counts"
+  href="refcounts.html"><img src='../icons/up.png'
+  border='0' height='32'  alt='Up one Level' width='32' /></a></td>
+<td class='online-navigation'><a rel="next" title="1.10.3 thin Ice"
+  href="thinIce.html"><img src='../icons/next.png'
+  border='0' height='32'  alt='Next Page' width='32' /></a></td>
+<td align="center" width="100%">Extending and Embedding the Python Interpreter</td>
+<td class='online-navigation'><a rel="contents" title="Table of Contents"
+  href="contents.html"><img src='../icons/contents.png'
+  border='0' height='32'  alt='Contents' width='32' /></a></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+<td class='online-navigation'><img src='../icons/blank.png'
+  border='0' height='32'  alt='' width='32' /></td>
+</tr></table>
+<div class='online-navigation'>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="refcountsInPython.html">1.10.1 Reference Counting in</a>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" href="refcounts.html">1.10 Reference Counts</a>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" href="thinIce.html">1.10.3 Thin Ice</a>
+</div>
+</div>
+<hr />
+<span class="release-info">Release 2.5.1, documentation updated on 18th April, 2007.</span>
+</div>
+<!--End of Navigation Panel-->
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+</body>
+</html>
