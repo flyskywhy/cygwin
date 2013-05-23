@@ -3,6 +3,14 @@
 # Li Zheng <flyskywhy@gmail.com>
 # 2013.5.20
 
+set_attrib_on_all()
+{
+    all=`find $1 -name "*" | xargs file | grep 012 | sed "s/:.*//g"`
+    for i in $all; do
+        attrib +s $i
+    done
+}
+
 set_attrib_on_exe()
 {
     all=`find $1 -name "*.exe" | xargs file | grep 012 | sed "s/:.*//g"`
@@ -27,7 +35,8 @@ set_attrib_on_la()
     done
 }
 
-set_attrib_on_exe ./bin
+set_attrib_on_all ./bin
+set_attrib_on_all ./usr/sbin
 set_attrib_on_exe ./usr
 set_attrib_on_a ./usr
 set_attrib_on_a ./lib
