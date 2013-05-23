@@ -1,6 +1,6 @@
 @echo off
 
-z:
-chdir z:\program\cygwin\bin
+c:
+chdir c:\cygwin\bin
 
 bash --login -i
