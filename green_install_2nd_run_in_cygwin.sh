@@ -1,43 +1,23 @@
 #! /bin/sh
 #
+# There're many symlink in cygwin, but if not attrib +s, the symlink can't work
+# even Cygwin.bat can still work. setup.exe from www.cygwin.com will automatically
+# attrib +s them, so we need run this shell script with this green cygwin manually.
 # Li Zheng <flyskywhy@gmail.com>
-# 2013.5.20
+# 2013.6.6
 
-set_attrib_on_all()
+set_attrib()
 {
-    all=`find $1 -name "*" | xargs file | grep 012 | sed "s/:.*//g"`
+    all=`find $1 -name "*" -print0 | xargs -0 grep "^\!<symlink>" -l`
     for i in $all; do
         attrib +s $i
     done
 }
 
-set_attrib_on_exe()
-{
-    all=`find $1 -name "*.exe" | xargs file | grep 012 | sed "s/:.*//g"`
-    for i in $all; do
-        attrib +s $i
-    done
-}
-
-set_attrib_on_a()
-{
-    all=`find $1 -name "*.a" | xargs file | grep 012 | sed "s/:.*//g"`
-    for i in $all; do
-        attrib +s $i
-    done
-}
-
-set_attrib_on_la()
-{
-    all=`find $1 -name "*.la" | xargs file | grep 012 | sed "s/:.*//g"`
-    for i in $all; do
-        attrib +s $i
-    done
-}
-
-set_attrib_on_all ./bin
-set_attrib_on_all ./usr/sbin
-set_attrib_on_exe ./usr
-set_attrib_on_a ./usr
-set_attrib_on_a ./lib
-set_attrib_on_la ./lib
+set_attrib ./bin
+set_attrib ./etc
+set_attrib ./lib
+set_attrib ./opt
+set_attrib ./srv
+set_attrib ./usr
+set_attrib ./var
