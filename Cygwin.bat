@@ -1,8 +1,8 @@
 @echo off
 
-set HOME=c:\cygwin\home\default
+set HOME=d:\cygwin\home\default
 
-c:
-chdir c:\cygwin\bin
+d:
+chdir d:\cygwin\bin
 
 bash --login -i
